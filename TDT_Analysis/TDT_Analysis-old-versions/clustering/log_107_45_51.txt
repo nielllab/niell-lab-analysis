@@ -1,0 +1,4319 @@
+ 
+  To get started, type one of these: helpwin, helpdesk, or demo.
+  For product information, visit www.mathworks.com.
+ 
+Maximum possible array:            1347 MB (1.412e+009 bytes) *
+Memory available for all arrays:   2643 MB (2.771e+009 bytes) **
+Memory used by MATLAB:              208 MB (2.183e+008 bytes)
+Physical Memory (RAM):             3326 MB (3.488e+009 bytes)
+
+*  Limited by contiguous virtual address space available.
+** Limited by virtual address space available.
+
+blocks = 
+
+    'adrec107-45'    'adrec107-46'    'adrec107-47'    'adrec107-48'    'adrec107-49'    'adrec107-50'    'adrec107-51'
+
+
+ans =
+
+     9
+
+
+done =
+
+     0
+
+
+Event_Name_Snip =
+
+Snip
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 1 : noise = 10.659306
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 1 : noise = 10.305982
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 1 : noise = 12.194998
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 1 : noise = 10.492424
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 1 : noise = 9.205807
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 1 : noise = 11.537260
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 1 : noise = 10.361628
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 2 : noise = 10.003554
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 2 : noise = 9.493581
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 2 : noise = 10.614786
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 2 : noise = 9.463506
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 2 : noise = 8.853840
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 2 : noise = 10.457558
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 2 : noise = 9.364450
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 3 : noise = 9.972384
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 3 : noise = 9.610817
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 3 : noise = 10.496994
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 3 : noise = 9.328588
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 3 : noise = 8.927601
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 3 : noise = 10.035306
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 3 : noise = 9.284330
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 4 : noise = 10.000477
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 4 : noise = 9.880973
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 4 : noise = 10.782268
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 4 : noise = 9.476734
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 4 : noise = 9.267231
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 4 : noise = 10.354631
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 4 : noise = 9.663849
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 196
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 248
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 253
+  In cluster_adrec107_45_51 at 12
+
+ica_fig =
+
+     2
+
+
+ans =
+
+       50000          76
+
+Number of signals: 76
+Number of samples: 50000
+Calculating covariance...
+Reducing dimension...
+Selected [ 8 ] dimensions.
+Smallest remaining (non-zero) eigenvalue [ 150.382 ]
+Largest remaining (non-zero) eigenvalue [ 9922.8 ]
+Sum of removed eigenvalues [ 729.655 ]
+[ 94.5641 ] % of (non-zero) eigenvalues retained.
+Whitening...
+Check: covariance differs from identity by [ 2.44249e-015 ].
+Used approach [ symm ].
+Used nonlinearity [ tanh ].
+Using stabilized algorithm.
+Starting ICA calculation...
+Step no. 1
+Step no. 2, change in value of estimate: 0.847 
+Step no. 3, change in value of estimate: 0.78 
+Step no. 4, change in value of estimate: 0.164 
+Step no. 5, change in value of estimate: 0.0255 
+Step no. 6, change in value of estimate: 0.0139 
+Step no. 7, change in value of estimate: 0.00848 
+Step no. 8, change in value of estimate: 0.00461 
+Step no. 9, change in value of estimate: 0.00359 
+Step no. 10, change in value of estimate: 0.00295 
+Step no. 11, change in value of estimate: 0.00204 
+Step no. 12, change in value of estimate: 0.0012 
+Step no. 13, change in value of estimate: 0.000634 
+Step no. 14, change in value of estimate: 0.000321 
+Step no. 15, change in value of estimate: 0.000172 
+Convergence after 16 steps
+Adding the mean back to the data.
+
+ans =
+
+    2.4937    0.9013   -0.3718   -0.2735    0.3438    1.9803    2.6412   -0.5080    0.8275    0.0327
+    0.4004   -0.4335    0.4593   -0.4082    0.1773    0.6518    0.9436    1.2306    0.5540   -1.1571
+    1.4737   -0.2112   -0.0295   -0.2549   -0.5808    0.2918   -0.2071    2.0615    0.4943    0.1277
+    0.8988    1.1363   -0.1909    1.2701   -0.5043    0.7251   -0.2527    0.4369    0.0681    1.3822
+   -1.1691    1.1159   -0.1136    2.8231   -1.6140   -0.8297    1.0807   -0.3142   -0.2649   -0.0213
+    0.0011   -0.3102    0.8854   -0.2315   -0.2151    0.9575    1.0244   -0.0580    0.2363    0.5198
+   -0.2556   -0.2654    0.2608   -0.2519   -0.9765    0.7143   -2.0145    0.9460    1.4690   -0.7018
+   -0.2047   -0.4373   -0.3190    1.9213    0.5451   -0.2960    0.9523   -0.1637   -0.0150   -2.1842
+
+
+ans =
+
+    1.4599    2.4937    0.9013   -0.5395   -0.3718   -0.2735    0.0029    0.3438    1.9803   -1.4541
+    0.3350    0.4004   -0.4335   -0.1967    0.4593   -0.4082    0.0925    0.1773    0.6518    0.0757
+    1.9689    1.4737   -0.2112    0.2490   -0.0295   -0.2549   -0.0430   -0.5808    0.2918   -0.5146
+    1.7454    0.8988    1.1363    0.4400   -0.1909    1.2701    1.1747   -0.5043    0.7251    2.8578
+   -0.3542   -1.1691    1.1159   -0.2491   -0.1136    2.8231   -0.3645   -1.6140   -0.8297    1.0856
+   -1.6191    0.0011   -0.3102   -0.3033    0.8854   -0.2315    0.7415   -0.2151    0.9575   -0.2966
+    0.6187   -0.2556   -0.2654   -0.3526    0.2608   -0.2519    0.3028   -0.9765    0.7143    0.8097
+   -0.2136   -0.2047   -0.4373   -2.9027   -0.3190    1.9213    0.7160    0.5451   -0.2960    1.9697
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 307
+  In cluster_adrec107_45_51 at 12
+
+select_ica =
+
+n
+
+
+fname =
+
+pca.fet.1
+
+
+ans =
+
+clustering data .....
+
+FileBase	pca
+ElecNo	1
+MinClusters	5
+MaxClusters	10
+MaxPossibleClusters	12
+nStarts	2
+RandomSeed	1
+Debug	0
+Verbose	0
+UseFeatures	11111111111100001
+DistDump	0
+DistThresh	6.907755
+FullStepEvery	20
+ChangedThresh	0.050000
+Log	1
+Screen	1
+MaxIter	500
+StartCluFile	
+SplitEvery	40
+PenaltyMix	1.000000
+Subset	1
+help	0
+Loaded 77460 data points of dimension 8.
+Starting from 5 clusters...
+--- Clustering full data set of 77460 points ---
+Splitting cluster 1 changes total score from -756889.187500 to -757194.875000
+So it's getting split into cluster 5.
+Splitting cluster 2 changes total score from -756889.187500 to -761336.250000
+So it's getting split into cluster 6.
+Splitting cluster 3 changes total score from -756889.187500 to -765148.312500
+So it's getting split into cluster 7.
+Splitting cluster 3 changes total score from -766704.062500 to -766662.687500
+So it's not getting split.
+Splitting cluster 4 changes total score from -766704.062500 to -767283.125000
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -766704.062500 to -767230.125000
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -768324.812500 to -770331.750000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+5->11 Clusters: Score -771660.437500, best is 100000003318135351409612647563264.000000
+THE BEST YET!
+
+Starting from 5 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 1. Lose 235.037827 but Gain 253.294128
+Splitting cluster 2 changes total score from -740139.937500 to -748821.250000
+So it's getting split into cluster 1.
+Splitting cluster 3 changes total score from -740139.937500 to -749029.937500
+So it's getting split into cluster 5.
+Splitting cluster 4 changes total score from -740139.937500 to -753478.687500
+So it's getting split into cluster 6.
+Splitting cluster 1 changes total score from -757265.500000 to -759491.375000
+So it's getting split into cluster 7.
+Splitting cluster 2 changes total score from -757265.500000 to -760212.937500
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -757265.500000 to -760281.125000
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -757265.500000 to -760660.312500
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+5->11 Clusters: Score -772311.187500, best is -771660.437500
+THE BEST YET!
+
+Starting from 6 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 3. Lose 191.326736 but Gain 253.294189
+Splitting cluster 1 changes total score from -748066.562500 to -748023.812500
+So it's not getting split.
+Splitting cluster 4 changes total score from -748066.562500 to -751369.562500
+So it's getting split into cluster 3.
+Splitting cluster 5 changes total score from -748066.562500 to -756916.500000
+So it's getting split into cluster 6.
+Splitting cluster 1 changes total score from -762568.000000 to -763177.062500
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -762568.000000 to -765128.687500
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -762568.000000 to -765566.937500
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -771946.312500 to -772414.687500
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+6->11 Clusters: Score -772672.500000, best is -772311.187500
+THE BEST YET!
+
+Starting from 6 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 5. Lose 154.503616 but Gain 253.294189
+Splitting cluster 1 changes total score from -756275.500000 to -756952.750000
+So it's getting split into cluster 5.
+Splitting cluster 2 changes total score from -756275.500000 to -759010.062500
+So it's getting split into cluster 6.
+Splitting cluster 3 changes total score from -756275.500000 to -762069.312500
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -756275.500000 to -762327.812500
+So it's getting split into cluster 8.
+Splitting cluster 3 changes total score from -771676.000000 to -772073.500000
+So it's getting split into cluster 9.
+Splitting cluster 4 changes total score from -771676.000000 to -772019.875000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+6->11 Clusters: Score -772389.500000, best is -772672.500000
+
+Starting from 7 clusters...
+--- Clustering full data set of 77460 points ---
+Splitting cluster 2 changes total score from -760645.750000 to -763033.187500
+So it's getting split into cluster 7.
+Splitting cluster 3 changes total score from -760645.750000 to -762992.812500
+So it's getting split into cluster 8.
+Splitting cluster 4 changes total score from -760645.750000 to -764006.000000
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -760645.750000 to -764486.000000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+7->11 Clusters: Score -771843.187500, best is -772672.500000
+
+Starting from 7 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 3. Lose 194.710236 but Gain 253.294067
+Splitting cluster 1 changes total score from -760889.062500 to -760877.687500
+So it's not getting split.
+Splitting cluster 2 changes total score from -760889.062500 to -760985.937500
+So it's getting split into cluster 3.
+Splitting cluster 6 changes total score from -760889.062500 to -768585.437500
+So it's getting split into cluster 7.
+Splitting cluster 1 changes total score from -770441.562500 to -770844.500000
+So it's getting split into cluster 8.
+Splitting cluster 2 changes total score from -770441.562500 to -770818.375000
+So it's getting split into cluster 9.
+Splitting cluster 5 changes total score from -770441.562500 to -771431.437500
+So it's getting split into cluster 10.
+Splitting cluster 7 changes total score from -770441.562500 to -771434.625000
+So it's getting split into cluster 11.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+7->12 Clusters: Score -772726.250000, best is -772672.500000
+THE BEST YET!
+
+Starting from 8 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 7. Lose 217.027802 but Gain 253.294189
+Deleting Class 4. Lose 225.709305 but Gain 253.294067
+Splitting cluster 1 changes total score from -757401.625000 to -764122.875000
+So it's getting split into cluster 4.
+Splitting cluster 2 changes total score from -757401.625000 to -764335.687500
+So it's getting split into cluster 7.
+Splitting cluster 3 changes total score from -757401.625000 to -764701.000000
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -757401.625000 to -768574.375000
+So it's getting split into cluster 9.
+8->10 Clusters: Score -771689.312500, best is -772726.250000
+
+Starting from 8 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 5. Lose 128.029709 but Gain 253.294189
+Splitting cluster 2 changes total score from -763198.562500 to -764918.187500
+So it's getting split into cluster 5.
+Splitting cluster 6 changes total score from -763198.562500 to -765518.250000
+So it's getting split into cluster 8.
+Splitting cluster 7 changes total score from -763198.562500 to -765705.500000
+So it's getting split into cluster 9.
+Splitting cluster 1 changes total score from -767699.625000 to -767950.562500
+So it's getting split into cluster 10.
+Splitting cluster 7 changes total score from -767699.625000 to -767986.375000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitDeleting Class 4. Lose 236.966461 but Gain 253.293945
+Won't try splitting - already at maximum number of clusters
+8->11 Clusters: Score -768768.125000, best is -772726.250000
+
+Starting from 9 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 5. Lose 63.625946 but Gain 253.294067
+Splitting cluster 1 changes total score from -768070.375000 to -768326.750000
+So it's getting split into cluster 5.
+Splitting cluster 3 changes total score from -768070.375000 to -771058.375000
+So it's getting split into cluster 9.
+Splitting cluster 7 changes total score from -768070.375000 to -771417.625000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+9->11 Clusters: Score -772569.062500, best is -772726.250000
+
+Starting from 9 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 1. Lose 66.349907 but Gain 253.294067
+Deleting Class 7. Lose 157.775909 but Gain 253.294189
+Splitting cluster 2 changes total score from -762813.187500 to -762758.875000
+So it's not getting split.
+Splitting cluster 3 changes total score from -762813.187500 to -763136.875000
+So it's getting split into cluster 1.
+Splitting cluster 4 changes total score from -762813.187500 to -763362.875000
+So it's getting split into cluster 7.
+Splitting cluster 8 changes total score from -762813.187500 to -767267.000000
+So it's getting split into cluster 9.
+Splitting cluster 9 changes total score from -768327.500000 to -770332.125000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+9->11 Clusters: Score -771625.937500, best is -772726.250000
+
+Starting from 10 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 8. Lose 85.961197 but Gain 253.294189
+Deleting Class 3. Lose 248.112656 but Gain 253.294067
+Splitting cluster 4 changes total score from -765034.750000 to -765394.562500
+So it's getting split into cluster 3.
+Splitting cluster 5 changes total score from -765034.750000 to -770621.375000
+So it's getting split into cluster 8.
+Splitting cluster 9 changes total score from -765034.750000 to -770819.812500
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+10->11 Clusters: Score -772620.687500, best is -772726.250000
+
+Starting from 10 clusters...
+--- Clustering full data set of 77460 points ---
+Deleting Class 8. Lose 98.351585 but Gain 253.294189
+Deleting Class 3. Lose 177.608002 but Gain 253.294067
+Splitting cluster 5 changes total score from -766899.750000 to -767189.562500
+So it's getting split into cluster 3.
+Splitting cluster 6 changes total score from -766899.750000 to -770889.375000
+So it's getting split into cluster 8.
+Splitting cluster 3 changes total score from -771925.500000 to -771849.062500
+So it's not getting split.
+Splitting cluster 6 changes total score from -771925.500000 to -771907.500000
+So it's not getting split.
+10->10 Clusters: Score -771925.500000, best is -772726.250000
+
+That took 172.750015 seconds.
+Elapsed time is 173.508182 seconds.
+
+n_clust =
+
+   12
+
+
+t =
+
+     1
+
+
+t =
+
+     2
+
+
+t =
+
+     3
+
+
+t =
+
+     4
+
+
+clust_size =
+
+  Columns 1 through 11
+
+          18        1365         993        3966        4222         913        8133       29744         443        1213       24297
+
+  Column 12
+
+        2153
+
+
+noise =
+
+  1.0e-004 *
+
+    0.1116
+    0.1008
+    0.0998
+    0.1019
+
+
+amp =
+
+  1.0e-004 *
+
+   -0.4365   -0.3277   -0.3032   -0.4494
+   -0.3295   -0.3074   -0.2959   -0.3346
+   -0.4248   -0.2574   -0.2211   -0.2735
+   -0.4770   -0.2086   -0.1240   -0.1653
+   -0.2826   -0.4394   -0.2452   -0.2356
+   -0.9875   -0.2477   -0.1940   -0.3528
+   -0.1694   -0.2197   -0.3980   -0.1975
+   -0.2701   -0.2597   -0.2728   -0.3475
+   -0.7830   -0.2723   -0.2574   -0.3084
+   -0.3394   -0.1533   -0.1341   -0.3708
+   -0.8825   -0.1497   -0.1265   -0.2919
+   -0.1666   -0.0979   -0.1368   -0.4049
+
+
+spread =
+
+  1.0e-004 *
+
+    0.3338    0.2079    0.1387    0.2718
+    0.1276    0.1261    0.1176    0.1071
+    0.0913    0.1133    0.1141    0.1083
+    0.0699    0.0903    0.0813    0.0846
+    0.1001    0.0809    0.1016    0.1092
+    0.1856    0.1738    0.1600    0.1790
+    0.0805    0.0782    0.0592    0.0832
+    0.0960    0.1044    0.0975    0.0747
+    0.2036    0.1240    0.1181    0.1096
+    0.0815    0.0803    0.0731    0.0644
+    0.1421    0.1004    0.0998    0.1062
+    0.0811    0.0705    0.0741    0.0741
+
+
+c =
+
+    1
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     4
+
+
+c =
+
+    1
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3925
+   -0.3171
+   -0.2069
+   -0.0956
+   -0.0033
+    0.0690
+    0.1285
+    0.1802
+    0.2277
+    0.2742
+    0.3180
+    0.3558
+    0.3813
+    0.3878
+
+
+ans =
+
+  3.8776e-005
+
+
+c =
+
+    2
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     4
+
+
+c =
+
+    2
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.2918
+   -0.2203
+   -0.1237
+   -0.0273
+    0.0475
+    0.0900
+    0.1016
+    0.0920
+    0.0744
+    0.0599
+    0.0537
+    0.0572
+    0.0704
+
+
+ans =
+
+  1.0163e-005
+
+
+c =
+
+    3
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     1
+
+
+c =
+
+    3
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3900
+   -0.3276
+   -0.2396
+   -0.1454
+   -0.0609
+    0.0049
+    0.0500
+    0.0769
+    0.0910
+    0.0976
+    0.1001
+    0.1004
+    0.0991
+
+
+ans =
+
+  1.0044e-005
+
+
+c =
+
+    4
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     1
+
+
+c =
+
+    4
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4379
+   -0.3447
+   -0.2185
+   -0.0866
+    0.0322
+    0.1278
+    0.1977
+    0.2438
+    0.2703
+    0.2824
+    0.2849
+    0.2817
+    0.2755
+
+
+ans =
+
+  2.8490e-005
+
+
+c =
+
+    5
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     2
+
+
+c =
+
+    5
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3723
+   -0.2700
+   -0.1355
+    0.0073
+    0.1376
+    0.2408
+    0.3095
+    0.3429
+    0.3455
+    0.3253
+    0.2911
+    0.2508
+    0.2102
+
+
+ans =
+
+  3.4547e-005
+
+
+c =
+
+    6
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     1
+
+
+c =
+
+    6
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.7883
+   -0.4549
+   -0.0462
+    0.3483
+    0.6686
+    0.8831
+    0.9836
+    0.9820
+    0.9040
+    0.7802
+    0.6385
+    0.4997
+    0.3746
+
+
+ans =
+
+  9.8359e-005
+
+
+c =
+
+    7
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     3
+
+
+c =
+
+    7
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3830
+   -0.3256
+   -0.2298
+   -0.1183
+   -0.0103
+    0.0830
+    0.1569
+    0.2108
+    0.2462
+    0.2651
+    0.2699
+    0.2637
+    0.2499
+    0.2313
+
+
+ans =
+
+  2.6989e-005
+
+
+c =
+
+    8
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     4
+
+
+c =
+
+    8
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3052
+   -0.2215
+   -0.1105
+   -0.0009
+    0.0863
+    0.1422
+    0.1681
+    0.1712
+    0.1601
+    0.1419
+    0.1219
+    0.1030
+    0.0867
+
+
+ans =
+
+  1.7121e-005
+
+
+c =
+
+    9
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     1
+
+
+c =
+
+    9
+
+
+trough_t =
+
+    10
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.6058
+   -0.3843
+   -0.0717
+    0.2663
+    0.5687
+    0.7950
+    0.9278
+    0.9676
+    0.9284
+
+
+ans =
+
+  9.6763e-005
+
+
+c =
+
+   10
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     4
+
+
+c =
+
+   10
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3311
+   -0.2472
+   -0.1412
+   -0.0353
+    0.0565
+    0.1266
+    0.1731
+    0.1990
+    0.2096
+    0.2101
+    0.2050
+    0.1977
+    0.1903
+    0.1836
+
+
+ans =
+
+  2.1015e-005
+
+
+c =
+
+   11
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     1
+
+
+c =
+
+   11
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.7024
+   -0.3820
+    0.0028
+    0.3675
+    0.6585
+    0.8487
+    0.9315
+    0.9187
+    0.8355
+    0.7110
+    0.5708
+    0.4330
+    0.3084
+
+
+ans =
+
+  9.3155e-005
+
+
+c =
+
+   12
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     4
+
+
+c =
+
+   12
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3827
+   -0.3224
+   -0.2310
+   -0.1302
+   -0.0364
+    0.0418
+    0.1016
+    0.1442
+    0.1727
+    0.1904
+    0.2003
+    0.2046
+    0.2052
+    0.2031
+
+
+ans =
+
+  2.0517e-005
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 5 : noise = 6.650566
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 5 : noise = 7.741706
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 5 : noise = 7.269873
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 5 : noise = 6.721069
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 5 : noise = 6.701648
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 5 : noise = 6.408078
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 5 : noise = 6.710498
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 6 : noise = 7.877469
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 6 : noise = 8.596985
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 6 : noise = 8.651778
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 6 : noise = 7.922087
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 6 : noise = 7.962136
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 6 : noise = 7.220932
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 6 : noise = 7.348534
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 7 : noise = 7.410025
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 7 : noise = 8.582183
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 7 : noise = 7.982439
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 7 : noise = 7.676977
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 7 : noise = 7.469901
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 7 : noise = 6.893581
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 7 : noise = 6.909565
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 8 : noise = 7.184504
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 8 : noise = 8.095283
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 8 : noise = 7.679845
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 8 : noise = 7.352443
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 8 : noise = 6.813346
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 8 : noise = 6.956426
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 8 : noise = 6.826904
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 196
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 248
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 253
+  In cluster_adrec107_45_51 at 12
+
+ica_fig =
+
+     2
+
+
+ans =
+
+       13197          76
+
+Number of signals: 76
+Number of samples: 13197
+Calculating covariance...
+Reducing dimension...
+Selected [ 8 ] dimensions.
+Smallest remaining (non-zero) eigenvalue [ 67.7553 ]
+Largest remaining (non-zero) eigenvalue [ 267.793 ]
+Sum of removed eigenvalues [ 324.516 ]
+[ 78.3717 ] % of (non-zero) eigenvalues retained.
+Whitening...
+Check: covariance differs from identity by [ 1.66533e-015 ].
+Used approach [ symm ].
+Used nonlinearity [ tanh ].
+Using stabilized algorithm.
+Starting ICA calculation...
+Step no. 1
+Step no. 2, change in value of estimate: 0.855 
+Step no. 3, change in value of estimate: 0.432 
+Step no. 4, change in value of estimate: 0.712 
+Step no. 5, change in value of estimate: 0.125 
+Step no. 6, change in value of estimate: 0.0588 
+Step no. 7, change in value of estimate: 0.0771 
+Step no. 8, change in value of estimate: 0.0461 
+Step no. 9, change in value of estimate: 0.0147 
+Step no. 10, change in value of estimate: 0.00811 
+Step no. 11, change in value of estimate: 0.00485 
+Step no. 12, change in value of estimate: 0.00361 
+Step no. 13, change in value of estimate: 0.00324 
+Step no. 14, change in value of estimate: 0.00275 
+Step no. 15, change in value of estimate: 0.00261 
+Step no. 16, change in value of estimate: 0.00232 
+Step no. 17, change in value of estimate: 0.00218 
+Step no. 18, change in value of estimate: 0.00196 
+Step no. 19, change in value of estimate: 0.00183 
+Step no. 20, change in value of estimate: 0.00163 
+Step no. 21, change in value of estimate: 0.00151 
+Stroke!
+Step no. 22, change in value of estimate: 0.00134 
+Step no. 23, change in value of estimate: 0.00291 
+Step no. 24, change in value of estimate: 0.00327 
+Step no. 25, change in value of estimate: 0.00029 
+Step no. 26, change in value of estimate: 0.00011 
+Convergence after 27 steps
+Adding the mean back to the data.
+
+ans =
+
+   -1.9412   -1.0680    0.0898    1.5043    0.8147   -0.2911   -0.9477   -0.0319    0.4774   -1.0016
+   -0.6328    1.2907   -1.3581    0.0065   -0.3365   -0.4856   -1.8213   -0.5075   -0.8070   -0.3004
+   -0.0511    0.1528   -0.7272    0.8660    1.4700   -0.8723    0.7621   -0.8992   -2.0133   -0.1764
+    0.4191   -0.6260    0.4080   -0.5904   -0.1892    0.8486    0.7406   -0.3434   -1.2953    1.2503
+    0.8676    0.2456   -0.1024    0.1886    0.1066    0.9112   -1.1943    0.2816   -0.0149    1.1238
+   -1.7690   -0.5617    0.1959   -0.7495    0.4363    1.2725   -0.5192   -1.3532    0.6372   -0.8295
+   -0.6448   -1.5775    1.0178   -1.0845    0.4787   -0.2188   -0.1612   -1.7013    1.3804    0.5727
+   -0.8351   -0.2208   -1.4441    1.1980   -0.7189    1.9499    1.1884   -1.4732   -1.2258    0.1725
+
+
+ans =
+
+   -1.9412   -1.0680    0.0898    1.5043    0.8147   -0.2911   -0.9477   -0.0319    0.4774   -1.0016
+   -0.6328    1.2907   -1.3581    0.0065   -0.3365   -0.4856   -1.8213   -0.5075   -0.8070   -0.3004
+   -0.0511    0.1528   -0.7272    0.8660    1.4700   -0.8723    0.7621   -0.8992   -2.0133   -0.1764
+    0.4191   -0.6260    0.4080   -0.5904   -0.1892    0.8486    0.7406   -0.3434   -1.2953    1.2503
+    0.8676    0.2456   -0.1024    0.1886    0.1066    0.9112   -1.1943    0.2816   -0.0149    1.1238
+   -1.7690   -0.5617    0.1959   -0.7495    0.4363    1.2725   -0.5192   -1.3532    0.6372   -0.8295
+   -0.6448   -1.5775    1.0178   -1.0845    0.4787   -0.2188   -0.1612   -1.7013    1.3804    0.5727
+   -0.8351   -0.2208   -1.4441    1.1980   -0.7189    1.9499    1.1884   -1.4732   -1.2258    0.1725
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 307
+  In cluster_adrec107_45_51 at 12
+
+select_ica =
+
+n
+
+
+fname =
+
+pca.fet.1
+
+
+ans =
+
+clustering data .....
+
+FileBase	pca
+ElecNo	1
+MinClusters	5
+MaxClusters	10
+MaxPossibleClusters	12
+nStarts	2
+RandomSeed	1
+Debug	0
+Verbose	0
+UseFeatures	11111111111100001
+DistDump	0
+DistThresh	6.907755
+FullStepEvery	20
+ChangedThresh	0.050000
+Log	1
+Screen	1
+MaxIter	500
+StartCluFile	
+SplitEvery	40
+PenaltyMix	1.000000
+Subset	1
+help	0
+Loaded 13197 data points of dimension 8.
+Starting from 5 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 1. Lose 146.346008 but Gain 213.474243
+5->4 Clusters: Score -71526.632812, best is 100000003318135351409612647563264.000000
+THE BEST YET!
+
+Starting from 5 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 1. Lose 104.082024 but Gain 213.474243
+Deleting Class 3. Lose 140.193588 but Gain 213.474274
+Splitting cluster 2 changes total score from -71955.734375 to -71991.132812
+So it's getting split into cluster 1.
+5->4 Clusters: Score -72002.109375, best is -71526.632812
+THE BEST YET!
+
+Starting from 6 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 3. Lose 160.392044 but Gain 213.474304
+Deleting Class 5. Lose 198.736511 but Gain 213.474243
+Deleted class 2: not enough members
+6->4 Clusters: Score -72001.062500, best is -72002.109375
+
+Starting from 6 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 3. Lose 122.091362 but Gain 213.474304
+Deleting Class 1. Lose 180.613739 but Gain 213.474243
+6->4 Clusters: Score -71750.148438, best is -72002.109375
+
+Starting from 7 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 2. Lose 102.249947 but Gain 213.474243
+Deleting Class 5. Lose 200.214615 but Gain 213.474304
+7->5 Clusters: Score -71498.234375, best is -72002.109375
+
+Starting from 7 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 2. Lose 101.089821 but Gain 213.474243
+Deleting Class 1. Lose 194.667770 but Gain 213.474304
+Deleting Class 3. Lose 209.455566 but Gain 213.474243
+Deleting Class 4. Lose 168.977936 but Gain 213.474274
+Splitting cluster 5 changes total score from -71914.015625 to -71956.460938
+So it's getting split into cluster 1.
+7->4 Clusters: Score -72001.000000, best is -72002.109375
+
+Starting from 8 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 6. Lose 78.392715 but Gain 213.474243
+Deleting Class 2. Lose 133.858429 but Gain 213.474243
+Deleting Class 1. Lose 196.252594 but Gain 213.474304
+Deleting Class 4. Lose 181.469086 but Gain 213.474243
+8->4 Clusters: Score -71684.773438, best is -72002.109375
+
+Starting from 8 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 3. Lose 71.587196 but Gain 213.474243
+Deleting Class 1. Lose 188.243042 but Gain 213.474243
+Deleting Class 6. Lose 210.363083 but Gain 213.474304
+8->5 Clusters: Score -71769.859375, best is -72002.109375
+
+Starting from 9 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 7. Lose 68.388214 but Gain 213.474243
+Deleting Class 6. Lose 212.351883 but Gain 213.474243
+Deleting Class 4. Lose 200.810669 but Gain 213.474243
+Deleting Class 3. Lose 160.094238 but Gain 213.474304
+Deleting Class 2. Lose 153.195129 but Gain 213.474243
+9->4 Clusters: Score -72000.828125, best is -72002.109375
+
+Starting from 9 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 4. Lose 73.933815 but Gain 213.474243
+Deleting Class 3. Lose 191.288269 but Gain 213.474243
+Deleting Class 1. Lose 159.222412 but Gain 213.474243
+9->6 Clusters: Score -71600.070312, best is -72002.109375
+
+Starting from 10 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 2. Lose 71.877464 but Gain 213.474243
+Deleting Class 5. Lose 182.159470 but Gain 213.474243
+Deleting Class 7. Lose 203.172607 but Gain 213.474243
+Deleting Class 4. Lose 212.722382 but Gain 213.474243
+Deleting Class 8. Lose 212.776154 but Gain 213.474304
+Deleting Class 6. Lose 179.789963 but Gain 213.474243
+10->4 Clusters: Score -71696.601562, best is -72002.109375
+
+Starting from 10 clusters...
+--- Clustering full data set of 13197 points ---
+Deleting Class 1. Lose 27.580729 but Gain 213.474243
+Deleting Class 4. Lose 164.385529 but Gain 213.474243
+Deleting Class 3. Lose 176.760559 but Gain 213.474243
+Deleting Class 6. Lose 191.048965 but Gain 213.474243
+Deleting Class 5. Lose 204.957947 but Gain 213.474304
+10->5 Clusters: Score -71706.273438, best is -72002.109375
+
+That took 14.500001 seconds.
+Elapsed time is 14.564109 seconds.
+
+n_clust =
+
+    4
+
+
+t =
+
+     1
+
+
+t =
+
+     2
+
+
+t =
+
+     3
+
+
+t =
+
+     4
+
+
+clust_size =
+
+  Columns 1 through 11
+
+       11621         824         748        3966        4222         913        8133       29744         443        1213       24297
+
+  Column 12
+
+        2153
+
+
+noise =
+
+  1.0e-005 *
+
+    0.7009
+    0.8159
+    0.7755
+    0.7454
+
+
+amp =
+
+  1.0e-004 *
+
+   -0.1703   -0.1649   -0.2421   -0.2062
+   -0.2588   -0.1524   -0.1475   -0.1525
+   -0.1257   -0.2977   -0.1367   -0.1348
+
+
+spread =
+
+  1.0e-005 *
+
+    0.5897    0.6333    0.5160    0.6470
+    0.2059    0.6059    0.4965    0.4909
+    0.5416    0.1997    0.5611    0.5729
+
+
+c =
+
+    1
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     7
+
+
+c =
+
+    1
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.2229
+   -0.1841
+   -0.1305
+   -0.0729
+   -0.0193
+    0.0248
+    0.0570
+    0.0774
+    0.0877
+    0.0901
+    0.0870
+    0.0808
+    0.0732
+
+
+ans =
+
+  9.0102e-006
+
+
+c =
+
+    2
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     5
+
+
+c =
+
+    2
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.2400
+   -0.2011
+   -0.1478
+   -0.0913
+   -0.0398
+    0.0018
+    0.0320
+    0.0521
+    0.0636
+    0.0676
+    0.0668
+    0.0637
+    0.0600
+
+
+ans =
+
+  6.7638e-006
+
+
+c =
+
+    3
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     6
+
+
+c =
+
+    3
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.2657
+   -0.2158
+   -0.1546
+   -0.0947
+   -0.0439
+   -0.0050
+    0.0224
+    0.0399
+    0.0488
+    0.0517
+    0.0513
+    0.0494
+    0.0465
+
+
+ans =
+
+  5.1705e-006
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 9 : noise = 10.584481
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 9 : noise = 10.561543
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 9 : noise = 10.980192
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 9 : noise = 10.673077
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 9 : noise = 10.537203
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 9 : noise = 11.010202
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 9 : noise = 11.012468
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 10 : noise = 10.759188
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 10 : noise = 11.029273
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 10 : noise = 11.052175
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 10 : noise = 10.911223
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 10 : noise = 10.780184
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 10 : noise = 10.771558
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 10 : noise = 10.445583
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 11 : noise = 11.277193
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 11 : noise = 11.252263
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 11 : noise = 11.437785
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 11 : noise = 11.305376
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 11 : noise = 11.335915
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 11 : noise = 11.608859
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 11 : noise = 10.580102
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 12 : noise = 10.435947
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 12 : noise = 10.292958
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 12 : noise = 10.713852
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 12 : noise = 10.302684
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 12 : noise = 10.283104
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 12 : noise = 10.914285
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 12 : noise = 10.104938
+
+
+ans =
+
+warning missing spikes
+
+
+ans =
+
+     0
+
+
+i =
+
+      224856
+
+
+N =
+
+      224855
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 196
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 248
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 253
+  In cluster_adrec107_45_51 at 12
+
+ica_fig =
+
+     2
+
+
+ans =
+
+       50000          76
+
+Number of signals: 76
+Number of samples: 50000
+Calculating covariance...
+Reducing dimension...
+Selected [ 8 ] dimensions.
+Smallest remaining (non-zero) eigenvalue [ 296.741 ]
+Largest remaining (non-zero) eigenvalue [ 10554.7 ]
+Sum of removed eigenvalues [ 1073.59 ]
+[ 93.6911 ] % of (non-zero) eigenvalues retained.
+Whitening...
+Check: covariance differs from identity by [ 5.9952e-015 ].
+Used approach [ symm ].
+Used nonlinearity [ tanh ].
+Using stabilized algorithm.
+Starting ICA calculation...
+Step no. 1
+Step no. 2, change in value of estimate: 0.958 
+Step no. 3, change in value of estimate: 0.819 
+Step no. 4, change in value of estimate: 0.508 
+Step no. 5, change in value of estimate: 0.113 
+Step no. 6, change in value of estimate: 0.0299 
+Step no. 7, change in value of estimate: 0.0119 
+Step no. 8, change in value of estimate: 0.00403 
+Step no. 9, change in value of estimate: 0.00108 
+Step no. 10, change in value of estimate: 0.000234 
+Convergence after 11 steps
+Adding the mean back to the data.
+
+ans =
+
+    0.3394   -3.6086    0.8167    1.2199   -0.6299   -0.5789   -0.2695    0.0170   -1.6137   -1.5817
+   -0.4503    2.1093    1.2077    0.5173   -0.2973   -0.9520    1.0315    0.3588   -0.6510    0.2647
+    0.2805    0.5516   -1.2693    0.8114    0.4367    0.6042   -0.9004   -0.3664   -1.8863   -0.2400
+    0.0132   -0.9678    1.3412    0.8658    0.2792    0.5716   -0.8580    0.2741    0.1855    0.4867
+   -0.9151   -0.4763    1.6081    0.9061   -0.6486   -0.5688   -1.6597    0.4486    0.9530    0.9398
+    0.7314    0.0083   -0.4873   -0.0264    0.3251    0.9660   -0.4840    3.0333   -0.5732   -0.6314
+   -0.2415    2.8434    0.2543    0.1206   -0.6008    0.4207    0.5747   -1.3706   -0.0387    0.6216
+    1.6286    1.6158    0.7309    1.5485    1.3438    1.0973    1.6327    2.2819    1.7566    1.5660
+
+
+ans =
+
+    0.7015   -0.8390    0.0231    0.3394   -0.0713   -0.7221    0.4626    1.0536   -3.6086   -1.1982
+   -0.4282   -0.3509   -0.4868   -0.4503    1.2688    3.6518   -0.3862    1.3450    2.1093   -0.0713
+    0.1083    0.0589    0.2663    0.2805    1.2440    0.0670    0.0197    1.3299    0.5516    0.4997
+   -0.4796   -0.0338   -0.3356    0.0132   -1.7602   -1.3836    0.2951   -0.7492   -0.9678    0.0050
+   -0.7111   -0.8949   -0.2674   -0.9151    0.7545   -0.9627   -0.3916    0.2026   -0.4763   -0.2865
+    0.7076    0.1781    0.8941    0.7314    0.6147   -1.8083   -0.4923    0.4911    0.0083   -0.7190
+   -0.2843   -0.6111    0.3099   -0.2415    0.4475    0.6318   -0.0401   -0.3080    2.8434   -0.2097
+    1.2613    0.3471    1.0878    1.6286    1.3597    2.1157   -0.0782    4.2634    1.6158    0.9020
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 307
+  In cluster_adrec107_45_51 at 12
+
+select_ica =
+
+n
+
+
+fname =
+
+pca.fet.1
+
+
+ans =
+
+clustering data .....
+
+FileBase	pca
+ElecNo	1
+MinClusters	5
+MaxClusters	10
+MaxPossibleClusters	12
+nStarts	2
+RandomSeed	1
+Debug	0
+Verbose	0
+UseFeatures	11111111111100001
+DistDump	0
+DistThresh	6.907755
+FullStepEvery	20
+ChangedThresh	0.050000
+Log	1
+Screen	1
+MaxIter	500
+StartCluFile	
+SplitEvery	40
+PenaltyMix	1.000000
+Subset	1
+help	0
+Loaded 222425 data points of dimension 8.
+Starting from 5 clusters...
+--- Clustering full data set of 222425 points ---
+Splitting cluster 1 changes total score from -2357708.500000 to -2358467.250000
+So it's getting split into cluster 5.
+Splitting cluster 2 changes total score from -2357708.500000 to -2367519.750000
+So it's getting split into cluster 6.
+Splitting cluster 3 changes total score from -2357708.500000 to -2412319.250000
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -2357708.500000 to -2415386.250000
+So it's getting split into cluster 8.
+Splitting cluster 1 changes total score from -2458503.500000 to -2458592.500000
+So it's getting split into cluster 9.
+Splitting cluster 2 changes total score from -2458503.500000 to -2461608.500000
+So it's getting split into cluster 10.
+Splitting cluster 3 changes total score from -2458503.500000 to -2463117.750000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+5->12 Clusters: Score -2467367.000000, best is 100000003318135351409612647563264.000000
+THE BEST YET!
+
+Starting from 5 clusters...
+--- Clustering full data set of 222425 points ---
+Splitting cluster 1 changes total score from -2365941.750000 to -2369351.250000
+So it's getting split into cluster 5.
+Splitting cluster 2 changes total score from -2365941.750000 to -2374498.500000
+So it's getting split into cluster 6.
+Splitting cluster 3 changes total score from -2365941.750000 to -2412425.750000
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -2365941.750000 to -2421444.250000
+So it's getting split into cluster 8.
+Splitting cluster 1 changes total score from -2461897.000000 to -2462656.000000
+So it's getting split into cluster 9.
+Splitting cluster 2 changes total score from -2461897.000000 to -2464468.250000
+So it's getting split into cluster 10.
+Splitting cluster 4 changes total score from -2461897.000000 to -2467170.000000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+5->12 Clusters: Score -2471398.750000, best is -2467367.000000
+THE BEST YET!
+
+Starting from 6 clusters...
+--- Clustering full data set of 222425 points ---
+Splitting cluster 1 changes total score from -2421880.000000 to -2441531.250000
+So it's getting split into cluster 6.
+Splitting cluster 2 changes total score from -2421880.000000 to -2441814.250000
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -2421880.000000 to -2444463.500000
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -2421880.000000 to -2450159.750000
+So it's getting split into cluster 9.
+Splitting cluster 5 changes total score from -2463677.750000 to -2464078.000000
+So it's getting split into cluster 10.
+Splitting cluster 6 changes total score from -2463677.750000 to -2465370.000000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+6->12 Clusters: Score -2469706.500000, best is -2471398.750000
+
+Starting from 6 clusters...
+--- Clustering full data set of 222425 points ---
+Splitting cluster 1 changes total score from -2347429.750000 to -2348455.000000
+So it's getting split into cluster 6.
+Splitting cluster 2 changes total score from -2347429.750000 to -2352432.500000
+So it's getting split into cluster 7.
+Splitting cluster 3 changes total score from -2347429.750000 to -2433029.000000
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -2347429.750000 to -2444494.000000
+So it's getting split into cluster 9.
+Splitting cluster 2 changes total score from -2465099.500000 to -2465683.000000
+So it's getting split into cluster 10.
+Splitting cluster 3 changes total score from -2465099.500000 to -2465820.250000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+6->12 Clusters: Score -2467475.750000, best is -2471398.750000
+
+Starting from 7 clusters...
+--- Clustering full data set of 222425 points ---
+Splitting cluster 1 changes total score from -2450884.500000 to -2450976.500000
+So it's getting split into cluster 7.
+Splitting cluster 3 changes total score from -2450884.500000 to -2451767.250000
+So it's getting split into cluster 8.
+Splitting cluster 4 changes total score from -2450884.500000 to -2457480.000000
+So it's getting split into cluster 9.
+Splitting cluster 5 changes total score from -2450884.500000 to -2458079.000000
+So it's getting split into cluster 10.
+Splitting cluster 6 changes total score from -2450884.500000 to -2460894.750000
+So it's getting split into cluster 11.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+7->12 Clusters: Score -2469276.000000, best is -2471398.750000
+
+Starting from 7 clusters...
+--- Clustering full data set of 222425 points ---
+Deleting Class 3. Lose 222.017532 but Gain 277.027832
+Splitting cluster 1 changes total score from -2420428.500000 to -2423076.500000
+So it's getting split into cluster 3.
+Splitting cluster 2 changes total score from -2420428.500000 to -2427429.000000
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -2420428.500000 to -2450523.000000
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -2420428.500000 to -2451519.750000
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -2420428.500000 to -2451783.750000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+7->11 Clusters: Score -2464788.750000, best is -2471398.750000
+
+Starting from 8 clusters...
+--- Clustering full data set of 222425 points ---
+Deleting Class 2. Lose 212.027328 but Gain 277.027710
+Splitting cluster 1 changes total score from -2433510.000000 to -2436085.250000
+So it's getting split into cluster 2.
+Splitting cluster 3 changes total score from -2433510.000000 to -2436461.500000
+So it's getting split into cluster 8.
+Splitting cluster 5 changes total score from -2433510.000000 to -2437071.250000
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -2433510.000000 to -2439369.500000
+So it's getting split into cluster 10.
+Splitting cluster 7 changes total score from -2433510.000000 to -2460175.750000
+So it's getting split into cluster 11.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+8->12 Clusters: Score -2469202.250000, best is -2471398.750000
+
+Starting from 8 clusters...
+--- Clustering full data set of 222425 points ---
+Deleting Class 1. Lose 211.932175 but Gain 277.027710
+Splitting cluster 2 changes total score from -2441337.750000 to -2443645.500000
+So it's getting split into cluster 1.
+Splitting cluster 3 changes total score from -2441337.750000 to -2444061.500000
+So it's getting split into cluster 8.
+Splitting cluster 4 changes total score from -2441337.750000 to -2445486.250000
+So it's getting split into cluster 9.
+Splitting cluster 6 changes total score from -2441337.750000 to -2460585.250000
+So it's getting split into cluster 10.
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+8->11 Clusters: Score -2468753.750000, best is -2471398.750000
+
+Starting from 9 clusters...
+--- Clustering full data set of 222425 points ---
+Splitting cluster 2 changes total score from -2414065.750000 to -2414293.000000
+So it's getting split into cluster 9.
+Splitting cluster 3 changes total score from -2414065.750000 to -2454470.250000
+So it's getting split into cluster 10.
+Splitting cluster 4 changes total score from -2414065.750000 to -2455478.250000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+9->12 Clusters: Score -2465028.250000, best is -2471398.750000
+
+Starting from 9 clusters...
+--- Clustering full data set of 222425 points ---
+Deleting Class 3. Lose 114.057526 but Gain 277.027832
+Splitting cluster 1 changes total score from -2377721.500000 to -2379998.000000
+So it's getting split into cluster 3.
+Splitting cluster 2 changes total score from -2377721.500000 to -2380186.000000
+So it's getting split into cluster 9.
+Splitting cluster 4 changes total score from -2377721.500000 to -2382794.500000
+So it's getting split into cluster 10.
+Splitting cluster 5 changes total score from -2377721.500000 to -2437759.750000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+9->12 Clusters: Score -2467445.750000, best is -2471398.750000
+
+Starting from 10 clusters...
+--- Clustering full data set of 222425 points ---
+Deleting Class 6. Lose 154.421310 but Gain 277.027832
+Splitting cluster 1 changes total score from -2450772.750000 to -2456711.250000
+So it's getting split into cluster 6.
+Splitting cluster 2 changes total score from -2450772.750000 to -2457077.750000
+So it's getting split into cluster 10.
+Splitting cluster 3 changes total score from -2450772.750000 to -2459315.750000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+10->12 Clusters: Score -2469366.000000, best is -2471398.750000
+
+Starting from 10 clusters...
+--- Clustering full data set of 222425 points ---
+Deleting Class 9. Lose 181.941147 but Gain 277.027832
+Splitting cluster 3 changes total score from -2444986.500000 to -2445301.500000
+So it's getting split into cluster 9.
+Splitting cluster 5 changes total score from -2444986.500000 to -2448173.500000
+So it's getting split into cluster 10.
+Splitting cluster 7 changes total score from -2444986.500000 to -2448628.250000
+So it's getting split into cluster 11.
+No free clusters, abandoning splitWon't try splitting - already at maximum number of clusters
+Won't try splitting - already at maximum number of clusters
+10->12 Clusters: Score -2453278.500000, best is -2471398.750000
+
+That took 510.640015 seconds.
+Elapsed time is 512.253594 seconds.
+
+n_clust =
+
+   12
+
+
+t =
+
+     1
+
+
+t =
+
+     2
+
+
+t =
+
+     3
+
+
+t =
+
+     4
+
+
+clust_size =
+
+  Columns 1 through 11
+
+        2413        2266       30496       56872       10277       39227       51364       15164        4062        6256        4021
+
+  Column 12
+
+        2153
+
+
+noise =
+
+  1.0e-004 *
+
+    0.1076
+    0.1088
+    0.1134
+    0.1049
+
+
+amp =
+
+  1.0e-003 *
+
+   -0.0207   -0.0469   -0.0351   -0.0167
+   -0.0415   -0.0861   -0.0307   -0.0576
+   -0.0142   -0.0174   -0.0483   -0.0185
+   -0.0213   -0.0136   -0.0195   -0.0546
+   -0.0404   -0.0246   -0.0220   -0.0220
+   -0.0411   -0.1005   -0.0203   -0.0247
+   -0.0180   -0.0536   -0.0284   -0.0138
+   -0.0228   -0.0271   -0.0354   -0.0449
+   -0.0253   -0.0490   -0.0318   -0.0170
+   -0.0347   -0.0927   -0.0276   -0.0218
+   -0.0182   -0.0164   -0.0418   -0.0435
+
+
+spread =
+
+  1.0e-004 *
+
+    0.1227    0.2276    0.1626    0.1159
+    0.1739    0.2794    0.1338    0.1703
+    0.0860    0.0856    0.0775    0.0860
+    0.0899    0.0905    0.1040    0.0985
+    0.0591    0.1027    0.1108    0.0923
+    0.1071    0.1679    0.0975    0.0972
+    0.0815    0.0899    0.0917    0.0792
+    0.1188    0.1790    0.1833    0.2035
+    0.1008    0.1110    0.1431    0.1119
+    0.1593    0.2681    0.1995    0.1625
+    0.0765    0.0734    0.0770    0.0791
+
+
+c =
+
+    1
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    10
+
+
+c =
+
+    1
+
+
+trough_t =
+
+     7
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3538
+   -0.3330
+   -0.3175
+   -0.3107
+   -0.3091
+   -0.3062
+   -0.2963
+   -0.2746
+   -0.2365
+   -0.1776
+   -0.0951
+    0.0088
+
+
+ans =
+
+  8.7582e-007
+
+
+c =
+
+    2
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    10
+
+
+c =
+
+    2
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.6376
+   -0.5533
+   -0.4252
+   -0.2845
+   -0.1532
+   -0.0398
+    0.0575
+    0.1441
+    0.2238
+    0.2967
+    0.3595
+    0.4086
+    0.4422
+    0.4608
+
+
+ans =
+
+  4.6081e-005
+
+
+c =
+
+    3
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    11
+
+
+c =
+
+    3
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4183
+   -0.3293
+   -0.2234
+   -0.1182
+   -0.0238
+    0.0555
+    0.1191
+    0.1687
+    0.2069
+    0.2361
+    0.2582
+    0.2745
+    0.2858
+
+
+ans =
+
+  2.8578e-005
+
+
+c =
+
+    4
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    12
+
+
+c =
+
+    4
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.5086
+   -0.4087
+   -0.2630
+   -0.1097
+    0.0252
+    0.1297
+    0.2027
+    0.2490
+    0.2750
+    0.2872
+    0.2907
+    0.2888
+    0.2839
+    0.2772
+
+
+ans =
+
+  2.9067e-005
+
+
+c =
+
+    5
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+     9
+
+
+c =
+
+    5
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3674
+   -0.2947
+   -0.1938
+   -0.0855
+    0.0144
+    0.0950
+    0.1514
+    0.1836
+    0.1951
+    0.1909
+    0.1766
+    0.1572
+    0.1357
+
+
+ans =
+
+  1.9511e-005
+
+
+c =
+
+    6
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    10
+
+
+c =
+
+    6
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.9149
+   -0.6782
+   -0.3600
+   -0.0430
+    0.2188
+    0.4052
+    0.5198
+    0.5779
+    0.5971
+    0.5921
+    0.5731
+    0.5464
+    0.5155
+    0.4827
+
+
+ans =
+
+  5.9714e-005
+
+
+c =
+
+    7
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    10
+
+
+c =
+
+    7
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4580
+   -0.3474
+   -0.2209
+   -0.1010
+    0.0002
+    0.0791
+    0.1369
+    0.1777
+    0.2056
+    0.2246
+    0.2372
+    0.2453
+    0.2497
+
+
+ans =
+
+  2.4973e-005
+
+
+c =
+
+    8
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    12
+
+
+c =
+
+    8
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3488
+   -0.2745
+   -0.1889
+   -0.1058
+   -0.0326
+    0.0282
+    0.0763
+    0.1126
+    0.1390
+    0.1580
+    0.1727
+    0.1851
+    0.1962
+
+
+ans =
+
+  1.9624e-005
+
+
+c =
+
+    9
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    10
+
+
+c =
+
+    9
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4615
+   -0.4057
+   -0.3225
+   -0.2299
+   -0.1420
+   -0.0665
+   -0.0057
+    0.0417
+    0.0779
+    0.1055
+    0.1267
+    0.1429
+    0.1548
+
+
+ans =
+
+  1.5481e-005
+
+
+c =
+
+   10
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    10
+
+
+c =
+
+   10
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.8481
+   -0.7136
+   -0.4913
+   -0.2357
+    0.0072
+    0.2087
+    0.3580
+    0.4567
+    0.5131
+    0.5386
+    0.5433
+    0.5352
+    0.5197
+    0.4997
+
+
+ans =
+
+  5.4326e-005
+
+
+c =
+
+   11
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    12
+
+
+c =
+
+   11
+
+
+trough_t =
+
+     5
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4151
+   -0.3464
+   -0.2438
+   -0.1328
+   -0.0310
+    0.0529
+    0.1168
+    0.1627
+    0.1939
+    0.2146
+    0.2281
+    0.2371
+    0.2432
+    0.2464
+
+
+ans =
+
+  2.4643e-005
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 13 : noise = 8.277864
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 13 : noise = 8.276890
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 13 : noise = 8.359065
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 13 : noise = 8.098846
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 13 : noise = 7.676322
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 13 : noise = 7.790346
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 13 : noise = 7.812609
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 14 : noise = 9.097939
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 14 : noise = 8.750390
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 14 : noise = 8.848721
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 14 : noise = 8.400293
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 14 : noise = 7.712613
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 14 : noise = 7.790812
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 14 : noise = 7.978108
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 15 : noise = 9.219428
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 15 : noise = 9.287059
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 15 : noise = 9.605941
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 15 : noise = 9.228669
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 15 : noise = 9.040570
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 15 : noise = 9.207033
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 15 : noise = 9.040820
+
+
+Block_Name =
+
+adrec107-45
+
+
+ans =
+
+channel 16 : noise = 8.903010
+
+
+Block_Name =
+
+adrec107-46
+
+
+ans =
+
+channel 16 : noise = 9.522639
+
+
+Block_Name =
+
+adrec107-47
+
+
+ans =
+
+channel 16 : noise = 9.391087
+
+
+Block_Name =
+
+adrec107-48
+
+
+ans =
+
+channel 16 : noise = 9.321541
+
+
+Block_Name =
+
+adrec107-49
+
+
+ans =
+
+channel 16 : noise = 8.921343
+
+
+Block_Name =
+
+adrec107-50
+
+
+ans =
+
+channel 16 : noise = 8.748757
+
+
+Block_Name =
+
+adrec107-51
+
+
+ans =
+
+channel 16 : noise = 8.952326
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 196
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 248
+  In cluster_adrec107_45_51 at 12
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 253
+  In cluster_adrec107_45_51 at 12
+
+ica_fig =
+
+     2
+
+
+ans =
+
+       50000          76
+
+Number of signals: 76
+Number of samples: 50000
+Calculating covariance...
+Reducing dimension...
+Selected [ 8 ] dimensions.
+Smallest remaining (non-zero) eigenvalue [ 229.476 ]
+Largest remaining (non-zero) eigenvalue [ 1981.61 ]
+Sum of removed eigenvalues [ 874.494 ]
+[ 85.9001 ] % of (non-zero) eigenvalues retained.
+Whitening...
+Check: covariance differs from identity by [ 1.88738e-015 ].
+Used approach [ symm ].
+Used nonlinearity [ tanh ].
+Using stabilized algorithm.
+Starting ICA calculation...
+Step no. 1
+Step no. 2, change in value of estimate: 0.611 
+Step no. 3, change in value of estimate: 0.526 
+Step no. 4, change in value of estimate: 0.347 
+Step no. 5, change in value of estimate: 0.125 
+Step no. 6, change in value of estimate: 0.0321 
+Step no. 7, change in value of estimate: 0.0154 
+Step no. 8, change in value of estimate: 0.00731 
+Step no. 9, change in value of estimate: 0.00288 
+Step no. 10, change in value of estimate: 0.00129 
+Step no. 11, change in value of estimate: 0.000725 
+Step no. 12, change in value of estimate: 0.000285 
+Step no. 13, change in value of estimate: 0.000226 
+Convergence after 14 steps
+Adding the mean back to the data.
+
+ans =
+
+    0.2111    0.0159    1.9702   -0.7482    0.0264    0.0866   -0.2006   -0.0601   -0.3041   -1.9906
+    0.9099    1.4623    1.2031   -0.1703    1.3771   -0.4528   -0.5732   -0.4896    1.7606    1.4276
+   -0.4940   -0.4123   -1.2734   -0.8573   -0.0403   -0.6418   -0.2452   -0.6386   -0.0262   -1.6898
+    1.1282    1.5438    2.1928    1.6100    3.1311    0.6571    1.7224    3.4201    0.8008    1.9061
+   -0.4407    1.3104   -0.6317   -1.4011   -1.5950   -1.1951   -0.1608   -0.5690   -0.2570   -0.4484
+    1.7659   -0.2574    1.1807    0.7841   -0.4221   -0.0061    0.0842   -0.8162   -0.1184    0.1065
+   -0.4695   -0.5378    0.7702    0.8454   -1.0716    1.5163    1.5199    1.4018   -0.3214   -0.4518
+    0.4991   -1.3437   -0.0921    0.8269   -0.3777    0.4120   -0.6740   -2.5683    0.9628   -0.4352
+
+
+ans =
+
+   -1.8864   -1.2158    0.2111   -0.6447   -0.2418    0.0159   -0.6586   -0.4386    1.9702   -0.9198
+   -0.1882   -0.1560    0.9099   -0.0354    1.4679    1.4623    1.2821    0.5609    1.2031    1.5744
+    1.3430   -1.0382   -0.4940   -0.4977    1.3014   -0.4123    0.6359   -0.1595   -1.2734    0.9520
+    1.4457    2.2366    1.1282    2.3362    0.2942    1.5438    0.7033    3.0475    2.1928    1.9435
+    0.5680    0.5038   -0.4407   -0.7959   -1.1641    1.3104   -0.4373    2.1486   -0.6317   -0.3075
+   -0.2888    0.1552    1.7659    0.0170    1.8983   -0.2574    0.4642   -0.6227    1.1807    1.1867
+    0.6013    1.1147   -0.4695    1.7124   -0.5783   -0.5378    0.1213    0.3589    0.7702    0.0198
+    2.8557   -1.0311    0.4991    1.3087    0.3117   -1.3437    1.3356    0.0186   -0.0921   -0.4393
+
+{Warning: PACK can only be used from the MATLAB command line.} 
+> In cluster_tetrode_cmd at 307
+  In cluster_adrec107_45_51 at 12
+
+select_ica =
+
+n
+
+
+fname =
+
+pca.fet.1
+
+
+ans =
+
+clustering data .....
+
+FileBase	pca
+ElecNo	1
+MinClusters	5
+MaxClusters	10
+MaxPossibleClusters	12
+nStarts	2
+RandomSeed	1
+Debug	0
+Verbose	0
+UseFeatures	11111111111100001
+DistDump	0
+DistThresh	6.907755
+FullStepEvery	20
+ChangedThresh	0.050000
+Log	1
+Screen	1
+MaxIter	500
+StartCluFile	
+SplitEvery	40
+PenaltyMix	1.000000
+Subset	1
+help	0
+Loaded 142716 data points of dimension 8.
+Starting from 5 clusters...
+--- Clustering full data set of 142716 points ---
+Splitting cluster 2 changes total score from -1115062.875000 to -1115059.000000
+So it's not getting split.
+Splitting cluster 4 changes total score from -1115062.875000 to -1116609.625000
+So it's getting split into cluster 5.
+Splitting cluster 1 changes total score from -1117752.250000 to -1118285.375000
+So it's getting split into cluster 6.
+Splitting cluster 2 changes total score from -1117752.250000 to -1130762.750000
+So it's getting split into cluster 7.
+Splitting cluster 5 changes total score from -1117752.250000 to -1130793.625000
+So it's getting split into cluster 8.
+Splitting cluster 7 changes total score from -1132762.625000 to -1132821.625000
+So it's getting split into cluster 9.
+Splitting cluster 8 changes total score from -1136810.000000 to -1136718.625000
+So it's not getting split.
+5->10 Clusters: Score -1136810.000000, best is 100000003318135351409612647563264.000000
+THE BEST YET!
+
+Starting from 5 clusters...
+--- Clustering full data set of 142716 points ---
+Splitting cluster 1 changes total score from -1121570.500000 to -1121664.125000
+So it's getting split into cluster 5.
+Splitting cluster 2 changes total score from -1121570.500000 to -1121632.875000
+So it's getting split into cluster 6.
+Splitting cluster 3 changes total score from -1121570.500000 to -1125744.375000
+So it's getting split into cluster 7.
+Deleting Class 6. Lose 261.012634 but Gain 267.043823
+Splitting cluster 2 changes total score from -1132874.000000 to -1132939.000000
+So it's getting split into cluster 6.
+Splitting cluster 4 changes total score from -1132874.000000 to -1133096.750000
+So it's getting split into cluster 8.
+Splitting cluster 7 changes total score from -1132874.000000 to -1135181.875000
+So it's getting split into cluster 9.
+5->10 Clusters: Score -1136696.250000, best is -1136810.000000
+
+Starting from 6 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 1. Lose 246.325974 but Gain 267.043823
+Splitting cluster 4 changes total score from -1122865.625000 to -1128588.875000
+So it's getting split into cluster 1.
+Splitting cluster 1 changes total score from -1130934.875000 to -1131655.750000
+So it's getting split into cluster 6.
+Splitting cluster 4 changes total score from -1130934.875000 to -1131782.875000
+So it's getting split into cluster 7.
+Splitting cluster 3 changes total score from -1136437.500000 to -1136353.375000
+So it's not getting split.
+Splitting cluster 3 changes total score from -1136479.375000 to -1136387.875000
+So it's not getting split.
+6->8 Clusters: Score -1136479.375000, best is -1136810.000000
+
+Starting from 6 clusters...
+--- Clustering full data set of 142716 points ---
+Splitting cluster 1 changes total score from -1109398.000000 to -1109456.125000
+So it's getting split into cluster 6.
+Splitting cluster 3 changes total score from -1109398.000000 to -1115692.625000
+So it's getting split into cluster 7.
+Splitting cluster 4 changes total score from -1109398.000000 to -1125028.375000
+So it's getting split into cluster 8.
+Deleting Class 5. Lose 239.060577 but Gain 267.043701
+Deleting Class 2. Lose 246.694214 but Gain 267.043823
+Splitting cluster 7 changes total score from -1132750.875000 to -1132921.875000
+So it's getting split into cluster 2.
+Splitting cluster 8 changes total score from -1134130.500000 to -1134139.500000
+So it's getting split into cluster 5.
+6->9 Clusters: Score -1136889.500000, best is -1136810.000000
+THE BEST YET!
+
+Starting from 7 clusters...
+--- Clustering full data set of 142716 points ---
+Splitting cluster 1 changes total score from -1125335.500000 to -1125503.750000
+So it's getting split into cluster 7.
+Splitting cluster 2 changes total score from -1125335.500000 to -1130203.250000
+So it's getting split into cluster 8.
+Deleting Class 5. Lose 162.234161 but Gain 267.043701
+Splitting cluster 3 changes total score from -1136336.750000 to -1136332.250000
+So it's not getting split.
+7->8 Clusters: Score -1136353.625000, best is -1136889.500000
+
+Starting from 7 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 5. Lose 266.760132 but Gain 267.043701
+Splitting cluster 1 changes total score from -1122791.375000 to -1128342.625000
+So it's getting split into cluster 5.
+Splitting cluster 2 changes total score from -1122791.375000 to -1128361.500000
+So it's getting split into cluster 7.
+Splitting cluster 6 changes total score from -1122791.375000 to -1128957.250000
+So it's getting split into cluster 8.
+Splitting cluster 3 changes total score from -1135923.000000 to -1135994.250000
+So it's getting split into cluster 9.
+7->10 Clusters: Score -1136772.750000, best is -1136889.500000
+
+Starting from 8 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 6. Lose 256.515076 but Gain 267.043823
+Splitting cluster 4 changes total score from -1126055.875000 to -1127455.750000
+So it's getting split into cluster 6.
+Splitting cluster 7 changes total score from -1135718.500000 to -1136165.250000
+So it's getting split into cluster 8.
+Splitting cluster 2 changes total score from -1136794.625000 to -1136716.875000
+So it's not getting split.
+8->9 Clusters: Score -1136794.625000, best is -1136889.500000
+
+Starting from 8 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 3. Lose 195.607101 but Gain 267.043823
+Splitting cluster 6 changes total score from -1126104.625000 to -1127109.875000
+So it's getting split into cluster 3.
+Splitting cluster 2 changes total score from -1136477.500000 to -1136400.750000
+So it's not getting split.
+8->8 Clusters: Score -1136477.500000, best is -1136889.500000
+
+Starting from 9 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 5. Lose 179.595703 but Gain 267.043701
+Splitting cluster 3 changes total score from -1124684.875000 to -1124657.375000
+So it's not getting split.
+Splitting cluster 8 changes total score from -1124684.875000 to -1130018.125000
+So it's getting split into cluster 5.
+Deleting Class 1. Lose 263.117676 but Gain 267.043701
+Deleting Class 6. Lose 257.670441 but Gain 267.043823
+Splitting cluster 3 changes total score from -1134369.625000 to -1134854.750000
+So it's getting split into cluster 1.
+Splitting cluster 2 changes total score from -1136339.875000 to -1136410.625000
+So it's getting split into cluster 6.
+Splitting cluster 7 changes total score from -1136339.875000 to -1136374.500000
+So it's getting split into cluster 9.
+9->10 Clusters: Score -1136656.500000, best is -1136889.500000
+
+Starting from 9 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 6. Lose 250.910965 but Gain 267.043701
+Deleting Class 5. Lose 219.164734 but Gain 267.043823
+Splitting cluster 4 changes total score from -1130252.375000 to -1130483.500000
+So it's getting split into cluster 5.
+Splitting cluster 7 changes total score from -1133985.875000 to -1134006.375000
+So it's getting split into cluster 6.
+9->9 Clusters: Score -1136883.625000, best is -1136889.500000
+
+Starting from 10 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 8. Lose 190.022430 but Gain 267.043701
+Splitting cluster 3 changes total score from -1132563.250000 to -1132632.250000
+So it's getting split into cluster 8.
+10->10 Clusters: Score -1133393.875000, best is -1136889.500000
+
+Starting from 10 clusters...
+--- Clustering full data set of 142716 points ---
+Deleting Class 1. Lose 224.231430 but Gain 267.043701
+Splitting cluster 4 changes total score from -1129697.000000 to -1130773.000000
+So it's getting split into cluster 1.
+Splitting cluster 9 changes total score from -1129697.000000 to -1131231.250000
+So it's getting split into cluster 10.
+Deleting Class 3. Lose 256.982849 but Gain 267.043945
+Splitting cluster 2 changes total score from -1136673.375000 to -1136580.125000
+So it's not getting split.
+10->10 Clusters: Score -1136673.375000, best is -1136889.500000
+
+That took 507.016022 seconds.
+Elapsed time is 508.917286 seconds.
+
+n_clust =
+
+    9
+
+
+t =
+
+     1
+
+
+t =
+
+     2
+
+
+t =
+
+     3
+
+
+t =
+
+     4
+
+
+clust_size =
+
+  Columns 1 through 11
+
+        2683       18464       35878       23715       44499        1704       15017         753        4062        6256        4021
+
+  Column 12
+
+        2153
+
+
+noise =
+
+  1.0e-005 *
+
+    0.8121
+    0.8513
+    0.9284
+    0.9179
+
+
+amp =
+
+  1.0e-004 *
+
+   -0.2189   -0.0856   -0.2037   -0.4329
+   -0.1899   -0.0818   -0.2225   -0.4116
+   -0.1401   -0.0741   -0.1625   -0.4919
+   -0.1512   -0.0866   -0.3673   -0.2137
+   -0.3258   -0.0870   -0.1691   -0.2177
+   -0.2581   -0.0547   -0.3131   -0.5735
+   -0.1295   -0.0778   -0.1191   -0.5088
+   -0.2743   -0.0759   -0.2772   -0.2966
+
+
+spread =
+
+  1.0e-004 *
+
+    0.0919    0.0714    0.0889    0.0663
+    0.0773    0.0691    0.0952    0.0689
+    0.0789    0.0683    0.0811    0.0753
+    0.0775    0.0692    0.0615    0.0897
+    0.0532    0.0695    0.0885    0.0919
+    0.1406    0.0751    0.1592    0.2105
+    0.0755    0.0695    0.0806    0.0942
+    0.1033    0.0718    0.1066    0.1161
+
+
+c =
+
+    1
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    16
+
+
+c =
+
+    1
+
+
+trough_t =
+
+     9
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3890
+   -0.3227
+   -0.2257
+   -0.1153
+   -0.0045
+    0.0981
+    0.1869
+    0.2586
+    0.3115
+    0.3458
+
+
+ans =
+
+  3.4582e-005
+
+
+c =
+
+    2
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    16
+
+
+c =
+
+    2
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3708
+   -0.3059
+   -0.2239
+   -0.1395
+   -0.0623
+    0.0026
+    0.0536
+    0.0918
+    0.1197
+    0.1395
+    0.1535
+    0.1631
+    0.1692
+
+
+ans =
+
+  1.6918e-005
+
+
+c =
+
+    3
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    16
+
+
+c =
+
+    3
+
+
+trough_t =
+
+     7
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4144
+   -0.3040
+   -0.1690
+   -0.0306
+    0.0964
+    0.2035
+    0.2863
+    0.3444
+    0.3799
+    0.3967
+    0.3986
+    0.3889
+
+
+ans =
+
+  3.9864e-005
+
+
+c =
+
+    4
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    15
+
+
+c =
+
+    4
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.3227
+   -0.2551
+   -0.1692
+   -0.0813
+   -0.0026
+    0.0609
+    0.1073
+    0.1380
+    0.1559
+    0.1643
+    0.1660
+    0.1634
+    0.1579
+
+
+ans =
+
+  1.6604e-005
+
+
+c =
+
+    5
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    13
+
+
+c =
+
+    5
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.2894
+   -0.2247
+   -0.1370
+   -0.0448
+    0.0376
+    0.1018
+    0.1452
+    0.1693
+    0.1781
+    0.1760
+    0.1668
+    0.1536
+    0.1388
+
+
+ans =
+
+  1.7812e-005
+
+
+c =
+
+    6
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    16
+
+
+c =
+
+    6
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.5155
+   -0.4284
+   -0.3000
+   -0.1522
+   -0.0032
+    0.1332
+    0.2479
+    0.3363
+    0.3983
+    0.4354
+    0.4508
+    0.4485
+    0.4326
+
+
+ans =
+
+  4.5077e-005
+
+
+c =
+
+    7
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    16
+
+
+c =
+
+    7
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.4190
+   -0.3038
+   -0.1672
+   -0.0340
+    0.0790
+    0.1641
+    0.2218
+    0.2565
+    0.2738
+    0.2790
+    0.2765
+    0.2693
+    0.2593
+
+
+ans =
+
+  2.7899e-005
+
+
+c =
+
+    8
+
+
+ans =
+
+    19
+
+
+trig_chan =
+
+    15
+
+
+c =
+
+    8
+
+
+trough_t =
+
+     6
+
+
+ans =
+
+  1.0e-004 *
+
+   -0.2365
+   -0.1948
+   -0.1475
+   -0.1043
+   -0.0718
+   -0.0524
+   -0.0437
+   -0.0402
+   -0.0358
+   -0.0275
+   -0.0141
+    0.0051
+    0.0286
+
+
+ans =
+
+  2.8564e-006
+
+
+Tank_Name =
+
+adrec107_102610
+
+
+bname =
+
+1-7
+
+
+output_path =
+
+D:\data\TDT\adrec107-analysis\Blocks45-51
+
+
+fname =
+
+D:\data\TDT\adrec107-analysis\Blocks45-51\cluster_data_adrec107_102610_1-7
+
+Elapsed time is 539.165255 seconds.
+
+ans =
+
+01-Feb-2011 21:32:50
+
+Maximum possible array:            1023 MB (1.073e+009 bytes) *
+Memory available for all arrays:   2248 MB (2.357e+009 bytes) **
+Memory used by MATLAB:              560 MB (5.872e+008 bytes)
+Physical Memory (RAM):             3326 MB (3.488e+009 bytes)
+
+*  Limited by contiguous virtual address space available.
+** Limited by virtual address space available.

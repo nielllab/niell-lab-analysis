@@ -1,0 +1,9 @@
+function layer_bar_inh(data,used,exc,inh,layertwo,layerthree,layerfour,layerfive,layersix)
+figure
+barweb([mean(data(used&exc&layertwo)), mean(data(used&exc&layerthree)), mean(data(used&exc&layerfour)) ,mean(data(used&exc&layerfive)),mean(data(used&exc&layersix)),mean(data(used&inh)); 0 0 0 0 0 0]', ...
+    [std(data(used&exc&layertwo))/sqrt(sum(used&exc&layertwo )), std(data(used&exc&layerthree))/sqrt(sum(used&exc&layerthree)) ,  ...
+    std(data(used&exc&layerfour))/sqrt(sum(used&exc&layerfour )), std(data(used&exc&layerfive))/sqrt(sum(used&exc&layerfive )) , std(data(used&exc&layersix))/sqrt(sum(used&exc&layersix)), std(data(used&inh))/sqrt(sum(used&inh)); 0 0 0 0 0 0]', ...
+    2,{'upper 2/3' 'lower 2/3' '4' '5' '6' 'inh'},[],[],[],[0 0 .75]);
+set(gca,'xticklabel', {'upper 2/3', 'lower 2/3', '4', '5' '6' 'inh'})
+set(gca,'FontSize',14)
+

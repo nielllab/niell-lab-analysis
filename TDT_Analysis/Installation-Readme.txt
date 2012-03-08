@@ -1,0 +1,1 @@
+As of 7/19/11, download mps-pc15 to obtain the latest TDT analysis files.  This folder includes all the archive cmn files plus additional files from the megumi folder.  mps-pc15 folder will need to be updated following revisions made by Cris Niell (ability to analyze data without having TDT software installed in computer). -Sebastian

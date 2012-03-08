@@ -1,0 +1,86 @@
+It was originally set up for AMD opteron architecture:
+
+KlustaKwik: KlustaKwik.C
+	g++ -march=opteron -ffast-math -fomit-frame-pointer -mfpmath=sse -msse -msse2 -pipe -O2 -o KlustaKwik KlustaKwik.C  param.c -lm
+I renamed this one KlustaKwik_amd.exe
+
+I made another version optimized for one of the newer Intel architectures:
+
+KlustaKwik_prescott: KlustaKwik.C
+	g++ -mtune=prescott -O2 -o KlustaKwik_prescott KlustaKwik.C  param.c -lm
+
+-------
+From:  Kenneth D. Harris <kdharris@rutgers.edu>
+Hi again
+
+I just tried recompiling what I sent you and it didn't work because of an
+outdated header. The version attached here at least compiles under Linux. 
+
+The key difference with version 2 is the -Subset parameter. If you run it
+with -Subset 10, it uses every tenth point to make the clusters, so should
+run 10 times as fast (with a slight performance hit).
+
+If you do get it compiled under Windows, could you email me the compiled
+version?
+
+Thanks
+Ken.
+
+------------------------
+
+Hi Michael
+
+Glad you like it!
+
+There is no threaded version of KlustaKwik. However, at least with our own
+data, there isn't much need to thread it. Our recordings are always of
+multiple tetrodes, so it is possible to run KK in "processor farm" mode, by
+running N tetrodes simultaneously on an N-processor machine. In recent years
+we have started using a 32-node Linux cluster, which is often close to fully
+loaded, so again it wouldn't be more efficient if threaded; each job would
+finish faster, but the queue would be longer.
+
+If someone wanted to thread it, there is an easy way to do it. KK runs the
+same algorithm 10 times on each data set, from different starting points,
+and picks the best result. These 10 iterations could all be run in separate
+threads. 
+
+One thing I should check though: do you have version 2.0? It runs up to 10
+times faster than previous versions, but I think it is still not up at
+sourceforge yet.
+
+All the best,
+Ken.
+
+-----Original Message-----
+From: Michael P Stryker [mailto:stryker@phy.ucsf.edu] 
+Sent: Wednesday, October 29, 2008 3:42 PM
+To: Ken Harris
+Subject: threaded implementation of Klustakwik
+
+Dear Ken Harris,
+
+Thank you for writing Klustakwik.  We have used it to great advantage 
+(eg, in Niell, C.M.and Stryker, M.P. (2008) Highly selective receptive 
+fields in mouse visual cortex.  J. Neurosci 28: 7520-7536. 
+doi:10.1523/jneurosci.0623-08.2008 
+http://keck.ucsf.edu/~idl/CV/Niell_MouseRFs_JNS_2008.pdf).
+
+We were wondering if you know of parallelized (threaded) version that 
+would take advantage of multi-core CPUs?  I have only looked quickly at 
+the code, but  it was not obvious how to parallelize it at first glance.
+   One would first need to do profiling to see where it spent its time.
+
+If you have any advice, I would be grateful.  Klustakwik as you wrote it 
+is a terrific contribution to neuroscience.  Now it would be nice if we 
+could cheaply make it run even faster (by getting a speedup with 
+multi-core cpus).
+
+with best wishes,
+--Michael
+
+Professor Michael P. Stryker
+Department of Physiology | 513 Parnassus Ave., Room HSE-802
+University of California | San Francisco, CA 94143-0444
+telephone: 415.476-5443  | email: stryker@phy.ucsf.edu
+Assistant:  Alissa Gee 415.476-8371 AlissaGee@phy.ucsf.edu
