@@ -1,4 +1,4 @@
-
+%%% a random change for git
 
 %function [laserT laserTTL tstamp LFPall] = analyzeEEG_chronux_laser;
 % Matlab codes for reading EEG data
