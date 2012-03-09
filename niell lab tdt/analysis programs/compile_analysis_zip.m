@@ -1,4 +1,4 @@
-%function compile_analysis_movement
+%function compile_analysis_pkmzeta data
 for dataset = 1:2
     
     cells=0;
