@@ -159,11 +159,37 @@ barweb(meanspont,spont_err);
 title('Mean Spontaneous Activity')
 
 figure
+histbins= 0:0.5:5;
+for rep=1:2
+    h(rep,:) = hist(bothspont{rep},histbins)/length(bothspont{rep});
+end
+bar(histbins,h')
+legend('wt','tg')
+
+%figure
+%histbins= -30:2:30;
+%for rep=1:2
+ %   h(rep,:) = hist(bothpeak{rep})/length(bothpeak{rep});
+%end
+%bar(histbins,h')
+%legend('wt','tg')
+
+figure
 histbins= 0:0.1:1;
 for rep=1:2
     h(rep,:) = hist(bothOSI{rep},histbins)/length(bothOSI{rep});
 end
 bar(histbins,h')
+legend('wt','tg')
+
+%figure
+%histbins= 0:0.2:1;
+%for rep=1:2
+ %   h(rep,:) = hist(bothwidth{rep},histbins)/length(bothwidth{rep});
+%end
+%bar(histbins,h')
+%legend('wt','tg')
+
 
 figure
 histbins= [0.01 0.02 0.04 0.08 0.16 0.32];
