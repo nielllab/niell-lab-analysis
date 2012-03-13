@@ -1,4 +1,4 @@
-%function noise_analysis
+
 
 % Matlab codes for reading from TTank for movie data
 % Calculates RFs from spike triggered average, and spike triggered covariance
@@ -14,11 +14,7 @@ cells =1;
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
     load(fullfile(pname,fname));
-    %     for i =1:length(Block_Name);
-    %         sprintf('%d : %s ',i,Block_Name{i})
-    %     end
-    %block = input('which block to analyze ? ');
-    block = listdlg('ListString',Block_Name,'SelectionMode','single')
+    block = listdlg('ListString',Block_Name,'SelectionMode','single');
     Block_Name = Block_Name{block}
     [afname, apname] = uigetfile('*.mat','analysis data');
     noisepname = apname;
@@ -52,14 +48,21 @@ mv_noise=3;
 
 if movietype==cm_noise
     contrast_modulated = input('contrast modulated? 0/1 : ');
+    framerate = input('movie frame rate 30/60 : ');
     correct_spectrum = input('correct spectrum? 0/1 : ');
-    pos_neg = input('separate on/off sta? 0/1 : ');
-    compute_svd = input('compute svd ? 0/1 : ');
+    %pos_neg = input('separate on/off sta? 0/1 : ');
+    %compute_svd = input('compute svd ? 0/1 : ');
+    crop_mov=input('crop to screen size [128 x 72] 0/1 :');
+    pos_neg=0;
+    compute_svd=1;
+    contrast_period=10;
 else
     contrast_modulated=0;
     correct_spectrum=0;
-    pos_neg = input('separate on/off sta? 0/1 : ');
-    compute_svd = input('compute svd ? 0/1 : ');
+    pos_neg=0;
+    compute_svd=0;
+    % pos_neg = input('separate on/off sta? 0/1 : ');
+    %compute_svd = input('compute svd ? 0/1 : ');
 end
 
 
@@ -69,7 +72,7 @@ yrange = 30:50;
 dx = size(xrange,2);
 dy=size(yrange,2);
 moviedata = double(moviedata);
-m = reshape(moviedata(xrange,yrange,1:n_frames),[dx*dy n_frames])/128;
+%m = reshape(moviedata(xrange,yrange,1:n_frames),[dx*dy n_frames])/128;
 if calculate_stc
     covmat_prior=0;
     
@@ -83,9 +86,13 @@ end
 
 if contrast_modulated
     for f = 1:n_frames;
-        moviedata(:,:,f) = 128 + (moviedata(:,:,f)-128)/( 0.1 + 0.5 - 0.5*cos(2*pi*f/300));
+        moviedata(:,:,f) = 128 + (moviedata(:,:,f)-128)/( 0.1 + 0.5 - 0.5*cos(2*pi*f/(framerate*contrast_period)));
     end
 end
+
+%%%
+spectrum_thresh=0.2; %%%to avoid bringing up high freqs
+%spectrum_thresh=0.05 %%% to correct all freqs, but not rounding error
 
 if correct_spectrum
     tic
@@ -96,8 +103,9 @@ if correct_spectrum
     mean_spectrum = mean(abs(spectrum(:,:,:)),3);
     mean_spectrum = mean_spectrum / max(max(mean_spectrum));
     toc
-    
-    inv_spectrum = (1./mean_spectrum).*(mean_spectrum>.05);
+    figure
+    imagesc(fftshift(mean_spectrum))
+    inv_spectrum = (1./mean_spectrum).*(mean_spectrum>spectrum_thresh);
     
     tic
     for f = 1:n_frames
@@ -106,20 +114,55 @@ if correct_spectrum
     toc
 end
 
-m= m(:,1:1000);
+if crop_mov
+    moviedata=moviedata(:,29:100,:);
+end
 mov_var = var(squeeze(moviedata(50,50,:)))
 movavg = mean(moviedata,3);
 
-figure
-imagesc(movavg-127,[-64 64])
+% figure
+% imagesc(movavg-127,[-64 64])
+
+if movietype==mv_noise
+    th_mov=double(th_mov);
+    
+    
+    th_mov=th_mov*2*pi/255;
+    th_mov(th_mov>(15*pi/8)) = th_mov(th_mov>(15*pi/8))-2*pi;
+    th_mov= uint8(round((th_mov)/(pi/4)+1));
+    th_mov(sz_mov==0)=255;
+end
+
+moviedata=single(moviedata);
+
+sta_length = 16;contrast_period=10;
+display('reshaping movie')
+tic
+mov_squeeze = reshape(moviedata(:,:,1:end-sta_length),size(moviedata,1)*size(moviedata,2),size(moviedata,3)-sta_length);
+mov_squeeze=single(mov_squeeze);
+
+if movietype==fl_noise | movietype==mv_noise
+    mov_neg = (mov_squeeze-127)<0;
+    mov_zero = (mov_squeeze-127)==0;
+    mov_pos= (mov_squeeze-127)>0;
+    s = ones(size(mov_squeeze,2),sta_length);
+    mov_neg_avg =  reshape(mov_neg*s,size(moviedata,1),size(moviedata,2),sta_length)/length(s);
+    mov_zero_avg =  reshape(mov_zero*s,size(moviedata,1),size(moviedata,2),sta_length)/length(s);
+    mov_pos_avg =  reshape(mov_pos*s,size(moviedata,1),size(moviedata,2),sta_length)/length(s);
+    
+end
+toc
 
 if SU
     cell_range = 1:size(cells,1)
 else
     cell_range=1:4:nchan
 end
-cell_range=5;
+%cell_range=5;
+
 for cell_n = cell_range
+    tic
+    display('reading data')
     if SU
         channel_no = cells(cell_n,1)
         clust_no = cells(cell_n,2)
@@ -132,12 +175,12 @@ for cell_n = cell_range
         frame_duration = median(diff(data.frameEpocs(2,:)))
         times=data.MUspikeT{cell_n};
     end
-    if ~isempty(times)
-        sta0 = zeros(size(moviedata(:,:,1)));
-        sta1 = sta0; sta2=sta0;
-        
-        
+    toc
+    
+    if ~isempty(times)     
         n_spikes = zeros(n_frames,1);
+        display('getting frames')
+        tic
         for f = 1:n_frames
             if SU
                 [Spike_Timing index numtrials] = getTrials(frameEpocs{block},times, f, frame_duration);
@@ -149,11 +192,10 @@ for cell_n = cell_range
             n_spikes(f) = length(Spike_Timing);
             ntrials(f) = numtrials;
         end
+        toc
         
         n_reps = min(ntrials);
         
-
-       
         
         %%% evaluate these before normalizing to rate
         N=sum(n_spikes)
@@ -165,16 +207,21 @@ for cell_n = cell_range
             break
         end
         n_spikes = n_spikes./(frame_duration*ntrials');
-       
-       if movietype == cm_noise
-            figure
-        bar(condenseData(n_spikes,15));
-        else
-            figure
-            hist(n_spikes)
-        end
         
-        cyc_frames = 10*30;
+        
+        if movietype == cm_noise
+            wnfig=figure;
+            subplot(2,2,1)
+            cspikes=condenseData(n_spikes,15);
+            bar(cspikes);
+            xlim([0 length(cspikes)])
+        end
+        %         else
+        %
+        %             hist(n_spikes)
+        %         end
+        
+        cyc_frames = round(contrast_period/frame_duration);
         if contrast_modulated
             %     for f= 1:n_frames;
             %         frm = moviedata(:,:,f);
@@ -183,22 +230,27 @@ for cell_n = cell_range
             f = 1:n_frames;
             c = double(0.5- 0.5*cos(2*pi*f/cyc_frames));  %%% define contrast
             
-            nf = zeros(300,1);
+            nf = zeros(cyc_frames,1);
             contrastdata = zeros(cyc_frames,1);
             for i = 1:n_frames;
                 contrastdata(mod(i,cyc_frames)+1)=contrastdata(mod(i,cyc_frames)+1)+double(c(i));
                 nf(mod(i,cyc_frames)+1) = nf(mod(i,cyc_frames)+1)+1;
             end
             contrastdata = contrastdata./(nf/cyc_frames);
+            
             fftsignal = (fft(n_spikes));
             fftsignal = fftsignal(1:round(n_frames/2));
-            figure
+            subplot(2,2,2)
             loglog(abs(fftsignal));
             
+            df=(1/n_frames);
+           contrastfreq = 1/cyc_frames;
+            fft_chan = round(n_frames/cyc_frames)+1   %%%contrastfreq/df
+            framerate = round(1/frame_duration);
             
-            sta_responsiveness(cell_n) = 2*abs(fftsignal(31))/(abs(fftsignal(1)));  %%double to normalize FFT relative to DC
-            sta_contrastphase(cell_n) = angle(fftsignal(31));
-            phaseangle = angle(fftsignal(31))
+            wn_responsiveness(cell_n) = 2*abs(fftsignal(fft_chan))/(abs(fftsignal(1)));  %%double to normalize FFT relative to DC
+            wn_phase(cell_n) = angle(fftsignal(fft_chan));
+            phaseangle = angle(fftsignal(fft_chan))
             cycledata = zeros(cyc_frames,1);
             for i = 1:n_frames;
                 cycledata(mod(i,cyc_frames)+1)=cycledata(mod(i,cyc_frames)+1)+n_spikes(i);
@@ -206,8 +258,8 @@ for cell_n = cell_range
             cycledata = cycledata./(nf/cyc_frames);
             
             %cycledata = conv(cycledata,ones(1,30))/10;
-            cycledata = condenseData(cycledata,15);
-            contrastdata = condenseData(contrastdata,15);
+            cycledata = condenseData(cycledata,framerate/2);
+            contrastdata = condenseData(contrastdata,framerate/2);
             
             %      figure
             %     hold on
@@ -239,7 +291,7 @@ for cell_n = cell_range
             %     plot(halfcontrast_wn(cell_n),0.5,'r*');
             %     halfslope_wn(cell_n) = polyval(polyder(p),halfcontrast_wn(cell_n));
             
-            figure
+            subplot(2,2,3)
             hold on
             %%% plot average of up and down on contrast response
             meancontrast = 0.5*(contrastdata(1:10)+contrastdata(20:-1:11));
@@ -249,9 +301,7 @@ for cell_n = cell_range
             xlabel('contrast');
             ylabel('response');
             plot(contrastdata/max(contrastdata),cycledata/max(meandata));
-            if SU
-                saveas(gcf,fullfile(noisepname,sprintf('CRF_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-            end     %%% calculate adaptation index by difference between
+           %%% calculate adaptation index by difference between
             %%%  up leg and down leg
             adaptation_index(cell_n) = sum(cycledata(1:10)-cycledata(20:-1:11))/sum(cycledata(1:10)+cycledata(20:-1:11));
             
@@ -274,47 +324,59 @@ for cell_n = cell_range
         %     saveas(gcf,fullfile (pname,sprintf('hist%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
         
         
-        sta_length = 16;  %%% number of time points to calculate STA at
-        sta_t = zeros(size(moviedata(:,:,1:sta_length)));
-        N=0;
-        sta2 = sta_t;    %%%spike triggered variance (not covariance!)
-        sta_pos = sta_t;
-        sta_neg = sta_t;
+        %%% number of time points to calculate STA at
+        
+        
+        clear sp
+        
+        display('calculating sta')
         tic
-        for t = sta_length:n_frames
-            if n_spikes(t)>0
-                movie_snip =(moviedata(:,:,t-(sta_length-1):t));
-                movie_snip_pos = (movie_snip-127)/127;
-                movie_snip_neg =movie_snip_pos;
-                movie_snip_pos(movie_snip_pos<0)=0;
-                movie_snip_neg(movie_snip_pos>0)=0;
-                sta_pos = sta_pos+n_spikes(t).*movie_snip_pos;
-                sta_neg = sta_neg+n_spikes(t).*movie_snip_neg;
-                sta_t =sta_t + n_spikes(t).*movie_snip;
-                sta2 = sta2 + n_spikes(t).*((movie_snip-128).^2);
-                N = N + n_spikes(t);
-            end
+        for lag = 1:sta_length
+            sp(:,lag) = n_spikes(lag:end-sta_length+lag);
         end
+        st = mov_squeeze*sp;
+        sta_t = reshape(st,size(moviedata,1),size(moviedata,2),sta_length)/sum(n_spikes);
+        N= sum(n_spikes);
         toc
         
+        if movietype == mv_noise | movietype==fl_noise
+            
+            sta_neg =  reshape(mov_neg*sp,size(moviedata,1),size(moviedata,2),sta_length)/N;
+            sta_zero=reshape(mov_zero*sp,size(moviedata,1),size(moviedata,2),sta_length)/N;
+            sta_pos = reshape(mov_pos*sp,size(moviedata,1),size(moviedata,2),sta_length)/N;
+            
+            sta_diff = sqrt((sta_neg-mov_neg_avg).^2 + (sta_zero-mov_zero_avg).^2 +(sta_pos-mov_pos_avg).^2);
+        end
         
-        sta_t = sta_t(:,:,sta_length:-1:1)/N;
-        sta2 = sta2(:,:,sta_length:-1:1)/N;
-        sta_pos = sta_pos(:,:,sta_length:-1:1)/N;
-        sta_neg = sta_neg(:,:,sta_length:-1:1)/N;
-        %stvar = (sta2 - sta_t.^2)/(128^2);
-        stvar = sta2/(128^2);
+        if pos_neg
+            moviepos = (moviedata-127)/127;
+            moviepos(moviepos<0)=0;
+            moviepos = reshape(moviepos(:,:,1:end-sta_length),size(moviedata,1)*size(moviedata,2),size(moviedata,3)-sta_length);
+            st = moviepos*sp;
+            sta_pos = reshape(st,size(moviedata,1),size(moviedata,2),sta_length)/N;
+            
+            movieneg = (moviedata-127)/127;
+            movieneg(movieneg>0)=0;
+            movieneg = reshape(movieneg(:,:,1:end-sta_length),size(moviedata,1)*size(moviedata,2),size(moviedata,3)-sta_length);
+            st = movieneg*sp;
+            sta_neg = reshape(st,size(moviedata,1),size(moviedata,2),sta_length)/N;
+            
+        end
+        
         if movietype ==cm_noise
-color_range = [-64 64];
+            color_range = [-64 64];
         else
-        color_range = [-32 32];
+            color_range = [-32 32];
         end
         %%% plot STA at each time point
-        figure
+        stafig=figure
         for t = 1:16
             subplot(4, 4, t);
             imagesc(sta_t(:,:,t)'-movavg' ,color_range);
             axis equal
+            axis tight        
+                set(gca,'XTickLabel',[])
+                set(gca,'YTickLabel',[])
             sta_all(cell_n,:,:,t) = sta_t(:,:,t)-movavg;
             if t==1
                 title_text = sprintf('%s',Tank_Name);
@@ -325,130 +387,175 @@ color_range = [-64 64];
                 text(0,-10,title_text,'FontSize',8);
             end
         end
+        drawnow;
         
-            if SU
-            saveas(gcf,fullfile(noisepname,sprintf('sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        if movietype == mv_noise | movietype==fl_noise
+            figure
+            for t = 1:16
+                subplot(4, 4, t);
+                imagesc(sta_diff(:,:,t)' ,[0 .15]);
+                axis equal
+                            axis tight        
+                set(gca,'XTickLabel',[])
+                set(gca,'YTickLabel',[])
+                
+                if t==1
+                    title_text = sprintf('%s',Tank_Name);
+                    text(0,-10,title_text,'FontSize',8);
+                end
+                if t==2
+                    title_text = sprintf('ch%d c%d',channel_no,clust_no);
+                    text(0,-10,title_text,'FontSize',8);
+                end
+            end
+            drawnow;
         end
         
-        
         if movietype~=cm_noise
-            sz_all = zeros(length(n_spikes),1);
-            sz_rand = sz_all;
-            sp_all = sz_all;
-            th=sz_all;
-            spd=sz_all;
-            mov = sz_all;
-            mov_rand= sz_all;
-            [m ind] = max(abs(sta_t(:)-127));
-            (m-128) / 128
+            
+            clear d
+            
+            %[m ind] = max(abs(sta_t(:)-127));
+            [m ind] = max(sta_diff(:));
+            m
             [x y t] = ind2sub(size(sta_t),ind)
             t_lag = t-1;
             
-            movie_peak(cell_n,1)=x;
-            movie_peak(cell_n,2)=y;
-            movie_lag(cell_n) = t_lag*frame_duration;
-            h=0;
-            h_rand=0;
+            if movietype == mv_noise
+                d=zeros(4,size(moviedata,3)-t_lag-1);
+            else
+                d=zeros(2,size(moviedata,3)-t_lag-1);
+            end
+            size(d)
             
-            mh = 0;
-            mh_rand=0;
-            mhistbins = [0 127 255];
-             histbins = [0 1 2 4 8 16];
-%             
-%             if movietype == fl_noise
-%                 histbins = [0 1 2 4 8 16];
-%             elseif movietype == mv_noise
-%                 histbins = [0 1 2 3 4 5];
-%             end
-            w=0;
-            x = max(x,w+1);
-            y= max(y,w+1);
-            x= min(x,size(moviedata,1)-w);
-            y= min(y,size(moviedata,2)-w);
-            spd_hist=0; spd_hist_rand=0;
-            th_hist=0; th_hist_rand=0;
-            spdbins = [0 10 20 40 80 160];
-            thbins = [0:pi/4:2*pi];
-            
-            
-            for f = t_lag+1:length(n_spikes);
-                mov(f) = double(moviedata(x,y,f-t_lag));
-                mov_rand(f) =double(moviedata(round(rand)*127+1,round(rand*127)+1,f-t_lag));
-                sz_all(f) = double(sz_mov(x,y,f-t_lag));
-                sz_rand(f) = double(sz_mov(round(rand)*127+1,round(rand*127)+1,f-t_lag));
-                
-                sp_all(f) = n_spikes(f);
-                if movietype == mv_noise
-                    spd(f) = double(sp_mov(x,y,f-t_lag));
-                    th(f) =double(th_mov(x,y,f-t_lag))*2*pi/255;
-                end
-                if sp_all(f)>0
-                    if movietype ==mv_noise
-                        spd_hist = spd_hist+hist(double(sp_mov(x-w:x+w,y-w:y+w,f-t_lag)),spdbins)*sp_all(f);
-                        th_hist = th_hist+hist(double(th_mov(x-w:x+w,y-w:y+w,f-t_lag))*2*pi/255,thbins)*sp_all(f);
-                        spd_hist_rand = spd_hist_rand+sp_all(f)*hist(double(sp_mov(x-w:x+w,y-w:y+w,ceil(rand*length(n_spikes)))),spdbins);
-                        th_hist_rand = th_hist_rand+sp_all(f)*hist(double(th_mov(x-w:x+w,y-w:y+w,ceil(rand*length(n_spikes))))*2*pi/255,thbins);
-                    end
-                    
-                    h = h+hist(double(sz_mov(x-w:x+w,y-w:y+w,f-t_lag)),histbins)*sp_all(f);
-                    h_rand = h_rand+hist(double(sz_mov(x-w:x+w,y-w:y+w,ceil(rand*length(n_spikes)))),histbins)*sp_all(f);
-                    
-                    mh = mh+hist(mov(f),mhistbins)*sp_all(f);
-                    mh_rand = mh_rand+hist(mov_rand(f),mhistbins)*sp_all(f);
-                end
+            clear p
+            p{1} = [-1 1];
+            p{2} = [1 2 4 8 16];
+            d(1,:) = squeeze(round((moviedata(x,y,1:end-t_lag-1)-127)/127));
+            d(2,:) = squeeze(sz_mov(x,y,1:end-t_lag-1));
+            hist_all = zeros(length(p{1}),length(p{2}));
+            if movietype==mv_noise              
+                p{3} = [10 20 40 80 160];
+                p{4} =1:8;
+                d(3,:) = squeeze(sp_mov(x,y,1:end-t_lag-1));
+                d(4,:) = th_mov(x,y,1:end-t_lag-1);
+                hist_all = zeros(length(p{1}),length(p{2}),length(p{3}),length(p{4}));
             end
             
-            %         figure
-            %         polar(th,spd,'o');
-            %         hold on
-            %         polar(th(sp_all>0),spd(sp_all>0),'go');
+            size(d)
+            display('computing histogram');
+            tic
+                       
+            n_all = hist_all;
+            ndim = length(p);
+            if movietype== fl_noise
+                for c = 1:length(p{1})
+                    c
+                    for sz = 1:length(p{2})
+                        f = find(d(1,:)==p{1}(c) & d(2,:)==p{2}(sz));
+                        n_all(c,sz)=length(f);
+                        if length(f)>0
+                            hist_all(c,sz)=sum(n_spikes(f+t_lag).*ntrials(f+t_lag)')/sum(ntrials(f+t_lag));
+                        else
+                            hist_all(c,sz)=nan;
+                        end
+                    end
+                end
+            end
             
             if movietype == mv_noise
-                sp_norm = spd_hist/sum(sp_all);
-                sp_norm_rand = spd_hist_rand/sum(sp_all);
-                
+                for c = 1:length(p{1})
+                    c
+                    for sz = 1:length(p{2})
+                        for sp = 1:length(p{3})
+                            for th = 1:length(p{4})
+                                hit = (d(1,:)==p{1}(c) & d(2,:)==p{2}(sz) & d(3,:)==p{3}(sp) & d(4,:)==p{4}(th));
+                                n_unique(c,sz,sp,th) = sum(diff(hit)>0);
+                                f= find(hit);
+                                n_all(c,sz,sp,th)=length(f);
+                                if length(f)>0
+                                    hist_all(c,sz,sp,th)=sum(n_spikes(f+t_lag).*ntrials(f+t_lag)')/sum(ntrials(f+t_lag));
+                                else
+                                    hist_all(c,sz,sp,th)=nan;
+                                end
+                            end
+                        end
+                    end
+                end
+            end          
+            
+            squeeze(hist_all(1,:,:,:))
+            squeeze(hist_all(2,:,:,:))
+            toc
+            
+            f_null = find(d(1,:)==0);
+            spont = sum(n_spikes(f_null+t_lag).*ntrials(f_null+t_lag)')/sum(ntrials(f_null+t_lag));
+       
+            if movietype==mv_noise
                 figure
-                plot(sp_norm);
-                hold on
-                plot(sp_norm_rand,'r');
-                xlabel('speed')
-                
-                th_norm = th_hist/sum(sp_all);
-                th_norm_rand = th_hist_rand/sum(sp_all);
-                figure
-                plot(th_norm);
-                hold on
-                plot(th_norm_rand,'r');
-                xlabel('theta')
-                
-                figure
-                plot((sp_norm(2:6)-sp_norm_rand(2:6))./sp_norm_rand(2:6))
-                xlabel('speed')
-                spd_tuning(cell_n,:) = (sp_norm(2:6)-sp_norm_rand(2:6))./sp_norm_rand(2:6);
-                %         figure
-                %         plot(th_hist);
-                %
+                h = (squeeze(nanmean(hist_all,4)));
+                h(isnan(h))=-0.1*max(h(:));
+                for i= 1:2
+                    subplot(1,2,i)
+                    
+                    imagesc(squeeze(h(i,:,:)),[min(h(:)) max(h(:))]);
+                    axis equal
+                    axis square
+                end
+            end
+
+            if movietype == fl_noise
+                sz_tune= hist_all;                
+            elseif movietype == mv_noise
+                sz_tune = nanmean(nanmean(hist_all,4),3);
             end
             
-            figure
-            plot(h/nansum(sp_all));
+            tuningfig=figure
+            subplot(2,2,1);
+            plot(sz_tune');
             hold on
-            plot(h_rand/nansum(sp_all),'r');
+            plot([1 5],[spont spont],'r')
+            title(sprintf('ch%d c%d',channel_no,clust_no))
+            axis([1 5 0 max(max(sz_tune))])
             xlabel('size')
+             set(gca,'Xtick',1:length(p{2}));
+                set(gca,'Xticklabel',p{2});
             
-            sz_tune_rand = h_rand/nansum(sp_all);
-            sz_tune = h/nansum(sp_all);
-            baseline = (1-sz_tune_rand(1))/(length(sz_tune)-1)
+            if movietype == mv_noise
+                
+                
+                sp_tune = squeeze(nanmean(nanmean(hist_all,4),2));
+                subplot(2,2,2);
+                plot(sp_tune');
+                hold on
+                plot([1 5],[spont spont],'r')
+                axis([1 5 0 max(max(sp_tune))])
+                xlabel('speed');
+                title(printf('ch%d c%d',channel_no,clust_no))
+                set(gca,'Xtick',1:length(p{3}));
+                set(gca,'Xticklabel',p{3});
+                
+                th_tune = squeeze(nanmean(nanmean(hist_all,3),2));
+                
+                subplot(2,2,3);
+                plot(th_tune');
+                hold on
+                plot([1 8],[spont spont],'r')
+                axis([1 8 0 max(max(th_tune))])
+                xlabel('theta');
+                title(printf('ch%d c%d',channel_no,clust_no))
+                
+                
+            end
+            subplot(2,2,4);
+            imagesc(sta_t(:,:,t_lag+1)'-127,[-32 32]);hold on
+            plot(x,y,'o');
+            xlabel(sprintf('t = %d',t_lag+1));
             
-            figure
-            plot((sz_tune(2:6)-baseline)/baseline)
-            xlabel('size')
-            
-            size_tuning(cell_n,:) =(sz_tune(2:6)-baseline)/baseline;
             
             %%%%% histrograms relative to onset/offset
-            rastfig = figure;
-            histfig=figure;
+            timefig = figure;
+            
             
             for rep = 1:2
                 n=0;
@@ -485,7 +592,7 @@ color_range = [-64 64];
                 end
                 
                 h=0;
-                figure(rastfig)
+                subplot(2,1,1)
                 hold on
                 for i = 1:n
                     t = times-ontime(i);
@@ -496,15 +603,17 @@ color_range = [-64 64];
                     end
                 end
                 
-               if length(h)>1
-                   figure(histfig)
-                hold on
-                plot(histbins(1:end-1)+dt/2,h(1:end-1)/(n*dt),c)
-                onset_hist(cell_n,rep,:) = h(1:end-1)/(n*dt);
-               end
+                if length(h)>1
+                    subplot(2,1,2)
+                    hold on
+                    plot(histbins(1:end-1)+dt/2,h(1:end-1)/(n*dt),c)
+                    onset_hist(cell_n,rep,:) = h(1:end-1)/(n*dt);
+                end
             end
-            figure(histfig);
+            subplot(2,1,2)
             legend('gray->on','gray->off')
+            title(sprintf('ch%d c%d',channel_no,clust_no))
+            
             if movietype ==fl_noise
                 plot([0.25 0.5], [0.5 0.5],'g','LineWidth',8)
             end
@@ -527,21 +636,24 @@ color_range = [-64 64];
             sta_col =reshape(sta_t,nx*ny,nt);
             [u s v] = svd(sta_col-mean(sta_t(:)));
             
-            figure
+            svdfig=figure
             
             for i = 1:3
-                subplot(1,3,i)
+                subplot(2,3,i)
                 range = max(abs(min(u(:,i))),abs(max(u(:,i))));
-                imagesc(reshape(u(:,i),nx,ny)'*sign(v(1,i)),1.2*[-range range]);
-                v(:,i) = v(:,i)*sign(v(1,i));
-                axis square;
+                imagesc(reshape(u(:,i),nx,ny)'*sign(v(4,i)),1.2*[-range range]);
+                svdt(i,:,:) = reshape(u(:,i),nx,ny)'*sign(v(4,i));
+                v(:,i) = v(:,i)*sign(v(4,i));
+                axis equal; axis tight;
                 set(gca,'XTickLabel',[])
                 set(gca,'YTickLabel',[])
+                subplot(2,3,i+3)
+                plot(v(:,i));
+                xlim([0 size(v,1)])
             end
-            figure
-            plot(v(:,1:3));
-            figure
-            plot(diag(s));
+            
+            %figure
+            %plot(diag(s));
         end
         
         if pos_neg
@@ -631,51 +743,57 @@ color_range = [-64 64];
         if movietype==cm_noise
             [m ind] = max(abs(sta_t(:)-127));
             
-            [x y t] = ind2sub(size(sta_t),ind)
-            figure
-            imagesc(fftshift(abs(fft2(sta_t(:,:,t)'-128))));
-             title(titlestr);
-            saveas(gcf,fullfile(noisepname,sprintf('fft_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        end
-        h = zeros(size(n_spikes));
-        m=0;
-        tic
-        sta=(sta_t(xrange,yrange,t_lag)-movavg(xrange,yrange))/128;
-        
-        
-        sta = sta/sqrt(sum(sum(sta.^2)));
-        
-        %%% calculate transfer function
-        for t = (t_lag+1):n_frames
-            if n_spikes(t)>=0
-                m = (moviedata(xrange,yrange,t-t_lag+1)-movavg(xrange,yrange))/(128*sqrt(dx*dy));
-                h(t) = sta(:)'*m(:);
+            [x y t_lag] = ind2sub(size(sta_t),ind)
+            figure(wnfig)
+            subplot(2,2,4)
+            imagesc(fftshift(abs(fft2(sta_t(:,:,t_lag)'-128))));
+            title(titlestr);
+                      axis equal;
+                set(gca,'XTickLabel',[])
+                set(gca,'YTickLabel',[])
+                axis tight
+            %saveas(gcf,fullfile(noisepname,sprintf('fft_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            
+            h = zeros(size(n_spikes));
+            m=0;
+            tic
+            sta=(sta_t(xrange,yrange,t_lag)-movavg(xrange,yrange))/128;
+            
+            
+            sta = sta/sqrt(sum(sum(sta.^2)));
+            
+            %%% calculate transfer function
+            for t = (t_lag+1):n_frames
+                if n_spikes(t)>=0
+                    m = (moviedata(xrange,yrange,t-t_lag+1)-movavg(xrange,yrange))/(128*sqrt(dx*dy));
+                    h(t) = sta(:)'*m(:);
+                end
             end
+            
+            %      figure
+            %      plot(h(t_lag+1:n_frames),n_spikes(t_lag+1:n_frames),'.');
+            
+            hist_int =0.05;
+            h_round = round(h(t_lag+1:n_frames)/hist_int);
+            n_sp = n_spikes(t_lag+1:n_frames);
+            h_min = min(h_round);
+            h_range = h_min:max(h_round)-1;
+            n_mean=0; n_std=0; n_samp=0;
+            for i = h_range;
+                use = find(h_round ==i);
+                n_mean(i-h_min+1) = mean(n_sp(use));
+                n_std(i-h_min+1) = std(n_sp(use));
+                n_samp(i-h_min+1) = size(use,1);
+            end
+            %             if movietype == cm_noise
+            %                 figure
+            %                 errorbar(h_range*hist_int,n_mean,n_std./sqrt(n_samp));
+            %                 hold on;
+            %                 plot(h_range*hist_int,n_samp/500,'g');
+            %             end
+            
+            transfer_function(cell_n,1:size(n_mean,2)) = n_mean;
         end
-        
-        %      figure
-        %      plot(h(t_lag+1:n_frames),n_spikes(t_lag+1:n_frames),'.');
-        
-        hist_int =0.05;
-        h_round = round(h(t_lag+1:n_frames)/hist_int);
-        n_sp = n_spikes(t_lag+1:n_frames);
-        h_min = min(h_round);
-        h_range = h_min:max(h_round)-1;
-        n_mean=0; n_std=0; n_samp=0;
-        for i = h_range;
-            use = find(h_round ==i);
-            n_mean(i-h_min+1) = mean(n_sp(use));
-            n_std(i-h_min+1) = std(n_sp(use));
-            n_samp(i-h_min+1) = size(use,1);
-        end
-        if movietype == cm_noise
-            figure
-        errorbar(h_range*hist_int,n_mean,n_std./sqrt(n_samp));
-        hold on;
-        plot(h_range*hist_int,n_samp/500,'g');
-        end
-        
-        transfer_function(cell_n,1:size(n_mean,2)) = n_mean;
         
         if calculate_stc
             covmat =0;
@@ -771,9 +889,59 @@ color_range = [-64 64];
             plot(h_range*hist_int,n_samp/500,'g');
         end   %% if spike-triggered covariance
     end
-end    %%% cell
+    if movietype == cm_noise
+    
+        saveas(wnfig,fullfile(noisepname,sprintf('wndata_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        
+        wn_crf{cell_n}=cycledata;
+        wn_N(cell_n)=N;
+        wnsvd_xy{cell_n} = svdt;
+        wnsvd_t{cell_n} = v;
+        wn_sta{cell_n}=sta_t;
+    elseif movietype == fl_noise
+        
+        saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        
+        fl_N(cell_n)=N;
+        fl_hist_all{cell_n}=hist_all;
+        fl_n_all{cell_n} = n_all;
+        fl_sta_diff{cell_n}=sta_diff;
+        fl_sta{cell_n}=sta_t;
+        fl_lag(cell_n)=t_lag;
+        fl_spont(cell_n)=spont;
+    
+    elseif movietype==mv_noise
+        
+        saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        saveas(tuningfig,fullfile(noisepname,sprintf('move_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+        
+        mv_N(cell_n)=N;
+        mv_hist_all{cell_n}=hist_all;
+        mv_n_unique{cell_n} = n_unique;
+        mv_sta_diff{cell_n}=sta_diff;
+        mv_sta{cell_n}=sta_t;
+        mv_lag(cell_n)=t_lag;
+        mv_spont(cell_n)=spont;
+    end
+end  %%%cell
 
-% 
+if movietype==cm_noise
+    wn_degperpix=degperpix;
+    save(afile,'wn_N','wnsvd_t','wnsvd_xy','wn_sta','wn_crf','wn_degperpix','wn_responsiveness','wn_phase','-append')
+elseif movietype==fl_noise
+    fl_degperpix=degperpix;
+    save(afile,'fl_N','fl_hist_all','fl_n_unique','fl_onset','fl_lag','fl_degperpix','fl_spont','-append')
+elseif movietype==mv_noise
+    mv_degperpix=degperpix;
+    save(afile,'mv_N','mv_hist_all','mv_n_unique','mv_onset','mv_lag','mv_degperpix','mv_spont','-append')
+end
+
+
+
+%
 % if SU
 %     save(afile,'sta_N','sta_wpref','sta_responsiveness','sta_contrastphase','halfslope_wn','contrast_wn','response_wn','duration_wn','adaptation_index','sta_thetapref','sta_A1','sta_null','sta_thetawidth','sta_baseline','sta_all','transfer_function','fano','-append');
 % end
