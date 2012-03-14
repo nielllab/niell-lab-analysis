@@ -304,7 +304,10 @@ for tet=use_tets
         X(:,:,chan)=X(:,:,chan)+avg;
     end
 
-    save waveformdata X idx score
+   % save waveformdata X idx score
+    wave_all{tet} = X;
+    score_all{tet}=score;
+    
     
     for c = 1:n_clust
         clust_size(c)=sum(idx==c);
@@ -489,7 +492,7 @@ end %tet
 
 Tank_Name
 
-clear X Xshift Xica Xold Xraw used nonc_score s score c_score
+clear  Xshift Xica Xold Xraw used nonc_score s c_score clear group
 
 %%% save everything
 [bname output_path] = uiputfile('','data folder');

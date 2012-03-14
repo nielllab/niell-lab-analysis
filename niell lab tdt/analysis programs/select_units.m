@@ -86,6 +86,8 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
     used = find(goodcells);
 
     %%% once potential clusters have been selected, show avg waveform and ISI
+   
+    
     for i =length(used):-1:1;
 
         c = used(i);
@@ -102,6 +104,9 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         dt =dt(dt<.02);
         hist(dt,.0005:0.001:.02);
           set(gcf,'Position',[50 50 800 400], 'Color',linecolor(c,:));
+          
+          %%% call Erik's code to calculate cluster separation
+          %%%showClusterSeparation(wave_all{tet},idx_all{tet_ch},i);
     end
 
     %%% give the user a chance to revise their choices
