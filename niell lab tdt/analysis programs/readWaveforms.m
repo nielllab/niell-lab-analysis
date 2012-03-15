@@ -145,5 +145,6 @@ for tet=use_tets;
     size(idx_all{(tet-1)*4+1})
     sprintf('finished tet %d ',tet)
 end %tet
-%
- save(fullfile(pname,fname))
+
+[fname pname] = uiputfile('','cluster file','*.mat');
+save(fullfile(pname,fname));
