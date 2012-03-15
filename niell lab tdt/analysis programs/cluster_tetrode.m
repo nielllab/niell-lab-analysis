@@ -140,7 +140,6 @@ for tet=use_tets
     end
         
 
-
     %%% cut out beginning of waveform before threshold, no information
     %%% there (necessary?)
     X = X(:,6:30,:);
@@ -185,6 +184,9 @@ for tet=use_tets
         end
     end
 
+    
+    wave_all{tet}=Xshift;
+    
     figure
     hist(I);
     X= Xshift(used,:,:);
@@ -303,12 +305,7 @@ for tet=use_tets
     for chan = 1:4
         X(:,:,chan)=X(:,:,chan)+avg;
     end
-
-   % save waveformdata X idx score
-    wave_all{tet} = X;
-    score_all{tet}=score;
-    
-    
+   
     for c = 1:n_clust
         clust_size(c)=sum(idx==c);
     end
