@@ -1,4 +1,4 @@
-function p = fitLGNrf(z);
+function [p g] = fitLGNrf(z);
 %%% fit gaussian rf cmn 2012
 %%% peak has to be reasonably high above background
 %%% p = [A B x0 y0 sigx sigy]
@@ -23,22 +23,21 @@ p0(4) = max_y;
 p0(5)= sigx;
 p0(6)=sigy;
 
-p0
+% figure 
+% subplot(2,1,1)
+% imagesc(z)
+% axis equal
 
-figure 
-imagesc(z)
-axis equal
-
-guess = gauss2d(p0,xy);
-figure
-imagesc(reshape(guess,size(z,1),size(z,2)))
-axis equal
-
-
+% guess = gauss2d(p0,xy);
+% figure
+% imagesc(reshape(guess,size(z,1),size(z,2)))
+% axis equal
 
 p = nlinfit(xy,z(:),@gauss2d,p0)
 
 fit= gauss2d(p,xy);
-figure
-imagesc(reshape(fit,size(z,1),size(z,2)))
-axis equal
+g= reshape(fit,size(z,1),size(z,2));
+
+% subplot(2,1,2);
+% imagesc(g)
+% axis equal

@@ -79,8 +79,9 @@ for tet=use_tets
                 s = s(:,1:length(T));
             end
             
-            Nblock(block) = length(T);
-            
+            if ~isempty(T)
+                Nblock(block) = length(T);
+            end
             event_times_all{ch}(N+(1:Nblock(block))) = T +10^5 *(block-1);
             X(N+(1:Nblock(block)),1:size(s,1),tet_ch)=s';
             size(X)
@@ -140,7 +141,14 @@ for tet=use_tets
     end
         
 
-    %%% cut out beginning of waveform before threshold, no information
+    %%% in case of no data
+    if N<10
+        N=100;
+        X= -1*(10^-5)*rand(N,30,4);
+    end
+    
+    
+     %%% cut out beginning of waveform before threshold, no information
     %%% there (necessary?)
     X = X(:,6:30,:);
 

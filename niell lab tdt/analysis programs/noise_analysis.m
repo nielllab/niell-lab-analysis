@@ -429,11 +429,12 @@ for cell_n = cell_range
             clear d
             
             %[m ind] = max(abs(sta_t(:)-127));
-            [m ind] = max(sta_diff(:));
-            m
-            [x y t] = ind2sub(size(sta_t),ind)
-            t_lag = t-1;
-            
+           
+                [m ind] = max(sta_diff(:));
+                m
+                [x y t] = ind2sub(size(sta_t),ind)
+                t_lag = t-1;
+    
             if movietype == mv_noise
                 d=zeros(4,size(moviedata,3)-t_lag-1);
             else
@@ -624,7 +625,7 @@ for cell_n = cell_range
                     subplot(2,1,2)
                     hold on
                     plot(histbins(1:end-1)+dt/2,h(1:end-1)/(n*dt),c)
-                    onset_hist(cell_n,rep,:) = h(1:end-1)/(n*dt);
+                    onset_hist(rep,:) = h(1:end-1)/(n*dt);
                     onset_bins=histbins;
                 end
             end
