@@ -34,11 +34,19 @@ else
     
 end
 
-stim_duration = input('duration : ');
-nrows = input('# orients : ');
-ncols = input('# sfs : ');
-tf = input('temp freqs : ');
-latency = input('latency (0.05]');
+stim_duration = input('duration [1] : ');
+if stim_duration==[]
+    stim_duration=1;
+end
+nrows = input('# orients [8] : ');
+
+ncols = input('# sfs [6]  : ');
+
+tf = input('temp freqs [2 8] : ');
+
+latency = input('latency (0.05) : ');
+
+latency
 panels= length(tf);
 
 plot_duration=stim_duration; %in second
@@ -53,8 +61,8 @@ else
     cell_range=1:4:nchan;
 end
 
-%for cell_n = cell_range;
-for cell_n=4:4
+for cell_n = cell_range;
+%for cell_n=21:26
     cell_n
     if SU
         channel_no = cells(cell_n,1)
@@ -94,7 +102,7 @@ for cell_n=4:4
                 drift(cell_n).spont(f+1) = spikeFFT(spikes,tf(1)*f)/(stim_duration*numtrials);
             end
         else
-            for f = 0:2
+            for f = 0:2  %%% fix this when adding more tf for flicker
                 drift(cell_n).flicker(f+1) = spikeFFT(spikes,tf(1)*f)/(stim_duration*numtrials);
             end
             xlabel('flicker')
@@ -152,48 +160,79 @@ for cell_n=4:4
             
         end %orientation
         if SU
-            saveas(rast_fig,fullfile(pname,sprintf('generic_rast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
-            saveas(hist_fig,fullfile(pname,sprintf('generic_hist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+            saveas(rast_fig,fullfile(pname,sprintf('drift_rast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+            if rep==2
+                saveas(hist_fig,fullfile(pname,sprintf('drift_hist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+            end
         end
-        figure
+        if rep==1
+            colorplot=figure
+        else
+            figure(colorplot)
+        end
         for f = 1:3
-            subplot(2,2,f)
+            subplot(2,3,f+(rep-1)*3)
             imagesc(squeeze(abs(drift(cell_n).R(:,:,rep,f))));
             colorbar
         end
         
     end  %%% panel
     
-    wfig= figure
-    thetafig=figure
+    %wfig= figure
+    thetafig=figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
     color={'b','r'};
+    drift(cell_n).orient_tune = zeros(3,length(tf),nrows);
+    drift(cell_n).sf_tune=zeros(3,length(tf),ncols+1);
     
     for f=1:3
         for rep = 1:length(tf)
            
             [u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f)))-abs(drift(cell_n).spont(f)))
            %[u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f))))
-            orient_tune = u(:,1);
-            sf_tune = v(:,1);
-            if sum(orient_tune)<0 & sum(sf_tune)<0;
+          
+           orient_tune = u(:,1);
+           
+           sf_tune = v(:,1);
+                      if sum(orient_tune)<0 & sum(sf_tune)<0;
                 orient_tune=-1 * orient_tune;
                 sf_tune=-1 * sf_tune;
-            end 
+                      end 
+            [max_o]= max(orient_tune);
+            max_sf = max(sf_tune);
+                sf_tune = sf_tune*s(1,1)*max_o;
+                orient_tune=orient_tune*s(1,1)*max_sf;
+                
+                
+           sf_tune(2:end+1)=sf_tune;
+            sf_tune(1) = abs(drift(cell_n).flicker(f));  %%% fix this when adding more tfs for flicker
+            
+            drift(cell_n).orient_tune(rep,f,:)=orient_tune';
+            drift(cell_n).sf_tune(rep,f,:) = sf_tune;
+ 
             figure(thetafig)
-            subplot(2,2,f)
+            subplot(2,3,f)
             hold on
             plot(orient_tune,color{rep})
             xlabel('theta')
-            axis([ 1 8 0 1])
+            lim = ylim;
+            if rep==2
+                ylim([min(0,lim(1)) lim(2)])
+            end 
+            xlim([1 length(orient_tune)])
             
-            figure(wfig)
-            subplot(2,2,f)
+            %figure(wfig)
+            subplot(2,3,f+3)
             hold on
             plot(sf_tune,color{rep})
             xlabel('SF')
-            axis([1 6 0 1])
+            xlim([1 length(sf_tune)])
+            if rep ==2
+                lim = ylim;
+            ylim([min(0,lim(1)) lim(2)])
+            end
         end
         
     end
 end
 
+save(afile,'drift','-append');
