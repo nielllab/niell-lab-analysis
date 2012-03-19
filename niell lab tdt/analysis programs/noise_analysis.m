@@ -121,7 +121,7 @@ if correct_spectrum
 end
 
 if crop_mov
-    moviedata=moviedata(:,29:100,:);
+    moviedata=moviedata(:,27:102,:);
 end
 
 
@@ -147,7 +147,9 @@ display('reshaping movie')
 tic
 
 mov_squeeze = reshape(moviedata(:,:,1:end-sta_length),size(moviedata,1)*size(moviedata,2),size(moviedata,3)-sta_length);
-mov_squeeze=uint8(mov_squeeze);
+if movietype~=cm_noise
+    mov_squeeze=uint8(mov_squeeze);
+end
 toc
 
 display('computing avgs')
@@ -377,6 +379,7 @@ for cell_n = cell_range
         
         if movietype ==cm_noise
             color_range = [-64 64];
+            movavg=127;
         else
             color_range = [-0.25 0.25];
             movavg=0;
@@ -385,6 +388,7 @@ for cell_n = cell_range
         stafig=figure
         for t = 1:16
             subplot(4, 4, t);
+            
             imagesc(sta_t(:,:,t)'-movavg' ,color_range);
             axis equal
             axis tight
@@ -429,12 +433,12 @@ for cell_n = cell_range
             clear d
             
             %[m ind] = max(abs(sta_t(:)-127));
-           
-                [m ind] = max(sta_diff(:));
-                m
-                [x y t] = ind2sub(size(sta_t),ind)
-                t_lag = t-1;
-    
+            
+            [m ind] = max(sta_diff(:));
+            m
+            [x y t] = ind2sub(size(sta_t),ind)
+            t_lag = t-1;
+            
             if movietype == mv_noise
                 d=zeros(4,size(moviedata,3)-t_lag-1);
             else
@@ -574,59 +578,70 @@ for cell_n = cell_range
             %%%%% histrograms relative to onset/offset
             timefig = figure;
             
-            
+            sizes = [1 2 4 8 16 255];
             for rep = 1:2
-                n=0;
-                ontime=0;
-                tseries = single(squeeze(moviedata(x,y,:)));
-                if rep ==1
-                    onset = (tseries(1:end-1)==127 & diff(tseries)>0);
-                    c = 'r';
-                elseif rep ==2
-                    onset = (tseries(1:end-1)==127 & diff(tseries)<0);
-                    c= 'b';
-                elseif rep ==3
-                    onset = (tseries(1:end-1)==255 & diff(tseries)<0);
-                    c= 'g';
-                elseif rep ==4
-                    onset = (tseries(1:end-1)==0 & diff(tseries)>1);
-                    c= 'c';
-                end
-                
-                for i=1:length(eps);
-                    if eps(1,i)<length(onset) & onset(eps(1,i))
-                        n= n+1;
-                        ontime(n) = eps(2,i);
+                for sz = 1:length(sizes);
+                    n=0;
+                    ontime=0;
+                    tseries = single(squeeze(moviedata(x,y,:)));
+                    size_series = single(squeeze(sz_mov(x,y,:)));
+                    if rep ==1
+                        if movietype==mv_noise
+                            onset = (tseries(1:end-1)==127 & diff(tseries)<0 &size_series(2:end)==sizes(sz));
+                        else
+                            onset = (tseries(1:end-2)==127 & tseries(2:end-1)==0 & tseries(3:end)==127 &size_series(2:end-1)==sizes(sz));
+                        end
+                        c = 'b';
+                    elseif rep ==2
+                        if movietype==mv_noise
+                            onset = (tseries(1:end-1)==127 & diff(tseries)>0 &size_series(2:end)==sizes(sz));
+                        else
+                            onset = (tseries(1:end-2)==127 & tseries(2:end-1)==255 & tseries(3:end)==127 &size_series(2:end-1)==sizes(sz));
+                        end
+                        c= 'r';
+                    elseif rep ==3
+                        onset = (tseries(1:end-1)==255 & diff(tseries)<0);
+                        c= 'g';
+                    elseif rep ==4
+                        onset = (tseries(1:end-1)==0 & diff(tseries)>1);
+                        c= 'c';
                     end
-                end
-                
-                
-                if movietype == fl_noise
-                    dt=0.05
-                    histbins = 0:dt:0.75;
-                elseif movietype==mv_noise
-                    dt = 0.1
-                    histbins = -1:dt:2;
-                end
-                
-                h=0;
-                subplot(2,1,1)
-                hold on
-                for i = 1:n
-                    t = times-ontime(i);
-                    t = t(t>histbins(1) & t<histbins(end));
-                    plot(t,ones(length(t),1)*i,[c '*'])
-                    if ~isempty(t)
-                        h =h+ histc(t, histbins);
+                    
+                    for i=1:length(eps);
+                        if eps(1,i)<length(onset) & onset(eps(1,i))
+                            n= n+1;
+                            ontime(n) = eps(2,i);
+                        end
                     end
-                end
-                
-                if length(h)>1
-                    subplot(2,1,2)
+                    
+                    
+                    if movietype == fl_noise
+                        dt=0.05;
+                        histbins = 0:dt:0.8;
+                    elseif movietype==mv_noise
+                        dt = 0.1;
+                        histbins = -1:dt:2;
+                    end
+                    
+                    h=0;
+                    subplot(2,1,1)
                     hold on
-                    plot(histbins(1:end-1)+dt/2,h(1:end-1)/(n*dt),c)
-                    onset_hist(rep,:) = h(1:end-1)/(n*dt);
-                    onset_bins=histbins;
+                    for i = 1:n
+                        t = times-ontime(i);
+                        t = t(t>histbins(1) & t<histbins(end));
+                        plot(t,ones(length(t),1)*i,[c '*'])
+                        if ~isempty(t)
+                            h =h+ histc(t, histbins);
+                        end
+                    end
+                    
+                    if length(h)>1
+                        subplot(2,1,2)
+                        hold on
+                        plot(histbins(1:end-1)+dt/2,h(1:end-1)/(n*dt),c)
+                        onset_hist(rep,sz,:) = h(1:end-1)/(n*dt);
+                        onset_bins=histbins;
+                    end
                 end
             end
             subplot(2,1,2)
@@ -637,11 +652,6 @@ for cell_n = cell_range
                 plot([0.25 0.5], [0.5 0.5],'g','LineWidth',8)
             end
             
-            %         figure
-            %         plot(mh/nansum(sp_all));
-            %         hold on
-            %         plot(mh_rand/nansum(sp_all),'r');
-            %
             
             
         end
@@ -773,45 +783,45 @@ for cell_n = cell_range
             axis tight
             %saveas(gcf,fullfile(noisepname,sprintf('fft_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
-            h = zeros(size(n_spikes));
-            m=0;
-            tic
-            sta=(sta_t(xrange,yrange,t_lag)-movavg(xrange,yrange))/128;
-            
-            
-            sta = sta/sqrt(sum(sum(sta.^2)));
-            
-            %%% calculate transfer function
-            for t = (t_lag+1):n_frames
-                if n_spikes(t)>=0
-                    m = (moviedata(xrange,yrange,t-t_lag+1)-movavg(xrange,yrange))/(128*sqrt(dx*dy));
-                    h(t) = sta(:)'*m(:);
-                end
-            end
-            
-            %      figure
-            %      plot(h(t_lag+1:n_frames),n_spikes(t_lag+1:n_frames),'.');
-            
-            hist_int =0.05;
-            h_round = round(h(t_lag+1:n_frames)/hist_int);
-            n_sp = n_spikes(t_lag+1:n_frames);
-            h_min = min(h_round);
-            h_range = h_min:max(h_round)-1;
-            n_mean=0; n_std=0; n_samp=0;
-            for i = h_range;
-                use = find(h_round ==i);
-                n_mean(i-h_min+1) = mean(n_sp(use));
-                n_std(i-h_min+1) = std(n_sp(use));
-                n_samp(i-h_min+1) = size(use,1);
-            end
-            %             if movietype == cm_noise
-            %                 figure
-            %                 errorbar(h_range*hist_int,n_mean,n_std./sqrt(n_samp));
-            %                 hold on;
-            %                 plot(h_range*hist_int,n_samp/500,'g');
+            %             h = zeros(size(n_spikes));
+            %             m=0;
+            %             tic
+            %             sta=(sta_t(xrange,yrange,t_lag)-movavg(xrange,yrange))/128;
+            %
+            %
+            %             sta = sta/sqrt(sum(sum(sta.^2)));
+            %
+            %             %%% calculate transfer function
+            %             for t = (t_lag+1):n_frames
+            %                 if n_spikes(t)>=0
+            %                     m = (moviedata(xrange,yrange,t-t_lag+1)-movavg(xrange,yrange))/(128*sqrt(dx*dy));
+            %                     h(t) = sta(:)'*m(:);
+            %                 end
             %             end
-            
-            transfer_function(cell_n,1:size(n_mean,2)) = n_mean;
+            %
+            %             %      figure
+            %             %      plot(h(t_lag+1:n_frames),n_spikes(t_lag+1:n_frames),'.');
+            %
+            %             hist_int =0.05;
+            %             h_round = round(h(t_lag+1:n_frames)/hist_int);
+            %             n_sp = n_spikes(t_lag+1:n_frames);
+            %             h_min = min(h_round);
+            %             h_range = h_min:max(h_round)-1;
+            %             n_mean=0; n_std=0; n_samp=0;
+            %             for i = h_range;
+            %                 use = find(h_round ==i);
+            %                 n_mean(i-h_min+1) = mean(n_sp(use));
+            %                 n_std(i-h_min+1) = std(n_sp(use));
+            %                 n_samp(i-h_min+1) = size(use,1);
+            %             end
+            %             %             if movietype == cm_noise
+            %             %                 figure
+            %             %                 errorbar(h_range*hist_int,n_mean,n_std./sqrt(n_samp));
+            %             %                 hold on;
+            %             %                 plot(h_range*hist_int,n_samp/500,'g');
+            %             %             end
+            %
+            %             transfer_function(cell_n,1:size(n_mean,2)) = n_mean;
         end
         
         if calculate_stc
@@ -907,47 +917,48 @@ for cell_n = cell_range
             hold on;
             plot(h_range*hist_int,n_samp/500,'g');
         end   %% if spike-triggered covariance
-    end
-    if movietype == cm_noise
         
-        saveas(wnfig,fullfile(noisepname,sprintf('wndata_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        
-        wn(cell_n,stim_eye).crf=cycledata;
-        wn(cell_n,stim_eye).N=N;
-        wn(cell_n,stim_eye).svd_xy = svdt;
-        wn(cell_n,stim_eye).svd_t = v;
-        wn(cell_n,stim_eye).sta=sta_t;
-    elseif movietype == fl_noise
-        
-        saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        
-        fl(cell_n).N=N;
-        fl(cell_n).hist_all=hist_all;
-        fl(cell_n).n_all = n_all;
-        fl(cell_n).sta_diff=sta_diff;
-        fl(cell_n).sta=sta_t;
-        fl(cell_n).lag=t_lag;
-        fl(cell_n).spont=spont;
-        fl(cell_n).onset_hist=onset_hist;
-        fl(cell_n).onset_bins=onset_bins;
-        
-    elseif movietype==mv_noise
-        
-        saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        saveas(tuningfig,fullfile(noisepname,sprintf('move_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        
-        mv(cell_n).N=N;
-        mv(cell_n).hist_all=hist_all;
-        mv(cell_n).n_unique = n_unique;
-        mv(cell_n).sta_diff=sta_diff;
-        mv(cell_n).sta=sta_t;
-        mv(cell_n).lag=t_lag;
-        mv(cell_n).spont=spont;
-        mv(cell_n).onset_hist=onset_hist;
-        mv(cell_n).onset_bins=onset_bins;
+        if movietype == cm_noise
+            
+            saveas(wnfig,fullfile(noisepname,sprintf('wndata_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            
+            wn(cell_n,stim_eye).crf=cycledata;
+            wn(cell_n,stim_eye).N=N;
+            wn(cell_n,stim_eye).svd_xy = svdt;
+            wn(cell_n,stim_eye).svd_t = v;
+            wn(cell_n,stim_eye).sta=sta_t;
+        elseif movietype == fl_noise
+            
+            saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            
+            fl(cell_n).N=N;
+            fl(cell_n).hist_all=hist_all;
+            fl(cell_n).n_all = n_all;
+            fl(cell_n).sta_diff=sta_diff;
+            fl(cell_n).sta=sta_t;
+            fl(cell_n).lag=t_lag;
+            fl(cell_n).spont=spont;
+            fl(cell_n).onset_hist=onset_hist;
+            fl(cell_n).onset_bins=onset_bins;
+            
+        elseif movietype==mv_noise
+            
+            saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            saveas(tuningfig,fullfile(noisepname,sprintf('move_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            
+            mv(cell_n).N=N;
+            mv(cell_n).hist_all=hist_all;
+            mv(cell_n).n_unique = n_unique;
+            mv(cell_n).sta_diff=sta_diff;
+            mv(cell_n).sta=sta_t;
+            mv(cell_n).lag=t_lag;
+            mv(cell_n).spont=spont;
+            mv(cell_n).onset_hist=onset_hist;
+            mv(cell_n).onset_bins=onset_bins;
+        end
     end
 end  %%%cell
 
