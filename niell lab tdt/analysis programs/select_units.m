@@ -1,4 +1,4 @@
-function select_units
+%function select_units
 %%% after clustering is done, this program lets you go through and select
 %%% the clusters to use for analysis
 %%% written by Cris Niell, 2009-2010
@@ -12,8 +12,11 @@ oldfname = fname;
 load(fullfile(pname,fname));   %%% need to copy pname, or it can get written over in load
 pname = oldpname;
 
-[basename] =sscanf(oldfname,'cluster_data_%s.mat')
-basename = basename(1:length(basename)-4)
+
+basename = oldfname(14:end-4)
+
+% [basename] =sscanf(oldfname,'cluster_data_%s.mat')
+% basename = basename(1:length(basename)-4)
 
 %%% where to save analysis results
 [afname apname] = uiputfile('*.mat','analysis file');
@@ -55,6 +58,7 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
     goodcells = zeros(1,12);
     try
         open(sprintf('%shist%s_t%d.fig',oldpname,basename,tet))
+        sprintf('%shist%s_t%d.fig',oldpname,basename,tet)
         set(gcf,'Position',[10 50 500 400]);
         open(sprintf('%ssnip%s_t%d.fig',oldpname,basename,tet))
         set(gcf,'Position',[10 550 500 400]);
