@@ -47,15 +47,24 @@ fl_noise=2;
 mv_noise=3;
 
 if movietype==cm_noise
-    %contrast_modulated = input('contrast modulated? 0/1 : ');
-    contrast_modulated=1;
-    framerate = input('movie frame rate 30/60 : ');
-    correct_spectrum=1;
-    %correct_spectrum = input('correct spectrum? 0/1 : ');
-    %pos_neg = input('separate on/off sta? 0/1 : ');
-    %compute_svd = input('compute svd ? 0/1 : ');
-    crop_mov=input('crop to screen size [128 x 72] 0/1 : ');
-    stim_eye=input('contra eye (1) or ipsi eye (2) : ');
+    prompt = {'contrast modulated','frame rate','correct spectrum','crop to screen size','contra(1) or ipsi(2) eye'};
+num_lines = 1;
+def = {'1','60','1','1','1'};
+answer = inputdlg(prompt,'wn parameters',num_lines,def);
+contrast_modulated = str2num(answer{1})
+framerate = str2num(answer{2})
+correct_spectrum = str2num(answer{3})
+crop_mov =  str2num(answer{4})
+stim_eye =  str2num(answer{5})
+%     %contrast_modulated = input('contrast modulated? 0/1 : ');
+%     contrast_modulated=1;
+%     framerate = input('movie frame rate 30/60 : ');
+%     correct_spectrum=1;
+%     %correct_spectrum = input('correct spectrum? 0/1 : ');
+%     %pos_neg = input('separate on/off sta? 0/1 : ');
+%     %compute_svd = input('compute svd ? 0/1 : ');
+%     crop_mov=input('crop to screen size [128 x 72] 0/1 : ');
+%     stim_eye=input('contra eye (1) or ipsi eye (2) : ');
     pos_neg=0;
     compute_svd=1;
     contrast_period=10;
@@ -193,12 +202,15 @@ for cell_n = cell_range
     end
     toc
     
-    if ~isempty(times)
+    if isempty(times)
+        display('no spikes ... skipping')
+    else
         n_spikes = zeros(n_frames,1);
         display('getting frames')
         tic
         for f = 1:n_frames
-            if SU
+        
+             if SU
                 [Spike_Timing index numtrials] = getTrials(frameEpocs{block},times, f, frame_duration);
                 eps = frameEpocs{block};
             else
@@ -214,7 +226,7 @@ for cell_n = cell_range
         
         
         %%% evaluate these before normalizing to rate
-        N=sum(n_spikes)
+        N=nansum(n_spikes)
         duration_wn(cell_n)=max(times);
         sta_N(cell_n)=N;
         fano(cell_n) = var(n_spikes)/mean(n_spikes);
@@ -223,6 +235,7 @@ for cell_n = cell_range
             break
         end
         n_spikes = n_spikes./(frame_duration*ntrials');
+        n_spikes(isnan(n_spikes))=0;
         
         
         if movietype == cm_noise
@@ -536,9 +549,10 @@ for cell_n = cell_range
             subplot(2,2,1);
             plot(sz_tune');
             hold on
-            plot([1 6],[spont spont],'r')
+            plot([1 length(sz_tune)],[spont spont],'r')
             title(sprintf('ch%d c%d',channel_no,clust_no))
-            axis([1 6 0 max(max(sz_tune))])
+            yl = ylim;
+            axis([1 length(sz_tune) 0 yl(2)])
             xlabel('size')
             set(gca,'Xtick',1:length(p{2}));
             set(gca,'Xticklabel',p{2});
@@ -551,7 +565,8 @@ for cell_n = cell_range
                 plot(sp_tune');
                 hold on
                 plot([1 5],[spont spont],'r')
-                axis([1 5 0 max(max(sp_tune))])
+               yl=ylim;
+               axis([1 5 0 yl(2)])
                 xlabel('speed');
                 title(printf('ch%d c%d',channel_no,clust_no))
                 set(gca,'Xtick',1:length(p{3}));
@@ -563,7 +578,8 @@ for cell_n = cell_range
                 plot(th_tune');
                 hold on
                 plot([1 8],[spont spont],'r')
-                axis([1 8 0 max(max(th_tune))])
+              yl = ylim;
+              axis([1 8 0 yl(2)])
                 xlabel('theta');
                 title(printf('ch%d c%d',channel_no,clust_no))
                 
@@ -943,6 +959,7 @@ for cell_n = cell_range
             fl(cell_n).spont=spont;
             fl(cell_n).onset_hist=onset_hist;
             fl(cell_n).onset_bins=onset_bins;
+             fl(cell_n).sta_pos=[x y];
             
         elseif movietype==mv_noise
             
@@ -958,6 +975,7 @@ for cell_n = cell_range
             mv(cell_n).spont=spont;
             mv(cell_n).onset_hist=onset_hist;
             mv(cell_n).onset_bins=onset_bins;
+            mv(cell_n).sta_pos=[x y];
         end
     end
 end  %%%cell

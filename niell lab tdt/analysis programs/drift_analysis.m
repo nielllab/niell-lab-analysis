@@ -34,19 +34,23 @@ else
     
 end
 
-stim_duration = input('duration [1] : ');
-if stim_duration==[]
-    stim_duration=1;
-end
-nrows = input('# orients [8] : ');
+%stim_duration = input('duration [1] : ');
+% nrows = input('# orients [8] : ');
+% ncols = input('# sfs [6]  : ');
+% tf = input('temp freqs [2 8] : ');
+% latency = input('latency (0.05) : ');
 
-ncols = input('# sfs [6]  : ');
+prompt = {'duration','# orients','# sfs','temp freqs','latency'};
+num_lines = 1;
+def = {'1','8','6','[2 8]','0.05'};
+answer = inputdlg(prompt,'grating parameters',num_lines,def);
+stim_duration = str2num(answer{1})
+nrows = str2num(answer{2})
+ncols = str2num(answer{3})
+tf =  str2num(answer{4})
+latency =  str2num(answer{5})
 
-tf = input('temp freqs [2 8] : ');
 
-latency = input('latency (0.05) : ');
-
-latency
 panels= length(tf);
 
 plot_duration=stim_duration; %in second
@@ -70,19 +74,25 @@ for cell_n = cell_range;
         channel_times =spikeT{cell_n} - (block-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
         hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
+        epocs = stimEpocs{block}
     else
         hist_fig = figure('Name',sprintf('channel %d',cell_n))
+        epocs=data.stimEpocs;
     end
     
     %%% spont and flicker
     spontfig=figure
-    for rep=1:2
+    emax = max(epocs(1,:));
+    
+    extra_range = 1:(emax-panels*nrows*ncols)
+     
+    for rep=extra_range
         cond = panels*nrows*ncols+rep;
         
         if SU
-            [Spike_Timing index numtrials] = getTrialsSU(stimEpocs{block},times, cond, stim_duration);
+            [Spike_Timing index numtrials] = getTrialsSU(epocs,times, cond, stim_duration);
         else
-            [Spike_Timing index numtrials] = getTrialsSU(data.stimEpocs,data.MUspikeT{cell_n}, cond, stim_duration);
+            [Spike_Timing index numtrials] = getTrialsSU(epocs,data.MUspikeT{cell_n}, cond, stim_duration);
         end
         
         spikes=Spike_Timing(:);
@@ -90,7 +100,7 @@ for cell_n = cell_range;
         
         %%% rasters
         figure(spontfig);
-        subplot(2,1,rep)
+        subplot(length(extra_range),1,rep)
         hold on; set(gca, 'yDir','reverse');
         axis([0 plot_duration 0 numtrials+1]);
         plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
@@ -103,7 +113,7 @@ for cell_n = cell_range;
             end
         else
             for f = 0:2  %%% fix this when adding more tf for flicker
-                drift(cell_n).flicker(f+1) = spikeFFT(spikes,tf(1)*f)/(stim_duration*numtrials);
+                drift(cell_n).flicker(rep-1,f+1) = spikeFFT(spikes,tf(1)*f)/(stim_duration*numtrials);
             end
             xlabel('flicker')
         end
@@ -204,8 +214,12 @@ for cell_n = cell_range;
                 
                 
            sf_tune(2:end+1)=sf_tune;
-            sf_tune(1) = abs(drift(cell_n).flicker(f));  %%% fix this when adding more tfs for flicker
-            
+            rep
+            if rep<=(length(extra_range)-1)
+                sf_tune(1) = abs(drift(cell_n).flicker(rep,f));  %%% fix this when adding more tfs for flicker
+            else
+                 sf_tune(1) = abs(drift(cell_n).flicker(length(extra_range)-1,f));
+            end
             drift(cell_n).orient_tune(rep,f,:)=orient_tune';
             drift(cell_n).sf_tune(rep,f,:) = sf_tune;
  

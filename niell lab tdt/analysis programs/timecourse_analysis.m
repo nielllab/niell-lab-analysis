@@ -61,8 +61,19 @@ for cell_n = cell_range;
         amps =squeeze(min(wv(:,5:10,:),[],2));
         figure
         hist(amps,[-200:1:0]*10^-6)
+        if SU
+            title(sprintf('ch %d cl %d',channel_no,clust_no));
+        else
+            title(sprintf('channel %d',cell_n));
+        end
+        
         figure
         plot(times/60,amps,'.');
+        if SU
+            title(sprintf('ch %d cl %d',channel_no,clust_no));
+        else
+            title(sprintf('channel %d',cell_n));
+        end
         
     else
         times = data.MUspikeT{cell_n};

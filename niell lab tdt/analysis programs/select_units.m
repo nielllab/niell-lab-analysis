@@ -1,4 +1,4 @@
-%function select_units
+function select_units
 %%% after clustering is done, this program lets you go through and select
 %%% the clusters to use for analysis
 %%% written by Cris Niell, 2009-2010
