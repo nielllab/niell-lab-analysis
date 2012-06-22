@@ -69,7 +69,7 @@ for cell_n = cell_range;
         
         if SU
             rast_fig = figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
-            timefig = figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
+           % timefig = figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
         else
             rast_fig = figure('Name',sprintf('unit %d rep %d',cell_n));
              timefig = figure('Name',sprintf('unit %d rep %d',cell_n));
@@ -103,11 +103,8 @@ for cell_n = cell_range;
             figure(hist_fig);
             subplot(nrows,ncols,c);
             hold on
-            if rep ==1
-                color = 'b';
-            else
-                color = 'r';
-            end
+            color_list = 'brg';
+        color = color_list(rep);
             plot(hist_range, hist(Spike_Timing, hist_range)/(hist_int*numtrials),color);
             hold on;
             axis(axis_range);
@@ -117,15 +114,15 @@ for cell_n = cell_range;
             %                 title_text = sprintf('ch%d c%d rep%d',channel_no,clust_no, rep);
             %             end
             
-            figure(timefig);
-            for i=1:numtrials;
-                r(i)=sum(index==i);
-                subplot(nrows,ncols,c);
-                plot(r);
-                axis([0 length(r) 0 1+max(r)*1.1])
-            end
-            set(gca,'XTickLabel',[])
-            set(gca,'YTickLabel',[])
+%             figure(timefig);
+%             for i=1:numtrials;
+%                 r(i)=sum(index==i);
+%                 subplot(nrows,ncols,c);
+%                 plot(r);
+%                 axis([0 length(r) 0 1+max(r)*1.1])
+%             end
+%             set(gca,'XTickLabel',[])
+%             set(gca,'YTickLabel',[])
 
         end %orientation
         if SU

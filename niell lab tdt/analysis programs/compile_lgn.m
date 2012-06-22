@@ -10,24 +10,54 @@ afile = {'C:\data\ephys matlab data\030912_LGN\recording2\analysis_final.mat',..
     'C:\data\ephys matlab data\031512_LGN\recording3\analysis_3final.mat',...
     'C:\data\ephys matlab data\031612_lgn\recording1\analysis_1final.mat',...
     'C:\data\ephys matlab data\031612_lgn\recording2\analysis_2final.mat',...
-    'C:\data\ephys matlab data\031612_lgn\recording3\analysis_3final.mat'};
+    'C:\data\ephys matlab data\031612_lgn\recording3\analysis_3final.mat', ...
+    'C:\data\ephys matlab data\052512_lgn\analysis1.mat',...
+    'C:\data\ephys matlab data\060112_LGN\analysis1.mat',...
+    'C:\data\ephys matlab data\060712_lgn\analysis1.mat',...
+    'C:\data\ephys matlab data\060812_LGN\analysis1.mat',...
+    'C:\data\ephys matlab data\061212_LGN\recording1\analysis1.mat',...
+    'C:\data\ephys matlab data\061212_LGN\recording2\analysis2.mat',...
+    'C:\data\ephys matlab data\061412_LGN\record1\analysis1.mat'};
+% 
+% histfile ={'C:\data\histology data\dmn015_P2_A55.tif',...
+%     'C:\data\histology data\dmn015_P3_A53.tif',...
+%     'C:\data\histology data\dmn015_P4_A50.tif',...
+%     'C:\data\histology data\dmn016_P5_A51.tif',...
+%     'C:\data\histology data\dmn016_P6_A51.tif',...
+%     'C:\data\histology data\dmn017_P4_A53.tif',...
+%     'C:\data\histology data\dmn017_P7_A49.tif',...
+%     'C:\data\histology data\dmn018_P3_A48.tif',...
+%     'C:\data\histology data\dmn018_P4_A53.tif',...
+%     'C:\data\histology data\dmn018_p5_A54.tif'};
 
-histfile ={'C:\data\histology data\dmn015_P2_A55.tif',...
-    'C:\data\histology data\dmn015_P3_A53.tif',...
-    'C:\data\histology data\dmn015_P4_A50.tif',...
-    'C:\data\histology data\dmn016_P5_A51.tif',...
-    'C:\data\histology data\dmn016_P6_A51.tif',...
-    'C:\data\histology data\dmn017_P1_A55.tif',...
-    'C:\data\histology data\dmn017_P3_A49.tif',...
-    'C:\data\histology data\dmn017_P4_A53.tif',...
-    'C:\data\histology data\dmn017_P7_A49.tif',...
-    'C:\data\histology data\dmn018_P3_A48.tif',...
-    'C:\data\histology data\dmn018_P4_A53.tif',...
-    'C:\data\histology data\dmn018_p5_A54.tif'};
+histfile = {'C:\data\histology data\ANATOMY2\dmn015_P2_A54.tif', ...
+    'C:\data\histology data\ANATOMY2\dmn015_P3_A53.tif', ...
+    'C:\data\histology data\ANATOMY2\dmn015_P4_A50.tif', ...
+    'C:\data\histology data\ANATOMY2\dmn016_P5_A53.tif',...
+    'C:\data\histology data\ANATOMY2\dmn016_P6_A53.tif',...
+    'C:\data\histology data\ANATOMY2\dmn017_P4_A53.tif',...
+    'C:\data\histology data\ANATOMY2\dmn017_P7_A52.tif',...
+    'C:\data\histology data\ANATOMY2\dmn018_P3_A50.tif',...
+    'C:\data\histology data\ANATOMY2\dmn018_P4_A53.tif',...
+    'C:\data\histology data\ANATOMY2\dmn018_P5_A54.tif',...
+    'C:\data\histology data\ANATOMY2\DMN020P1F50.tif',...
+    'C:\data\histology data\ANATOMY2\dmn021P7F50.tif',...
+    'C:\data\histology data\ANATOMY2\dmn022P10F48.tif',...
+    'C:\data\histology data\ANATOMY2\dmn023P5F53.tif',...
+    'C:\data\histology data\ANATOMY2\DMN024P9F53.tif',...
+    'C:\data\histology data\ANATOMY2\DMN024P10F51.tif',...
+    'C:\data\histology data\ANATOMY2\DMN025P5F53.tif'};
+    
+ PaxPos=[54 53 50 53 53 53 52 50 53 54 50 50 48 53 53 51 53];
+%  AllenPos=[82 81 77 81 81 83 76 81 80 77 81 82 77 77 75 81 81 79 81 80];
+
 n=0;
+%PaxPos=[55 53 50 51 51 53 49 48 53 54];
+[anatomy sections]=LGN_histo(histfile, PaxPos);
 
-lgn_histo
-sitexy(i).xy [x y]
+
+
+
 for i = 1:length(afile);
     i
     clear displayOffset drift mv fl wn
@@ -54,13 +84,27 @@ for i = 1:length(afile);
     offsetX(cell_range)=displayOffset;
     offsetY(cell_range)=displayHeight*atand(1/25);
     peaksite(cell_range)=peakchan;
+    clear x y z s
     for j =1:length(peakchan)
-        sitexy(i).
-    histox(cell_range)
-    histoy(cell_range)
-    histoz(cell_range)
+        x(j)=anatomy(i).siteXY(1,peakchan(j));
+        y(j)=anatomy(i).siteXY(2,peakchan(j));
+        z(j)=anatomy(i).AP;
+        s(j)=anatomy(i).section;
+    end
+    
+    histox(cell_range)=x;
+    histoy(cell_range)=y;
+    histoz(cell_range)=z;
+    histSection(cell_range)=s;
     
 end
+
+
+labels = zeros(n,3);
+labels(:,3)=1;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+
+
 wn_degperpix = wn(end).degperpix;
 
 clear p
@@ -91,17 +135,17 @@ for cell_n = 1:n
                 wn_all(cell_n).sta_fit=fit;
                 wn_all(cell_n).sta_final=sta;
                 wn_all(cell_n).zscore=z;
-                figure
-                subplot(2,2,1)
-                imagesc(sta); axis equal; axis tight;
-                
-                subplot(2,2,2)
-                imagesc(g);axis equal; axis tight;
-                
-                subplot(2,2,4);
-                plot(wn_all(cell_n).sta_t)
-                xlim([0 30])
-                
+%                 figure
+%                 subplot(2,2,1)
+%                 imagesc(sta); axis equal; axis tight;
+%                 
+%                 subplot(2,2,2)
+%                 imagesc(g);axis equal; axis tight;
+%                 
+%                 subplot(2,2,4);
+%                 plot(wn_all(cell_n).sta_t)
+%                 xlim([0 30])
+%                 
                 
                 n_sta=n_sta+1;
                 break
@@ -113,15 +157,21 @@ end
 ind=0;
 tmin=zeros(1,cell_n); tmax = tmin; wn_lat=tmin;
 
+x0 = nan(n,1); y0 = nan(n,1); wx=nan(n,1),wy=nan(n,1);A = nan(n,1); wn_resp = nan(n,1); wn_phase=nan(n,1);
+tmin= nan(n,1); tmax=nan(n,1); wn_lat = nan(n,1); wn_cr=nan(n,1); wn_cr_norm=nan(n,1);
+
+
 for cell_n=1:n
-    if ~isempty(wn_all(cell_n).N)
+   
+   if ~isempty(wn_all(cell_n).N)
+       
         wn_resp(cell_n) = wn_all(cell_n).responsiveness(1);
         wn_phase(cell_n) =wn_all(cell_n).phase;
         A(cell_n) = wn_all(cell_n,1).sta_fit(1);
         wx(cell_n)=wn_all(cell_n,1).sta_fit(6);
         wy(cell_n)=wn_all(cell_n,1).sta_fit(5);
         x0(cell_n)= (wn_all(cell_n,1).sta_fit(4) - 64)*wn_degperpix + offsetX(cell_n);
-        y0(cell_n)= (wn_all(cell_n,1).sta_fit(3) - 38)*wn_degperpix - offsetY(cell_n);
+        y0(cell_n)= (wn_all(cell_n,1).sta_fit(3) - 38)*wn_degperpix -offsetY(cell_n);  %%% top of monitor = -38, bottom = 38,  so moving upward means more negative
         if ~isempty(wn_all(cell_n,1).sta_t)
             [z wn_lat(cell_n)] = max(wn_all(cell_n,1).sta_t);
             tmax(cell_n)=max(wn_all(cell_n,1).sta_t)*sign(A(cell_n));
@@ -129,8 +179,36 @@ for cell_n=1:n
         end
         wn_cr(cell_n) = (wn_all(cell_n).crf(10) - wn_all(cell_n).crf(1));
         wn_cr_norm(cell_n) = (wn_all(cell_n).crf(10) - wn_all(cell_n).crf(1)) ./ ( (wn_all(cell_n).crf(10) + wn_all(cell_n).crf(1)));
-    end
+   end
 end
+
+
+figure
+plot (histox,x0,'o');
+
+figure
+plot (histoy,y0,'o');
+
+
+labels=zeros(n,3);
+goodfit = find(~isnan(x0));
+labels(goodfit,1)=1;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('wn sta rfs');
+
+labels= makeColors(x0);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);  
+title('x0')
+
+labels= makeColors(y0);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);  
+title('y0');
+
+tratio=tmin./tmax;
+tratio(tratio<-1)=-1;
+labels= makeColors(tratio);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);  
+title('min max ratio');
 
 for cell_n = 1:n
     f= fl_all(cell_n);
@@ -167,6 +245,7 @@ for cell_n = 1:n
         
         fl_lat(cell_n)=onset_lat(cell_n,fl_onoff(cell_n));
         fl_trans(cell_n) =onset_trans(cell_n,fl_onoff(cell_n));
+        fl_onset_amp(cell_n) = onset(cell_n,fl_onoff(cell_n));
         
         fl_lag(cell_n) = f.lag;
         fl_onoff(cell_n) = 2*(fl_onoff(cell_n)-1.5);
@@ -175,6 +254,22 @@ for cell_n = 1:n
         end
     end
 end
+
+fl_type= nan(size(fl_lag));
+fl_type(fl_lag==0)=1;
+fl_type(fl_lag==1)=2;
+labels= makeColors(fl_type);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);  
+
+labels= makeColors(fl_type);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels,8:11); 
+
+fl_trans_norm = fl_trans;
+fl_trans_norm(fl_trans_norm<0)=0;
+fl_trans_norm(fl_trans_norm<0)=0;
+fl_trans_norm(fl_onset_amp<2)=nan;
+labels= makeColors(fl_trans_norm);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);  
 
 
 for cell_n=1:n
@@ -211,17 +306,17 @@ for cell_n=1:n
         [mv_osi(cell_n) mv_prefO(cell_n)]= calcOSI(os_tune,0);
         [mv_dsi(cell_n) mv_prefD(cell_n)]= calcOSI(os_tune,1)
         
-        figure('Name',sprintf('cell %d',cell_n))
-        subplot(2,2,1)
-        plot(sz);
-        axis([1 3 min(0,min(sz)) max(1,max(sz))])
-        subplot(2,2,2)
-        plot(sp);
-        axis([1 5 min(0,min(sp)) max(1,max(sp))])
-        subplot(2,2,3)
-        plot(os_tune)
-        axis([1 8 min(0,min(os_tune)) max(1,max(os_tune))])
-        title(sprintf('OSI = %f DSI=%f',mv_osi(cell_n),mv_dsi(cell_n)))
+%         figure('Name',sprintf('cell %d',cell_n))
+%         subplot(2,2,1)
+%         plot(sz);
+%         axis([1 3 min(0,min(sz)) max(1,max(sz))])
+%         subplot(2,2,2)
+%         plot(sp);
+%         axis([1 5 min(0,min(sp)) max(1,max(sp))])
+%         subplot(2,2,3)
+%         plot(os_tune)
+%         axis([1 8 min(0,min(os_tune)) max(1,max(os_tune))])
+%         title(sprintf('OSI = %f DSI=%f',mv_osi(cell_n),mv_dsi(cell_n)))
         
         d = drift_all(cell_n);
         tfs = squeeze(nanmean(d.orient_tune(1:2,:,:),3));
@@ -252,8 +347,11 @@ for cell_n=1:n
 end
 
 
-
-
+fl_type= nan(size(fl_lag));
+fl_type(fl_lag==0)=1;
+fl_type(fl_lag==1)=2;
+labels= makeColors(fl_type);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);  
 
 
 
