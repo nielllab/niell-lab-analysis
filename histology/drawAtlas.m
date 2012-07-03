@@ -19,7 +19,7 @@ Xall = [];
 Yall = [];
 Zall = [];
 for paxnum=1:totalnum;
-    pathname='C:\data\histology data\paxinos traces';
+    pathname='C:\data\lgn rf project\histology data\paxinos traces';
      filename = sprintf('paxinos%d.tif',paxnum+43);%sprintf returns as string. lgn paxinos figures 44-55.
 img=imread(fullfile(pathname,filename));
 
