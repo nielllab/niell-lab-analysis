@@ -24,8 +24,8 @@ fontSize=12;
 %     'C:\data\histology data\ANATOMY2\DMN025P5F53.tif'...
 %     'C:\data\histology data\ANATOMY2\DMN025P7F52.tif'};
 %     
-%  PaxPos=[54 53 50 53 53 55 49 53 52 50 53 54 50 50 48 53 53 51 53 52];
-  AllenPos=[82 81 77 81 81 83 76 81 80 77 81 82 77 77 75 81 81 79 81 80];
+%   PaxPos=[54 53 50 53 53 55 49 53 52 50 53 54 50 50 48 53 53 51 53 52];
+%   AllenPos=[82 81 77 81 81 83 76 81 80 77 81 82 77 77 75 81 81 79 81 80];
 %call drawAtlas function to get paxinos figures and 3d rendering 
 [atlasFig Render3D Xall Yall Zall sections] = drawAtlas;
 
@@ -35,7 +35,7 @@ for i = 1:length(file);
     
 %Find AP position. Position AP is approximated using Paxinos Atlas.
 Paxinos=PaxPos(i);
-Allen=AllenPos(i);
+%Allen=AllenPos(i);
 
 PaxList = [44 45 46 47 48 49 50 51 52 53 54 55];
 PaxAP = [-1.58 -1.70 -1.82 -1.94 -2.06 -2.18 -2.30 -2.46 -2.54 -2.70 -2.8 -2.92];
@@ -125,7 +125,7 @@ hold on;
 plot(x, y, 'ro');
 plot (XElectrode, YElectrode, 'g.');
 plot (CentroidX, CentroidY, 'cx');
-title(AP, 'FontSize', fontSize);
+title(sprintf('file %d AP %f',i,AP));
 axis([-600 600 -600 600]);
 axis square;
 
@@ -133,7 +133,7 @@ axis square;
 
 %calculate site positions relative to centroid and define matrices.
 Centroid = [CentroidX; CentroidY];
-ElectrodeSite = [CentroidX-x; CentroidY-y];
+ElectrodeSite = [x; y];
 LGN=[YCoord, XCoord];
 Electrode=[YElectrode, XElectrode];
 

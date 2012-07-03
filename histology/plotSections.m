@@ -1,5 +1,6 @@
 function f =plotSections(sections,anatomy,histox,histoy,histSection,labels, range)
 
+colordef black
 if ~exist('range','var')
     range = 1:length(sections)
     use_subplot=1;
@@ -8,12 +9,13 @@ else
 end
 
 f=figure;
+
 for i = range
     hold on
     if use_subplot
         subplot(3,4,i)
     end
-    plot(sections(i).coords(:,1),sections(i).coords(:,2) ,'.','MarkerSize',2)
+    plot(sections(i).coords(:,1),sections(i).coords(:,2) ,'b.','MarkerSize',2)
     axis([-500 500 -500 500])
     axis square
     hold on
@@ -30,3 +32,4 @@ for i = range
         scatter(histox(cells)+30*(rand(size(cells))-0.5),histoy(cells),[],labels(cells,:),'.');
     end
 end
+colordef white
