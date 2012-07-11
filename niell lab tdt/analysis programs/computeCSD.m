@@ -62,6 +62,9 @@ for c= 0:(nchan/4-1)
     end
     plot((phi((4*c+1):(4*c+4),1:duration_samps)'));
     axis([0 duration_samps minV*1.1 maxV*1.1])
+    if c==0
+        legend({'1','2','3','4'})
+    end
 end
 title(Tank_Name);
 
