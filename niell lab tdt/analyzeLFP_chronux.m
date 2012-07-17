@@ -23,10 +23,18 @@ for ch = chans
             lfpData{ch} = lfp;
         end
         if spectrumOn
-        params.Fs = 1/median(diff(ts));
+       
+           
+            
+            params.Fs = 1/median(diff(ts));
         params.tapers = [3 5];
         params.fpass = [0 150];
         
+        % lfp=rmlinesmovingwinc(lfp,[1 1],[],params,[],'y');
+        
+                 % lfp=rmlinesc(lfp,params,[],'y',60);
+
+         
         [S t f] = mtspecgramc(lfp',[3 1],params);
 
         spectData{ch} = S;

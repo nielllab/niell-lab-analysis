@@ -39,7 +39,7 @@ tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
 
 histsize = 2;
 histbins = histsize/2:histsize:max(tdtData.mouseT);
-histbins = histsize/2:histsize:1000;
+%histbins = histsize/2:histsize:1000;
 clear mousehist
     for i = 1:length(histbins);
         
@@ -69,12 +69,10 @@ for cell_n = cell_range
     end
    
     R = hist(times,histbins);
-    figure
-    %subplot(2,1,1)
+    speedfig(cell_n) = figure;
+    subplot(2,1,1)
     plot(histbins,R);
-    %plot(histbins,R/max(R));
     hold on
-    %plot(histbins, mousehist/max(mousehist),'g');
     plot(histbins, mousehist,'g');
     legend('rate','cm/sec')
     title(sprintf('ch = %d',ch));
@@ -84,53 +82,75 @@ for cell_n = cell_range
 %     figure
 %     plot(mousehist,mousehist2,'o')
     %subplot(2,1,2)
-    figure
+   subplot(2,1,2)
     plot(mousehist,R,'o');
    hold on
     xlabel('cm/sec')
     ylabel('hz')
     R = R(~isnan(mousehist));
-    mousehist = mousehist(~isnan(mousehist));
+    mousehist_nonan = mousehist(~isnan(mousehist));
     
-    c = corrcoef(mousehist,R);
+    c = corrcoef(mousehist_nonan,R);
      title(sprintf('ch %d - corr = %f',ch,c(1,2)))
      co(cell_n) = c(1,2);
      
-     shuffle_c = corrcoef(mousehist(end:-1:1),R);
+     shuffle_c = corrcoef(mousehist_nonan(end:-1:1),R);
      shuffle_co(cell_n) = shuffle_c(1,2);
      
-     interval = [0 0.5 1 2 4 8 16 32 ];
+     interval = [0 0.5 1 2 4 8 16 32 64];
      d=0;
      p=0;
      for i = 1:length(interval)-1;
-         d(i) = mean(R(find(mousehist>interval(i) & mousehist<interval(i+1))));
-         p(i) = mean(interval(i:i+1));
+         d(cell_n,i) = mean(R(find(mousehist_nonan>interval(i) & mousehist_nonan<interval(i+1))));
+         p(cell_n,i) = mean(interval(i:i+1));
      end
  
-   plot(p,d,'g');    
+   plot(p(cell_n,:),d(cell_n,:),'g');    
      
 end
 
-figure
-h = histc(co,[-0.5 -0.3 0.3 1]);
-bar(h(1:3)/sum(h))
 
+histfig=figure
+h = hist([co ; shuffle_co]', -0.4:0.2:0.8)
+bar( -0.4:0.2:0.8, h)
+legend({'raw','shuffled'})
 
-figure
-h = hist([co_all ; shuffle_co_all]', -0.4:0.2:0.8)
-bar( -0.4:0.2:0.8, h/31)
-
-figure
+wvfig = figure
 hold on
 for i = 1:length(co);
     
-if co(i)>0.3;
+if co(i)>0.5;
     plot(wv(:,i),'g');
+elseif co(i)<-0.5
+    plot(wv(:,i),'r');
+    else
+         plot(wv(:,i),'b');
+end
+end
+
+
+if SU
+    save(fullfile(apname,afname),'co','shuffle_co' ,'p','d','-append');
+end
+
+
+[fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+if exist(psfname,'file')==2;delete(psfname);end
+
+figure(histfig)
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',fullfile(pname,fname),'-append');
+figure(wvfig)
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',fullfile(pname,fname),'-append');
+
+for i = 1:length(speedfig)
+    figure(speedfig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',fullfile(pname,fname),'-append');
+end
+if SU
+    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
 else
-    plot(wv(:,i),'b');
+   ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']); 
 end
-end
-
-
-
-

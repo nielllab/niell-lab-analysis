@@ -42,7 +42,7 @@ tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
 
 mainfig= figure;
 if uselaser
-nx=2; ny=2;
+    nx=3; ny=2;
 else
     nx=2;ny=1;
 end
@@ -60,6 +60,7 @@ subplot(nx,ny,2)
 plot(bins(1:end-1),R(1:end-1,:))
 xlabel('secs')
 ylabel('sp/sec')
+xlim([0 max(tdtData.MUspikeT{ch})]);
 
 
 if uselaser
@@ -69,16 +70,17 @@ if uselaser
     smoothwindow = ceil(smoothwindow_secs/dt)
     lasersmooth = zeros(size(tdtData.laserTTL));
     %%% replace this with convolution (for speed)!
-%     for i = smoothwindow+1:length(tdtData.laserTTL);
-%         lasersmooth(i)= mean(tdtData.laserTTL(i-smoothwindow:i));
-%     end
-smoothfilter=ones(smoothwindow,1);
-lasersmooth=conv(double(tdtData.laserTTL),smoothfilter,'same')/sum(smoothfilter);
-
+    %     for i = smoothwindow+1:length(tdtData.laserTTL);
+    %         lasersmooth(i)= mean(tdtData.laserTTL(i-smoothwindow:i));
+    %     end
+    smoothfilter=ones(smoothwindow,1);
+    lasersmooth=conv(double(tdtData.laserTTL),smoothfilter,'same')/sum(smoothfilter);
+    
     lasersmooth = lasersmooth;
     figure(mainfig)
     subplot(nx,ny,1)
     plot(laserT,lasersmooth,'g')
+    xlim([0 max(laserT)])
     
     tic
     tsamp = 0;
@@ -102,19 +104,40 @@ lasersmooth=conv(double(tdtData.laserTTL),smoothfilter,'same')/sum(smoothfilter)
     plot(timeRange,vdata)
     hold on
     plot([0 17],[40 40],'g','LineWidth',12)
+    xlim([min(timeRange) max(timeRange)])
     xlabel('secs')
     ylabel('cm/sec');
     
-    subplot(nx,ny,4);
+        subplot(nx,ny,4);
     plot(timeRange,nanmean(vdata,2))
     hold on
     plot([0 17],[20 20],'g','LineWidth',12)
-     xlabel('secs')
+    xlim([min(timeRange) max(timeRange)])
+    xlabel('secs')
     ylabel('avg cm/sec');
+    tsamps = 0:0.5:max(laserT);
+    laserdownsamp = interp1(laserT,lasersmooth,tsamps);
     
+    for laser =1:2
+        if laser ==1
+            timepts = tsamps(laserdownsamp==0);
+        else
+            timepts = tsamps(laserdownsamp>0);
+        end
+        speeds = interp1(tdtData.mouseT,tdtData.mouseV,timepts);
+        laserspeed(laser) = nanmean(speeds);
+        laserspeed_std(laser) = nanstd(speeds)/sqrt(npulse);
+    end
+    subplot(nx,ny,6);
+    barweb(laserspeed,laserspeed_std);
+    legend({'off','on'})
+    ylabel('cm/sec')
+    
+
     spectrafig=figure;
-    
+    lfpfig = figure;
     for ch = chans;
+        freqs{ch} = tdtData.spectF{ch};
         df = median(diff(tdtData.spectF{ch}));
         specdata = tdtData.spectData{ch};
         normalizer = 1:size(specdata,2);
@@ -128,6 +151,7 @@ lasersmooth=conv(double(tdtData.laserTTL),smoothfilter,'same')/sum(smoothfilter)
                 spect_avg(:,f) = spect_avg(:,f) + interp1(tdata,squeeze(specdata(:,f)),timeRange+onT(i))';
             end
         end
+        figure(spectrafig)
         subplot(2,4,ceil(ch/4))
         imagesc(spect_avg',1.5*[0 prctile(spect_avg(:),95)])
         axis xy
@@ -138,6 +162,23 @@ lasersmooth=conv(double(tdtData.laserTTL),smoothfilter,'same')/sum(smoothfilter)
         set(gca,'XTick',(5:5:40)/dt);
         set(gca,'XTickLabel',{'-5','0','5','10','15','20','25','30'})
         title(sprintf('ch=%d',ch));
+       figure(lfpfig)
+       for laser = 1:2
+            
+      if laser ==1
+            timepts = tsamps(laserdownsamp==0);
+        else
+            timepts = tsamps(laserdownsamp>0);
+        end
+            
+            for f = 1:size(specdata,2)
+                laserlfp(ch,laser,f)= nanmean(interp1(tdata,squeeze(specdata(:,f)),timepts));
+            end
+       end
+        subplot(2,4,ceil(ch/4))
+        plot(tdtData.spectF{ch}, squeeze(laserlfp(ch,:,:)));
+        ylim([0 1.5*prctile(laserlfp(ch,1,:),95)])
+        xlim([0 90])
     end
     
 end
@@ -199,6 +240,10 @@ for cell_n = cell_range
     for rep = 1:2  %%% rep = stationary/moving  and laser off/on
         R=zeros(1,max(f));
         
+        statlaserRcycle = zeros(1,cycframes);
+        statlaserntrial = zeros(1,max(f));
+        statlasercyctrials = zeros(1,cycframes);
+        
         
         Rcycle = zeros(1,cycframes);
         ntrial = zeros(1,max(f));
@@ -232,10 +277,20 @@ for cell_n = cell_range
                     ntrial(f(i))=ntrial(f(i))+1;
                     Rcycle(mod(f(i),cycframes)+1) = Rcycle(mod(f(i),cycframes)+1) + fspikes;
                     cyctrials(mod(f(i),cycframes)+1) = cyctrials(mod(f(i),cycframes)+1) +1;
+                    if mouseInterp(i)<1
+                        statlaserntrial(f(i))=statlaserntrial(f(i))+1;
+                        statlaserRcycle(mod(f(i),cycframes)+1) = statlaserRcycle(mod(f(i),cycframes)+1) + fspikes;
+                        statlasercyctrials(mod(f(i),cycframes)+1) = statlasercyctrials(mod(f(i),cycframes)+1) +1;
+                    end
                 elseif rep==2 & laserInterp(i)>0.01;
                     ntrial(f(i))=ntrial(f(i))+1;
                     Rcycle(mod(f(i),cycframes)+1) = Rcycle(mod(f(i),cycframes)+1) + fspikes;
                     cyctrials(mod(f(i),cycframes)+1) = cyctrials(mod(f(i),cycframes)+1) +1;
+                    if mouseInterp(i)<1
+                        statlaserntrial(f(i))=statlaserntrial(f(i))+1;
+                        statlaserRcycle(mod(f(i),cycframes)+1) = statlaserRcycle(mod(f(i),cycframes)+1) + fspikes;
+                        statlasercyctrials(mod(f(i),cycframes)+1) = statlasercyctrials(mod(f(i),cycframes)+1) +1;
+                    end
                 end
             end
             if rep ==1 & mouseInterp(i)<1
@@ -251,6 +306,7 @@ for cell_n = cell_range
         R = R./ntrial;
         %         figure
         %         plot(R)
+        statlaserRcyclerep{cell_n,rep} = statlaserRcycle./statlasercyctrials;
         Rcyclerep{cell_n,rep} = Rcycle./cyctrials;
         movRcyclerep{cell_n,rep} = movRcycle./movcyctrials;
         %         figure
@@ -259,8 +315,8 @@ for cell_n = cell_range
             Rtc = Rtimecycle./timecyc_trials;  %%% firing as function of both time relative to laser and movie phase
             subplot(nx,ny,4);
             imagesc(Rtc);
-           
-           % plot(Rtc);
+            
+            % plot(Rtc);
             subplot(nx,ny,5)
             plot(mean(Rtc(:,[1 10]),2));
             hold on
@@ -293,19 +349,19 @@ for cell_n = cell_range
         d2 = condenseData(Rcyclerep{cell_n,2}',15)/(frame_duration);
         d2 = (d2(1:10) + d2(20:-1:11))/2;
         plot(0.5*(1-cos(2*pi*(1:10)/20)),d2,'g');
-          yl = get(gca,'YLim');
-    ylim([min(yl(1),0) yl(2)]);
-       % legend('off','on');
+        yl = get(gca,'YLim'); 
+        ylim([min(yl(1),0) yl(2)]);
+        % legend('off','on');
         xlabel('contrast');
         ylabel('sp/sec');
         title('laser effect');
         
-                    subplot(nx,ny,3) ;
-                    bar([mean(d(1:2)) mean(d2(1:2));mean(d(8:10))-mean(d(1:2)) mean(d2(8:10))-mean(d2(1:2))])
-          
-            xlim([0.5 2.5])
-            set(gca,'Xtick',1:2);
-            set(gca,'Xticklabel',{'spont','evoked'})
+        subplot(nx,ny,3) ;
+        bar([mean(d(1:2)) mean(d2(1:2));mean(d(8:10))-mean(d(1:2)) mean(d2(8:10))-mean(d2(1:2))])
+        
+        xlim([0.5 2.5])
+        set(gca,'Xtick',1:2);
+        set(gca,'Xticklabel',{'spont','evoked'})
         
     end
     
@@ -329,26 +385,32 @@ end
 [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
 if exist(psfname,'file')==2;delete(psfname);end
 
- figure(mainfig)
- set(gcf, 'PaperPositionMode', 'auto');
- print('-dpsc',fullfile(pname,fname),'-append');
+figure(mainfig)
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',fullfile(pname,fname),'-append');
 
- for i = 1:length(spikefig)
-     figure(spikefig(i))
- set(gcf, 'PaperPositionMode', 'auto');
- print('-dpsc',fullfile(pname,fname),'-append');
- end
- 
- if uselaser
-     figure(spectrafig)
- set(gcf, 'PaperPositionMode', 'auto');
- print('-dpsc',fullfile(pname,fname),'-append');
- end
- 
- ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-2)) 'pdf']);
- 
+for i = 1:length(spikefig)
+    figure(spikefig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',fullfile(pname,fname),'-append');
+end
+
+if uselaser
+    figure(spectrafig)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',fullfile(pname,fname),'-append');
+       figure(lfpfig)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',fullfile(pname,fname),'-append');
+end
+
 if SU
-    save(fullfile(apname,afname),'Rcyclerep','movRcyclerep','RtcAll','-append');
+    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
+else
+   ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']); 
+end
+if SU
+    save(fullfile(apname,afname),'laserspeed','laserspeed_std','statlaserRcyclerep','Rcyclerep','movRcyclerep','RtcAll','laserlfp','freqs','-append');
 end
 
 
