@@ -61,6 +61,7 @@ for cell_n = cell_range;
         clust_no = cells(cell_n,2)
         channel_times =spikeT{cell_n} - (block-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
+        times = times';
         hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
     else
         hist_fig = figure('Name',sprintf('channel %d',cell_n))
