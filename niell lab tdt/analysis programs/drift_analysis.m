@@ -1,4 +1,4 @@
-%function drift_analysis
+function drift_analysis(clustfile,afile,pdfFile,Block_Name,blocknum)
 % Matlab codes for reading from TTank for sweeping bars in 8 orientations
 % plots histgrams and rasters and fits data to a gaussian peak
 % Uses clustering information from cluster_linear.m or cluster_tetrode.m
@@ -7,19 +7,33 @@
 
 
 %%% read in cluster data, then connect to the tank and read the block
-clear all
-SU = menu('recording type','multi-unit','single unit')-1
+
+if ~exist('Block_Name','var');
+    SU = menu('recording type','multi-unit','single unit')-1;
+    useArgin=0;
+else
+    SU=1;
+    useArgin=1;
+end
 
 cells =1;
 if SU
-    [fname, pname] = uigetfile('*.mat','cluster data');
-    load(fullfile(pname,fname));
-    block = listdlg('ListString',Block_Name,'SelectionMode','single');
-    Block_Name = Block_Name{block}
-    [afname, apname] = uigetfile('*.mat','analysis data');
-    noisepname = apname;
-    afile = fullfile(apname,afname);
+    if ~useArgin
+        [fname, pname] = uigetfile('*.mat','cluster data');
+        clustfile=fullfile(pname,fname);
+    end
+    load(clustfile);
+    if ~useArgin
+        blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');
+        
+        
+        [afname, apname] = uigetfile('*.mat','analysis data');
+        noisepname = apname;
+        afile = fullfile(apname,afname);
+    end
     load(afile);
+    [pname fname] = fileparts(afile);
+    Block_Name = Block_Name{blocknum}
     use_afile=1;
     cells
 else
@@ -43,12 +57,23 @@ end
 prompt = {'duration','# orients','# sfs','temp freqs','latency'};
 num_lines = 1;
 def = {'1','8','6','[2 8]','0.05'};
-answer = inputdlg(prompt,'grating parameters',num_lines,def);
+if ~useArgin
+    answer = inputdlg(prompt,'grating parameters',num_lines,def);
+else
+    answer=def;
+end
 stim_duration = str2num(answer{1})
 nrows = str2num(answer{2})
 ncols = str2num(answer{3})
 tf =  str2num(answer{4})
 latency =  str2num(answer{5})
+
+if useArgin
+    psfilename = [pdfFile(1:end-4) 'drift.ps'];
+else
+    [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+end
+if exist(psfilename,'file')==2;delete(psfilename);end
 
 
 panels= length(tf);
@@ -65,16 +90,17 @@ else
     cell_range=1:4:nchan;
 end
 
+
 for cell_n = cell_range;
-%for cell_n=21:26
+    %for cell_n=21:26
     cell_n
     if SU
         channel_no = cells(cell_n,1)
         clust_no = cells(cell_n,2)
-        channel_times =spikeT{cell_n} - (block-1)*10^5;
+        channel_times =spikeT{cell_n} - (blocknum-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
         hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
-        epocs = stimEpocs{block}
+        epocs = stimEpocs{blocknum}
     else
         hist_fig = figure('Name',sprintf('channel %d',cell_n))
         epocs=data.stimEpocs;
@@ -85,7 +111,7 @@ for cell_n = cell_range;
     emax = max(epocs(1,:));
     
     extra_range = 1:(emax-panels*nrows*ncols)
-     
+    
     for rep=extra_range
         cond = panels*nrows*ncols+rep;
         
@@ -133,7 +159,7 @@ for cell_n = cell_range;
             sf_ind = mod(c-1,ncols)+1;
             orient_ind= ceil(c/ncols);
             if SU
-                [Spike_Timing index numtrials] = getTrialsSU(stimEpocs{block},times, cond, stim_duration);
+                [Spike_Timing index numtrials] = getTrialsSU(stimEpocs{blocknum},times, cond, stim_duration);
             else
                 [Spike_Timing index numtrials] = getTrialsSU(data.stimEpocs,data.MUspikeT{cell_n}, cond, stim_duration);
             end
@@ -189,41 +215,41 @@ for cell_n = cell_range;
     end  %%% panel
     
     %wfig= figure
-    thetafig=figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
+    thetafig(cell_n)=figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
     color={'b','r'};
     drift(cell_n).orient_tune = zeros(3,length(tf),nrows);
     drift(cell_n).sf_tune=zeros(3,length(tf),ncols+1);
     
     for f=1:3
         for rep = 1:length(tf)
-           
+            
             [u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f)))-abs(drift(cell_n).spont(f)))
-           %[u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f))))
-          
-           orient_tune = u(:,1);
-           
-           sf_tune = v(:,1);
-                      if sum(orient_tune)<0 & sum(sf_tune)<0;
+            %[u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f))))
+            
+            orient_tune = u(:,1);
+            
+            sf_tune = v(:,1);
+            if sum(orient_tune)<0 & sum(sf_tune)<0;
                 orient_tune=-1 * orient_tune;
                 sf_tune=-1 * sf_tune;
-                      end 
+            end
             [max_o]= max(orient_tune);
             max_sf = max(sf_tune);
-                sf_tune = sf_tune*s(1,1)*max_o;
-                orient_tune=orient_tune*s(1,1)*max_sf;
-                
-                
-           sf_tune(2:end+1)=sf_tune;
+            sf_tune = sf_tune*s(1,1)*max_o;
+            orient_tune=orient_tune*s(1,1)*max_sf;
+            
+            
+            sf_tune(2:end+1)=sf_tune;
             rep
             if rep<=(length(extra_range)-1)
                 sf_tune(1) = abs(drift(cell_n).flicker(rep,f));  %%% fix this when adding more tfs for flicker
             else
-                 sf_tune(1) = abs(drift(cell_n).flicker(length(extra_range)-1,f));
+                sf_tune(1) = abs(drift(cell_n).flicker(length(extra_range)-1,f));
             end
             drift(cell_n).orient_tune(rep,f,:)=orient_tune';
             drift(cell_n).sf_tune(rep,f,:) = sf_tune;
- 
-            figure(thetafig)
+            
+            figure(thetafig(cell_n))
             subplot(2,3,f)
             hold on
             plot(orient_tune,color{rep})
@@ -231,7 +257,7 @@ for cell_n = cell_range;
             lim = ylim;
             if rep==2
                 ylim([min(0,lim(1)) lim(2)])
-            end 
+            end
             xlim([1 length(orient_tune)])
             
             %figure(wfig)
@@ -242,11 +268,27 @@ for cell_n = cell_range;
             xlim([1 length(sf_tune)])
             if rep ==2
                 lim = ylim;
-            ylim([min(0,lim(1)) lim(2)])
+                ylim([min(0,lim(1)) lim(2)])
             end
         end
         
     end
+    
+    
+    
+    
+    figure(thetafig(cell_n))
+    title(sprintf('ch=%d cl=%d',channel_no,clust_no));
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+    figure(hist_fig) 
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
 end
 
 save(afile,'drift','-append');
+
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+

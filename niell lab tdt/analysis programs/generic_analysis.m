@@ -46,8 +46,11 @@ plot_duration=stim_duration; %in second
 
 hist_int = plot_duration/20;
 hist_range=[0:hist_int:plot_duration];
-axis_range=[0 plot_duration 0 100];
-
+if SU
+    axis_range=[0 plot_duration 0 25];
+else
+    axis_range=[0 plot_duration 0 100];
+end
 if SU
     cell_range = 1:size(cells,1)
 else
@@ -61,7 +64,7 @@ for cell_n = cell_range;
         clust_no = cells(cell_n,2)
         channel_times =spikeT{cell_n} - (block-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
-        times = times';
+        times = times;
         hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
     else
         hist_fig = figure('Name',sprintf('channel %d',cell_n))

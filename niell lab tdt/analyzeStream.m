@@ -33,6 +33,7 @@ for block = 1:nblocks;
             Vfilt = t;
         end
         t=data.streamT{ch};
+   
         
         sampRate = 1./median(diff(t));
         nyq = 0.5*sampRate;
@@ -55,10 +56,12 @@ for block = 1:nblocks;
         title(sprintf('ch=%d',ch))
     end
     
-    sprintf('calculating corr matrix')
-    c= corrcoef(Vfilt(:,1000:1000:length(Vfilt))');
-    figure
-    imagesc(c,[-1 1]);
+    clear f
+    
+%     sprintf('calculating corr matrix')
+%     c= corrcoef(Vfilt(:,1000:1000:length(Vfilt))');
+%     figure
+%     imagesc(c,[-1 1]);
     
 %     mn_wv = mean(Vfilt,1);
 %     figure
@@ -73,16 +76,16 @@ sprintf('calculating median');
         Vfilt_ref(ch,:) = Vfilt(ch,:)-med_wv;
     end
     
-    sprintf('calculating referenced corr matrix')
-    c_ref = corrcoef(Vfilt_ref(:,1000:1000:length(Vfilt_ref))')
-    figure
-    imagesc(c_ref,[-1 1]);
-    
-    sprintf('calculating std')
-    std_raw = std(Vfilt(:,1:length(Vfilt)/100)');
-    std_ref = std(Vfilt_ref(:,1:length(Vfilt)/100)');
-    figure
-    plot(std_raw); hold on; plot(std_ref);
+%     sprintf('calculating referenced corr matrix')
+%     c_ref = corrcoef(Vfilt_ref(:,1000:1000:length(Vfilt_ref))')
+%     figure
+%     imagesc(c_ref,[-1 1]);
+%     
+%     sprintf('calculating std')
+%     std_raw = std(Vfilt(:,1:length(Vfilt)/100)');
+%     std_ref = std(Vfilt_ref(:,1:length(Vfilt)/100)');
+%     figure
+%     plot(std_raw); hold on; plot(std_ref);
     
     
     clear Vfilt
@@ -100,11 +103,12 @@ sprintf('calculating median');
         
         plot(bins,(h))
         hold on
-        plot(-4.5*median(abs(v(100:100:length(v))))/0.6745, 1000,'*');
+        plot(-5*median(abs(v(100:100:length(v))))/0.6745, 1000,'*');
         xlim([min(bins) max(bins)]);
         ylim([0 10^4]);
         title(sprintf('ch = %d',ch));
-        [thresh(ch) ~] = ginput(1);
+        %[thresh(ch) ~] = ginput(1);
+        thresh(ch) = -5*median(abs(v(100:100:length(v))))/0.6745;
         lockoutRatio(ch)= sum(v<thresh(ch))/length(v);
         close
         %     figure
@@ -113,9 +117,13 @@ sprintf('calculating median');
     
     end
     
+    clear v
+    
     lockoutPeriod = 32;
-    pre_int=10;
-    post_int = 21;
+%     pre_int=10;
+%     post_int = 21;
+pre_int=7;
+post_int=24;
     snipLength= pre_int+post_int+1;
     if block==1
         for tet=1:8
@@ -155,6 +163,8 @@ sprintf('calculating median');
         end
         Xall{tet} = [Xall{tet}; X];
         Tall{tet} = [Tall{tet} t(finalCrossings)'+(block-1)*10^5];
+        
+        clear threshcrossed pre_win crossing
     end
     
 end
