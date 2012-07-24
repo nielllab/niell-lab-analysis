@@ -53,6 +53,10 @@ else
 end
 maxV = max(tdtData.mouseV);
 close all
+
+   d=0;
+     p=0;
+     
 for cell_n = cell_range
     ch= cell_n;
     if SU
@@ -98,8 +102,7 @@ for cell_n = cell_range
      shuffle_co(cell_n) = shuffle_c(1,2);
      
      interval = [0 0.5 1 2 4 8 16 32 64];
-     d=0;
-     p=0;
+  
      for i = 1:length(interval)-1;
          d(cell_n,i) = mean(R(find(mousehist_nonan>interval(i) & mousehist_nonan<interval(i+1))));
          p(cell_n,i) = mean(interval(i:i+1));
