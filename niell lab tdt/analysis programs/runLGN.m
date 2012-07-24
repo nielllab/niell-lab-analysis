@@ -63,5 +63,5 @@ end
 noise_analysis(clustfile,afile,pdfFile,flfile,Block_Name,flblock,2)  %%% flashing spots
 close all
 
-noise_analysis(clustfile,afile,pdfFile,mvFile,Block_Name,mvblock,3)   %%%% moving spots
+noise_analysis(clustfile,afile,pdfFile,mvfile,Block_Name,mvblock,3)   %%%% moving spots
 close all

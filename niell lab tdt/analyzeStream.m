@@ -26,11 +26,12 @@ for block = 1:nblocks;
     chans = 1:32;
     clear t Vfilt Vfilt_ref
     for ch = chans
-        ch
-        data = getTDTdata(Tank_Name,Block_Name{block},ch,flags);
+       
+       sprintf('reading channel %d',ch)
+       data = getTDTdata(Tank_Name,Block_Name{block},ch,flags);
         if ch == min(chans)
             t= zeros(1,length(data.streamT{ch}));
-            Vfilt = t;
+            Vfilt = zeros(length(chans), length(t));
         end
         t=data.streamT{ch};
    
@@ -40,6 +41,8 @@ for block = 1:nblocks;
         hp = 300;
         lp = 5000;
         [B,A] = butter(2,[hp lp]/nyq);
+      
+        sprintf('filtering')
         tic
        
         Vfilt(ch,:) = filtfilt(B,A,double(data.streamV{ch}));
