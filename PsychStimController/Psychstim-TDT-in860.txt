@@ -1,0 +1,13 @@
+Psychstim-pc10 uses UDP to convey the condition number and frame synch and stim synch
+to the RZ5 in HSE-860 using the UDP shutter control box, 
+which has an extra 16 bits of output in addition to the eye shutter control.
+The Pinout uses a straight-through DB25 cable and is from 
+PortB of the shutter DIO -->  Byte A of RZ5
+PortC of the shutter DIO -->  Byte B or RZ5
+
+The only difficult part is that sometimes the shutter box has to be restarted.
+Psychstimcontroller restarts it each time it runs.  
+It is probably best to leave it unplugged??
+
+The matching TDT program is in pc22:c:\bin\sort_linear_tetrode_RZ5_860
+

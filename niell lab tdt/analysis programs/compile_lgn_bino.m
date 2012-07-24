@@ -17,10 +17,12 @@ afile = {'C:\data\lgn rf project\lgn_analysis\030912_rec2_analysis_final.mat',..
     'C:\data\lgn rf project\lgn_analysis\060812_rec1_analysis1.mat',...
     'C:\data\lgn rf project\lgn_analysis\061212_rec1_analysis1.mat',...
     'C:\data\lgn rf project\lgn_analysis\061212_rec2_analysis2.mat',...
-    'C:\data\lgn rf project\lgn_analysis\061412_rec1_analysis1.mat'};
+    'C:\data\lgn rf project\lgn_analysis\061412_rec1_analysis1.mat', ...
+    'C:\data\lgn rf project\lgn_analysis\062212_rec3_analysis3.mat', ...
+    'C:\data\lgn rf project\lgn_analysis\062212_rec4_analysis4.mat' };
 
 
-histfile = {'C:\data\lgn rf project\histology data\ANATOMY2\dmn015_P2_A54.tif', ...
+histfile = {'C:\data\lgn rf project\histology data\ANATOMY2\dmn015p2r2F54.tif', ...
     'C:\data\lgn rf project\histology data\ANATOMY2\dmn015_P3_A53.tif', ...
     'C:\data\lgn rf project\histology data\ANATOMY2\dmn015_P4_A50.tif', ...
     'C:\data\lgn rf project\histology data\ANATOMY2\dmn016_P5_A53.tif',...
@@ -36,10 +38,12 @@ histfile = {'C:\data\lgn rf project\histology data\ANATOMY2\dmn015_P2_A54.tif', 
     'C:\data\lgn rf project\histology data\ANATOMY2\dmn023P5F53.tif',...
     'C:\data\lgn rf project\histology data\ANATOMY2\DMN024P9F53.tif',...
     'C:\data\lgn rf project\histology data\ANATOMY2\DMN024P10F51.tif',...
-    'C:\data\lgn rf project\histology data\ANATOMY2\DMN025P5F53.tif'};
+    'C:\data\lgn rf project\histology data\ANATOMY2\DMN025P5F53.tif', ...
+    'C:\data\lgn rf project\histology data\ANATOMY2\dmn026p4F53.tif', ...
+    'C:\data\lgn rf project\histology data\ANATOMY2\dmn026p5F53.tif'};
 
 %PaxPos=[54 53 50 53 53 53 52 50 53 54 50 50 48 53 53 51 53];
-PaxPos=[54 53 50 53 53 52 53 53 50 54 50 50 48 53 53 51 53];
+PaxPos=[54 53 50 53 53 52 53 53 50 54 50 50 48 53 53 51 53 53 53];
 %  AllenPos=[82 81 77 81 81 83 76 81 80 77 81 82 77 77 75 81 81 79 81 80];
 
 n=0;
@@ -96,6 +100,28 @@ for i = 1:length(afile);
     
 end
 
+  for cell_n=1:length(histox)
+  %for cell_n=1:1  
+      paxxy = sections(histSection(cell_n)).coords;
+      tracexy = anatomy(site(cell_n)).LGN;  %%% coords are reversed
+    widthX = max(tracexy(:,2))-min(tracexy(:,2));
+    normX(cell_n) = (histox(cell_n)-min(tracexy(:,2))) / widthX;
+    ypts = find(abs((tracexy(:,2))-(histox(cell_n)))<10);
+    if length(ypts)>1
+        normY(cell_n) = (histoy(cell_n)-min(tracexy(ypts,1))) / (max(tracexy(ypts,1)) - min(tracexy(ypts,1)));
+    else
+        normY(cell_n)=0;
+    end
+    alignedX(cell_n) = min(paxxy(:,1)) + normX(cell_n)*(max(paxxy(:,1))-min(paxxy(:,1)));
+    ypts = find(abs((paxxy(:,2))-(alignedX(cell_n)))<10);
+    if length(ypts)>1
+        alignedY(cell_n) = min(paxxy(ypts,2))+normY(cell_n)*(max(paxxy(ypts,2))-min(paxxy(ypts,2)));
+    else
+        alignedY(cell_n)=0;
+    end
+  end
+    
+
 inside= ones(n,1);
 for cell_n= 1:n
     sec = sections(histSection(cell_n)).coords;
@@ -117,46 +143,52 @@ clear p
 
 n_sta=0;
 
-for cell_n = 1:n
-    cell_n
-    wn_all(cell_n).sta_fit=[nan nan nan nan nan nan ];
-    wn_all(cell_n).fitsta=nan;
-    if ~isempty(wn_all(cell_n).N)
-        for s =1:3
-            sta = double(squeeze(wn_all(cell_n).svd_xy(s,:,:)));
+wn_cr=nan(n,2);
+for eye=1:2;
+    for cell_n = 1:n
+        cell_n
+        wn_all(cell_n,eye).sta_fit=[nan nan nan nan nan nan ];
+        wn_all(cell_n,eye).fitsta=nan;
+        if ~isempty(wn_all(cell_n,eye).N)
             
-            [fit g]= fitLGNrf(sta);
-            background = find(abs(g-fit(2))<(0.1*abs(fit(1))));
-            if fit(1)>1 | fit(3)<1 | fit(4)<1 | fit(3)>size(sta,1) | fit(4)>size(sta,2)
-                break
-            end
-            z=abs(fit(1))/std(sta(background))
-            
-            if z>6
-                wn_all(cell_n).sta_t = wn_all(cell_n).svd_t(:,s);
-                if wn_all(cell_n).sta_t(6)<0;
-                    wn_all(cell_n).sta_t = wn_all(cell_n).sta_t *-1;
-                    fit(1) = fit(1)*-1;
-                    fit(2)=fit(2)*-1;
-                end
-                wn_all(cell_n).sta_fit=fit;
-                wn_all(cell_n).sta_final=sta;
-                wn_all(cell_n).zscore=z;
-                wn_all(cell_n).fitsta= g;
-                %                 figure
-                %                 subplot(2,2,1)
-                %                 imagesc(sta); axis equal; axis tight;
-                %
-                %                 subplot(2,2,2)
-                %                 imagesc(g);axis equal; axis tight;
-                %
-                %                 subplot(2,2,4);
-                %                 plot(wn_all(cell_n).sta_t)
-                %                 xlim([0 30])
-                %
+            wn_cr(cell_n,eye) = (wn_all(cell_n,eye).crf(10) - wn_all(cell_n,eye).crf(1));
+            eye
+            for s =1:3
+                sta = double(squeeze(wn_all(cell_n,eye).svd_xy(s,:,:)));
                 
-                n_sta=n_sta+1;
-                break
+                [fit g]= fitLGNrf(sta);
+                background = find(abs(g-fit(2))<(0.1*abs(fit(1))));
+                if fit(1)>1 | fit(3)<1 | fit(4)<1 | fit(3)>size(sta,1) | fit(4)>size(sta,2)
+                    break
+                end
+                z=abs(fit(1))/std(sta(background))
+                
+                if z>6
+                    wn_all(cell_n,eye).sta_t = wn_all(cell_n,eye).svd_t(:,s);
+                    if wn_all(cell_n,eye).sta_t(6)<0;
+                        wn_all(cell_n,eye).sta_t = wn_all(cell_n,eye).sta_t *-1;
+                        fit(1) = fit(1)*-1;
+                        fit(2)=fit(2)*-1;
+                    end
+                    wn_all(cell_n,eye).sta_fit=fit;
+                    wn_all(cell_n,eye).sta_final=sta;
+                    wn_all(cell_n,eye).zscore=z;
+                    wn_all(cell_n,eye).fitsta= g;
+                    %                 figure
+                    %                 subplot(2,2,1)
+                    %                 imagesc(sta); axis equal; axis tight;
+                    %
+                    %                 subplot(2,2,2)
+                    %                 imagesc(g);axis equal; axis tight;
+                    %
+                    %                 subplot(2,2,4);
+                    %                 plot(wn_all(cell_n,eye).sta_t)
+                    %                 xlim([0 30])
+                    %
+                    
+                    n_sta=n_sta+1;
+                    break
+                end
             end
         end
     end
@@ -166,31 +198,42 @@ ind=0;
 tmin=zeros(1,cell_n); tmax = tmin; wn_lat=tmin;
 
 x0 = nan(n,1); y0 = nan(n,1); wx=nan(n,1),wy=nan(n,1);A = nan(n,1); wn_resp = nan(n,1); wn_phase=nan(n,1);
-tmin= nan(n,1); tmax=nan(n,1); wn_lat = nan(n,1); wn_cr=nan(n,1); wn_cr_norm=nan(n,1);wn_adapt=nan(n,1);
+tmin= nan(n,1); tmax=nan(n,1); wn_lat = nan(n,1); wn_cr_norm=nan(n,1);wn_adapt=nan(n,1); dom_eye=ones(n,1)
 
+dom_eye(wn_cr(:,2)>1000 & wn_cr(:,2)>wn_cr(:,1)& wn_cr(:,1)>-10^3)=2;
+figure
+scatter(wn_cr(:,1),wn_cr(:,2),6,dom_eye)
 
 for cell_n=1:n
-    
-    if ~isempty(wn_all(cell_n).N)
+    for eye=1:2
         
-        wn_resp(cell_n) = wn_all(cell_n).responsiveness(1);
-        wn_phase(cell_n) =wn_all(cell_n).phase;
-        A(cell_n) = wn_all(cell_n,1).sta_fit(1);
-        wx(cell_n)=wn_all(cell_n,1).sta_fit(6);
-        wy(cell_n)=wn_all(cell_n,1).sta_fit(5);
-        x0(cell_n)= (wn_all(cell_n,1).sta_fit(4) - 64)*wn_degperpix + offsetX(cell_n);
-        y0(cell_n)= (wn_all(cell_n,1).sta_fit(3) - 38)*wn_degperpix -offsetY(cell_n);  %%% top of monitor = -38, bottom = 38,  so moving upward means more negative
-        y0(cell_n) = 90 - y0(cell_n);  %%% invert so y goes from bottom up
-        if ~isempty(wn_all(cell_n,1).sta_t)
-            [z wn_lat(cell_n)] = max(wn_all(cell_n,1).sta_t);
-            tmax(cell_n)=max(wn_all(cell_n,1).sta_t)*sign(A(cell_n));
-            tmin(cell_n)=min(wn_all(cell_n,1).sta_t)*sign(A(cell_n));
-        end
-        wn_cr(cell_n) = (wn_all(cell_n).crf(10) - wn_all(cell_n).crf(1));
-        wn_cr_norm(cell_n) = (wn_all(cell_n).crf(10) - wn_all(cell_n).crf(1)) ./ ( (wn_all(cell_n).crf(10) + wn_all(cell_n).crf(1)));
-        up = mean(wn_all(cell_n).crf(1:10)); dn = mean(wn_all(cell_n).crf(11:20));
-        if up~=0
-            wn_adapt(cell_n) = dn/up;
+        if ~isempty(wn_all(cell_n,eye).N)
+            if eye==dom_eye(cell_n);
+%                 if eye==2
+%                     keyboard
+%                 end;
+                dom_eye(cell_n)=eye;
+                wn_resp(cell_n) = wn_all(cell_n,eye).responsiveness(1);
+                wn_phase(cell_n) =wn_all(cell_n,eye).phase;
+                A(cell_n) = wn_all(cell_n,eye).sta_fit(1);
+                wx(cell_n)=abs(wn_all(cell_n,eye).sta_fit(6));
+                wy(cell_n)=abs(wn_all(cell_n,eye).sta_fit(5));
+                x0(cell_n)= (wn_all(cell_n,eye).sta_fit(4) - 64)*wn_degperpix + offsetX(cell_n);
+                y0(cell_n)= (wn_all(cell_n,eye).sta_fit(3) - 38)*wn_degperpix -offsetY(cell_n);  %%% top of monitor = -38, bottom = 38,  so moving upward means more negative
+                y0(cell_n) = 90 - y0(cell_n);  %%% invert so y goes from bottom up
+                if ~isempty(wn_all(cell_n,eye).sta_t)
+                    [z wn_lat(cell_n)] = max(wn_all(cell_n,eye).sta_t);
+                    tmax(cell_n)=max(wn_all(cell_n,eye).sta_t - wn_all(cell_n,eye).sta_t(1))*sign(A(cell_n));
+                    tmin(cell_n)=min(wn_all(cell_n,eye).sta_t- wn_all(cell_n,eye).sta_t(1))*sign(A(cell_n));
+                end
+                %wn_cr(cell_n) = (wn_all(cell_n,eye).crf(10) - wn_all(cell_n,eye).crf(1));
+                wn_cr_dom(cell_n) = wn_cr(cell_n,eye);
+                wn_cr_norm(cell_n) = (wn_all(cell_n,eye).crf(10) - wn_all(cell_n,eye).crf(1)) ./ ( (wn_all(cell_n,eye).crf(10) + wn_all(cell_n,eye).crf(1)));
+                up = mean(wn_all(cell_n,eye).crf(1:10)); dn = mean(wn_all(cell_n,eye).crf(11:20));
+                if up~=0
+                    wn_adapt(cell_n) = dn/up;
+                end
+            end
         end
     end
 end
@@ -200,6 +243,7 @@ n_obs=n_obs+1; obs_name{n_obs} = 'histoy'; obs(:,n_obs)=histoy;
 n_obs=n_obs+1; obs_name{n_obs} = 'hist sections'; obs(:,n_obs)=histSection;
 n_obs=n_obs+1; obs_name{n_obs} = 'x0'; obs(:,n_obs) = x0;
 n_obs=n_obs+1; obs_name{n_obs} = 'y0'; obs(:,n_obs)=y0;
+n_obs=n_obs+1; obs_name{n_obs} = 'eye'; obs(:,n_obs) = dom_eye;
 n_obs=n_obs+1; obs_name{n_obs} = 'sta amp'; obs(:,n_obs)=A;
 
 figure
@@ -235,6 +279,7 @@ tratio(tratio>1)=1;
 labels= makeColors(tratio,nan,'div','RdBu');
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 title('min max ratio');
+
 
 n_obs=n_obs+1; obs_name{n_obs} = 'tminmax'; obs(:,n_obs) = tratio;
 n_obs=n_obs+1; obs_name{n_obs} = 'wx'; obs(:,n_obs) = wx;
@@ -453,9 +498,9 @@ n_obs=n_obs+1; obs_name{n_obs} = 'driftOSI1'; obs(:,n_obs) = driftOSI(:,2)';
 n_obs=n_obs+1; obs_name{n_obs} = 'dr spont'; obs(:,n_obs) = dr_spont;
 n_obs=n_obs+1; obs_name{n_obs} = 'dr f1f0'; obs(:,n_obs) = driftF1F0;
 
-n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr'; obs(:,n_obs) = wn_cr;
+n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr'; obs(:,n_obs) = wn_cr_dom;
 n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr_norm'; obs(:,n_obs)=wn_cr_norm;
-n_obs=n_obs+1; obs_name{n_obs} = 'sbc'; obs(:,n_obs)=(wn_cr<-2*10^3);
+n_obs=n_obs+1; obs_name{n_obs} = 'sbc'; obs(:,n_obs)=(wn_cr_dom<-2*10^3);
 n_obs=n_obs+1; obs_name{n_obs} = 'wn adapt'; obs(:,n_obs)=wn_adapt;
 
 
@@ -638,14 +683,36 @@ figure
 plot(score(:,1),score(:,2),'o')
 
 %usedcells= find(inside & ~(isnan(obs(:,4)) & isnan(obs(:,16))&isnan(obs(:,24))));
-nonresp =isnan(obs(:,7))+isnan(obs(:,10))+isnan(obs(:,17))+isnan(obs(:,21));
-sbc = wn_cr<-2*10^3;
+resp =~isnan(obs(:,find(strcmp(obs_name,'sta amp'))))+  ~isnan(obs(:,find(strcmp(obs_name,'fl_type')))) +...
+    ~isnan(obs(:,find(strcmp(obs_name,'mv spd'))))+  ~isnan(obs(:,find(strcmp(obs_name,'dr f1f0')))) ;
+    
+sbc = wn_cr_dom<-2*10^3;
+sbc=sbc';
 
-usedcells = find(inside & nonresp<4 | sbc)
+usedcells = find(inside & resp>=1| sbc)
+
 obs_used = obs(usedcells,:);
+obs_used=replaceNan(obs_used,obs_name,'driftDSI0',0);
+obs_used=replaceNan(obs_used,obs_name,'driftOSI0',0);
+obs_used=replaceNan(obs_used,obs_name,'mv osi',0);
+obs_used=replaceNan(obs_used,obs_name,'mv dsi',0);
+obs_used=replaceNan(obs_used,obs_name,'sta amp',0);
+obs_used=replaceNan(obs_used,obs_name,'mv spd',3);
+obs_used=replaceNan(obs_used,obs_name,'mv sp ratio',0);
+
 obs_norm = (obs_used-repmat(nanmean(obs_used),size(obs_used,1),1))./repmat(nanstd(obs_used),size(obs_used,1),1);
 obs_norm(obs_norm>2)=2;
 obs_norm(obs_norm<-2)=-2;
+
+figure
+for i = 1:n_obs;
+    subplot(5,7,i)
+    [h b]=hist(obs_norm(:,i));
+    bar(b,h);
+    set(gca,'Ytick',[])
+    title(obs_name{i})
+end
+
 
 c = nancov(obs_norm);
 figure
@@ -678,13 +745,16 @@ for i = 1:length(obs_name);
     labels{i} = sprintf('%s  %d',obs_name{i},i);
 end
 
-start_obs=6;
+start_obs=7;
 used_obs=start_obs:n_obs;
- used_obs=used_obs(used_obs~=12); %%% fl_lag (1,2 are the only meaningful)
- used_obs=used_obs(used_obs~=31); %%% cr_norm (captured by cr)
- used_obs=used_obs(used_obs~=25); %%% drift DSI F1
- used_obs=used_obs(used_obs~=27);  %%% drift OSI F1
- 
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'fl_lag'))); %%% fl_lag (1,2 are the only meaningful)
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wn_cr_norm'))); %%% cr_norm (captured by cr)
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'driftDSI1'))); %%% drift DSI F1
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'driftOSI1')));  %%% drift OSI F1
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wx'))); %%% drift DSI F1
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wy')));  %%% drift OSI F1
+
+
 e = eig(pcorr(used_obs,used_obs));
 figure
 plot(e(end:-1:1));
@@ -694,6 +764,7 @@ imagesc(v(:,size(v,2):-1:1));
 set(gca,'YTickLabel',labels(used_obs))
 set(gca,'YTick',1:length(obs_name))
 title('pairwise corr')
+
 
 v(abs(v)<0.1)=0;
 % gamma = 1.5;
@@ -721,70 +792,73 @@ plot3(pc(:,1),pc(:,2),pc(:,3),'o')
 
 clear DB CH Dunn KL Han
 close all
-for rep=1:5;
-    for c_rep=1:5
-        npca=rep+5;
-n_clust=c_rep+5;
-%n_clust=rep+2;
-phi=1.2                         % fuzzy exponent
-
-maxiter=200;
-toldif=0.0000001;
-
-ndata = size(pc, 1);         % number of data 
-% initialise random 
-Uinit= initmember(0.1,n_clust,ndata);
-tic
-[U, centroid, dist, W, obj] = fuzme(n_clust,pc(:,1:npca),Uinit,phi,maxiter,1,toldif);
-toc
-%T= kmeans(pc(:,1:7),n_clust,'Replicates',100);
-%T= clusterdata(pc(:,1:6),'maxclust',n_clust,'linkage','ward');
-
-[conf T]= max(U');
-
-for dt=1:2
-[DB(rep,c_rep,dt),CH(rep,c_rep,dt),Dunn(rep,c_rep,dt),KL(rep,c_rep,dt),Han(rep,c_rep,dt),st] = valid_internal_deviation(pc(:,1:npca),T,dt)
-end
-
-obs_sort = zeros(size(obs_norm));
-obs_sort_mean = zeros(size(obs_norm));
-cell_list = zeros(length(obs_norm),1);
-usort = zeros(size(U));
-n=0;
-for i = 1:max(T);
-    members = find(T==i);
-    obs_sort(n+1:n+length(members),:) = obs_norm(members,:);
-    obs_sort_mean(n+1:n+length(members),:) = repmat(nanmean(obs_norm(members,:),1),length(members),1);
-    cell_list(n+1:n+length(members))=members;
-  
-    usort(n+1:n+length(members),:)=U(members,:);
-      n=n+length(members);
-end
-obs_sort(isnan(obs_sort))=-3;
-labels  ={};
-for i = 1:length(obs_name);
-    labels{i} = sprintf('%s  %d',obs_name{i},i);
-end
-% figure
-% imagesc(obs_sort');
-% set(gca,'YTickLabel',labels(1:n_obs))
-% set(gca,'YTick',1:length(obs_name))
-figure
-imagesc(obs_sort_mean');
-set(gca,'YTickLabel',labels(1:n_obs))
-set(gca,'YTick',1:length(obs_name))
-% figure
-% imagesc(usort')
-
-figure
-imagesc(corrcoef(pc(cell_list,1:7)'));
-title(sprintf('nclust %d npca %d phi %0.2f',n_clust,npca,phi))
-end
+for rep=1:6;
+    for c_rep=1:6
+       npca=2*rep+4; 
+        %npca =6;
+        n_clust=5+c_rep;
+       % n_clust=c_rep+5;
+        
+        phi=1.1                       % fuzzy exponent
+        
+        maxiter=200;
+        toldif=0.0000001;
+        
+        ndata = size(pc, 1);         % number of data
+        % initialise random
+        Uinit= initmember(0.1,n_clust,ndata);
+        tic
+        data=pc(:,1:npca);
+        [U, centroid, dist, W, obj] = run_fuzme(n_clust,data,phi,maxiter,1,toldif,0.1,200);
+        toc
+        %T= kmeans(pc(:,1:7),n_clust,'Replicates',100);
+        %T= clusterdata(pc(:,1:6),'maxclust',n_clust,'linkage','ward');
+        
+        [conf T]= max(U');
+        
+        for dt=1:2
+            [DB(rep,c_rep,dt),CH(rep,c_rep,dt),Dunn(rep,c_rep,dt),KL(rep,c_rep,dt),Han(rep,c_rep,dt),st] = valid_internal_deviation(data,T,dt)
+        end
+        
+        obs_sort = zeros(size(obs_norm));
+        obs_sort_mean = zeros(size(obs_norm));
+        cell_list = zeros(length(obs_norm),1);
+        usort = zeros(size(U));
+        n=0;
+        for i = 1:max(T);
+            members = find(T==i);
+            obs_sort(n+1:n+length(members),:) = obs_norm(members,:);
+            obs_sort_mean(n+1:n+length(members),:) = repmat(nanmean(obs_norm(members,:),1),length(members),1);
+            cell_list(n+1:n+length(members))=members;
+            
+            usort(n+1:n+length(members),:)=U(members,:);
+            n=n+length(members);
+        end
+        obs_sort(isnan(obs_sort))=-3;
+        labels  ={};
+        for i = 1:length(obs_name);
+            labels{i} = sprintf('%s  %d',obs_name{i},i);
+        end
+        figure
+        imagesc(obs_sort');
+        set(gca,'YTickLabel',labels(1:n_obs))
+        set(gca,'YTick',1:length(obs_name))
+        figure
+        imagesc(obs_sort_mean');
+        set(gca,'YTickLabel',labels(1:n_obs))
+        set(gca,'YTick',1:length(obs_name))
+        % figure
+        % imagesc(usort')
+        
+        figure
+        imagesc(corrcoef(data(cell_list,:)'),[-1 1]);
+        title(sprintf('nclust %d npca %d phi %0.2f',n_clust,npca,phi))
+    end
 end
 figure
 imagesc(Dunn(:,:,1));
 
-keyboard
+
 types = nan(1,length(drift_all));
 types(usedcells)=T;
 
@@ -818,42 +892,49 @@ for i = 1:length(obs_name);
 end
 set(gca,'YTickLabel',labels(1:n_obs))
 set(gca,'YTick',1:length(obs_name))
- set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',psfilename,'-append');
 
-for c = 1:length(cell_list);
-    %for i =1:10
-    cell_n = usedcells(cell_list(c));
+%for c = 1:length(cell_list);
+    for c = 1:length(wn_all)
+
+    
+    %cell_n = usedcells(cell_list(c));
+    cell_n=c;
+    
     i = cell_n;
     
     figure
     set(gcf,'position',[100 50 850 950])
     subplot(5,4,1);
     
-    if ~isempty(wn_all(cell_n).N)
+    if ~isempty(wn_all(cell_n,dom_eye(cell_n)).N)
         for j=1:3
             subplot(5,4,j);
-            imagesc(squeeze(wn_all(i,1).svd_xy(j,:,:)));
+            imagesc(squeeze(wn_all(i,dom_eye(cell_n)).svd_xy(j,:,:)));
             axis off
         end
         
         subplot(5,4,5);
-        imagesc(squeeze(wn_all(i,1).fitsta));
+        imagesc(squeeze(wn_all(i,dom_eye(cell_n)).fitsta));
         axis off
         title(sprintf('x=%d y=%d wx=%d wy=%d',round(x0(cell_n)),round(y0(cell_n)),round(wx(cell_n)),round(wy(cell_n))));
         subplot(5,4,6);
-        plot(squeeze(wn_all(i,1).sta_t));
+        plot(squeeze(wn_all(i,dom_eye(cell_n)).sta_t));
         title(sprintf('tminmax = %0.2f',tratio(cell_n)));
         subplot(5,4,7);
         plot(1-cos((1:20)*2*pi/20),squeeze(wn_all(i,1).crf));hold on
         if ~isempty(wn_all(i,2).crf)
             plot(1-cos((1:20)*2*pi/20),squeeze(wn_all(i,2).crf),'r');
         end
-        title(sprintf('cnrm=%0.1f ad=%0.1f',wn_cr_norm(cell_n),wn_adapt(cell_n)))
+        title(sprintf('cnrm=%0.1f ad=%0.1f dom=%d',wn_cr_norm(cell_n),wn_adapt(cell_n),dom_eye(cell_n)))
     end
     subplot(5,4,1);
-    title(sprintf('cell %d; type %d',c,T(cell_list(c))));
-    
+    if ismember(cell_n,usedcells)
+        title(sprintf('cell %d; type %d',c,T(find(usedcells==c))));
+    else
+        title(sprintf('cell %d; type nan',c))
+    end
     subplot(5,4,2);
     title(sprintf('filenum %d',site(cell_n)));
     
@@ -922,6 +1003,8 @@ for c = 1:length(cell_list);
     subplot(5,4,4)
     plot(sections(histSection(cell_n)).coords(:,1),sections(histSection(cell_n)).coords(:,2),'b.'); hold on
     plot(histox(cell_n),histoy(cell_n),'r*');
+    hold on
+    plot(alignedX(cell_n),alignedY(cell_n),'g*')
     title(sprintf('Pax AP = %d',histSection(cell_n)));
     axis([-500 500 -500 500]);
     axis off
