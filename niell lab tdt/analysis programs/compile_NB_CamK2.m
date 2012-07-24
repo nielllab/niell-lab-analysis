@@ -1,16 +1,12 @@
-afile = {...
-   % 'C:\data\ephys matlab data\021412_awake_chr2\wndrift1\analysis.mat', ...
-    'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...
-    'C:\data\ephys matlab data\021612_awake\wn2b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn3\analysis.mat',...
-    'C:\data\ephys matlab data\021612_awake\wn4bdrift5\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn2\analysis.mat',...
-    'C:\data\ephys matlab data\021812_awake_pptg\wn3e_drift2\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn5\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn1fg\analysis.mat','C:\data\ephys matlab data\070112_awake_mlr\wn2a\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn3d\analysis.mat','C:\data\ephys matlab data\070112_awake_mlr\wn4\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn5b\analysis.mat','C:\data\ephys matlab data\070312_awake_mlr\wn2e\analysis.mat',...
-    'C:\data\ephys matlab data\070312_awake_mlr\wn3a\analysis.mat','C:\data\ephys matlab data\070312_awake_mlr\wn4c\analysis.mat'}
+afile = {'C:\data\ephys matlab data\070112_awake_mlr\wn7\analysis.mat',... % may want to exclude since this was contralateral
+    'C:\data\ephys matlab data\070612_awake_mlr\wn4b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn5b\analysis.mat',...
+    'C:\data\ephys matlab data\070612_awake_mlr\wn6b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn7a\analysis.mat',...
+    'C:\data\ephys matlab data\070612_awake_mlr\wn8b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn9a\analysis.mat',...
+    'C:\data\tdt tanks\071312_awake_MLR\wn1b\analysis.mat','C:\data\ephys matlab data\071312_awake_mlr\wn2d\analysis.mat',...
+    'C:\data\ephys matlab data\071312_awake_mlr\wn5\analysis.mat'}
+
 
 lfp_channel = [  ];
-
 n=0
 frame_duration = 1/30;
 
@@ -77,7 +73,7 @@ title('gamma')
 xlabel('laser off');
 ylabel('laser on');
 axis equal
-plot([0 10^4],[0 10^4])
+plot([0 10^3],[0 10^3])
 
 figure
 plot(alpha(:,1),alpha(:,2),'o');
@@ -86,8 +82,13 @@ title('alpha')
 xlabel('laser off');
 ylabel('laser on');
 axis equal
-plot([0 10^4],[0 10^4])
+plot([0 10^3],[0 10^3])
 axis equal
+
+figure
+barwitherr([std(alpha(:,1))/sqrt(length(gamma)) std(alpha(:,2))/sqrt(length(gamma)); std(gamma(:,1))/sqrt(length(gamma)) std(gamma(:,2))/sqrt(length(gamma))], ...
+    [mean(alpha(:,1)) mean(alpha(:,2)) ; mean(gamma(:,1)) mean(gamma(:,2))]);
+
 
 
 

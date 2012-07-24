@@ -50,7 +50,7 @@ end
 
 
 dt=0.001;
-histbins = -0.1:dt:0.1;
+histbins = -0.05:dt:0.05;
 psth=zeros(length(cell_range),length(hist(0,histbins)));
 nfig=0;
 for c = 1:length(cell_range)
@@ -68,20 +68,24 @@ for c = 1:length(cell_range)
     end
     
     histfig(c)=figure;
-   subplot(2,1,1);
+    set(gcf,'position',[200 200 600 700]);
+   subplot(3,1,1);
    plot(laserT,tdtData.laserTTL,'g');
    hold on
    plot(0:1:max(times),hist(times,0:1:max(times)));
    
    title(sprintf('ch %d ',cell_n))
   
+ subplot(3,1,2)
+ hold on
     for t = 1:length(edges);
         tdiff = times-edges(t);
         tdiff = tdiff(abs(tdiff)<max(histbins));
+        plot(tdiff*1000,t*ones(size(tdiff)),'.','MarkerSize',1)
         psth(c,:) = psth(c,:) + hist(tdiff,histbins);
     end
     psth(c,:)=psth(c,:)/(dt*length(edges));
-    subplot(2,1,2);
+    subplot(3,1,3);
     plot(histbins*1000,psth(c,:));
     hold on
     plot([0 0],[0 max(psth(c,:))],'g');
