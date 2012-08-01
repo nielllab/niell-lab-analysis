@@ -15,8 +15,12 @@ if isfield(flags,'stream') && flags.stream
     event_code = 'pAll';
     max_events = 10^6;
     max_t = 10^9;
-    for ch = chans
-        [tdtData.streamV{ch} tdtData.streamT{ch}] = readWave(TTX,ch, event_code,max_events,max_t);
+    if length(chans)==16 | length(chans)==32
+        [tdtData.streamV tdtData.streamT] = readWaveAll(TTX, event_code,max_events,max_t);
+    else
+       for ch = chans
+        [tdtData.streamV{ch} tdtData.streamT] = readWave(TTX,ch, event_code,max_events,max_t);
+       end
     end
 end
 

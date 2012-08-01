@@ -1,4 +1,4 @@
-%function cluster_tetrode
+function cluster_tetrode_stream(snipfname,snippname)
 % Matlab codes for clustering tetrode data
 % Reads in waveform snippets from TDT tank, performs alignment,
 % calculates independent components, calls Klustakwik, then displays
@@ -6,8 +6,6 @@
 % User can then use select_units.m to choose appropriate clusters
 % written by Cris Niell, 2006-2010
 
-close all
-clear all
 Tank_Name=[];
 
 global goodcells;
@@ -15,7 +13,9 @@ done=0;
 nblock=0;
 
 % option to redo an old clustering
-useStream = strcmp(input('use streamed data? (y/n)','s'),'y')
+%useStream = strcmp(input('use streamed data? (y/n)','s'),'y')
+useStream=1;
+
 subtractMean = 1;
     choose_pca=0;   %%% select the componets to use, or use all
 
@@ -55,8 +55,10 @@ else    %% reclustering
 end
 
 else
-    [fname pname] = uigetfile('','snippet file');
-    load(fullfile(pname,fname));
+    if ~exist('snipfname','var')
+        [snipfname snippname] = uigetfile('','snippet file');
+    end
+        load(fullfile(snippname,snipfname));
      max_time = 60*60; %%% total recording duration (secs)
     max_events=5*10^5;
     use_tets = 1:input('# of sites : ')/4;  %%% use all tetrodes
@@ -539,7 +541,10 @@ Tank_Name
 clear  Xshift Xica Xold Xraw used nonc_score s c_score clear group
 
 %%% save everything
-[bname output_path] = uiputfile('','data folder');
+%[bname output_path] = uiputfile('','data folder');
+output_path = snippname;
+bname = snipfname(1:end-8);
+
 bname
 output_path
 
@@ -556,7 +561,5 @@ if bname~=0
     end
 end
 
-
-display('C:\src\niell lab tdt\analysis programs\cluster_tetrode.m')
 
 toc

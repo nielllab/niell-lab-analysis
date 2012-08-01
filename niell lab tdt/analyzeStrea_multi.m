@@ -1,6 +1,6 @@
-function analyzeStream(snipfname,snippname);
-
-
+close all
+clear all
+pack
 done=0; nblock=0;
 while ~done
     if nblock==0
@@ -18,12 +18,10 @@ while ~done
         Block_Name{nblock} = pname(delims(length(delims))+1 :length(pname))
     end
 end
-if ~exist('snipfname','var') | isempty(snipfname)
-[snipfname snippname] = uiputfile('','data folder');
-end
-
-
 nblocks = length(Block_Name);
+
+[bname output_path] = uiputfile('','data folder');
+save(fullfile(output_path,bname),'Xall','Tall','Block_Name','Tank_Name','nblocks');
 
 for block = 1:nblocks;
     
@@ -130,8 +128,8 @@ for block = 1:nblocks;
     lockoutPeriod = 32;
     %     pre_int=10;
     %     post_int = 21;
-    pre_int=8;
-    post_int=23;
+    pre_int=9;
+    post_int=22;
     snipLength= pre_int+post_int+1;
     if block==1
         for tet=1:8
@@ -177,4 +175,5 @@ for block = 1:nblocks;
     
 end
 
-save(fullfile(snippname,snipfname),'Xall','Tall','Block_Name','Tank_Name','nblocks');
+[fname pname] = uiputfile('','data folder');
+save(fullfile(pname,fname),'Xall','Tall','Block_Name','Tank_Name','nblocks');
