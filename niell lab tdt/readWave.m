@@ -2,6 +2,8 @@ function [ W tstamp ] = readWave(TTX,ch, event_code, max_events, max_t )
 %reads in continuous data from TDT tank
 %and assigns timestamps cmn 2011
 
+% max_events=10^12;
+% max_t=10^9;
 tic
 % N = TTX.ReadEventsV(   max_events ,event_code,ch, 0, ...
 %     0,max_t,'All')
@@ -26,15 +28,5 @@ for i = 1:length(Wave_TS);
 end
 tstamp = tstamp(1:length(W));
 
-% ch
-TTX.SetGlobalV('WavesMemLimit',1e9);
-TTX.SetGlobalV('Channel', ch);
-TTX.SetGlobalV('T2', 0);
-TTX.SetGlobalV('T1', 0);
-% event_code
-tic
-Wave= TTX.ReadWavesV(event_code);
-toc
-size(Wave)
-size(W)
+ch
 
