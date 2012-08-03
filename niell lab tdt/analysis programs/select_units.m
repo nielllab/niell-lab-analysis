@@ -97,11 +97,11 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         c = used(i);
 
         figure
-        subplot(1,2,1);
+        subplot(2,2,1);
         plot(mean_wvform(:,tet_ch:tet_ch+3,c));
         title(sprintf('ch %d cl %d',tet,c));
       
-       subplot(1,2,2);
+       subplot(2,2,2);
         t1= squeeze(event_times_all{tet_ch}(find(idx_all{tet_ch} == c)));
         length(t1)
         dt = diff(t1);
@@ -109,6 +109,16 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         hist(dt,.0005:0.001:.02);
           set(gcf,'Position',[50 50 800 400], 'Color',linecolor(c,:));
           
+          wvall = wave_all{tet};
+           wvclust = wvall(find(idx_all{tet_ch}==c),:,:);
+            
+          dt = diff(t1);
+          dt(dt>1000)=1;
+          tmerge = cumsum(dt);
+                  amps =squeeze(min(wvclust(:,5:10,:),[],2));
+        subplot(2,2,3:4)
+        plot([0 tmerge],amps,'.','MarkerSize',2 );
+        
           %%% call Erik's code to calculate cluster separation
           %%%showClusterSeparation(wave_all{tet},idx_all{tet_ch},i);
     end

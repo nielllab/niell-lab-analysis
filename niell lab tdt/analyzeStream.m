@@ -35,35 +35,37 @@ for block = 1:nblocks;
     sprintf('reading data')
     data = getTDTdata(Tank_Name,Block_Name{block},chans,flags);
     t=data.streamT;
-    
-    Vfilt = zeros(length(chans), length(t));
-    
-    
-    for ch = chans
-        
-        sampRate = 1./median(diff(t));
+
+    Vfilt = data.streamV;
+    clear data
+            sampRate = 1./median(diff(t));
         nyq = 0.5*sampRate;
         hp = 300;
         lp = 5000;
         [B,A] = butter(2,[hp lp]/nyq);
+    
+        memory
+        whos
+       tic  
+       display(sprintf('filtering'))
+    for ch = chans
+           
         
-        sprintf('filtering %d',ch)
-        tic
+       
+        Vfilt(ch,:) = single(filtfilt(B,A,double(Vfilt(ch,:))));
         
-        Vfilt(ch,:) = filtfilt(B,A,double(data.streamV(ch,:)));
-        toc
         df = 1/max(t);
         
         %     figure
         %     plot((1:length(t))*df,abs(fft(data.streamV{1})))
         
-        close
-        figure
-        f= abs(fft(Vfilt(ch,:)));
-        plot((1000:1000:length(t))*df,f(1000:1000:length(t)))
-        title(sprintf('ch=%d',ch))
+%         close
+%         figure
+%         f= abs(fft(data.streamV(ch,:)));
+%         plot((1000:1000:length(t))*df,f(1000:1000:length(t)))
+%         title(sprintf('ch=%d',ch))
     end
-    
+    toc
     clear f data
     
     %     sprintf('calculating corr matrix')
@@ -78,10 +80,10 @@ for block = 1:nblocks;
     sprintf('calculating median');
     med_wv = median(Vfilt);
     
-    Vfilt_ref =zeros(size(Vfilt));
+
     for ch = 1:32;
         ch
-        Vfilt_ref(ch,:) = Vfilt(ch,:)-med_wv;
+        Vfilt(ch,:) = Vfilt(ch,:)-med_wv;
     end
     
     %     sprintf('calculating referenced corr matrix')
@@ -96,7 +98,7 @@ for block = 1:nblocks;
     %     plot(std_raw); hold on; plot(std_ref);
     
     
-    clear Vfilt
+    clear data
     
     vmin =0;
     bins = -150:2:(vmin+1);
@@ -105,7 +107,7 @@ for block = 1:nblocks;
         chans = 1:32;
         for ch = chans
             %v = Vfilt(ch,:);
-            v = Vfilt_ref(ch,:);
+            v = Vfilt(ch,:);
             h= hist(v(v<vmin),bins);
             figure
             
@@ -126,6 +128,7 @@ for block = 1:nblocks;
     end
     
     clear v
+    close all
     
     lockoutPeriod = 32;
     %     pre_int=10;
@@ -144,25 +147,29 @@ for block = 1:nblocks;
         crossing = [];
         for tet_ch = 1:4;
             ch = (tet-1)*4+tet_ch;
-            threshcrossed = Vfilt_ref(ch,:)<thresh(ch);
+            threshcrossed = Vfilt(ch,:)<thresh(ch);
             crossing = union(crossing,find(diff(threshcrossed)>0));
         end
         pre_win = diff(crossing);
         lockedout= find(pre_win<lockoutPeriod)+1;
         finalCrossings = setdiff(crossing, crossing(lockedout));
         finalCrossings = finalCrossings(finalCrossings>pre_int);
-        finalCrossings =finalCrossings((finalCrossings < length(Vfilt_ref)-post_int));
+        finalCrossings =finalCrossings((finalCrossings < length(Vfilt)-post_int));
         X=zeros(4,length(finalCrossings),snipLength);
         for snip=1:length(finalCrossings);
-            X(1:4,snip,1:snipLength) = Vfilt_ref((tet-1)*4+(1:4),(finalCrossings(snip)-pre_int) : (finalCrossings(snip)+post_int) );
+            X(1:4,snip,1:snipLength) = Vfilt((tet-1)*4+(1:4),(finalCrossings(snip)-pre_int) : (finalCrossings(snip)+post_int) );
             
             % X(1:4,snip,1:snipLength) = Vfilt((tet-1)*4+(1:4), (finalCrossings(snip)-pre_int) : (finalCrossings(snip)+post_int));
         end
         X= shiftdim(X,1);  %%% much faster to make matrix as above, then shift
+       
+       
+        
         figure
         for i = 1:16;
             subplot(4,4,i);
             plot(squeeze(X(i,:,:)));
+            ylim([-200 100]);
         end
         figure
         for i = 1:4

@@ -61,7 +61,8 @@ else
         load(fullfile(snippname,snipfname));
      max_time = 60*60; %%% total recording duration (secs)
     max_events=5*10^5;
-    use_tets = 1:input('# of sites : ')/4;  %%% use all tetrodes
+    %use_tets = 1:input('# of sites : ')/4;  %%% use all tetrodes
+    use_tets = 1:8;
     badsites = [];   %%% no bad sites to be removed
     plot_all=1;
 end
