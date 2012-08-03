@@ -32,6 +32,7 @@ if SU
         afile = fullfile(apname,afname);
     end
     load(afile);
+    afile
     [noisepname noisefname] = fileparts(afile);
     Block_Name = Block_Name{blocknum}
     use_afile=1;
@@ -47,6 +48,8 @@ else
     data = getTDTdata(Tank_Name,Block_Name,1:4:nchan,flags);
     
 end
+
+Block_Name
 
 if ~useArgin
     [fname pname] = uigetfile('*.mat','movie file');
@@ -99,10 +102,17 @@ end
 if useArgin
     psfilename = [pdfFile(1:end-4) Block_Name '.ps'];
 else
-    [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
 end
 if exist(psfilename,'file')==2;delete(psfilename);end
 
+if ~useArgin
+    [fname pname] = uigetfile('*.mat','movie file');
+    movieFile = fullfile(pname,fname);
+end
+movieFile
+
+load(movieFile);
 
 
 calculate_stc =0;    %%% whether or not to calculate STC (it's slow!)
@@ -217,9 +227,9 @@ for cell_n = cell_range
     if SU
         channel_no = cells(cell_n,1)
         clust_no = cells(cell_n,2)
-        channel_times =spikeT{cell_n} - (block-1)*10^5;
+        channel_times =spikeT{cell_n} - (blocknum-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
-        frame_duration = median(diff(frameEpocs{block}(2,:)))
+        frame_duration = median(diff(frameEpocs{blocknum}(2,:)))
     else
         clust_no = [];
         channel_no = cell_n;
@@ -237,8 +247,8 @@ for cell_n = cell_range
         for f = 1:n_frames
             
             if SU
-                [Spike_Timing index numtrials] = getTrials(frameEpocs{block},times, f, frame_duration);
-                eps = frameEpocs{block};
+                [Spike_Timing index numtrials] = getTrials(frameEpocs{blocknum},times, f, frame_duration);
+                eps = frameEpocs{blocknum};
             else
                 [Spike_Timing index numtrials] = getTrialsSU(data.frameEpocs,data.MUspikeT{cell_n}, f, frame_duration);
                 eps = data.frameEpocs;
