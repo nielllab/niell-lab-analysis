@@ -21,6 +21,10 @@ pdfFile = fullfile(pname,fname);
 
 load(clustfile,'Block_Name');
 
+for i =1:length(Block_Name);
+    sprintf('%d : %s ',i,Block_Name{i})
+end
+barblock = input('which block for  bars (0=none) ? ');
 
 for i =1:length(Block_Name);
     sprintf('%d : %s ',i,Block_Name{i})
@@ -49,6 +53,12 @@ for i =1:length(Block_Name);
 end
 ipsiblock = input('which block for  ipsi movie (0=none) ? ');
 
+
+
+
+bars_analysis(clustfile,afile,pdfFile,Block_Name,barblock)   %%%% moving spots
+close all
+
 drift_analysis(clustfile,afile,pdfFile,Block_Name,driftblock);
 close all
 
@@ -65,3 +75,4 @@ close all
 
 noise_analysis(clustfile,afile,pdfFile,mvfile,Block_Name,mvblock,3)   %%%% moving spots
 close all
+
