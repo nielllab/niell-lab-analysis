@@ -1,4 +1,4 @@
-function drift_analysis(clustfile,afile,pdfFile,Block_Name,blocknum)
+function bars_analysis(clustfile,afile,pdfFile,Block_Name,blocknum)
 % Matlab codes for reading from TTank for sweeping bars in 8 orientations
 % plots histgrams and rasters and fits data to a gaussian peak
 % Uses clustering information from cluster_linear.m or cluster_tetrode.m
@@ -54,9 +54,9 @@ end
 % tf = input('temp freqs [2 8] : ');
 % latency = input('latency (0.05) : ');
 
-prompt = {'duration','# orients','# sfs','temp freqs','latency'};
+prompt = {'duration','# orients','# sfs','temp freqs'};
 num_lines = 1;
-def = {'1','8','6','[2 8]','0.05'};
+def = {'4','2','4','[1 2]'};
 if ~useArgin
     answer = inputdlg(prompt,'grating parameters',num_lines,def);
 else
@@ -65,18 +65,18 @@ end
 stim_duration = str2num(answer{1})
 nrows = str2num(answer{2})
 ncols = str2num(answer{3})
-tf =  str2num(answer{4})
-latency =  str2num(answer{5})
+bw =  str2num(answer{4})
+
 
 if useArgin
-    psfilename = [pdfFile(1:end-4) 'drift.ps'];
+    psfilename = [pdfFile(1:end-4) 'bars.ps'];
 else
-    [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
 end
 if exist(psfilename,'file')==2;delete(psfilename);end
 
 
-panels= length(tf);
+panels= length(bw);
 
 plot_duration=stim_duration; %in second
 
@@ -90,6 +90,8 @@ else
     cell_range=1:4:nchan;
 end
 
+orient_list = linspace(0,360,nrows*ncols+1);
+orient_list = orient_list(1:end-1);
 
 for cell_n = cell_range;
     %for cell_n=21:26
@@ -112,8 +114,8 @@ for cell_n = cell_range;
     
     extra_range = 1:(emax-panels*nrows*ncols)
     
-    for rep=extra_range
-        cond = panels*nrows*ncols+rep;
+  
+        cond = panels*nrows*ncols+1;
         
         if SU
             [Spike_Timing index numtrials] = getTrialsSU(epocs,times, cond, stim_duration);
@@ -122,29 +124,19 @@ for cell_n = cell_range;
         end
         
         spikes=Spike_Timing(:);
-        spikes=spikes(spikes>latency & spikes<stim_duration+latency);
+        spikes=spikes(spikes<stim_duration);
         
         %%% rasters
         figure(spontfig);
-        subplot(length(extra_range),1,rep)
+       
         hold on; set(gca, 'yDir','reverse');
         axis([0 plot_duration 0 numtrials+1]);
         plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
         set(gca,'XTickLabel',[]);     set(gca,'YTickLabel',[])
         
-        if rep==1
-            xlabel('spont')
-            for f = 0:2
-                drift(cell_n).spont(f+1) = spikeFFT(spikes,tf(1)*f)/(stim_duration*numtrials);
-            end
-        else
-            for f = 0:2  %%% fix this when adding more tf for flicker
-                drift(cell_n).flicker(rep-1,f+1) = spikeFFT(spikes,tf(1)*f)/(stim_duration*numtrials);
-            end
-            xlabel('flicker')
-        end
-    end
-    
+     for rep = 1:panels
+    bars(cell_n,rep).spont = length(Spike_Timing)/(stim_duration*numtrials);
+     end
     
     for rep =1:panels
         
@@ -156,8 +148,8 @@ for cell_n = cell_range;
         
         for c =1:nrows*ncols;
             cond = (c-1)*panels+rep;
-            sf_ind = mod(c-1,ncols)+1;
-            orient_ind= ceil(c/ncols);
+            
+            orientation=c;
             if SU
                 [Spike_Timing index numtrials] = getTrialsSU(stimEpocs{blocknum},times, cond, stim_duration);
             else
@@ -165,10 +157,10 @@ for cell_n = cell_range;
             end
             %%% calculate total spikes
             spikes=Spike_Timing(:);
-            spikes=spikes(spikes>latency & spikes<stim_duration+latency);
-            for f = 0:2
-                drift(cell_n).R(orient_ind,sf_ind,rep,f+1) = spikeFFT(spikes,tf(rep)*f)/(stim_duration*numtrials);
-            end
+            spikes=spikes(spikes<stim_duration);
+            R = length(spikes)/(stim_duration*numtrials);
+            
+            bars(cell_n,rep).R(c)=R;
             
             figure(rast_fig);
             subplot(nrows,ncols,c)
@@ -187,108 +179,92 @@ for cell_n = cell_range;
             else
                 color = 'r';
             end
-            plot(hist_range, hist(Spike_Timing, hist_range)/(hist_int*numtrials),color);
+            histrate = hist(Spike_Timing, hist_range)/(hist_int*numtrials);
+            plot(hist_range, histrate,color);
             hold on;
-            plot([0 max(hist_range)], [drift(cell_n).spont(1) drift(cell_n).spont(1)],'g')
+            plot([0 max(hist_range)], [bars(cell_n,1).spont bars(cell_n,1).spont],'g')
             axis(axis_range);
             set(gca,'XTickLabel',[])
             set(gca,'YTickLabel',[])
             
-        end %orientation
-        if SU
-            saveas(rast_fig,fullfile(pname,sprintf('drift_rast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
-            if rep==2
-                saveas(hist_fig,fullfile(pname,sprintf('drift_hist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+            bars(cell_n,rep).Rmax(c) = max(histrate);
+            
+            fit_range = 0:0.2:stim_duration;
+            Spike_Timing = Spike_Timing(find((Spike_Timing>min(fit_range))&(Spike_Timing<max(fit_range))));
+            fit_int = fit_range(2)-fit_range(1);
+            obs = hist(Spike_Timing, fit_range)/(fit_int*numtrials);
+
+            fit_range_interp = 0:.02:stim_duration;
+            obs_interp = interp1(fit_range,obs,fit_range_interp,'pchip');
+
+            fit_range = fit_range_interp;
+            obs =obs_interp - bars(cell_n,1).spont;
+            [min(obs) max(obs) fit_range(find(max(obs))) stim_duration/5];
+            peak_guess = median(fit_range(find(obs> 0.75*max(obs))));
+            fit_coeff = nlinfit(fit_range,obs,@rf_fit_nobaseline,[ max(obs) peak_guess stim_duration/10]);
+            
+            fit_coeff(3)=abs(fit_coeff(3));
+            if isnan(fit_coeff(1))
+                fit_coeff(1)=0;
             end
-        end
-        if rep==1
-            colorplot=figure
-        else
-            figure(colorplot)
-        end
-        for f = 1:3
-            subplot(2,3,f+(rep-1)*3)
-            imagesc(squeeze(abs(drift(cell_n).R(:,:,rep,f))));
-            colorbar
-        end
+            baseline(cell_n,orientation) = bars(cell_n,1).spont;
+
+            amp(cell_n,orientation) = fit_coeff(1);
+            if isnan(fit_coeff(2))
+                amp(cell_n,orientation)=0;
+            end
+            if orientation<4
+                x0(cell_n,orientation) = fit_coeff(2) ;
+            else
+                x0(cell_n,orientation) = stim_duration-fit_coeff(2) ;
+            end
+            width(cell_n,orientation) = fit_coeff(3);
+
+            %% look for aberrant results, and set all values to zero
+            if abs(fit_coeff(3)>stim_duration) | (fit_coeff(1)<0) | fit_coeff(3)<.045 | sum(isnan(fit_coeff))>0
+                fit_coeff(2)=0;
+                amp(cell_n,orientation)=0;
+                x0(cell_n,orientation) = 0;
+                width(cell_n,orientation) = 0;
+                baseline(cell_n,orientation) = mean(obs);
+                fit_coeff(1)=mean(obs);
+            end
+
+
+            hold on
+            plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1.5);
+
+            
+            
+        end %orientation
+        
+        bars(cell_n,rep).amp = squeeze(amp(cell_n,:));
+        bars(cell_n,rep).x0 = squeeze(x0(cell_n,:));
+        bars(cell_n,rep).width = squeeze(amp(cell_n,:));
+       
+        
         
     end  %%% panel
-    
-    %wfig= figure
-    thetafig(cell_n)=figure('Name',sprintf('unit %d %d rep %d',channel_no,clust_no,rep));
-    color={'b','r'};
-    drift(cell_n).orient_tune = zeros(3,length(tf),nrows);
-    drift(cell_n).sf_tune=zeros(3,length(tf),ncols+1);
-    
-    for f=1:3
-        for rep = 1:length(tf)
-            
-            [u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f)))-abs(drift(cell_n).spont(f)))
-            %[u s v] = svd(abs(squeeze(drift(cell_n).R(:,:,rep,f))))
-            
-            orient_tune = u(:,1);
-            
-            sf_tune = v(:,1);
-            if sum(orient_tune)<0 & sum(sf_tune)<0;
-                orient_tune=-1 * orient_tune;
-                sf_tune=-1 * sf_tune;
-            end
-            [max_o]= max(orient_tune);
-            max_sf = max(sf_tune);
-            sf_tune = sf_tune*s(1,1)*max_o;
-            orient_tune=orient_tune*s(1,1)*max_sf;
-            
-            
-            sf_tune(2:end+1)=sf_tune;
-            rep
-            if rep<=(length(extra_range)-1)
-                sf_tune(1) = abs(drift(cell_n).flicker(rep,f));  %%% fix this when adding more tfs for flicker
-            else
-                sf_tune(1) = abs(drift(cell_n).flicker(length(extra_range)-1,f));
-            end
-            drift(cell_n).orient_tune(rep,f,:)=orient_tune';
-            drift(cell_n).sf_tune(rep,f,:) = sf_tune;
-            
-            figure(thetafig(cell_n))
-            subplot(2,3,f)
-            hold on
-            plot(orient_tune,color{rep})
-            xlabel('theta')
-            lim = ylim;
-            if rep==2
-                ylim([min(0,lim(1)) lim(2)])
-            end
-            xlim([1 length(orient_tune)])
-            
-            %figure(wfig)
-            subplot(2,3,f+3)
-            hold on
-            plot(sf_tune,color{rep})
-            xlabel('SF')
-            xlim([1 length(sf_tune)])
-            if rep ==2
-                lim = ylim;
-                ylim([min(0,lim(1)) lim(2)])
-            end
-        end
-        
-    end
-    
-    
-    
-    
-    figure(thetafig(cell_n))
-    title(sprintf('ch=%d cl=%d',channel_no,clust_no));
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
     
     figure(hist_fig) 
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
     
+    figure
+    plot(orient_list, bars(cell_n,1).amp);
+    hold on
+    %plot(orient_list,bars(cell_n,1).Rmax-bars(cell_n,1).spont,'--');
+
+    plot(orient_list,bars(cell_n,2).amp,'r');
+   % plot(orient_list,bars(cell_n,2).Rmax-bars(cell_n,1).spont,'r--');
+
+     set(gca,'XTick',orient_list)
+    xlabel('orientation -deg');
+    
+    
 end
 
-save(afile,'drift','-append');
+save(afile,'bars','-append');
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);

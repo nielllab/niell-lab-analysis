@@ -1,5 +1,4 @@
-
-
+function noise_analysis(clustfile,afile,pdfFile,movieFile,Block_Name,blocknum,movietype, stim_eye)
 % Matlab codes for reading from TTank for movie data
 % Calculates RFs from spike triggered average, and spike triggered covariance
 % Uses clustering information from cluster_linear.m or cluster_tetrode.m
@@ -7,19 +6,35 @@
 
 
 %%% read in cluster data, then connect to the tank and read the block
-clear all
 
-SU = menu('recording type','multi-unit','single unit')-1
+if ~exist('Block_Name','var');
+    SU = menu('recording type','multi-unit','single unit')-1;
+    useArgin=0;
+else
+    SU=1;
+    useArgin=1;
+end
+
+
 cells =1;
 if SU
-    [fname, pname] = uigetfile('*.mat','cluster data');
-    load(fullfile(pname,fname));
-    block = listdlg('ListString',Block_Name,'SelectionMode','single');
-    Block_Name = Block_Name{block}
-    [afname, apname] = uigetfile('*.mat','analysis data');
-    noisepname = apname;
-    afile = fullfile(apname,afname);
+    if ~useArgin
+        [fname, pname] = uigetfile('*.mat','cluster data');
+        clustfile=fullfile(pname,fname);
+    end
+    load(clustfile);
+    if ~useArgin
+        blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');
+        
+        
+        [afname, apname] = uigetfile('*.mat','analysis data');
+        noisepname = apname;
+        afile = fullfile(apname,afname);
+    end
     load(afile);
+    afile
+    [noisepname noisefname] = fileparts(afile);
+    Block_Name = Block_Name{blocknum}
     use_afile=1;
     cells
 else
@@ -34,37 +49,42 @@ else
     
 end
 
-[fname pname] = uigetfile('*.mat','movie file');
-load(fullfile(pname,fname));
+Block_Name
+
+if ~useArgin
+    [fname pname] = uigetfile('*.mat','movie file');
+    movieFile = fullfile(pname,fname);
+end
+load(movieFile);
 
 %load wn012alpha1_5hz_contrast10sec5min021407   %%% the usual
 
 n_frames = length(moviedata)-1;
 
-movietype = menu('Movie type','Contrast-modulated noise','Flashing sparse','Moving sparse');
+if ~useArgin
+    movietype = menu('Movie type','Contrast-modulated noise','Flashing sparse','Moving sparse');
+end
 cm_noise = 1;
 fl_noise=2;
 mv_noise=3;
 
 if movietype==cm_noise
     prompt = {'contrast modulated','frame rate','correct spectrum','crop to screen size','contra(1) or ipsi(2) eye'};
-num_lines = 1;
-def = {'1','60','1','1','1'};
-answer = inputdlg(prompt,'wn parameters',num_lines,def);
-contrast_modulated = str2num(answer{1})
-framerate = str2num(answer{2})
-correct_spectrum = str2num(answer{3})
-crop_mov =  str2num(answer{4})
-stim_eye =  str2num(answer{5})
-%     %contrast_modulated = input('contrast modulated? 0/1 : ');
-%     contrast_modulated=1;
-%     framerate = input('movie frame rate 30/60 : ');
-%     correct_spectrum=1;
-%     %correct_spectrum = input('correct spectrum? 0/1 : ');
-%     %pos_neg = input('separate on/off sta? 0/1 : ');
-%     %compute_svd = input('compute svd ? 0/1 : ');
-%     crop_mov=input('crop to screen size [128 x 72] 0/1 : ');
-%     stim_eye=input('contra eye (1) or ipsi eye (2) : ');
+    num_lines = 1;
+    def = {'1','60','1','1','1'};
+    if ~useArgin
+        answer = inputdlg(prompt,'wn parameters',num_lines,def);
+    else
+        answer=def;
+    end
+    contrast_modulated = str2num(answer{1})
+    framerate = str2num(answer{2})
+    correct_spectrum = str2num(answer{3})
+    crop_mov =  str2num(answer{4})
+    if ~useArgin
+        stim_eye =  str2num(answer{5})
+    end
+    
     pos_neg=0;
     compute_svd=1;
     contrast_period=10;
@@ -77,6 +97,22 @@ else
     % pos_neg = input('separate on/off sta? 0/1 : ');
     %compute_svd = input('compute svd ? 0/1 : ');
 end
+
+
+if useArgin
+    psfilename = [pdfFile(1:end-4) Block_Name '.ps'];
+else
+    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
+end
+if exist(psfilename,'file')==2;delete(psfilename);end
+
+if ~useArgin
+    [fname pname] = uigetfile('*.mat','movie file');
+    movieFile = fullfile(pname,fname);
+end
+movieFile
+
+load(movieFile);
 
 
 calculate_stc =0;    %%% whether or not to calculate STC (it's slow!)
@@ -191,9 +227,9 @@ for cell_n = cell_range
     if SU
         channel_no = cells(cell_n,1)
         clust_no = cells(cell_n,2)
-        channel_times =spikeT{cell_n} - (block-1)*10^5;
+        channel_times =spikeT{cell_n} - (blocknum-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
-        frame_duration = median(diff(frameEpocs{block}(2,:)))
+        frame_duration = median(diff(frameEpocs{blocknum}(2,:)))
     else
         clust_no = [];
         channel_no = cell_n;
@@ -209,10 +245,10 @@ for cell_n = cell_range
         display('getting frames')
         tic
         for f = 1:n_frames
-        
-             if SU
-                [Spike_Timing index numtrials] = getTrials(frameEpocs{block},times, f, frame_duration);
-                eps = frameEpocs{block};
+            
+            if SU
+                [Spike_Timing index numtrials] = getTrials(frameEpocs{blocknum},times, f, frame_duration);
+                eps = frameEpocs{blocknum};
             else
                 [Spike_Timing index numtrials] = getTrialsSU(data.frameEpocs,data.MUspikeT{cell_n}, f, frame_duration);
                 eps = data.frameEpocs;
@@ -565,8 +601,8 @@ for cell_n = cell_range
                 plot(sp_tune');
                 hold on
                 plot([1 5],[spont spont],'r')
-               yl=ylim;
-               axis([1 5 0 yl(2)])
+                yl=ylim;
+                axis([1 5 0 yl(2)])
                 xlabel('speed');
                 title(printf('ch%d c%d',channel_no,clust_no))
                 set(gca,'Xtick',1:length(p{3}));
@@ -578,8 +614,8 @@ for cell_n = cell_range
                 plot(th_tune');
                 hold on
                 plot([1 8],[spont spont],'r')
-              yl = ylim;
-              axis([1 8 0 yl(2)])
+                yl = ylim;
+                axis([1 8 0 yl(2)])
                 xlabel('theta');
                 title(printf('ch%d c%d',channel_no,clust_no))
                 
@@ -940,6 +976,21 @@ for cell_n = cell_range
             saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
+               figure(wnfig)
+            title(sprintf('ch=%d cl=%d',channel_no,clust_no));
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+    
+               figure(stafig)
+       
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            figure(svdfig)
+           
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
             wn(cell_n,stim_eye).crf=cycledata;
             wn(cell_n,stim_eye).N=N;
             wn(cell_n,stim_eye).svd_xy = svdt;
@@ -950,6 +1001,16 @@ for cell_n = cell_range
             saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
+            figure(timefig)
+            title(sprintf('ch=%d cl=%d',channel_no,clust_no));
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            figure(tuningfig)
+           
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
             fl(cell_n).N=N;
             fl(cell_n).hist_all=hist_all;
             fl(cell_n).n_all = n_all;
@@ -959,12 +1020,23 @@ for cell_n = cell_range
             fl(cell_n).spont=spont;
             fl(cell_n).onset_hist=onset_hist;
             fl(cell_n).onset_bins=onset_bins;
-             fl(cell_n).sta_pos=[x y];
+            fl(cell_n).sta_pos=[x y];
             
         elseif movietype==mv_noise
             
             saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(tuningfig,fullfile(noisepname,sprintf('move_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            
+            figure(timefig)
+            title(sprintf('ch=%d cl=%d',channel_no,clust_no));
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            
+            figure(tuningfig)
+           
+        set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
             
             mv(cell_n).N=N;
             mv(cell_n).hist_all=hist_all;
@@ -991,4 +1063,5 @@ elseif movietype==mv_noise
     save(afile,'mv','-append')
 end
 
-
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);

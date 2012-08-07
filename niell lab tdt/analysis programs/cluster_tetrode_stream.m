@@ -1,4 +1,4 @@
-%function cluster_tetrode
+function cluster_tetrode_stream(snipfname,snippname)
 % Matlab codes for clustering tetrode data
 % Reads in waveform snippets from TDT tank, performs alignment,
 % calculates independent components, calls Klustakwik, then displays
@@ -6,8 +6,6 @@
 % User can then use select_units.m to choose appropriate clusters
 % written by Cris Niell, 2006-2010
 
-close all
-clear all
 Tank_Name=[];
 
 global goodcells;
@@ -15,9 +13,13 @@ done=0;
 nblock=0;
 
 % option to redo an old clustering
-useStream = strcmp(input('use streamed data? (y/n)','s'),'y')
-subtractMean = 1;
+%useStream = strcmp(input('use streamed data? (y/n)','s'),'y')
+useStream=1;
 
+subtractMean = 1;
+    choose_pca=0;   %%% select the componets to use, or use all
+
+    
 if ~useStream
 recluster= input('reclustering? (y/n) ','s');
 if recluster~='y'
@@ -53,11 +55,14 @@ else    %% reclustering
 end
 
 else
-    [fname pname] = uigetfile('','snippet file');
-    load(fullfile(pname,fname));
+    if ~exist('snipfname','var')
+        [snipfname snippname] = uigetfile('','snippet file');
+    end
+        load(fullfile(snippname,snipfname));
      max_time = 60*60; %%% total recording duration (secs)
     max_events=5*10^5;
-    use_tets = 1:input('# of sites : ')/4;  %%% use all tetrodes
+    %use_tets = 1:input('# of sites : ')/4;  %%% use all tetrodes
+    use_tets = 1:8;
     badsites = [];   %%% no bad sites to be removed
     plot_all=1;
 end
@@ -173,17 +178,29 @@ for tet=use_tets
     
      %%% cut out beginning of waveform before threshold, no information
     %%% there (necessary?)
-    X = X(:,6:30,:);
-
+    if useStream
+    %X = X(:,6:32,:);
+    else
+       X = X(:,6:31,:); 
+    end
+    
     clear Xshift Xold etimes_old newtimes;
     pack
 
     %%% begin alignment of spikewaveforms
 
-    trigT = 6;  %%% timepoint to align on
-    shiftrange=6;  %%% maximum shift allowed in alignement
-
-    sz = 25-shiftrange;
+   
+    if useStream     
+        trigT = 8;  %%% timepoint to align on
+        shiftrange=8;  %%% maximum shift allowed in alignemen
+    sz = 32-shiftrange;
+%         shiftrange=8;  %%% maximum shift allowed in alignemen
+%     sz = 27-shiftrange;
+    else      
+        trigT = 6;  %%% timepoint to align on
+        shiftrange=7;  %%% maximum shift allowed in alignemen
+    sz = 26-shiftrange;
+    end
     Xshift = zeros(N,sz,4);
    
     %%% remove snippets that have an initial voltage that is beyond the
@@ -247,7 +264,6 @@ for tet=use_tets
     %%% calculate ICA components
     %%% note, some variable names reflect the fact that this used to be pca, not ica.
     
-    choose_pca=1;   %%% select the componets to use, or use all
     
     if choose_pca
         n_pca=8;
@@ -271,6 +287,7 @@ for tet=use_tets
         plot(coeff(sz+1:2*sz,i),'g');
         plot(coeff(2*sz+1:3*sz,i),'r');
         plot(coeff(3*sz+1:4*sz,i),'c');
+        xlim([1 sz])
         %plot(coeff(4*sz+1:5*sz,i),'k');
 
         % layer a (semi-)transparent patch over the axes to trap clicks
@@ -378,7 +395,7 @@ for tet=use_tets
         end
         set(gca,'XTickLabel',[])
         set(gca,'YTickLabel',[])
-        axis([0 25 -100 50])
+        axis([1 size(X,2) -200 75])
     end
     title(tet_title);
 
@@ -525,7 +542,10 @@ Tank_Name
 clear  Xshift Xica Xold Xraw used nonc_score s c_score clear group
 
 %%% save everything
-[bname output_path] = uiputfile('','data folder');
+%[bname output_path] = uiputfile('','data folder');
+output_path = snippname;
+bname = snipfname(1:end-8);
+
 bname
 output_path
 
@@ -542,7 +562,5 @@ if bname~=0
     end
 end
 
-
-display('C:\src\niell lab tdt\analysis programs\cluster_tetrode.m')
 
 toc
