@@ -55,6 +55,7 @@ function varargout = PsychStimController(varargin)
 
 % Last Modified by GUIDE v2.5 01-Sep-2009 16:28:25
 
+
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -83,19 +84,24 @@ function PsychStimController_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to PsychStimController (see VARARGIN)
 
-global moviedirpath paramdirpath kNone ktdtSync ktwoPhoton ktdtUDP kcsUDP ktdsUDP ktdtPT ktdtPTUDP ;
+global moviedirpath paramdirpath kNone ktdtSync ktwoPhoton ktdtUDP kcsUDP ktdsUDP ktdtPT ktdtPTUDP kWidefield;
 
 kNone = 1;
 ktdtSync = 2;
 ktwoPhoton = 3;
-ktdtUDP = 4;
-kcsUDP = 5;
-ktdsUDP = 6;
-ktdtPT = 7;
-ktdtPTUDP = 8;
+kWidefield=4;
+
+ktdtUDP = 5;
+kcsUDP = 6;
+ktdsUDP = 7;
+ktdtPT = 8;
+ktdtPTUDP = 9;
 
 moviedirpath = 'C:\movies\';
 paramdirpath = 'C:\Program Files\MATLAB\R2006b\work\';
+
+
+
 
 % Choose default command line output for PsychStimController
 handles.output = hObject;
@@ -212,7 +218,7 @@ function RunBtn_Callback(hObject, eventdata, handles) %#ok
 % handles    structure with handles and user data (see GUIDATA)
 
 clear mex
-global kNone ktdtSync ktwoPhoton ktdtUDP kcsUDP ktdsUDP ktdtPT ktdtPTUDP; %#ok
+global kNone ktdtSync ktwoPhoton ktdtUDP kcsUDP ktdsUDP ktdtPT ktdtPTUDP kWidefield; %#ok
 % kcsUDP
 
 %%% load file with rig-specific parameters
@@ -561,6 +567,15 @@ elseif sync == ktdtPTUDP
     syncUdp=pnet('udpsocket',1111);
     syncHost = tdtHost;
     syncPort = tdtPort;
+elseif sync==kWidefield
+   
+   % p.n = round(.75*numSecs*p.rate);
+   
+   p.msTolerance=5;
+   p.rate=11;
+   p.n=Duration*p.rate;
+   % p.addr = getPPaddr;
+    p = init(pco(p));
 end
 
 % shutterHost = 'mps-d.ucsf.edu'
@@ -656,6 +671,12 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     HideCursor;
     
     %% loop on conditions
+    frameNum=0;
+    maxframes=10000;
+    stimRec.ts= zeros(maxframes,1);
+    stimRec.f=zeros(maxframes,1);
+    stimRec.cond= zeros(maxframes,1);
+    
     while ~doneStim
         
         %%% randomize conditions
@@ -739,7 +760,7 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
         
         %% loop through frames
         for f = minframe:maxframe
-            s1(f) = GetSecs;
+            
             if clut
                 moglClutBlit(window,textures(c),clutcond(:,:,f));
             else % movie
@@ -747,10 +768,15 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
             end
             
             if f > 1
-                vbl = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+                [vbl onsetTime flipDone] = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
             else
-                vbl = Screen('Flip',window);
+                [vbl onsetTime flipDone] = Screen('Flip',window);
             end
+            frameNum=frameNum+1;
+            stimRec.ts(frameNum)=flipDone;
+            stimRec.f(frameNum)=f;
+            stimRec.cond(frameNum)=c;
+            s1(f) = flipDone;
             
             %% Send StimSync and FrameSync
             if sync == kcsUDP
@@ -783,39 +809,66 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
                 lptwrite(888,1+2);
                 WaitSecs(0.001);
                 lptwrite(888,1+0);
+            elseif sync==kWidefield
+                
+                p = exec(p);
             end
+            
+            
         end
-        
-        %% done with stimulus
-        if clearBkgrnd
-            if clut
-                moglClutBlit(window,textures(c),offclut);
-            else % movie
-                Screen('FillRect',window,grey);
+            
+            %% done with stimulus
+            if clearBkgrnd
+                if clut
+                    moglClutBlit(window,textures(c),offclut);
+                else % movie
+                    Screen('FillRect',window,grey);
+                end
+            else
+                if clut
+                    moglClutBlit(window,textures(c),clutcond(:,:,nFrames));
+                    % currentclut = squeeze(clutcond(:,:,nFrames));
+                end
             end
-        else
-            if clut
-                moglClutBlit(window,textures(c),clutcond(:,:,nFrames));
-                % currentclut = squeeze(clutcond(:,:,nFrames));
+            vbl = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+            
+            frameNum=frameNum+1;
+            stimRec.ts(frameNum)=flipDone;
+            stimRec.f(frameNum)=f;
+            stimRec.cond(frameNum)=c;
+            if sync==kWidefield
+                p = exec(p);
             end
-        end
-        vbl = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+            
         
-        % Reset StimSynch
-        if sync == ktdtSync
-            % putvalue(parentuddobj,[bitOff bitOff],bitLine);
-            io32(ioObj,bitLine,stimoff_frameoff);
-        elseif sync == ktdsUDP
-            pnet(syncTDSUdp,'write',sprintf('C%c',0+0));
-            pnet(syncTDSUdp,'writepacket',shutterHost,shutterPort);
-        elseif sync == ktdtPT
-            lptwrite(888,0+0+(4*c));
-        elseif sync == ktdtPTUDP
-            lptwrite(888,0+0);
-        end
-        
-        Priority(0);
-        WaitSecs(WaitInt);
+            % Reset StimSynch
+            if sync == ktdtSync
+                % putvalue(parentuddobj,[bitOff bitOff],bitLine);
+                io32(ioObj,bitLine,stimoff_frameoff);
+            elseif sync == ktdsUDP
+                pnet(syncTDSUdp,'write',sprintf('C%c',0+0));
+                pnet(syncTDSUdp,'writepacket',shutterHost,shutterPort);
+            elseif sync == ktdtPT
+                lptwrite(888,0+0+(4*c));
+            elseif sync == ktdtPTUDP
+                lptwrite(888,0+0);
+            end
+            
+            Priority(0);
+            
+            startWait=GetSecs;
+            while GetSecs<startWait+WaitInt
+              [vbl onsetTime flipDone] = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+               frameNum=frameNum+1;
+                stimRec.ts(frameNum)=flipDone;
+                stimRec.f(frameNum)=f;
+                stimRec.cond(frameNum)=c;
+                if sync==kWidefield
+                    p = exec(p);
+                end
+            end
+            
+      
         
         if nFrames > 1
             ds = max(ds,diff(s1));
@@ -882,6 +935,13 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     title('Dropped frames');
     
     ShowCursor;
+    
+    if sync==kWidefield
+        [fname pname] = uiputfile;
+        if ~isempty(fname);
+            save(fullfile(pname,fname),'stimRec','p')
+        end
+    end
     
     %%% if there's an error, clean up and rethrow the error
 catch
