@@ -1,6 +1,7 @@
 close all
 clear all
 n_obs=0;
+day = [1 1 2 2 3 3 4 4 4 5 6 7 8 9 9 10 10 11 12 12 13 13 14 14 14 15 16 16 17 17 18 18];
 afile = {    'C:\data\lgn rf project_new0824\lgn_analysis\030912_rec3_analysis3_final.mat',...
     'C:\data\lgn rf project_new0824\lgn_analysis\030912_rec4_analysis_4final.mat',...
     'C:\data\lgn rf project_new0824\lgn_analysis\031012_analysis1check.mat',...
@@ -16,20 +17,23 @@ afile = {    'C:\data\lgn rf project_new0824\lgn_analysis\030912_rec3_analysis3_
     'C:\data\lgn rf project_new0824\lgn_analysis\060812_analysis1check.mat',...
     'C:\data\lgn rf project_new0824\lgn_analysis\061212_analysis1check.mat',...
     'C:\data\lgn rf project_new0824\lgn_analysis\061212_analysis2check.mat',...
+    'C:\data\lgn rf project_new0824\lgn_analysis\062212_analysis3check.mat',...
+    'C:\data\lgn rf project_new0824\lgn_analysis\062212_analysis4check.mat',...
     'C:\data\lgn rf project_new0824\lgn_analysis\071612_analysis1new.mat', ...
     'C:\data\lgn rf project_new0824\lgn_analysis\071712_analysis1new.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\071712_analysis2new.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\071812_analysis1new.mat' ...
+    'C:\data\lgn rf project_new0824\lgn_analysis\071812_analysis2new.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\072012_analysis1newst.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\072012_analysis2new.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\072012_analysis3.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\072412_analysis1.mat' ...
     'C:\data\lgn rf project_new0824\lgn_analysis\072512_analysis1.mat' ...
-     'C:\data\lgn rf project_new0824\lgn_analysis\072512_ANALYSIS2.mat' ...
-      'C:\data\lgn rf project_new0824\lgn_analysis\080212_analysis1.mat' ...
-       'C:\data\lgn rf project_new0824\lgn_analysis\080212_analysis3.mat' ...
-        'C:\data\lgn rf project_new0824\lgn_analysis\080312_analysis2.mat' ...
-          'C:\data\lgn rf project_new0824\lgn_analysis\080312_analysis3bnew.mat' };
+    'C:\data\lgn rf project_new0824\lgn_analysis\072512_ANALYSIS2.mat' ...
+    'C:\data\lgn rf project_new0824\lgn_analysis\080212_analysis1.mat' ...
+    'C:\data\lgn rf project_new0824\lgn_analysis\080212_analysis3.mat' ...
+    'C:\data\lgn rf project_new0824\lgn_analysis\080312_analysis2.mat' ...
+    'C:\data\lgn rf project_new0824\lgn_analysis\080312_analysis3bnew.mat' };
 
 
 histfile = { 'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn015_P3_A53.tif', ...
@@ -39,7 +43,7 @@ histfile = { 'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn015_P3_A
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn017_P4_A53.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn017_P7_A52.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn018_P3_A54.tif',...
-    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn018_P4_A51.tiff',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn018_P4_A51.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn018_P5_A52.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\DMN020P1F50.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn021P7F50.tif',...
@@ -50,33 +54,43 @@ histfile = { 'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn015_P3_A
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn026s10p4f53r3.tif', ...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn026s10p5f53r4.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn027S10P1F49R1.tif',...
-    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn028S11P5F49R2.tif',...
-    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn028S12P3F47R1.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn028p3s11f3r1.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn028p5s12f2r2.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn029S6P2F54R1.tif',...
     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn029S5P5F55R2.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn029S6P2F54R1tif.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn030S9P2F52R1.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn030S9P3F53R2.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn030S9P4F52R3.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn031S6P3F52R1.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn032S5P6F54R2.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn032S7P5F51R1.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn033S4P3F1R1.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn033S4P5F51R3.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn034S6P3F51R2.tif',...
-     'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn034S6P4F51R3.tif',...
-    };
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn030S9P2F52R1.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn030S9P3F53R2.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn030S9P4F52R3.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn031S6P3F52R1.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn032S7P5F51R1.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn032S5P6F54R2.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn033S4P3F1R1.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn033S4P5F51R3.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn034S6P3F51R2.tif',...
+    'C:\data\lgn rf project_new0824\histology data\ANATOMY2\dmn034S6P4F51R3.tif'};
 
-%PaxPos=[54 53 50 53 53 53 52 50 53 54 50 50 48 53 53 51 53];
-PaxPos=[54 53 50 53 53 52 53 53 50 54 50 50 48 53 53 51 53 53 53];
+PaxPos=[53 51 53 53 53 52 54 51 52 50 50 48 53 53 51 53 53 49 49 47 55 54 52 53 52 52 54 51 51 51 51 51];
+lgnPos  = [5 3 5 5 4 3 4 2 3 3 2 1 4 5 3 2 2 2 3 2 3 4 4 4 4 3 2 4 3 3 3 3];
+lgnPos  = [5 3 5 5 4 3 4 2 3 3 2 2 4 5 3 2 2 2 3 2 3 4 4 4 4 3 2 4 3 3 3 3];
+lgn2pax = [48 50 52 53 54];
+%lgn2pax = [49 50 51 52 54];
+%PaxPos = lgn2pax(lgnPos);
+
+length(afile)
+length(histfile)
+length(PaxPos)
 %  AllenPos=[82 81 77 81 81 83 76 81 80 77 81 82 77 77 75 81 81 79 81 80];
 
 n=0;
-%PaxPos=[55 53 50 51 51 53 49 48 53 54];
-[anatomy sections]=LGN_histo(histfile, PaxPos);
+%%PaxPos=[55 53 50 51 51 53 49 48 53 54];
+%[anatomy sections]=LGN_histoPV(histfile, PaxPos);
+[anatomy sections]=LGN_histoPV(histfile, lgnPos);
+
 
 numsites = 32*ones(1,length(histfile));
-numsites(12)=16;
+numsites(11)=16;
 
+manual_type = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 082912.xlsx');
 
 for i = 1:length(afile);
     i
@@ -95,10 +109,13 @@ for i = 1:length(afile);
     fl_all(cell_range)=fl;
     site(cell_range)=i;
     cell_id(cell_range,:) = cells;
+    if size(wv,1)>19
+        wv=wv(1:19,:);
+    end
     wvform(cell_range,:) = wv';
     if ~exist('displayOffset')
         display(sprintf('need to add display for file %d',i))
-        %input('press return to continue')
+        input('press return to continue')
         displayOffset =45;
         displayHeight=4;
     end
@@ -124,10 +141,11 @@ for i = 1:length(afile);
     
 end
 
-  for cell_n=1:length(histox)
-  %for cell_n=1:1  
-      paxxy = sections(histSection(cell_n)).coords;
-      tracexy = anatomy(site(cell_n)).LGN;  %%% coords are reversed
+%%% align points on trace to reference
+for cell_n=1:length(histox)
+    
+    paxxy = sections(histSection(cell_n)).coords;
+    tracexy = anatomy(site(cell_n)).LGN;  %%% coords are reversed
     widthX = max(tracexy(:,2))-min(tracexy(:,2));
     normX(cell_n) = (histox(cell_n)-min(tracexy(:,2))) / widthX;
     ypts = find(abs((tracexy(:,2))-(histox(cell_n)))<10);
@@ -137,15 +155,19 @@ end
         normY(cell_n)=0;
     end
     alignedX(cell_n) = min(paxxy(:,1)) + normX(cell_n)*(max(paxxy(:,1))-min(paxxy(:,1)));
-    ypts = find(abs((paxxy(:,2))-(alignedX(cell_n)))<10);
+    ypts = find(abs((paxxy(:,1))-(alignedX(cell_n)))<10);
     if length(ypts)>1
         alignedY(cell_n) = min(paxxy(ypts,2))+normY(cell_n)*(max(paxxy(ypts,2))-min(paxxy(ypts,2)));
     else
         alignedY(cell_n)=0;
     end
-  end
-    
+end
 
+
+histox=alignedX;
+histoy=alignedY;
+
+%%% find inside points
 inside= ones(n,1);
 for cell_n= 1:n
     sec = sections(histSection(cell_n)).coords;
@@ -155,10 +177,28 @@ for cell_n= 1:n
     end
 end
 
-
 labels = zeros(n,3);
 labels(:,3)=1;
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+
+labels= ones(n,3);
+labels(~inside,2)=0;
+labels(~inside,3)=0;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+
+
+%%% plot manual type on normal and aligned position
+for i = [0 3]
+%for i = 0
+    id = nan(size(manual_type));
+    id(~isnan(manual_type))=0;
+    id(manual_type==i)=1;
+    
+    [labels cmap clim]= makeColors(id,nan,'qual','Set1');
+    f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+    colormap(cmap); set(gca,'Clim',clim); title(sprintf('type %d',i));
+end
+
 
 
 wn_degperpix = wn(end).degperpix;
@@ -167,6 +207,7 @@ clear p
 
 n_sta=0;
 
+%%% fit wn movie stas
 wn_cr=nan(n,2);
 for eye=1:2;
     for cell_n = 1:n
@@ -223,19 +264,23 @@ tmin=zeros(1,cell_n); tmax = tmin; wn_lat=tmin;
 
 x0 = nan(n,1); y0 = nan(n,1); wx=nan(n,1),wy=nan(n,1);A = nan(n,1); wn_resp = nan(n,1); wn_phase=nan(n,1);
 tmin= nan(n,1); tmax=nan(n,1); wn_lat = nan(n,1); wn_cr_norm=nan(n,1);wn_adapt=nan(n,1); dom_eye=ones(n,1)
-
+mv_x0 = nan(n,1); mv_y0=nan(n,1); fl_x0=nan(n,1); fl_y0=nan(n,1);
 dom_eye(wn_cr(:,2)>1000 & wn_cr(:,2)>wn_cr(:,1)& wn_cr(:,1)>-10^3)=2;
 figure
 scatter(wn_cr(:,1),wn_cr(:,2),6,dom_eye)
+xlabel('contra eye response')
+ylabel('ipsi eye response');
+legend('contra unit','ipsi unit')
 
+%%% fill in white noise params
 for cell_n=1:n
     for eye=1:2
         
         if ~isempty(wn_all(cell_n,eye).N)
             if eye==dom_eye(cell_n);
-%                 if eye==2
-%                     keyboard
-%                 end;
+                %                 if eye==2
+                %                     keyboard
+                %                 end;
                 dom_eye(cell_n)=eye;
                 wn_resp(cell_n) = wn_all(cell_n,eye).responsiveness(1);
                 wn_phase(cell_n) =wn_all(cell_n,eye).phase;
@@ -243,8 +288,8 @@ for cell_n=1:n
                 wx(cell_n)=abs(wn_all(cell_n,eye).sta_fit(6));
                 wy(cell_n)=abs(wn_all(cell_n,eye).sta_fit(5));
                 x0(cell_n)= (wn_all(cell_n,eye).sta_fit(4) - 64)*wn_degperpix + offsetX(cell_n);
-                y0(cell_n)= (wn_all(cell_n,eye).sta_fit(3) - 38)*wn_degperpix -offsetY(cell_n);  %%% top of monitor = -38, bottom = 38,  so moving upward means more negative
-                y0(cell_n) = 90 - y0(cell_n);  %%% invert so y goes from bottom up
+                y0(cell_n)= (wn_all(cell_n,eye).sta_fit(3) - 38)*wn_degperpix ;  %%% top of monitor = -38, bottom = 38,  so moving upward means more negative
+                y0(cell_n) = -y0(cell_n) + offsetY(cell_n);  %%% invert so y goes from bottom up
                 if ~isempty(wn_all(cell_n,eye).sta_t)
                     [z wn_lat(cell_n)] = max(wn_all(cell_n,eye).sta_t);
                     tmax(cell_n)=max(wn_all(cell_n,eye).sta_t - wn_all(cell_n,eye).sta_t(1))*sign(A(cell_n));
@@ -257,18 +302,21 @@ for cell_n=1:n
                 if up~=0
                     wn_adapt(cell_n) = dn/up;
                 end
+                
+                if ~isempty(mv_all(cell_n).sta_pos)
+                    mv_x0(cell_n) = mv_all(cell_n).sta_pos(1)*mv_all(length(wn_all)).degperpix + offsetX(cell_n);
+                    mv_y0(cell_n) = -mv_all(cell_n).sta_pos(2)*mv_all(length(wn_all)).degperpix +offsetY(cell_n);
+                end
+                
+                if ~isempty(fl_all(cell_n).sta_pos)
+                    fl_x0(cell_n) = fl_all(cell_n).sta_pos(1)*fl_all(length(wn_all)).degperpix + offsetX(cell_n);
+                    fl_y0(cell_n) = -fl_all(cell_n).sta_pos(2)*fl_all(length(wn_all)).degperpix +offsetY(cell_n);
+                end
             end
         end
     end
 end
 
-n_obs=n_obs+1; obs_name{n_obs} = 'histox'; obs(:,n_obs) = histox;
-n_obs=n_obs+1; obs_name{n_obs} = 'histoy'; obs(:,n_obs)=histoy;
-n_obs=n_obs+1; obs_name{n_obs} = 'hist sections'; obs(:,n_obs)=histSection;
-n_obs=n_obs+1; obs_name{n_obs} = 'x0'; obs(:,n_obs) = x0;
-n_obs=n_obs+1; obs_name{n_obs} = 'y0'; obs(:,n_obs)=y0;
-n_obs=n_obs+1; obs_name{n_obs} = 'eye'; obs(:,n_obs) = dom_eye;
-n_obs=n_obs+1; obs_name{n_obs} = 'sta amp'; obs(:,n_obs)=A;
 
 figure
 plot (histox,x0,'o');
@@ -281,14 +329,11 @@ plot (histoy,y0,'o');
 xlabel('histology Y');
 ylabel('RF Y');
 
-
 labels=ones(n,3);
 goodfit = find(~isnan(x0));
 labels(goodfit,1)=0;
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 title('wn sta rfs');
-
-
 
 [labels cmap clim]= makeColors(x0,nan,'div','RdBu');
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
@@ -298,18 +343,39 @@ colormap(cmap); colorbar; set(gca,'Clim',clim); title('x0');
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 colormap(cmap); colorbar; set(gca,'Clim',clim); title('y0');
 
+
+[labels]= makeColors(mv_x0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('mv_x0');
+
+[labels]= makeColors(mv_y0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('mv_y0');
+
+[labels]= makeColors(fl_x0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('fl_x0');
+
+[labels]= makeColors(fl_y0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('fl_y0');
+
+
+figure
+scatter(x0,y0,8, manual_type);
+xlabel('wn x0'); ylabel('wn y0')
+
+figure
+scatter(mv_x0,mv_y0,8, manual_type);
+xlabel('mv x0'); ylabel('mv y0')
+
 tratio=-tmin./tmax;
 tratio(tratio>1)=1;
 labels= makeColors(tratio,nan,'div','RdBu');
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 title('min max ratio');
 
-
-n_obs=n_obs+1; obs_name{n_obs} = 'tminmax'; obs(:,n_obs) = tratio;
-n_obs=n_obs+1; obs_name{n_obs} = 'wx'; obs(:,n_obs) = wx;
-n_obs=n_obs+1; obs_name{n_obs} = 'wy'; obs(:,n_obs)=wy;
-n_obs=n_obs+1; obs_name{n_obs} = 'wn_latency'; obs(:,n_obs) = wn_lat;
-
+%%% flash spots
 for cell_n = 1:n
     f= fl_all(cell_n);
     if ~isempty(f.N)
@@ -344,10 +410,15 @@ for cell_n = 1:n
             offset_sust(cell_n,r) = mean(h(f.onset_bins>=0.55 & f.onset_bins<0.8))/offset(cell_n,r);
         end
         
-        fl_lat(cell_n)=onset_lat(cell_n,fl_onoff(cell_n));
-        fl_sust(cell_n) =onset_sust(cell_n,fl_onoff(cell_n));
-        fl_onset_amp(cell_n) = onset(cell_n,fl_onoff(cell_n));
         
+        if f.lag==1  %%% responds to offset
+            fl_lat(cell_n)=offset_lat(cell_n,fl_onoff(cell_n));
+            fl_sust(cell_n) =offset_sust(cell_n,fl_onoff(cell_n));
+        else
+            fl_sust(cell_n) =onset_sust(cell_n,fl_onoff(cell_n));
+            fl_lat(cell_n)=onset_lat(cell_n,fl_onoff(cell_n));
+        end
+        fl_onset_amp(cell_n) = onset(cell_n,fl_onoff(cell_n));
         fl_lag(cell_n) = f.lag;
         fl_onoff(cell_n) = 2*(fl_onoff(cell_n)-1.5);
         if fl_lag(cell_n)==1  %%% if a cell responds with 1 frame delay, it is responding to offset
@@ -374,16 +445,12 @@ fl_onoff(fl_amp<fl_thresh)=nan;
 fl_lat(fl_amp<fl_thresh)=nan;
 fl_onoffcorr(fl_amp<fl_thresh)=nan;
 
+fl_x0(fl_amp<fl_thresh)=nan;
+fl_x0(fl_x0<-20)=nan;
+fl_y0(fl_amp<fl_thresh)=nan;
 
-n_obs=n_obs+1; obs_name{n_obs} = 'fl peak size'; obs(:,n_obs) = fl_sz;
-n_obs=n_obs+1; obs_name{n_obs} = 'fl_lag'; obs(:,n_obs) = fl_lag;
-n_obs=n_obs+1; obs_name{n_obs} = 'fl_type'; obs(:,n_obs)=fl_type;
-n_obs=n_obs+1; obs_name{n_obs} = 'fl_sust'; obs(:,n_obs) = fl_sust;
-n_obs=n_obs+1; obs_name{n_obs} = 'fl_on/off'; obs(:,n_obs) = fl_onoff;
-n_obs=n_obs+1; obs_name{n_obs} = 'fl latency'; obs(:,n_obs) = fl_lat;
-n_obs=n_obs+1; obs_name{n_obs} = 'onfoff corr'; obs(:,n_obs) = fl_onoffcorr;
-
-
+fl_sust(fl_sust<0)=nan;
+fl_sust(fl_sust>1)=nan;
 
 labels= makeColors(fl_type,nan,'seq','GnBu');
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
@@ -397,6 +464,7 @@ f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 title('normalized transience')
 
 clear driftOSI driftDSI
+%%% drifting gratings & moving spots
 for cell_n=1:n
     %for cell_n = [24]
     m= mv_all(cell_n);
@@ -477,8 +545,10 @@ for cell_n=1:n
             end
         end
         pref_tf = round(sign(tf_ratio(cell_n,1))/2 + 1.5);
-        driftOSI(cell_n,:) = dr_osi(cell_n,pref_tf,:)
-        driftDSI(cell_n,:) = dr_dsi(cell_n,pref_tf,:)
+        driftOSI(cell_n,:) = dr_osi(cell_n,pref_tf,:);
+        driftDSI(cell_n,:) = dr_dsi(cell_n,pref_tf,:);
+        driftOSItheta(cell_n,:) = dr_prefO(cell_n,pref_tf,:);
+        driftDSItheta(cell_n,:) = dr_prefD(cell_n,pref_tf,:);
         driftF1F0(cell_n)=sum(d.orient_tune(pref_tf,2,:)) / sum(d.orient_tune(pref_tf,1,:));
     end
 end
@@ -488,11 +558,8 @@ mv_osi(mv_amp<thresh)=nan;
 mv_dsi(mv_amp<thresh)=nan;
 mv_spd(mv_amp<thresh)=nan;
 mv_spd_ratio(mv_amp<thresh)=nan;
-
-n_obs=n_obs+1; obs_name{n_obs} = 'mv osi'; obs(:,n_obs) =mv_osi;
-n_obs=n_obs+1; obs_name{n_obs} = 'mv dsi'; obs(:,n_obs) = mv_dsi;
-n_obs=n_obs+1; obs_name{n_obs} = 'mv spd'; obs(:,n_obs) = mv_spd;
-n_obs=n_obs+1; obs_name{n_obs} = 'mv sp ratio'; obs(:,n_obs) = mv_spd_ratio;
+mv_x0(mv_amp<thresh)=nan;
+mv_y0(mv_amp<thresh)=nan;
 
 d_thresh=1;
 tf_ratio(tf_ratio>1)=1;
@@ -503,21 +570,271 @@ driftDSI(sf_amp<d_thresh,:)=nan;
 driftOSI(sf_amp<d_thresh,:)=nan;
 driftF1F0(sf_amp<d_thresh)=nan;
 
-[labels cmap clim]= makeColors(driftOSI(:,1),nan,'seq','GnBu');
-f = plotSections(sections,anatomy,histox,histoy,histSection,labels,5:11);
-colormap(cmap); colorbar; set(gca,'Clim',clim); title('drift OSI');
 
-[labels cmap clim]= makeColors(driftDSI(:,1),nan,'seq','GnBu');
-f = plotSections(sections,anatomy,histox,histoy,histSection,labels,5:11);
-colormap(cmap); colorbar; set(gca,'Clim',clim); title('drift DSI');
+
+
+%%% lots of misc figs
+for misc_figs = 1:0
+    figure
+    hist(wn_cr);
+    
+    figure
+    hist(wn_cr_norm)
+    
+    figure
+    polar(wn_phase,wn_resp,'o');
+    figure
+    plot(wn_resp.*cos(wn_phase),wn_cr_norm,'o');
+    
+    %%% wn amplitudes
+    figure
+    hist(A)
+    sum(~isnan(A))/length(A)
+    
+    %%% wn sizes
+    figure
+    plot(wx*0.7,wy*0.7,'o');
+    axis([0 10 0 10])
+    axis square
+    
+    
+    
+    
+    %%% wn on/off
+    figure
+    plot(tmax,tmin,'o')
+    axis([-1 1 -1 1])
+    axis square
+    
+    %%% wn latency
+    figure
+    hist(wn_lat(wn_lat>0))
+    
+    %%% wn sites
+    figure
+    color = {'bo','go','ro','co','mo','yo','ko'};
+    for i=1:length(afile);
+        hold on
+        plot(x0(site==i),y0(site==i),color{mod(i,7)+1})
+        
+    end
+    axis ij
+    
+    
+    figure
+    plot(tmin./tmax,wx,'o')
+    
+    figure
+    plot(fl_lag,wx,'o')
+    xlabel('flash_lag');
+    ylabel('width deg');
+    
+    figure
+    plot(x0,wx,'o')
+    axis([0 128 0 15])
+    xlabel('x - deg');
+    ylabel('width x - deg');
+    
+    figure
+    plot(x0,wy,'o')
+    
+    figure
+    hist(fl_lat(fl_amp>4 & fl_lag==0));
+    
+    figure
+    hist(fl_sust(fl_amp>4 & fl_lag==0));
+    
+    
+    figure
+    hist(tmin./tmax)
+    
+    figure
+    plot(fl_lat(fl_amp>2 & fl_lag==0),fl_sust(fl_amp>2 & fl_lag==0),'o' );
+    
+    
+    figure
+    plot(tmax(fl_lag==0),tmin(fl_lag==0),'o')
+    hold on
+    plot(tmax(fl_lag==1),tmin(fl_lag==1),'ro')
+    
+    figure
+    plot(fl_sz(fl_amp>4),wx(fl_amp>4),'o');
+    hold on
+    plot(fl_sz(fl_amp>4),wy(fl_amp>4),'go');
+    figure
+    plot(onset);
+    figure
+    plot(offset);
+    
+    figure
+    plot(fl_onoff(fl_amp>4),tmax(fl_amp>4),'o')
+    
+    figure
+    plot(onset(:,1),onset(:,2),'o')
+    xlabel('off response onset')
+    ylabel('on response onset')
+    axis equal
+    figure
+    plot(onset(:,1),offset(:,2),'o');
+    axis equal
+    hold on
+    plot(onset(:,2),offset(:,1),'ro')
+    axis equal
+    
+    figure
+    for i =1:2
+        hold on
+        if i==1
+            plot(x0(fl_lag==0),y0(fl_lag==0),'o');
+        elseif i==2
+            plot(x0(fl_lag==1),y0(fl_lag==1),'go');
+        end
+    end
+    title('position - lag =0 vs 1')
+    axis ij
+    
+    fl_responder=find(onset>5)
+    figure
+    plot(onset_sust(fl_responder),onset_lat(fl_responder),'o')
+    
+    figure
+    hist(onset_sust(onset>5));
+    
+    figure
+    hist(onset_lat(onset>5),0:10)
+    
+    figure
+    plot(fl_sz(fl_amp>1),fl_amp(fl_amp>1),'o')
+    
+    figure
+    hist(fl_supp(fl_amp>2))
+    
+    figure
+    plot(fl_lag(fl_amp>4),fl_supp(fl_amp>4),'o')
+    
+    
+    fl_resp = find(fl_amp>4 | (fl_amp>2 & fl_spont<1))
+    
+end
+
+for histo_analysis=1:1
+    
+    fl_y0 = fl_y0 - (nanmean(fl_y0)-nanmean(y0));
+    mv_y0 = mv_y0 - (nanmean(mv_y0)-nanmean(y0));
+    fl_x0 = fl_x0 - (nanmean(fl_x0)-nanmean(x0));
+    mv_x0 = mv_x0 - (nanmean(mv_x0)-nanmean(x0));
+    
+    meanx0 = nanmean([x0 fl_x0 mv_x0],2);
+    meany0 = nanmean([y0 fl_y0 mv_y0],2);
+    
+    offsets = zeros(length(x0),max(day));
+    for i = 1:max(day);
+        offsets(:,i)=(day(site)==i)';
+    end
+    
+   %xyz = [ones(size(x0)) alignedX' alignedY' histSection'*200];
+    xyz = [offsets alignedX' alignedY' histSection'*200];
+    
+    xc = regress(meanx0,xyz);
+    yc = regress(meany0,xyz);
+    xfit = xyz*xc;
+    yfit = xyz*yc;
+    
+    colordef white
+    figure
+    scatter(meanx0,xfit,8,site);
+    xlabel('x0'); ylabel('xfit');
+    axis equal
+    
+    figure
+    scatter(meany0,yfit,8,site);
+    xlabel('y0'); ylabel('yfit');
+    axis equal
+    
+    figure
+    plot(x0,mv_x0,'o');
+    xlabel('wn x0'); ylabel('mv x0')
+    hold on; axis equal
+    plot([0 100],[0 100])
+    
+    
+    figure
+    plot(y0,mv_y0,'o')
+    xlabel('wn y0'); ylabel('mv y0')
+    hold on; axis equal
+    plot([0 100],[0 100])
+    
+    
+    figure
+    plot(x0,fl_x0,'o');
+    xlabel('wn x0'); ylabel('fl x0')
+    hold on; axis equal
+    plot([0 100],[0 100])
+    
+    figure
+    plot(y0,fl_y0,'o')
+    xlabel('wn y0'); ylabel('fl y0')
+    hold on; axis equal
+    plot([0 100],[0 100])
+    
+end
+
+
+figure
+hold on
+for siteN = 1:32
+    pts = find(site==siteN);
+    plot(histoy(pts),meany0(pts)')
+    if sum(~isnan(meany0(pts)))>1
+    yc = regress(meany0(pts),[ones(size(meany0(pts))) histoy(pts)']);
+    scale(siteN) = yc(2);
+    end
+end
+
+figure
+plot(histox,histoy,'o')
+axis equal
+
+for setup_obs=1:1
+n_obs=n_obs+1; obs_name{n_obs} = 'histox'; obs(:,n_obs) = histox;
+n_obs=n_obs+1; obs_name{n_obs} = 'histoy'; obs(:,n_obs)=histoy;
+n_obs=n_obs+1; obs_name{n_obs} = 'hist sections'; obs(:,n_obs)=histSection;
+n_obs=n_obs+1; obs_name{n_obs} = 'x0'; obs(:,n_obs) = x0;
+n_obs=n_obs+1; obs_name{n_obs} = 'y0'; obs(:,n_obs)=y0;
+n_obs=n_obs+1; obs_name{n_obs} = 'eye'; obs(:,n_obs) = dom_eye;
+n_obs=n_obs+1; obs_name{n_obs} = 'manual type'; obs(:,n_obs) = manual_type;
+n_obs=n_obs+1; obs_name{n_obs} = 'sta amp'; obs(:,n_obs)=A;
+
+n_obs=n_obs+1; obs_name{n_obs} = 'tminmax'; obs(:,n_obs) = tratio;
+n_obs=n_obs+1; obs_name{n_obs} = 'wx'; obs(:,n_obs) = wx;
+n_obs=n_obs+1; obs_name{n_obs} = 'wy'; obs(:,n_obs)=wy;
+n_obs=n_obs+1; obs_name{n_obs} = 'wn_latency'; obs(:,n_obs) = wn_lat;
+
+n_obs=n_obs+1; obs_name{n_obs} = 'fl peak size'; obs(:,n_obs) = fl_sz;
+n_obs=n_obs+1; obs_name{n_obs} = 'fl_lag'; obs(:,n_obs) = fl_lag;
+n_obs=n_obs+1; obs_name{n_obs} = 'fl_type'; obs(:,n_obs)=fl_type;
+n_obs=n_obs+1; obs_name{n_obs} = 'fl_sust'; obs(:,n_obs) = fl_sust;
+n_obs=n_obs+1; obs_name{n_obs} = 'fl_on/off'; obs(:,n_obs) = fl_onoff;
+n_obs=n_obs+1; obs_name{n_obs} = 'fl latency'; obs(:,n_obs) = fl_lat;
+n_obs=n_obs+1; obs_name{n_obs} = 'onfoff corr'; obs(:,n_obs) = fl_onoffcorr;
+
+n_obs=n_obs+1; obs_name{n_obs} = 'mv osi'; obs(:,n_obs) =mv_osi;
+n_obs=n_obs+1; obs_name{n_obs} = 'mv dsi'; obs(:,n_obs) = mv_dsi;
+n_obs=n_obs+1; obs_name{n_obs} = 'mv spd'; obs(:,n_obs) = mv_spd;
+n_obs=n_obs+1; obs_name{n_obs} = 'mv sp ratio'; obs(:,n_obs) = mv_spd_ratio;
 
 n_obs=n_obs+1; obs_name{n_obs} = 'tf0ratio'; obs(:,n_obs) = tf_ratio(:,1)';
 n_obs=n_obs+1; obs_name{n_obs} = 'peakSF'; obs(:,n_obs) = peak_sf;
 %n_obs=n_obs+1; obs_name{n_obs} = 'drift amp'; obs(:,n_obs) = sf_amp;
 
-n_obs=n_obs+1; obs_name{n_obs} = 'driftDSI0'; obs(:,n_obs) = driftDSI(:,1)';
+d = driftDSI(:,1)';
+d(d>0.33)=d(d>0.33)+0.1;
+n_obs=n_obs+1; obs_name{n_obs} = 'driftDSI0'; obs(:,n_obs) = d;
 n_obs=n_obs+1; obs_name{n_obs} = 'driftDSI1'; obs(:,n_obs) = driftDSI(:,2)';
-n_obs=n_obs+1; obs_name{n_obs} = 'driftOSI0'; obs(:,n_obs) = driftOSI(:,1)';
+
+d = driftOSI(:,1)';
+d(d>0.33)=d(d>0.33)+0.1;
+n_obs=n_obs+1; obs_name{n_obs} = 'driftOSI0'; obs(:,n_obs) = d;
 n_obs=n_obs+1; obs_name{n_obs} = 'driftOSI1'; obs(:,n_obs) = driftOSI(:,2)';
 n_obs=n_obs+1; obs_name{n_obs} = 'dr spont'; obs(:,n_obs) = dr_spont;
 n_obs=n_obs+1; obs_name{n_obs} = 'dr f1f0'; obs(:,n_obs) = driftF1F0;
@@ -526,166 +843,7 @@ n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr'; obs(:,n_obs) = wn_cr_dom;
 n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr_norm'; obs(:,n_obs)=wn_cr_norm;
 n_obs=n_obs+1; obs_name{n_obs} = 'sbc'; obs(:,n_obs)=(wn_cr_dom<-2*10^3);
 n_obs=n_obs+1; obs_name{n_obs} = 'wn adapt'; obs(:,n_obs)=wn_adapt;
-
-
-figure
-hist(wn_cr);
-
-figure
-hist(wn_cr_norm)
-
-figure
-polar(wn_phase,wn_resp,'o');
-figure
-plot(wn_resp.*cos(wn_phase),wn_cr_norm,'o');
-
-%%% wn amplitudes
-figure
-hist(A)
-sum(~isnan(A))/length(A)
-
-%%% wn sizes
-figure
-plot(wx*0.7,wy*0.7,'o');
-axis([0 10 0 10])
-axis square
-
-
-
-
-%%% wn on/off
-figure
-plot(tmax,tmin,'o')
-axis([-1 1 -1 1])
-axis square
-
-%%% wn latency
-figure
-hist(wn_lat(wn_lat>0))
-
-%%% wn sites
-figure
-color = {'bo','go','ro','co','mo','yo','ko'};
-for i=1:length(afile);
-    hold on
-    plot(x0(site==i),y0(site==i),color{mod(i,7)+1})
-    
 end
-axis ij
-
-
-figure
-plot(tmin./tmax,wx,'o')
-
-figure
-plot(fl_lag,wx,'o')
-xlabel('flash_lag');
-ylabel('width deg');
-
-figure
-plot(x0,wx,'o')
-axis([0 128 0 15])
-xlabel('x - deg');
-ylabel('width x - deg');
-
-figure
-plot(x0,wy,'o')
-
-figure
-hist(fl_lat(fl_amp>4 & fl_lag==0));
-
-figure
-hist(fl_sust(fl_amp>4 & fl_lag==0));
-
-
-figure
-hist(tmin./tmax)
-
-figure
-plot(fl_lat(fl_amp>2 & fl_lag==0),fl_sust(fl_amp>2 & fl_lag==0),'o' );
-
-
-figure
-plot(tmax(fl_lag==0),tmin(fl_lag==0),'o')
-hold on
-plot(tmax(fl_lag==1),tmin(fl_lag==1),'ro')
-
-figure
-plot(fl_sz(fl_amp>4),wx(fl_amp>4),'o');
-hold on
-plot(fl_sz(fl_amp>4),wy(fl_amp>4),'go');
-figure
-plot(onset);
-figure
-plot(offset);
-
-figure
-plot(fl_onoff(fl_amp>4),tmax(fl_amp>4),'o')
-
-figure
-plot(onset(:,1),onset(:,2),'o')
-xlabel('off response onset')
-ylabel('on response onset')
-axis equal
-figure
-plot(onset(:,1),offset(:,2),'o');
-axis equal
-hold on
-plot(onset(:,2),offset(:,1),'ro')
-axis equal
-
-
-
-figure
-for i =1:2
-    hold on
-    if i==1
-        plot(x0(fl_lag==0),y0(fl_lag==0),'o');
-    elseif i==2
-        plot(x0(fl_lag==1),y0(fl_lag==1),'go');
-    end
-end
-title('position - lag =0 vs 1')
-axis ij
-
-fl_responder=find(onset>5)
-figure
-plot(onset_sust(fl_responder),onset_lat(fl_responder),'o')
-
-figure
-hist(onset_sust(onset>5));
-
-figure
-hist(onset_lat(onset>5),0:10)
-
-figure
-plot(fl_sz(fl_amp>1),fl_amp(fl_amp>1),'o')
-
-figure
-hist(fl_supp(fl_amp>2))
-
-figure
-plot(fl_lag(fl_amp>4),fl_supp(fl_amp>4),'o')
-
-
-fl_resp = find(fl_amp>4 | (fl_amp>2 & fl_spont<1))
-
-% for cell_n = find(fl_resp)
-%     f= fl_all(cell_n);
-%     if ~isempty(f.N)
-%     figure
-%     for r = 1:2
-%         hold on
-%         if r==1
-%             plot(f.onset_bins(1:end-1),squeeze(mean(f.onset_hist(r,:,:),2)))
-%         else
-%             plot(f.onset_bins(1:end-1),squeeze(mean(f.onset_hist(r,:,:),2)),'r')
-%         end
-%     end
-%     end
-% end
-
-
 
 
 figure
@@ -695,25 +853,19 @@ for i = 1:n_obs;
     bar(b,h);
 end
 
-mn = mean(wvform(find(inside),:));
-[wv_pc score wv_eig] = princomp(wvform(find(inside),:)-repmat(mn,sum(inside),1));
-figure
-plot(wv_eig);
-figure
-plot(wv_pc(:,1:5))
-figure
-plot(score(:,1:5))
-figure
-plot(score(:,1),score(:,2),'o')
 
 %usedcells= find(inside & ~(isnan(obs(:,4)) & isnan(obs(:,16))&isnan(obs(:,24))));
 resp =~isnan(obs(:,find(strcmp(obs_name,'sta amp'))))+  ~isnan(obs(:,find(strcmp(obs_name,'fl_type')))) +...
     ~isnan(obs(:,find(strcmp(obs_name,'mv spd'))))+  ~isnan(obs(:,find(strcmp(obs_name,'dr f1f0')))) ;
-    
+
 sbc = wn_cr_dom<-2*10^3;
 sbc=sbc';
 
-usedcells = find(inside & resp>=1| sbc)
+usedcells = find(manual_type~=0)
+%usedcells = find(inside & resp>=1| sbc);
+%usedcells = 1:length(sbc);
+%usedcells=find(manual_type>=1 & manual_type<=2)
+length(usedcells)
 
 obs_used = obs(usedcells,:);
 obs_used=replaceNan(obs_used,obs_name,'driftDSI0',0);
@@ -737,21 +889,6 @@ for i = 1:n_obs;
     title(obs_name{i})
 end
 
-
-c = nancov(obs_norm);
-figure
-imagesc(c)
-
-cc = diag(c);
-denom = sqrt(repmat(cc,1,length(cc)).*repmat(cc',length(cc),1));
-nancorr = c./denom;
-
-figure
-imagesc(nancorr);
-set(gca,'YTickLabel',labels)
-set(gca,'YTick',1:length(obs_name))
-title('nancor')
-
 labels  ={};
 for i = 1:length(obs_name);
     labels{i} = sprintf('%s  %d',obs_name{i},i);
@@ -759,6 +896,7 @@ end
 
 figure
 pcorr = corrcoef(obs_norm,'rows','pairwise');
+pcorr(isnan(pcorr))=0;
 imagesc(pcorr)
 set(gca,'YTickLabel',labels)
 set(gca,'YTick',1:length(obs_name))
@@ -769,7 +907,7 @@ for i = 1:length(obs_name);
     labels{i} = sprintf('%s  %d',obs_name{i},i);
 end
 
-start_obs=7;
+start_obs=8;
 used_obs=start_obs:n_obs;
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'fl_lag'))); %%% fl_lag (1,2 are the only meaningful)
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wn_cr_norm'))); %%% cr_norm (captured by cr)
@@ -777,6 +915,15 @@ used_obs=used_obs(used_obs~=find(strcmp(obs_name,'driftDSI1'))); %%% drift DSI F
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'driftOSI1')));  %%% drift OSI F1
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wx'))); %%% drift DSI F1
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wy')));  %%% drift OSI F1
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'fl_sust')));  %%% sustained / trans from flash; redundant with lag
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'mv sp ratio')));  %%% sustained / trans from flash; redundant with lag
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'mv dsi')));  %%% sustained / trans from flash; redundant with lag
+obs_id = find(strcmp(obs_name,'sbc'))
+obs_norm(:,obs_id) = obs_norm(:,obs_id)*1.5;
+obs_id = find(strcmp(obs_name,'driftOSI0'))
+obs_norm(:,obs_id) = obs_norm(:,obs_id)*1.5;
+
+%used_obs=used_obs(used_obs~=find(strcmp(obs_name,'dr spont'))); %%% drift DSI F1
 
 
 e = eig(pcorr(used_obs,used_obs));
@@ -790,49 +937,31 @@ set(gca,'YTick',1:length(obs_name))
 title('pairwise corr')
 
 
-v(abs(v)<0.1)=0;
-% gamma = 1.5;
-% v= sign(v).*abs(v).^gamma;
-% figure
-% imagesc(v(:,size(v,2):-1:1));
-clear pc
-for i=1:length(obs_norm);
-    for j = 1:length(v);
-        pc(i,j) = nansum(obs_norm(i,used_obs).*v(:,length(v)-j+1)');
-        %pc(i,j) = nansum(obs_norm(i,6:end).*v(:,length(v)-j+1)')/sum(~isnan(obs_norm(i,6:end)));
-        %pc(i,j) = nansum(obs_norm(i,6:end).*v(:,length(v)-j+1)')/sqrt(nansum(obs_norm(i,6:end).^2));
-    end
-end
-
-figure
-plot3(pc(:,1),pc(:,2),pc(:,3),'o')
-
-% Y = pdist(pc(:,1:6), 'euclid');
-%        Z = linkage(Y, 'ward');
-%        T = cluster(Z, 'maxclust', n_clust);
-% figure
-% dendrogram(Z)
-%%% n=7, pc1:7 phi=1.2
-
 clear DB CH Dunn KL Han
-close all
-for rep=1:6;
-    for c_rep=1:6
-       npca=2*rep+4; 
+
+for rep=2:2;
+    for c_rep=7:7
+        npca=2*rep+4;
         %npca =6;
-        n_clust=5+c_rep;
-       % n_clust=c_rep+5;
+        n_clust=c_rep;
+        % n_clust=c_rep+5;
         
-        phi=1.1                       % fuzzy exponent
+        phi=1.01                       % fuzzy exponent
         
         maxiter=200;
         toldif=0.0000001;
         
-        ndata = size(pc, 1);         % number of data
+        ndata = length(obs_norm);         % number of data
         % initialise random
         Uinit= initmember(0.1,n_clust,ndata);
         tic
-        data=pc(:,1:npca);
+        %data=pc(:,1:npca);
+        data = obs_norm(:,used_obs);
+        data(isnan(data))=0;
+        
+        figure
+        imagesc(data')
+        
         [U, centroid, dist, W, obj] = run_fuzme(n_clust,data,phi,maxiter,1,toldif,0.1,200);
         toc
         %T= kmeans(pc(:,1:7),n_clust,'Replicates',100);
@@ -864,11 +993,11 @@ for rep=1:6;
             labels{i} = sprintf('%s  %d',obs_name{i},i);
         end
         figure
-        imagesc(obs_sort');
+        imagesc(obs_sort',[-3 3]);
         set(gca,'YTickLabel',labels(1:n_obs))
         set(gca,'YTick',1:length(obs_name))
         figure
-        imagesc(obs_sort_mean');
+        imagesc(obs_sort_mean',[-1.5 1.5]);
         set(gca,'YTickLabel',labels(1:n_obs))
         set(gca,'YTick',1:length(obs_name))
         % figure
@@ -879,9 +1008,11 @@ for rep=1:6;
         title(sprintf('nclust %d npca %d phi %0.2f',n_clust,npca,phi))
     end
 end
+
+keyboard
+
 figure
 imagesc(Dunn(:,:,1));
-
 
 types = nan(1,length(drift_all));
 types(usedcells)=T;
@@ -904,6 +1035,28 @@ for i = 1:max(T)
     colormap(cmap); colorbar; set(gca,'Clim',clim); title(sprintf('type %d',i));
 end
 
+osID = 5;
+
+figure
+os = find(types==osID);
+plot(driftOSI(os,1),driftDSI(os,1),'o')
+xlabel('OSI'); ylabel('DSI');
+axis equal
+axis square
+
+figure
+histrange = -90:30:90;
+h=hist(round(driftOSItheta(os,1)*180/pi),histrange)
+polar(histrange*pi/180,h)
+hold on
+polar(histrange*pi/180+pi,h)
+
+ds = find(types' == osID & driftDSI(:,1)>0.3)
+figure
+histrange = -180:45:180;
+h=hist(round(driftDSItheta(os,1)*180/pi),histrange)
+polar(histrange*pi/180,h)
+
 
 
 psfilename = 'c:/data/allLGN.ps'
@@ -920,8 +1073,8 @@ set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
 
 %for c = 1:length(cell_list);
-    for c = 1:length(wn_all)
-
+for c = 1:length(wn_all)
+    
     
     %cell_n = usedcells(cell_list(c));
     cell_n=c;
@@ -1037,6 +1190,8 @@ print('-dpsc',psfilename,'-append');
     lgnxy = anatomy(site(cell_n)).LGN;
     plot(lgnxy(:,2),lgnxy(:,1),'b.'); hold on
     plot(histox(cell_n),histoy(cell_n),'r*');
+    etrode = anatomy(site(cell_n)).Electrode;
+    plot(etrode(:,2),etrode(:,1),'k','LineWidth',1);
     axis([-500 500 -500 500]);
     axis off
     title(sprintf('monitor %0.0f',offsetX(cell_n)));
@@ -1056,7 +1211,7 @@ print('-dpsc',psfilename,'-append');
             subplot(5,4,16+f)
             hold on
             plot(drift_os,color{r});
-            title(sprintf('tf %0.1f os %0.1f ds %0.1f',tf_ratio(cell_n,f),driftOSI(cell_n,f),driftDSI(cell_n,f)));
+            title(sprintf('os%0.1f %d ds%0.1f %d',driftOSI(cell_n,f),round(driftOSItheta(cell_n,f)*180/pi),driftDSI(cell_n,f), round(driftDSItheta(cell_n,f)*180/pi)));
             axis([1 8 min(0,min(drift_os)) drift_amp(cell_n)+1])
             set(gca,'XTick',[])
             xlabel('theta')

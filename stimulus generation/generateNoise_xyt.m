@@ -118,8 +118,9 @@ if binarize
 end
 
 if movtype==bar
-    barPix=10;
+    barPix=20;
     center = linspace(0-barPix/2,imsize+barPix/2,contrast_period*framerate);
+    center=fliplr(center);
     loweredge = center-barPix/2; upperedge=center+barPix/2;
     loweredge(loweredge<1)=1; loweredge(loweredge>imsize)=imsize;
      upperedge(upperedge<1)=1; upperedge(upperedge>imsize)=imsize;
