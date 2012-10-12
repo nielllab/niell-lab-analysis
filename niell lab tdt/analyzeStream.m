@@ -184,4 +184,4 @@ for block = 1:nblocks;
     
 end
 
-save(fullfile(snippname,snipfname),'Xall','Tall','Block_Name','Tank_Name','nblocks');
+save(fullfile(snippname,snipfname),'Xall','Tall','Block_Name','Tank_Name','nblocks', '-v7.3');

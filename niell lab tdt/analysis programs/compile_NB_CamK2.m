@@ -1,11 +1,12 @@
-afile = {'C:\data\ephys matlab data\070112_awake_mlr\wn7\analysis.mat',... % may want to exclude since this was contralateral
-    'C:\data\ephys matlab data\070612_awake_mlr\wn4b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn5b\analysis.mat',...
+afile = {'C:\data\ephys matlab data\070612_awake_mlr\wn4b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn5b\analysis.mat',...
     'C:\data\ephys matlab data\070612_awake_mlr\wn6b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn7a\analysis.mat',...
     'C:\data\ephys matlab data\070612_awake_mlr\wn8b\analysis.mat','C:\data\ephys matlab data\070612_awake_mlr\wn9a\analysis.mat',...
     'C:\data\tdt tanks\071312_awake_MLR\wn1b\analysis.mat','C:\data\ephys matlab data\071312_awake_mlr\wn2d\analysis.mat',...
-    'C:\data\ephys matlab data\071312_awake_mlr\wn5\analysis.mat'}
+    'C:\data\ephys matlab data\071312_awake_mlr\wn5\analysis.mat','D:\Moses_ephys_data\082012_awake_mlr\wn2a\analysis.mat',...
+    'D:\Moses_ephys_data\082012_awake_mlr\wn3b\analysis.mat','D:\Moses_ephys_data\082112_awake_mlr\wn2c\analysis.mat','D:\Moses_ephys_data\082312_awake_MLR\wn3d\analysis.mat',...
+    'D:\Moses_ephys_data\082312_awake_MLR\wn5a\analysis.mat','D:\Moses_ephys_data\082312_awake_MLR\wn6b\analysis.mat'}
 
-
+close all
 lfp_channel = [  ];
 n=0
 frame_duration = 1/30;
@@ -55,7 +56,7 @@ for i= 1:n
 
     lfp = squeeze(laser_lfp_all{i});
    f=laser_lfp_freqs{i};
-   
+   close
    figure
 hold on
    plot(f(f<59),lfp(1,f<59),'b');
@@ -111,21 +112,31 @@ legend({'laser off','laser on'});
 title_str = {'laser','movement','laser no move'};
 
 
+used = find(evoked(:,2,2)>2);
+sprintf('used fraction = %d / %d  = %f',length(used),length(evoked),length(used)/length(evoked))
+
 for rep=1:3;
+   
     figure
-    plot(spont(:,rep,1),spont(:,rep,2),'o');
+    plot(spont(used,rep,1),spont(used,rep,2),'o');
     axis square; axis equal;hold on
     plot([0 max(spont(:))], [0 max(spont(:))])
     title(sprintf('spont %s',title_str{rep}));
     
     figure
-    plot(evoked(:,rep,1),evoked(:,rep,2),'o');
+    plot(evoked(used,rep,1),evoked(used,rep,2),'o');
      axis square; axis equal; hold on
      plot([0 max(evoked(:))], [0 max(evoked(:))])
     title(sprintf('evoked %s',title_str{rep}));
   
     figure
-    barwitherr( [std(spont(:,rep,1),1) std(spont(:,rep,2),1) ; std(evoked(:,rep,1),1) std(evoked(:,rep,2),1)]/sqrt(n),...
-        [nanmean(spont(:,rep,1),1) nanmean(spont(:,rep,2),1) ; nanmean(evoked(:,rep,1),1) nanmean(evoked(:,rep,2),1)] ); 
+    barwitherr( [std(spont(used,rep,1),1) std(spont(used,rep,2),1) ; std(evoked(used,rep,1),1) std(evoked(used,rep,2),1)]/sqrt(n),...
+        [nanmean(spont(used,rep,1),1) nanmean(spont(used,rep,2),1) ; nanmean(evoked(used,rep,1),1) nanmean(evoked(used,rep,2),1)] ); 
     title(title_str{rep});
+    
+        [h p ] = ttest2(spont(used,rep,1),spont(used,rep,2));
+    sprintf('%s spont p = %f',title_str{rep},p)
+     [h p] = ttest2(evoked(used,rep,1),evoked(used,rep,2));
+    sprintf('%s evoked p = %f',title_str{rep},p)
+    
 end

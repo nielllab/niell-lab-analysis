@@ -1,16 +1,7 @@
-afile = {...
-   % 'C:\data\ephys matlab data\021412_awake_chr2\wndrift1\analysis.mat', ...
-    'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...
-    'C:\data\ephys matlab data\021612_awake\wn2b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn3\analysis.mat',...
-    'C:\data\ephys matlab data\021612_awake\wn4bdrift5\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn2\analysis.mat',...
-    'C:\data\ephys matlab data\021812_awake_pptg\wn3e_drift2\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn5\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn1fg\analysis.mat','C:\data\ephys matlab data\070112_awake_mlr\wn2a\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn3d\analysis.mat','C:\data\ephys matlab data\070112_awake_mlr\wn4\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn5b\analysis.mat','C:\data\ephys matlab data\070312_awake_mlr\wn2e\analysis.mat',...
-    'C:\data\ephys matlab data\070312_awake_mlr\wn3a\analysis.mat','C:\data\ephys matlab data\070312_awake_mlr\wn4c\analysis.mat'}
+afile = {'D:\Moses_ephys_data\083112_awake_BF\wn1a\analysis3.mat','D:\Moses_ephys_data\083112_awake_BF\wn2a\analysis.mat'}
 
+close all
 lfp_channel = [  ];
-
 n=0
 frame_duration = 1/30;
 
@@ -59,11 +50,11 @@ for i= 1:n
 
     lfp = squeeze(laser_lfp_all{i});
    f=laser_lfp_freqs{i};
-   
-%    figure
-%    hold on
-%    plot(f(f<59),lfp(1,f<59),'b');
-%    plot(f(f<59),lfp(2,f<59),'r');
+   close
+   figure
+hold on
+   plot(f(f<59),lfp(1,f<59),'b');
+      plot(f(f<59),lfp(2,f<59),'r');
    gammaF = find(f>50 & f<58);
    alphaF = find(f>1 & f<8);
    gamma(i,:)= mean(lfp(:,gammaF),2);
@@ -77,7 +68,7 @@ title('gamma')
 xlabel('laser off');
 ylabel('laser on');
 axis equal
-plot([0 10^4],[0 10^4])
+plot([0 10^3],[0 10^3])
 
 figure
 plot(alpha(:,1),alpha(:,2),'o');
@@ -86,8 +77,13 @@ title('alpha')
 xlabel('laser off');
 ylabel('laser on');
 axis equal
-plot([0 10^4],[0 10^4])
+plot([0 10^3],[0 10^3])
 axis equal
+
+figure
+barwitherr([std(alpha(:,1))/sqrt(length(gamma)) std(alpha(:,2))/sqrt(length(gamma)); std(gamma(:,1))/sqrt(length(gamma)) std(gamma(:,2))/sqrt(length(gamma))], ...
+    [mean(alpha(:,1)) mean(alpha(:,2)) ; mean(gamma(:,1)) mean(gamma(:,2))]);
+
 
 
 
@@ -131,27 +127,4 @@ for rep=1:3;
     barwitherr( [std(spont(used,rep,1),1) std(spont(used,rep,2),1) ; std(evoked(used,rep,1),1) std(evoked(used,rep,2),1)]/sqrt(n),...
         [nanmean(spont(used,rep,1),1) nanmean(spont(used,rep,2),1) ; nanmean(evoked(used,rep,1),1) nanmean(evoked(used,rep,2),1)] ); 
     title(title_str{rep});
-    [p t] = ranksum(spont(used,rep,1),spont(used,rep,2));
-    sprintf('%s spont p = %f',title_str{rep},p)
-     [p t] = ranksum(evoked(used,rep,1),evoked(used,rep,2));
-    sprintf('%s evoked p = %f',title_str{rep},p)
 end
-% 
-% for rep=1:3;
-%     figure
-%     plot(spont(:,rep,1),spont(:,rep,2),'o');
-%     axis square; axis equal;hold on
-%     plot([0 max(spont(:))], [0 max(spont(:))])
-%     title(sprintf('spont %s',title_str{rep}));
-%     
-%     figure
-%     plot(evoked(:,rep,1),evoked(:,rep,2),'o');
-%      axis square; axis equal; hold on
-%      plot([0 max(evoked(:))], [0 max(evoked(:))])
-%     title(sprintf('evoked %s',title_str{rep}));
-%   
-%     figure
-%     barwitherr( [std(spont(:,rep,1),1) std(spont(:,rep,2),1) ; std(evoked(:,rep,1),1) std(evoked(:,rep,2),1)]/sqrt(n),...
-%         [nanmean(spont(:,rep,1),1) nanmean(spont(:,rep,2),1) ; nanmean(evoked(:,rep,1),1) nanmean(evoked(:,rep,2),1)] ); 
-%     title(title_str{rep});
-% end

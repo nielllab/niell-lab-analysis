@@ -7,7 +7,7 @@ function tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
 tdtData=struct('streamV',[],'streamT',[],'MUspikeT',[], 'snips',[], 'spikeT',[],  'lfpT' ,[],...
     'lfpData',[], 'spectT',[], 'spectF',[], 'spectData' ,[], ...
     'frameEpocs' ,[],'stimEpocs' ,[], ...
-    'mouseT',[], 'mouseV' ,[],'laserT',[], 'laserTTL',[]);
+    'mouseT',[], 'mouseV' ,[],'laserT',[], 'laserTTL',[],'analogV',[],'analogT',[]);
 
 TTX = openTTX(Tank_Name,Block_Name);
 
@@ -24,6 +24,17 @@ if isfield(flags,'stream') && flags.stream
     end
 end
 
+
+
+if isfield(flags,'analog') && flags.analog
+    event_code = 'AudS';
+    max_events = 10^6;
+    max_t = 10^9;
+
+       for ch = 1:2
+        [tdtData.analogV{ch} tdtData.analogT] = readWave(TTX,ch, event_code,max_events,max_t);
+       end
+end
 
 invoke(TTX,'CreateEpocIndexing');
 ep = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0, 1000);
@@ -53,9 +64,9 @@ if isfield(flags,'oldCluster') && flags.oldCluster
 elseif isfield(flags,'newCluster') && flags.newCluster
     [afname, apname] = uigetfile('*.mat','analysis data');
     if afname~=0
-        afile = fullfile(apname,afname);
-        load(afile,spikeT);
-        tdtData.spikeT=spikeT
+        afile = fullfile(apname,afname)
+        load(afile,'spikeT');
+        tdtData.spikeT=spikeT;
     end
     
 end

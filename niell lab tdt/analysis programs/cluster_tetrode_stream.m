@@ -1,4 +1,4 @@
-function cluster_tetrode_stream(snipfname,snippname)
+function cluster_tetrode_stream(snipfname,snippname,choose_pca)
 % Matlab codes for clustering tetrode data
 % Reads in waveform snippets from TDT tank, performs alignment,
 % calculates independent components, calls Klustakwik, then displays
@@ -17,8 +17,10 @@ nblock=0;
 useStream=1;
 
 subtractMean = 1;
-    choose_pca=0;   %%% select the componets to use, or use all
-
+%choose_pca=0;   %%% select the componets to use, or use all
+if ~exist('choose_pca','var') | isempty(choose_pca);
+    choose_pca=1;
+end
     
 if ~useStream
 recluster= input('reclustering? (y/n) ','s');
@@ -396,7 +398,7 @@ for tet=use_tets
         set(gca,'XTickLabel',[])
         set(gca,'YTickLabel',[])
         axis([1 size(X,2) -200 75])
-    end
+        endc
     title(tet_title);
 
 %%% plot histogram of spike amplitudes for all clusters
@@ -551,7 +553,7 @@ output_path
 
 if bname~=0
     fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname))
-    save(fname);
+    save(fname,'-v7.3');
     for t=use_tets
         fname = fullfile(output_path,sprintf('hist%s_%s_t%d',Tank_Name,bname,t));
         saveas(histfig(t),fname,'fig');

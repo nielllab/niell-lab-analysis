@@ -94,7 +94,7 @@ for cell_n = cell_range
     R = R(~isnan(mousehist));
     mousehist_nonan = mousehist(~isnan(mousehist));
     
-    c = corrcoef(mousehist_nonan,R);
+    [c,pvals] = corrcoef(mousehist_nonan,R);
      title(sprintf('ch %d - corr = %f',ch,c(1,2)))
      co(cell_n) = c(1,2);
      
