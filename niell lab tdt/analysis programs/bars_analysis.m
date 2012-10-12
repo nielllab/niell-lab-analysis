@@ -232,7 +232,7 @@ for cell_n = cell_range;
 
 
             hold on
-            plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1.5);
+            plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1);
 
             
             
@@ -242,7 +242,7 @@ for cell_n = cell_range;
         bars(cell_n,rep).x0 = squeeze(x0(cell_n,:));
         bars(cell_n,rep).width = squeeze(amp(cell_n,:));
        
-        
+        title(sprintf('ch %d cl %d',channel_no,clust_no));
         
     end  %%% panel
     
@@ -261,6 +261,8 @@ for cell_n = cell_range;
      set(gca,'XTick',orient_list)
     xlabel('orientation -deg');
     
+       set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
     
 end
 

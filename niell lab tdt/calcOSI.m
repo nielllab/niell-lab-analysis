@@ -8,5 +8,13 @@ end
 R(R<0)=0;
 
 osi = sum(R.*exp(sqrt(-1)*theta'))/sum(R);
-preftheta=0.5*angle(osi);
+
+    th = angle(osi);
+    th(th<0) = th(th<0)+2*pi;
+    if dsi
+        preftheta=th;
+    else
+        preftheta=0.5*th;
+    end
+
 osi = abs(osi);
