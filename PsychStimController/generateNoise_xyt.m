@@ -6,10 +6,10 @@ rand('state',sum(100*clock))
  
     %%% stimulus/display parameters
     
-    imsize = 128;                %% size in pixels
-    framerate = 60;             %% Hz
-        imageMag=10;                 %% magnification that movie will be played at
-
+    imsize = 120;                %% size in pixels
+    framerate = 30;             %% Hz
+  
+    imageMag=8;                 %% magnification that movie will be played at
     screenWidthPix = 1280        %% Screen width in Pixels
     screenWidthCm = 50;         %% Width in cm
     screenDistanceCm = 25;      %% Distance in cm
@@ -20,10 +20,9 @@ rand('state',sum(100*clock))
     %contrastSigma =0.5;         %% one-sigma value for contrast
     
     %% derived parameters
-    screenWidthDeg = 2*atan(0.5*screenWidthCm/screenDistanceCm)*180/pi
-    degperpix = (screenWidthDeg/screenWidthPix)*imageMag
-    
     nframes = framerate*60*duration;
+    screenWidthDeg = 2*atan(0.5*screenWidthCm/screenDistanceCm)*180/pi;
+    degperpix = (screenWidthDeg/screenWidthPix)*imageMag
     
     %% frequency intervals for FFT
     nyq_pix = 0.5;
@@ -126,13 +125,8 @@ rand('state',sum(100*clock))
    c = fftshift(c);
    figure
    imagesc(mean(abs(c(:,:,:)),3));
-
-       MovieRate= framerate;
-
-    MovieMag= imageMag;
-   
-[bname output_path] = uiputfile('','data folder');   
-    save(fullfile(output_path,bname),'moviedata','MovieMag','MovieRate','maxSpatFreq','maxTempFreq','contrastSigma','alpha','offset','degperpix','screenWidthPix')
+   figure
+    
 %%% to view movie
 % 
 %     for f=1:1000

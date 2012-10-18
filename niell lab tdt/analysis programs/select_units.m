@@ -12,8 +12,11 @@ oldfname = fname;
 load(fullfile(pname,fname));   %%% need to copy pname, or it can get written over in load
 pname = oldpname;
 
-[basename] =sscanf(oldfname,'cluster_data_%s.mat')
-basename = basename(1:length(basename)-4)
+
+basename = oldfname(14:end-4)
+
+% [basename] =sscanf(oldfname,'cluster_data_%s.mat')
+% basename = basename(1:length(basename)-4)
 
 %%% where to save analysis results
 [afname apname] = uiputfile('*.mat','analysis file');
@@ -55,6 +58,7 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
     goodcells = zeros(1,12);
     try
         open(sprintf('%shist%s_t%d.fig',oldpname,basename,tet))
+        sprintf('%shist%s_t%d.fig',oldpname,basename,tet)
         set(gcf,'Position',[10 50 500 400]);
         open(sprintf('%ssnip%s_t%d.fig',oldpname,basename,tet))
         set(gcf,'Position',[10 550 500 400]);
@@ -86,22 +90,39 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
     used = find(goodcells);
 
     %%% once potential clusters have been selected, show avg waveform and ISI
+   
+    
     for i =length(used):-1:1;
 
         c = used(i);
 
         figure
-        subplot(1,2,1);
+        subplot(2,2,1);
         plot(mean_wvform(:,tet_ch:tet_ch+3,c));
         title(sprintf('ch %d cl %d',tet,c));
       
-       subplot(1,2,2);
+       subplot(2,2,2);
         t1= squeeze(event_times_all{tet_ch}(find(idx_all{tet_ch} == c)));
         length(t1)
         dt = diff(t1);
         dt =dt(dt<.02);
         hist(dt,.0005:0.001:.02);
           set(gcf,'Position',[50 50 800 400], 'Color',linecolor(c,:));
+          
+         if exist('wave_all','var')
+             wvall = wave_all{tet};
+           wvclust = wvall(find(idx_all{tet_ch}==c),:,:);
+            
+          dt = diff(t1);
+          dt(dt>1000)=1;
+          tmerge = cumsum(dt);
+                  amps =squeeze(min(wvclust(:,5:10,:),[],2));
+        subplot(2,2,3:4)
+        plot([0 tmerge],amps,'.','MarkerSize',2 );
+         end
+         
+          %%% call Erik's code to calculate cluster separation
+          %%%showClusterSeparation(wave_all{tet},idx_all{tet_ch},i);
     end
 
     %%% give the user a chance to revise their choices

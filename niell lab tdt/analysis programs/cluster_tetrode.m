@@ -17,9 +17,9 @@ nblock=0;
 % option to redo an old clustering
 recluster= input('reclustering? (y/n) ','s');
 if recluster~='y'
-    while ~done
+    while ~done       
         if nblock==0
-            pname = uigetdir('C:\data\tdt tanks','block data')   %%% start location of tanks for search
+            pname = uigetdir('D:\','block data')   %%% start location of tanks for search
         else
             pname = uigetdir(selected_path,'block data')
         end
@@ -79,8 +79,9 @@ for tet=use_tets
                 s = s(:,1:length(T));
             end
             
-            Nblock(block) = length(T);
-            
+            if ~isempty(T)
+                Nblock(block) = length(T);
+            end
             event_times_all{ch}(N+(1:Nblock(block))) = T +10^5 *(block-1);
             X(N+(1:Nblock(block)),1:size(s,1),tet_ch)=s';
             size(X)
@@ -140,8 +141,14 @@ for tet=use_tets
     end
         
 
-
-    %%% cut out beginning of waveform before threshold, no information
+    %%% in case of no data
+    if N<10
+        N=100;
+        X= -1*(10^-5)*rand(N,30,4);
+    end
+    
+    
+     %%% cut out beginning of waveform before threshold, no information
     %%% there (necessary?)
     X = X(:,6:30,:);
 
@@ -185,6 +192,9 @@ for tet=use_tets
         end
     end
 
+    
+    wave_all{tet}=Xshift;
+    
     figure
     hist(I);
     X= Xshift(used,:,:);
@@ -218,6 +228,9 @@ for tet=use_tets
         n_pca=8;
     else
         n_pca =8;
+    end
+    if N<100
+        n_pca=3;
     end
     mn = mean(X,3);
     pc_data = [X(:,:,1) X(:,:,2) X(:,:,3) X(:,:,4)];  %%% concatenate waveforms to send to ICA
@@ -303,9 +316,7 @@ for tet=use_tets
     for chan = 1:4
         X(:,:,chan)=X(:,:,chan)+avg;
     end
-
-    save waveformdata X idx score
-    
+   
     for c = 1:n_clust
         clust_size(c)=sum(idx==c);
     end
@@ -489,7 +500,7 @@ end %tet
 
 Tank_Name
 
-clear X Xshift Xica Xold Xraw used nonc_score s score c_score
+clear  Xshift Xica Xold Xraw used nonc_score s c_score clear group
 
 %%% save everything
 [bname output_path] = uiputfile('','data folder');

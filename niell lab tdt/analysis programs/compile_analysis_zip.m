@@ -43,6 +43,7 @@ for dataset = 1:2
         N=N+n_units;
         
         
+        
         alldata( cellrange,1:2) = cells;
         alldata( cellrange,3) = L_ratio;
         
@@ -103,18 +104,121 @@ for dataset = 1:2
             driftA2(i,j);
             driftB(i,j);
             drift_theta_w(i,j);
-            [OSI(i,j) width(i,j) peak(i,j)] = calculate_tuning(driftA1(i,j),driftA2(i,j),driftB(i,j),drift_theta_w(i,j))
+            [OSI(i,j) width(i,j) peak(i,j)] = calculate_tuning(driftA1(i,j),driftA2(i,j),driftB(i,j),drift_theta_w(i,j));
         end
     end
     
-    sprintf('mean firing rate = %f',mean(peak))
+   % sprintf('mean firing rate = %f',mean(peak))
     meanpeak(dataset) = mean(peak)
     meanOSI(dataset) = mean(OSI(peak>2))
     meanwidth(dataset) = mean(width(peak>2 & OSI>0.5))
+    
     meanspont(dataset) = mean(driftspont(peak>2))
+    meanwpref(dataset) = mean(driftwpref(peak>2 &driftwpref<=0.32))
+    medianwpref(dataset) = median(driftwpref(peak>2 &driftwpref<=0.32))
+    meanF1F0(dataset) = mean(driftF1F0(peak>2));
+   %to generate variables to do stats on
+   bothwpref{dataset}=driftwpref(peak>2 &driftwpref<=0.32);
+   bothpeak{dataset}=peak;
+   bothOSI{dataset}=OSI(peak>2);
+   bothwidth{dataset}=width(peak>2 &OSI>0.5);
+   bothspont{dataset}=driftspont(peak>2);
+   bothF1F0{dataset}=driftF1F0(peak>2);
+
+    % to generate error bars for SEM on graphs
+    peak_err(dataset) = std(peak)/sqrt(length(peak));
+    OSI_err(dataset) = std(OSI(peak>2))/sqrt(length(OSI(peak>2)));
+    width_err(dataset) = std(width(peak>2 &OSI>0.5))/sqrt(length(width(peak>2 &OSI>0.5)));
+    wpref_err(dataset) = std(driftwpref(peak>2 &driftwpref<=0.32))/sqrt(length(driftwpref(peak>2 &driftwpref<=0.32)));
+    spont_err(dataset) = std(driftspont(peak>2))/sqrt(length(driftspont(peak>2)));
+    F1F0_err{dataset} = std(driftF1F0(peak>2))/sqrt(length(driftF1F0(peak>2)));
 end
 
+figure
+barweb(meanpeak,peak_err);
+title('Mean Peak Amplitude')
+
+figure
+barweb(meanOSI,OSI_err);
+title('Mean OSI')
+
+figure
+barweb(meanwidth,width_err);
+title('Mean Width of Orientation Selective Response')
+
+figure
+barweb(meanwpref,wpref_err);
+title('Mean Preferred Spatial Frequency')
+
+figure
+barweb(medianwpref,wpref_err);
+title('Median Preferred Spatial Frequency')
+
+figure
+barweb(meanspont,spont_err);
+title('Mean Spontaneous Activity')
+
+figure
+histbins= 0:0.5:5;
+for rep=1:2
+    h(rep,:) = hist(bothspont{rep},histbins)/length(bothspont{rep});
+end
+bar(histbins,h')
+legend('wt','tg')
+
+%figure
+%histbins= -30:2:30;
+%for rep=1:2
+ %   h(rep,:) = hist(bothpeak{rep})/length(bothpeak{rep});
+%end
+%bar(histbins,h')
+%legend('wt','tg')
+
+figure
+histbins= 0:0.1:1;
+for rep=1:2
+    h(rep,:) = hist(bothOSI{rep},histbins)/length(bothOSI{rep});
+end
+bar(histbins,h')
+legend('wt','tg')
+
+%figure
+%histbins= 0:0.2:1;
+%for rep=1:2
+ %   h(rep,:) = hist(bothwidth{rep},histbins)/length(bothwidth{rep});
+%end
+%bar(histbins,h')
+%legend('wt','tg')
+
+
+figure
+histbins= [0.01 0.02 0.04 0.08 0.16 0.32];
+for rep=1:2
+    wh(rep,:) = hist(bothwpref{rep},histbins)/length(bothwpref{rep});
+end
+bar(1:6,wh')
+set(gca,'Xtick',1:6);
+set(gca,'Xticklabel',histbins)
+legend('wt','tg')
+
+figure
+histbins= linspace(0,2,10);
+for rep=1:2
+    linh(rep,:) = hist(bothF1F0{rep},histbins)/length(bothF1F0{rep});
+end
+bar(histbins,linh')
+legend('wt','tg')
+
+
+%figure
+%barweb(meanF1F0,F1F0_err);
+%title('Mean Periodicity')
 
 
 
-
+ranksum(bothpeak{1},bothpeak{2})
+ranksum(bothOSI{1},bothOSI{2})
+ranksum(bothwpref{1},bothwpref{2})
+ranksum(bothwidth{1},bothwidth{2})
+ranksum(bothspont{1},bothspont{2})
+ranksum(bothF1F0{1},bothF1F0{2})

@@ -53,7 +53,7 @@ end
 
 
 
-thresh_velocity = 0.001;
+thresh_velocity = 1;
 figure
 plot(tsamp,vsmooth);
 
