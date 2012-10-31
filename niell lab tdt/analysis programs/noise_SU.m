@@ -18,7 +18,7 @@ end
 block = input('which block to analyze ? ');
 Block_Name = Block_Name{block}
 
-load wn012alpha1_5hz_contrast10sec5min021407   %%% the usual
+load wn012alpha1_5hz_contrast10sec5min021407  %%% the usual
 %load 5hz08cpdflat075sig10min
 n_frames = 8999;
  %load 10hz10cpdflat075sig10min

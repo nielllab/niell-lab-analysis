@@ -34,7 +34,11 @@ end
 if uselaser
     flags = struct('lfpTseries',1,'lfpSpectra',1','mouseOn',1,'laserOn',1,'MUspike',1,'visStim',1)
 else
-    flags = struct('mouseOn',1,'MUspike',1,'visStim',1)
+    if SU
+         flags = struct('mouseOn',1,'visStim',1);
+    else
+       flags = struct('mouseOn',1,'MUspike',1,'visStim',1);
+    end
 end
 
 tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
@@ -51,6 +55,7 @@ plot(tdtData.mouseT,tdtData.mouseV); hold on;
 xlabel('secs');
 ylabel('cm/sec')
 
+if ~SU
 bins = 0:0.25:max(tdtData.mouseT);
 R= zeros(length(bins),length(chans));
 for ch = chans;
@@ -61,7 +66,7 @@ plot(bins(1:end-1),R(1:end-1,:))
 xlabel('secs')
 ylabel('sp/sec')
 xlim([0 max(tdtData.MUspikeT{ch})]);
-
+end
 
 if uselaser
     smoothwindow_secs = 0.25;
@@ -409,10 +414,14 @@ if SU
 else
    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']); 
 end
-if SU
-    save(fullfile(apname,afname),'laserspeed','laserspeed_std','statlaserRcyclerep','Rcyclerep','movRcyclerep','RtcAll','laserlfp','freqs','-append');
-end
 
+    
+if SU & uselaser
+    save(fullfile(apname,afname),'laserspeed','laserspeed_std','statlaserRcyclerep','Rcyclerep','movRcyclerep','RtcAll','laserlfp','freqs','-append');
+elseif SU & ~uselaser
+    
+    save(afile,'Rcyclerep','movRcyclerep','-append');
+end
 
 
 

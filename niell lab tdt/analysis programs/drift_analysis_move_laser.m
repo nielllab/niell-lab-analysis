@@ -9,13 +9,7 @@
 
 
 
-% Tank_Name='06222011_mlr_stim_awake'
-% Block_Name='wn3_72hz'
-
-nchan = input('# chans : ');
-chans = 1:4:nchan;
-
-SU = input('multiunit (0) or single-unit (1) : ');
+SU = 1;
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
     load(fullfile(pname,fname));
@@ -38,15 +32,17 @@ Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
 Block_Name = pname(delims(length(delims))+1 :length(pname))
 end
 
+chans = 1:4:max(cells,1);
+
 laser = input('movement (0) or laser (1) : ');
 
 if laser
-    flags = struct('laserOn',1,'MUspike',1,'visStim',1)
+    flags = struct('laserOn',1,'visStim',1)
     tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
     tsamp  = tdtData.laserT;
     vsmooth = tdtData.laserTTL;
 else
-    flags = struct('mouseOn',1,'MUspike',1,'visStim',1)
+    flags = struct('mouseOn',1,'visStim',1)
     tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
     tsamp = tdtData.mouseT;
     vsmooth = tdtData.mouseV;
@@ -74,13 +70,7 @@ fft_int = .05;  %%% size of bins to use for fourier analyis (in sec)
 tempfreq = 2;    %%% temporal frequency of stimulus
 blank_stim = 1; %%% is there an extra stimulus to measure spontaneous
 full_field = 1;  %%% is there a full-field flicker?
-tetrode_linear=0;
 
-if tetrode_linear
-    ch_map = [14 8 10 4 13 7 9 3 11 1 15 5 12 2 16 6];
-else
-    ch_map = 1:16;
-end
 
 
 % set number of conditions and display setup (generally rows = orientation, columns = frequency)
@@ -346,12 +336,7 @@ for cell_n = cell_range;
         
         theta_ind = orients*pi/180;
         [theta_pref OSI A1 A2 w B yfit] = fit_tuningcurve(orient_tuning_mn,theta_ind);
-        
-        %       figure
-        %      plot(orient_tuning_mn);
-        %        hold on
-        %        plot(yfit,'g')
-        %          title(title_text);
+
         
         sf = [0:n_col];
         %%% find preferred SF at optimal theta
@@ -377,12 +362,7 @@ for cell_n = cell_range;
         end
         theta_pref_row
         w_tuning_round = interp1(sf,orientfreq(theta_pref_row,:),interp_sfs)   ;
-        
-        %     figure
-        %     plot(w_tuning_curve);
-        %     hold on
-        %     plot(w_tuning_round,'r');
-        %%% if can't interpolate tuning curve, use rounded theta
+
         if isnan(w_tuning_curve)
             w_tuning_curve= w_tuning_round;
         end
@@ -418,8 +398,8 @@ for cell_n = cell_range;
         w_pref_col = ones(size(1:n_orient)).*w_pref;
         theta_tuning = interp2(w,theta,orientfreq,w_pref_col,theta_ind);
         
-        [driftorient_theta(cell_n,rep) driftorient_osi(cell_n,rep) driftorient_A1(cell_n,rep) driftorient_A2(cell_n,rep) ...
-            driftorient_thetawidth(cell_n,rep) driftorient_B(cell_n,rep) driftorient_null(cell_n,rep) yfit]= fit_tuningcurve(theta_tuning,theta_ind);
+        [drift(cell_n,rep).theta drift(cell_n,rep).osi drift(cell_n,rep).A1 drift(cell_n,rep).A2 ...
+            drift(cell_n,rep).thetawidth drift(cell_n,rep).B drift(cell_n,rep).null yfit]= fit_tuningcurve(theta_tuning,theta_ind);
         
         i=sqrt(-1);
         mu = (sum(theta_tuning.*exp(i*theta_ind)))/sum(theta_tuning);
@@ -427,24 +407,19 @@ for cell_n = cell_range;
             mu=0;
         end
         
-        driftorient_dsi(cell_n) = abs(mu);
+        drift(cell_n,rep).dsi = abs(mu);
         
-        figure
-        plot(theta_ind,theta_tuning);
-        hold on
-        plot(theta_ind,yfit(1:length(theta_ind)),'g');
-        title(title_text);
         
         if w_pref <1
-            driftorient_wpref(cell_n)=0;
+            drift(cell_n,rep).wpref=0;
         else
-            driftorient_wpref(cell_n) = .01*(2^(w_pref-1))
+            drift(cell_n,rep).wpref = .01*(2^(w_pref-1))
         end
-        driftorient_bw(cell_n) = w_bw;
+        drift(cell_n,rep).bw = w_bw;
         
-        drift_thetatuning(cell_n,:,rep) = theta_tuning;
-        drift_sftuning(cell_n,:,rep) = w_tuning_curve;
-        drift_sftuning_round(cell_n,:) = w_tuning_round;
+        drift(cell_n,rep).thetatuning = theta_tuning;
+        drift(cell_n,rep).sftuning = w_tuning_curve;
+    
         
         
         
@@ -458,14 +433,14 @@ for cell_n = cell_range;
         
         F0all(:,2:n_col+1) = reshape(F0(cell_n,1:n_col*n_rows),n_col,n_rows)';
         F0all(:,1) = F0(cell_n,n_col*n_rows+2);  %%% full-field (w=0);
-        driftorient_F0(cell_n,rep) = interp2(w,theta,F0all,round(w_pref), theta_pref );
+        drift(cell_n,rep).F0 = interp2(w,theta,F0all,round(w_pref), theta_pref );
         
         F1all(:,2:n_col+1) = reshape(F1(cell_n,1:n_col*n_rows),n_col,n_rows)';
         F1all(:,1) = F1(cell_n,n_col*n_rows+2);  %%% full-field (w=0)
-        driftorient_F1(cell_n,rep) = interp2(w,theta,F1all,round(w_pref), theta_pref );
+        drift(cell_n,rep).F1 = interp2(w,theta,F1all,round(w_pref), theta_pref );
         
-        drift_spont(cell_n,rep) = R(cell_n,n_cond-1);
-        drift_orientfreq_all(cell_n,:,:)=orientfreq;
+        drift(cell_n,rep).spont = R(cell_n,n_cond-1);
+        drift(cell_n,rep).orientfreq_all=orientfreq;
         
         [drift_peakR(cell_n) maxcond] = max(R(cell_n,1:n_cond-2));
         drift_peakvar(cell_n) = R_var(cell_n,maxcond);
@@ -476,16 +451,7 @@ for cell_n = cell_range;
         if printfig
             print(hist_fig);
         end
-        %         figure(fft_fig);
-        %         subplot(12,8,1);
-        %         text(0,10,title_text);
-        %         figure(spont_full);
-        %         title(title_text);
-        %         figure(spont_full_rast);
-        %         title(title_text);
-        % close(spont_full)
-        % close(spont_full_rast)
-        %
+
         xlabel('secs');
         % saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
 %         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
@@ -494,53 +460,36 @@ for cell_n = cell_range;
         cell_n
         close(rast_fig);
         clear rast_fig;
+        
+     
     end %%% rep
     both_theta=figure
-    plot(theta_ind*180/pi,drift_thetatuning(cell_n,:,1)+both_drift_spont(cell_n,1))
+    plot(theta_ind*180/pi,drift(cell_n,1).thetatuning+drift(cell_n,1).spont)
     hold on
-    plot(theta_ind*180/pi,ones(12,1)*both_drift_spont(cell_n,1),':')
-    plot(theta_ind*180/pi,drift_thetatuning(cell_n,:,2)+both_drift_spont(cell_n,2),'g')
-    plot(theta_ind*180/pi,ones(12,1)*both_drift_spont(cell_n,2),'g:')
+    plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,1).spont,':')
+    plot(theta_ind*180/pi,drift(cell_n,2).thetatuning+drift(cell_n,2).spont,'g')
+    plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,2).spont,'g:')
 %     saveas(both_theta,fullfile(apname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
     
     both_sf=figure
-    plot(interp_sfs,drift_sftuning(cell_n,:,1)+both_drift_spont(cell_n,1));
+    plot(interp_sfs,drift(cell_n,1).sftuning+drift(cell_n,1).spont);
     hold on
-    plot(interp_sfs,ones(25,1)*both_drift_spont(cell_n,1),':')
-    plot(interp_sfs,ones(25,1)*both_drift_spont(cell_n,2),'g:')
-    plot(interp_sfs,drift_sftuning(cell_n,:,2)+both_drift_spont(cell_n,2),'g');
+    plot(interp_sfs,ones(25,1)*drift(cell_n,1).spont,':')
+    plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
+    plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
 %     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
 end
-figure
-bar(both_drift_spont);
 
-clear event_times_all etimes_old idx_all tm used score c_score channel_times
 
-driftorient_thetawidth
-driftorient_A1
-driftorient_A2
-driftorient_B
-
-osi_est = (driftorient_A1 )./(driftorient_A1 +driftorient_B);
-
-drift_spont
-wpref_dog
-wbw_dog
-peak_value
 
 if use_afile
     
-    drift_orients = orients;
-    drift_spatfreqs = spatfreqs;
+    drift(1,1).orients = orients;
+    drift(1,1).spatfreqs = spatfreqs;
     
-    drift_TF = tempfreq;
+    drift(1,1).TF = tempfreq;
     
-    drift_sponterr = R_err(:,n_cond-1);
-    drift_spontvar = R_var(:,n_cond-1);
-    
-    save(afile_drift, 'drift_orientfreq_all', 'driftorient_wpref', 'driftorient_bw',  'driftorient_theta', 'driftorient_osi','driftorient_dsi','driftorient_A1', 'driftorient_A2', 'driftorient_thetawidth', 'driftorient_B', ...
-        'driftorient_F0', 'driftorient_F1', 'driftorient_null', 'drift_spont',  'drift_TF', 'drift_thetatuning','drift_sftuning','drift_sftuning_round', ....
-        'drift_peakR','wpref_dog', 'wbw_dog', 'peak_value','-append');
+    save(afile, 'drift','-append');
 end
 
 invoke(TTX, 'CloseTank');
