@@ -15,9 +15,9 @@ size(histSection)
 
 x=x+500;
 y=y+500;
+use_subplot=0;
 
-
-
+range = [2 3 5]
 for i = range
 
    
@@ -26,16 +26,20 @@ for i = range
     hold on
     if use_subplot
         subplot(2,3,i)
+    else
+        figure
     end
     
     %sigma =100;
-    f= fspecial('gaussian',500,sigma);
+    f= fspecial('gaussian',1000,sigma);
     f = f/max(f(:));
+   % imagesc(f)
     i
     size(histSection)
     cells = find(histSection==i);
     
     space = zeros(1000,1000);
+   
     sites = histSection==i & ~isnan(type);
     space(sub2ind(size(space),x(sites),y(sites)))=type(sites);
     truefilter = imfilter(space,f,'same');   
@@ -47,11 +51,11 @@ for i = range
     sites = histSection==i & ~isnan(type);
     space(sub2ind(size(space),x(sites),y(sites)))=1;
     allfilter = imfilter(space,f,'same');
-    allfilter(allfilter<0.1)=0;
+    allfilter(allfilter<0.05)=0;
 %     figure
 %     imagesc(allfilter')
 %     axis xy
-    
+%     
 
     inside = zeros(1000,1000);
     for xind = min(sectionx):max(sectionx);
@@ -63,7 +67,7 @@ for i = range
     prob = truefilter./allfilter;
     prob(prob==Inf)=nan;
     prob(~inside)=nan;
- 
+
     h=imagesc(prob',mapRange);
     set(h,'alphadata',~isnan(prob'))
     axis xy

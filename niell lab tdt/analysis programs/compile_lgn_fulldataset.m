@@ -426,9 +426,9 @@ for cell_n = 1:n
         
         if f.lag==1  %%% responds to offset
             fl_lat(cell_n)=offset_lat(cell_n,fl_onoff(cell_n));
-            fl_sust(cell_n) =offset_sust(cell_n,fl_onoff(cell_n));
+            sustain(cell_n) =offset_sust(cell_n,fl_onoff(cell_n));
         else
-            fl_sust(cell_n) =onset_sust(cell_n,fl_onoff(cell_n));
+            sustain(cell_n) =onset_sust(cell_n,fl_onoff(cell_n));
             fl_lat(cell_n)=onset_lat(cell_n,fl_onoff(cell_n));
         end
         fl_onset_amp(cell_n) = onset(cell_n,fl_onoff(cell_n));
@@ -453,7 +453,7 @@ fl_thresh=1;
 fl_sz(fl_amp<fl_thresh)=nan;
 fl_lag(fl_amp<fl_thresh)=nan;
 fl_type(fl_amp<fl_thresh)=nan;
-fl_sust(fl_amp<fl_thresh)=nan;
+sustain(fl_amp<fl_thresh)=nan;
 fl_onoff(fl_amp<fl_thresh)=nan;
 fl_lat(fl_amp<fl_thresh)=nan;
 fl_onoffcorr(fl_amp<fl_thresh)=nan;
@@ -462,23 +462,23 @@ fl_x0(fl_amp<fl_thresh)=nan;
 fl_x0(fl_x0<-20)=nan;
 fl_y0(fl_amp<fl_thresh)=nan;
 
-fl_sust(fl_sust<0)=nan;
-fl_sust(fl_sust>1)=nan;
+sustain(sustain<0)=nan;
+sustain(sustain>1)=nan;
 
 labels= makeColors(fl_type,nan,'seq','GnBu');
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 title('fl_type')
 
-fl_sust_norm = fl_sust;
-fl_sust_norm(fl_sust_norm<0)=0;
-fl_sust_norm(fl_onset_amp<2)=nan;
-labels= makeColors(fl_sust_norm);
+sustain_norm = sustain;
+sustain_norm(sustain_norm<0)=0;
+sustain_norm(fl_onset_amp<2)=nan;
+labels= makeColors(sustain_norm);
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-title('normalized transience')
+title('normalized sustain')
 
 clear driftOSI driftDSI
 %%% drifting gratings & moving spots
-for cell_n=1:n
+for cell_n=1:length(x0)
     %for cell_n = [24]
     m= mv_all(cell_n);
     if ~isempty(m.N)
@@ -536,8 +536,10 @@ for cell_n=1:n
         %figure('Name',sprintf('cell %d',cell_n))
         color = {'b','r'};
         [sf_amp(cell_n) peak_sf(cell_n)] = max(squeeze(mean(nanmean(d.sf_tune(:,1:2,:),2),1)));
+        
         drift_amp(cell_n) = max(max(max(d.orient_tune)));
         for r=1:2  %%% tempfreq
+            lowsf(cell_n,r)=d.sf_tune(r,1,1);
             for f=1:2  %%% F0 F1
                 [peak_amp peak_tf(cell_n)] = max(squeeze(nanmean(d.sf_tune(:,f,:),3)));
                 drift_os = squeeze(d.orient_tune(r,f,:));
@@ -564,7 +566,7 @@ for cell_n=1:n
         driftDSItheta(cell_n,:) = dr_prefD(cell_n,pref_tf,:);
         driftF1F0(cell_n)=sum(d.orient_tune(pref_tf,2,:)) / sum(d.orient_tune(pref_tf,1,:)); %%% replace with max?
        %         driftF1F0(cell_n)=max(d.orient_tune(pref_tf,2,:)) / max(d.orient_tune(pref_tf,1,:)); %%% replace with max?
-
+        lowpass(cell_n) = lowsf(cell_n,pref_tf);
     end
 end
 
@@ -659,14 +661,14 @@ for misc_figs = 1:0
     hist(fl_lat(fl_amp>4 & fl_lag==0));
     
     figure
-    hist(fl_sust(fl_amp>4 & fl_lag==0));
+    hist(sustain(fl_amp>4 & fl_lag==0));
     
     
     figure
     hist(tmin./tmax)
     
     figure
-    plot(fl_lat(fl_amp>2 & fl_lag==0),fl_sust(fl_amp>2 & fl_lag==0),'o' );
+    plot(fl_lat(fl_amp>2 & fl_lag==0),sustain(fl_amp>2 & fl_lag==0),'o' );
     
     
     figure
@@ -823,42 +825,42 @@ for setup_obs=1:1
     n_obs=n_obs+1; obs_name{n_obs} = 'eye'; obs(:,n_obs) = dom_eye;
     n_obs=n_obs+1; obs_name{n_obs} = 'manual type'; obs(:,n_obs) = manual_type;
     n_obs=n_obs+1; obs_name{n_obs} = 'sta amp'; obs(:,n_obs)=A;
-        n_obs=n_obs+1; obs_name{n_obs} = 'fl_on/off'; obs(:,n_obs) = fl_onoff;
+        n_obs=n_obs+1; obs_name{n_obs} = 'flash on/off'; obs(:,n_obs) = fl_onoff;
 
     n_obs=n_obs+1; obs_name{n_obs} = 'tminmax'; obs(:,n_obs) = tratio;
     n_obs=n_obs+1; obs_name{n_obs} = 'wx'; obs(:,n_obs) = wx;
     n_obs=n_obs+1; obs_name{n_obs} = 'wy'; obs(:,n_obs)=wy;
-    n_obs=n_obs+1; obs_name{n_obs} = 'wn_latency'; obs(:,n_obs) = wn_lat;
-        n_obs=n_obs+1; obs_name{n_obs} = 'fl latency'; obs(:,n_obs) = fl_lat;
+    n_obs=n_obs+1; obs_name{n_obs} = 'sta latency'; obs(:,n_obs) = wn_lat;
+        n_obs=n_obs+1; obs_name{n_obs} = 'flash latency'; obs(:,n_obs) = fl_lat;
 
-    n_obs=n_obs+1; obs_name{n_obs} = 'fl peak size'; obs(:,n_obs) = fl_sz;
+    n_obs=n_obs+1; obs_name{n_obs} = 'peak size'; obs(:,n_obs) = fl_sz;
     n_obs=n_obs+1; obs_name{n_obs} = 'fl_lag'; obs(:,n_obs) = fl_lag;
-    n_obs=n_obs+1; obs_name{n_obs} = 'fl_type'; obs(:,n_obs)=-fl_type;
-    n_obs=n_obs+1; obs_name{n_obs} = 'fl_sust'; obs(:,n_obs) = fl_sust;
+    n_obs=n_obs+1; obs_name{n_obs} = 'offset-onset'; obs(:,n_obs)=-fl_type;
+    n_obs=n_obs+1; obs_name{n_obs} = 'sustain'; obs(:,n_obs) = sustain;
     n_obs=n_obs+1; obs_name{n_obs} = 'onfoff corr'; obs(:,n_obs) = fl_onoffcorr;
     
     n_obs=n_obs+1; obs_name{n_obs} = 'mv osi'; obs(:,n_obs) =mv_osi;
     n_obs=n_obs+1; obs_name{n_obs} = 'mv dsi'; obs(:,n_obs) = mv_dsi;
-    n_obs=n_obs+1; obs_name{n_obs} = 'mv spd'; obs(:,n_obs) = mv_spd;
+    n_obs=n_obs+1; obs_name{n_obs} = 'peak speed'; obs(:,n_obs) = mv_spd;
     n_obs=n_obs+1; obs_name{n_obs} = 'mv sp ratio'; obs(:,n_obs) = mv_spd_ratio;
     
-    n_obs=n_obs+1; obs_name{n_obs} = 'tf0ratio'; obs(:,n_obs) = tf_ratio(:,1)';
+    n_obs=n_obs+1; obs_name{n_obs} = 'TF ratio'; obs(:,n_obs) = tf_ratio(:,1)';
     n_obs=n_obs+1; obs_name{n_obs} = 'peakSF'; obs(:,n_obs) = peak_sf;
     %n_obs=n_obs+1; obs_name{n_obs} = 'drift amp'; obs(:,n_obs) = sf_amp;
     
     d = driftDSI(:,1)';
     d(d>0.3)=d(d>0.3)+0.1;
-    n_obs=n_obs+1; obs_name{n_obs} = 'driftDSI0'; obs(:,n_obs) = d;
+    n_obs=n_obs+1; obs_name{n_obs} = 'DSI'; obs(:,n_obs) = d;
  %   n_obs=n_obs+1; obs_name{n_obs} = 'driftDSI1'; obs(:,n_obs) = driftDSI(:,2)';
     
     d = driftOSI(:,1)';
     d(d>0.33)=d(d>0.33)+0.1;
-    n_obs=n_obs+1; obs_name{n_obs} = 'driftOSI0'; obs(:,n_obs) = d;
+    n_obs=n_obs+1; obs_name{n_obs} = 'OSI'; obs(:,n_obs) = d;
   %  n_obs=n_obs+1; obs_name{n_obs} = 'driftOSI1'; obs(:,n_obs) = driftOSI(:,2)';
-    n_obs=n_obs+1; obs_name{n_obs} = 'dr f1f0'; obs(:,n_obs) = driftF1F0;
+    n_obs=n_obs+1; obs_name{n_obs} = 'F1/F0'; obs(:,n_obs) = driftF1F0;
     
-    n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr'; obs(:,n_obs) = wn_cr_dom;
-    n_obs=n_obs+1; obs_name{n_obs} = 'wn_cr_norm'; obs(:,n_obs)=wn_cr_norm;
+    n_obs=n_obs+1; obs_name{n_obs} = 'contrast resp'; obs(:,n_obs) = wn_cr_dom;
+    n_obs=n_obs+1; obs_name{n_obs} = 'contrast resp_norm'; obs(:,n_obs)=wn_cr_norm;
     n_obs=n_obs+1; obs_name{n_obs} = 'sbc'; obs(:,n_obs)=(wn_cr_dom<-1*10^3);
     n_obs=n_obs+1; obs_name{n_obs} = 'wn adapt'; obs(:,n_obs)=wn_adapt;
         n_obs=n_obs+1; obs_name{n_obs} = 'spont'; obs(:,n_obs) = dr_spont;
@@ -875,8 +877,8 @@ end
 
 
 %usedcells= find(inside & ~(isnan(obs(:,4)) & isnan(obs(:,16))&isnan(obs(:,24))));
-resp =~isnan(obs(:,find(strcmp(obs_name,'sta amp'))))+  ~isnan(obs(:,find(strcmp(obs_name,'fl_type')))) +...
-    ~isnan(obs(:,find(strcmp(obs_name,'mv spd'))))+  ~isnan(obs(:,find(strcmp(obs_name,'dr f1f0')))) ;
+resp =~isnan(obs(:,find(strcmp(obs_name,'sta amp'))))+  ~isnan(obs(:,find(strcmp(obs_name,'offset-onset')))) +...
+    ~isnan(obs(:,find(strcmp(obs_name,'peak speed'))))+  ~isnan(obs(:,find(strcmp(obs_name,'F1/F0')))) ;
 
 sbc = wn_cr_dom<-1*10^3;
 sbc=sbc';
@@ -888,12 +890,12 @@ usedcells = find(manual_type~=0)
 length(usedcells)
 
 obs_used = obs(usedcells,:);
-obs_used=replaceNan(obs_used,obs_name,'driftDSI0',0);
-obs_used=replaceNan(obs_used,obs_name,'driftOSI0',0);
+obs_used=replaceNan(obs_used,obs_name,'DSI',0);
+obs_used=replaceNan(obs_used,obs_name,'OSI',0);
 obs_used=replaceNan(obs_used,obs_name,'mv osi',0);
 obs_used=replaceNan(obs_used,obs_name,'mv dsi',0);
 obs_used=replaceNan(obs_used,obs_name,'sta amp',0);
-obs_used=replaceNan(obs_used,obs_name,'mv spd',3);
+obs_used=replaceNan(obs_used,obs_name,'peak speed',3);
 obs_used=replaceNan(obs_used,obs_name,'mv sp ratio',0);
 
 obs_norm = (obs_used-repmat(nanmean(obs_used),size(obs_used,1),1))./repmat(nanstd(obs_used),size(obs_used,1),1);
@@ -930,12 +932,12 @@ end
 start_obs=8;
 used_obs=start_obs:n_obs;
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'fl_lag'))); %%% fl_lag (1,2 are the only meaningful)
-used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wn_cr_norm'))); %%% cr_norm (captured by cr)
+used_obs=used_obs(used_obs~=find(strcmp(obs_name,'contrast resp_norm'))); %%% cr_norm (captured by cr)
 %used_obs=used_obs(used_obs~=find(strcmp(obs_name,'driftDSI1'))); %%% drift DSI F1
 %used_obs=used_obs(used_obs~=find(strcmp(obs_name,'driftOSI1')));  %%% drift OSI F1
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wx'))); %%% drift DSI F1
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wy')));  %%% drift OSI F1
-%used_obs=used_obs(used_obs~=find(strcmp(obs_name,'fl_sust')));  %%% sustained / trans from flash; redundant with lag
+%used_obs=used_obs(used_obs~=find(strcmp(obs_name,'sustain')));  %%% sustained / trans from flash; redundant with lag
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'tminmax')));  %%% drift OSI F1
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'wn adapt')));  %%% drift OSI F1
 
@@ -945,9 +947,9 @@ used_obs=used_obs(used_obs~=find(strcmp(obs_name,'mv dsi')));  %%% redundant wit
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'mv osi')));  %%% redundant with mv osi
 obs_id = find(strcmp(obs_name,'sbc'))
 obs_norm(:,obs_id) = obs_norm(:,obs_id)*1.5;
-obs_id = find(strcmp(obs_name,'driftOSI0'))
+obs_id = find(strcmp(obs_name,'OSI'))
 obs_norm(:,obs_id) = obs_norm(:,obs_id)*1.5;
-obs_id = find(strcmp(obs_name,'driftDSI0'))
+obs_id = find(strcmp(obs_name,'DSI'))
 obs_norm(:,obs_id) = obs_norm(:,obs_id)*1.5;
 used_obs=used_obs(used_obs~=find(strcmp(obs_name,'sbc')));  %%% redundant with speed
 
@@ -1048,37 +1050,105 @@ scatter(obs_norm(:,1),obs_norm(:,2),[],T)
 f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
 colormap(cmap); colorbar; set(gca,'Clim',clim); title(sprintf('type %d',i));
 
+dsID = 4; ds = find(types==dsID);
+onsustID =2; onsust = find(types == onsustID);
+offsustID = 3; offsust= find(types == offsustID);
+offtransID =5; offtrans = find(types==offtransID);
+sbcID = 1; sbc = find(types==sbcID);
+miscwID = 6; miscw = find(types==miscwID);
+plist{1} = onsust; plist{2} = offsust; plist{3} = offtrans; plist{4} = ds; plist{5}=miscw; plist{6} = sbc;
+
+figure
+for i = 1:length(plist);
+    subplot(2,3,i)
+    hist(manual_type(plist{i}),1:7)
+end
+
 %for i = 1:max(T);
-for i = 1:max(T)
-  
+for i = [onsustID offsustID offtransID  dsID   sbcID miscwID];
     id = zeros(size(types));
-   %id(~isnan(types))=0;
     id(types==i)=1;
     
     [labels cmap clim]= makeColors(id,nan,'qual','Set1');
     f = plotSections(sections,anatomy,histox(~manual_outside),histoy(~manual_outside),histSection(~manual_outside),labels(~manual_outside,:));
     colormap(cmap); colorbar; set(gca,'Clim',clim); title(sprintf('type %d',i));
-
-    
-    
-    f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),id(~manual_outside),[],cbrewer('seq','Greens',64),[0 0.5],75);
-    
+   
+    f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),id(~manual_outside),[],cbrewer('seq','Greens',64),[0 0.4],100); 
+    %title(sprintf('type %d',i));
+    %subplot(2,3,1); colorbar
 end
 
+ id = zeros(size(types));
+    id(types==onsustID | types == offsustID | types ==offtransID)=1;
+      f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),id(~manual_outside),[],cbrewer('seq','Greens',64),[0 0.7],100); 
+    %title(sprintf('type %d',i));
+    %subplot(2,3,1); colorbar
+    
+    
+
+sects=[2 3 5];
+for section=1:3
+    sectionUnits = find(histSection==sects(section) & ~manual_outside');
+    Ntotal(section)=length(sectionUnits);
+    for type = 1:6;
+        N(section,type)=length(intersect(sectionUnits,plist{type}));
+        [phat pci] = binofit(N(section,type),Ntotal(section),0.1);
+        binoP(section,type)=phat;
+        binoCI(section,type,:) = pci;
+        err(section,type) = sqrt(Ntotal(section)*phat*(1-phat))/Ntotal(section);
+        fraction(section,type) = N(section,type)/Ntotal(section);
+    end
+end
+
+for tp = 1:6;
+figure
+bar(binoP(:,tp));
+hold on
+%errorbar(1:3,binoP(:,tp),binoP(:,tp)-binoCI(:,tp,1),binoCI(:,tp,2)-binoP(:,tp),'k.','LineWidth',2);
+errorbar(1:3,binoP(:,tp),err(:,tp),'k.','LineWidth',2)
+set(gca,'XTicklabel',{'anterior','mid','posterior'})
+ylabel('fraction'); set(gca,'FontSize',16); set(get(gca,'YLabel'),'Fontsize',16);
+end
+
+        
     f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),x0(~manual_outside)',[],jet,[0 90],100);
-
+   %subplot(2,3,1)
+   plot([100 300],[900 900],'Linewidth',4,'Color',[0.5 0.5 0.5])
+  % subplot(2,3,4); colorbar;
     f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),y0(~manual_outside)',[],jet,[-20 40],100);
-
-
+   %subplot(2,3,1)
+   plot([100 300],[900 900],'Linewidth',4,'Color',[0.5 0.5 0.5])
+  % subplot(2,3,4); colorbar;
+   
 keyboard
 
-dsID = 3; ds = find(types==dsID);
-onsustID =5; onsust = find(types == onsustID);
-offsustID = 6; offsust= find(types == offsustID);
-offtransID =1; offtrans = find(types==offtransID);
-sbcID = 4; sbc = find(types==sbcID);
-miscwID = 2; miscw = find(types==miscwID);
-plist{1} = onsust; plist{2} = offsust; plist{3} = offtrans; plist{4} = ds; plist{5}=miscw; plist{6} = sbc;
+
+
+%%% separate ds os
+
+ id = zeros(size(types));
+id(types' ==dsID & driftDSI(:,1)>0.3)=1;
+    f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),id(~manual_outside),[],cbrewer('seq','Greens',64),[0 0.3],100); 
+
+ id = zeros(size(types));
+id(types' ==dsID & driftDSI(:,1)<0.3)=1;
+    f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),id(~manual_outside),[],cbrewer('seq','Greens',64),[0 0.4],100); 
+
+        [labels cmap clim]= makeColors(id,nan,'qual','Set1');
+    f = plotSections(sections,anatomy,histox(~manual_outside),histoy(~manual_outside),histSection(~manual_outside),labels(~manual_outside,:));
+    colormap(cmap); colorbar; set(gca,'Clim',clim); title(sprintf('type %d',i));
+    
+    
+ncells = [length(offtrans) length(onsust) length(offsust) length(ds) length(sbc) length(miscw) sum(~manual_outside' & isnan(types))];
+figure
+bar(ncells/sum(ncells));
+grouplabels = {'tOff','sOn','sOff','DS/OS','supp','slow','unresp'};
+set(gca,'XTicklabel',grouplabels)
+rotateticklabel(gca,90)
+ylabel('fraction')
+set(get(gca,'Ylabel'),'FontSize',20); 
+set(get(gca,'Xlabel'),'FontSize',labelsize); set(get(gca,'Ylabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+ylim([0 0.28])
 
 figure
 for i = 1:length(plist);
@@ -1096,7 +1166,7 @@ obs_sort_mean = zeros(size(data));
 cell_list = zeros(length(obs_norm),1);
 usort = zeros(size(U));
 n=0;
-for i = [offtransID onsustID offsustID dsID   sbcID miscwID];
+for i = [onsustID offsustID offtransID  dsID   sbcID miscwID];
     members = find(T==i);
     obs_sort(n+1:n+length(members),:) = obs_norm(members,used_obs);
     obs_sort_mean(n+1:n+length(members),:) = repmat(nanmean(obs_norm(members,used_obs),1),length(members),1);
@@ -1108,7 +1178,7 @@ end
 %obs_sort(isnan(obs_sort))=-3;
 labels  ={};
 for i = 1:length(used_obs);
-    labels{i} = sprintf('%s  %d',obs_name{used_obs(i)},i);
+    labels{i} = sprintf('%s',obs_name{used_obs(i)});
 end
 figure
 imagesc(obs_sort',[-3 3]);
@@ -1122,6 +1192,9 @@ set(gca,'YTickLabel',labels(1:length(used_obs)))
 set(gca,'YTick',1:length(obs_name))
 %colormap(gray)
 colormap(flipud(cbrewer('div','RdBu',64)));
+set(gca,'Xtick',50:50:200); xlabel('cell #');
+colorbar
+set(get(gca,'Xlabel'),'FontSize',16); set(gca,'Fontsize',14); 
 
 %%% correlation
 figure
@@ -1129,55 +1202,161 @@ imagesc(corrcoef(data(cell_list,:)'),[-1 1]);
 %colormap gray
 colormap(flipud(cbrewer('div','RdBu',64)));
 colorbar
+set(gca,'Xtick',50:50:200);
+set(gca,'Ytick',50:50:200);
+set(gca,'Fontsize',14)
+
+[c p]=corrcoef(data(cell_list,:)');
+figure
+imagesc(p<0.05);
+mean(c(163:176,163:176));
+
+c= corrcoef(data');
+order= [offtransID onsustID offsustID dsID   sbcID miscwID];
+for i = 1:6
+    groupc = c(find(T==order(i)),find(T==order(i)));
+    cc(i,1) = mean(groupc(:));
+    ccstd(i,1) = std(groupc(:))/sqrt(sqrt(0.5*length(groupc(:))));
+    
+    groupc = c(find(T==order(i)),find(T~=order(i)));
+    cc(i,2) = mean(groupc(:));
+    ccstd(i,2) = std(groupc(:))/sqrt(sqrt(0.5*length(groupc(:))));
+end
+
+ticksize=14; labelsize=20; stdwidth=2;
+
+grouplabels = {'tOff','sOn','sOff','DS/OS','supp','slow'};
+
+figure
+bar(cc(:,1));
+hold on
+bar(cc(:,2),'r');
+errorbar(cc(:,2),ccstd(:,2),'k.','LineWidth',2);
+errorbar(cc(:,1),ccstd(:,1),'k.','LineWidth',2);
+axis([0 7 -0.25 0.75])
+ylabel('correlation'); 
+set(get(gca,'Xlabel'),'FontSize',labelsize); set(get(gca,'Ylabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+legend('within group', 'btw groups')
+set(gca,'Xticklabel',grouplabels);
+set(get(gca,'Xlabel'),'FontSize',16); 
+
+%%% size suppresion
+figure
+fl_cc = fl_supp([plist{1},plist{2},plist{3}]);
+fl_cc(fl_cc<0)=0;
+hist(1-fl_cc,0:0.2:1)
+set(gca,'Ytick',13.5:13.5:45); set(gca,'Yticklabel',0.1:0.1:0.3);
+xlabel('size supp');
+ylabel('fraction')
+set(get(gca,'Xlabel'),'FontSize',labelsize); set(get(gca,'Ylabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+xlim([-0.2 1.2])
+
+figure
+bandpass = lowpass([plist{1},plist{2},plist{3}])./drift_amp([plist{1},plist{2},plist{3}]);
+bandpass(bandpass>1)=1;
+hist(1-bandpass,0:0.2:1)
+set(gca,'Ytick',13.5:13.5:45); set(gca,'Yticklabel',0.1:0.1:0.3);
+xlabel('bandpass index');
+ylabel('fraction')
+set(get(gca,'Xlabel'),'FontSize',labelsize); set(get(gca,'Ylabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+xlim([-0.2 1.2])
+
+
 
 %%% bar graphs
 figure
 subplot(3,3,1)
 barparams(driftOSI,plist);
 ylabel('OSI','FontSize',10);
+subplotAxes(gca)
+
 
 subplot(3,3,2);
-barparams(fl_sust,plist);
-ylabel('sust','FontSize',10);
+hold off
+barparams(A*8,plist);
+ylabel('sta amp', 'Fontsize',10);
+ylim([-1 1])
+subplotAxes(gca)
+% subplot(3,3,2);
+% barparams(sustain,plist);
+% ylabel('sust','FontSize',10);
+% subplotAxes(gca)
 
 subplot(3,3,3);
-barparams_med(driftF1F0,plist);
+barparams_med(driftF1F0*2,plist);
 ylabel('F1/F0','FontSize',10);
+subplotAxes(gca)
 
-subplot(3,3,4);
-barparams(1000*fl_lat/20,plist);
-ylabel('fl_latency ','FontSize',10);
 
 subplot(3,3,5);
 speeds = [10 20 40 80 160 nan];
 mv_spd(isnan(mv_spd))=6;
 mv_spd_fix = speeds(mv_spd);
 barparams(mv_spd_fix,plist);
-ylabel('peak speed (deg/sec)','Fontsize',10)
+ylabel('peak speed deg/sec','Fontsize',10)
+subplotAxes(gca)
 
-subplot(3,3,6);
-sfs = [0.01 0.02 0.04 0.08 0.16 0.32 0 nan];
+
+subplot(3,3,9);
+sfs = [0 0.01 0.02 0.04 0.08 0.16 0.32 nan];
 sf_inds = peak_sf;
 sf_inds(peak_sf ==0) = 7;
 sf_inds(isnan(peak_sf))=8;
 barparams(sfs(sf_inds),plist);
 ylabel('peak SF (cpd)','FontSize',10)
+ylim([0 0.14])
+subplotAxes(gca)
 
-subplot(3,3,7);
-barparams(tf_ratio(:,1),plist);
-ylabel('TF ratio', 'Fontsize',10);
+% subplot(3,3,7);
+% barparams(tf_ratio(:,1),plist);
+% ylabel('TF ratio', 'Fontsize',10);
 
-subplot(3,3,8);
-barparams(wx,plist);
-ylabel('wx', 'Fontsize',10);
-
-subplot(3,3,9);
-barparams(wy,plist);
-ylabel('wy', 'Fontsize',10);
+subplot(3,3,6);hold off
+barparams_med(wn_cr_dom/600,plist,6);
+ylabel('wn resp sp/sec');
+ylim([-8 8])
+subplotAxes(gca,6)
 
 
-democells = [108 119 181];
-xedge = 64-32;
+subplot(3,3,7);hold off
+barparams_med(dr_spont,plist,6);
+ylabel('spont (sp/sec)', 'Fontsize',10);
+ylim([0 11])
+subplotAxes(gca,6)
+
+
+subplot(3,3,8);hold off
+barparams(fl_onoffcorr,plist);
+ylabel('on/off corr', 'Fontsize',10);
+subplotAxes(gca)
+
+subplot(3,3,8);hold off
+barparams(tratio,plist);
+ylabel('sta transience', 'Fontsize',10);
+subplotAxes(gca)
+
+
+
+% subplot(3,3,8);
+% barparams(wx,plist);
+% ylabel('wx', 'Fontsize',10);
+% 
+% subplot(3,3,9);
+% barparams(wy,plist);
+% ylabel('wy', 'Fontsize',10);
+
+
+%democells = [57 89 199]; %sbc
+%democells = 89
+% democells=199
+%  democells = [124 129 157 182 185 231] %% ds os
+ % democells = [124 157 182]
+%  democells = [ 156] %sOff
+ % democells = [108 ] %sOff
+% democells = [119 ]; %sOn
+ democells = [181 236]; %tOff
+% democells = [181]; %tOff
+xedge = 64-32; 
 ticksize=14; labelsize=20; stdwidth=2;
 for c = 1:length(democells);
     figure
@@ -1199,10 +1378,13 @@ for c = 1:length(democells);
     axis square
     
     
+    
     dt=0.05;
     tmax=0.25;
     figure
     stat= squeeze(wn_all(i,dom_eye(i)).sta_t);
+    
+    if ~isnan(stat)
     if abs(min(sta(:)))>max(sta(:))
         stat = -stat;
     end
@@ -1214,6 +1396,7 @@ for c = 1:length(democells);
     set(gca,'Ytick',[-0.5 -0.25 0 0.25 0.5])
     xlabel('msec')
     set(get(gca,'Xlabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+    end
     
     figure
     f= fl_all(i);
@@ -1266,6 +1449,7 @@ for c = 1:length(democells);
         xlabel('SF (cpd)'); ylabel('sp/sec')
     end
     set(get(gca,'Xlabel'),'FontSize',labelsize); set(get(gca,'Ylabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+    legend('2Hz','8Hz')
     
     figure
      plot(fl_sztune(i,:),'Linewidth',stdwidth);
@@ -1282,7 +1466,27 @@ for c = 1:length(democells);
         
 end
 
+figure
+plot(dr_spont(~manual_type==0), wn_cr_dom(~manual_type==0)/600,'o')
+hold on
+%plot(dr_spont(plist{6}), wn_cr(plist{6})/600,'ro')
+plot(dr_spont(manual_type==4), wn_cr_dom(manual_type==4)/600,'go')
 
+figure 
+plot(wx([plist{1} plist{2} plist{3}]),wy([plist{1} plist{2} plist{3}]),'o')
+
+labelsize=20; ticksize=16;
+figure
+hist(1.17*wx([plist{1} plist{2} plist{3}]),1:1:14)
+xlabel('radius (deg)');
+ylabel('fraction');
+npts = length([plist{1} plist{2} plist{3}])
+set(gca,'Xtick',2:2:14)
+set(gca,'Ytick',(0:0.1:0.4)*npts); set(gca,'YTickLabel',0:0.1:0.4);
+axis([0 15.5 0 0.35*npts])
+       set(get(gca,'Xlabel'),'FontSize',labelsize); set(get(gca,'Ylabel'),'FontSize',labelsize); set(gca,'Fontsize',ticksize);
+
+       
 figure
 os = find(types==dsID);
 plot(driftOSI(os,1),driftDSI(os,1),'o')
@@ -1290,8 +1494,79 @@ xlabel('OSI'); ylabel('DSI');
 axis equal
 axis square
 
+
+id = zeros(1,length(types));
+id(types' ==dsID & (sin(driftOSItheta(:,1)).^2)>0.5)=1;
+    f = plotFiltSections(sections,anatomy,round(histox(~manual_outside)),round(histoy(~manual_outside)),histSection(~manual_outside),id(~manual_outside),[],cbrewer('seq','Greens',64),[0 0.4],100); 
+
+hrange = 0.05:0.1:1
+    figure
+    hist(driftOSI(~isnan(types) ),hrange);
+    hold on
+    hist(driftOSI(types==dsID),hrange,'r');
+    
+    driftDSI(driftDSI(:,1)>0.4 & types'~=dsID)=nan;
+    hrange = 0.05:0.1:1
+    figure
+   hist(driftDSI(~isnan(types) ),hrange);
+    hold on
+    hist(driftDSI(types==dsID),hrange,'r');
+sum(hist(driftDSI(~isnan(types) ),hrange))
+  
+
+grouplabels = {'sOn','sOff','tOff','DS/OS','slow','supp'};
+
+datatable=[];
+for i = 1:6
+    datatable{1,i+1}=grouplabels{i};
+end
+for i = 1:size(obs,2);
+    datatable{i+1,1}=obs_name{i};
+    for c = 1:6
+        if i==8
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',9*nanmean(obs(plist{c},i)),9*nanstd(obs(plist{c},i))/sqrt(length(plist{c})));
+        elseif i==13
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',16.6*nanmean(obs(plist{c},i)),16.6*nanstd(obs(plist{c},i))/sqrt(length(plist{c})));
+        elseif i==14
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',1000*nanmean(obs(plist{c},i))/20,(1000/20)*nanstd(obs(plist{c},i))/sqrt(length(plist{c})));
+        elseif i==15
+            szs= [2 4 8 16 32 64 nan];
+            sz = obs(:,i); sz(isnan(sz))=7;
+            sz_all = szs(sz);
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',nanmean(sz_all(plist{c})),nanstd(sz_all(plist{c}))/sqrt(length(plist{c})));
+        elseif i==22
+            speeds = [10 20 40 80 160 nan];
+            mv_spd(isnan(mv_spd))=6;
+            mv_spd_fix = speeds(mv_spd);
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',nanmean(mv_spd_fix(plist{c})),nanstd(mv_spd_fix(plist{c}))/sqrt(length(plist{c})));
+        elseif i == 25
+            sfs = [0 0.01 0.02 0.04 0.08 0.16 0.32 nan];
+            sf_inds = peak_sf;
+            sf_inds(peak_sf ==0) = 7;
+            sf_inds(isnan(peak_sf))=8;
+            sfvalue = sfs(sf_inds);
+            datatable{i+1,c+1} = sprintf('%0.2f +/- %0.3f',nanmean(sfvalue(plist{c})),nanstd(sfvalue(plist{c}))/sqrt(length(plist{c})));
+        elseif i==28
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',2*nanmedian(obs(plist{c},i)),2*nanstd(obs(plist{c},i))/sqrt(length(plist{c})));
+        elseif i==29
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',nanmedian(obs(plist{c},i))/600,(1/600)*nanstd(obs(plist{c},i))/sqrt(length(plist{c})));
+            
+        else
+            datatable{i+1,c+1} = sprintf('%0.1f +/- %0.2f',nanmedian(obs(plist{c},i)),nanstd(obs(plist{c},i))/sqrt(length(plist{c})));
+        end
+    end
+end
+xlswrite('datatableLGN2.xls',datatable)
+
+
 figure
-histrange = 0:30:180
+histrange = 0:45:330
+rose([ driftOSItheta(os,1) ;driftOSItheta(os,1)+pi],histrange*pi/180)
+set(gca,'LineWidth',4)
+set(gca,'Fontsize',16)
+
+figure
+histrange = 0:45:180
 h=hist(round(driftOSItheta(os,1)*180/pi),histrange)
 hfix= h;
 hfix(1)=h(1)+h(end);
@@ -1302,8 +1577,10 @@ polar(histrange*pi/180+pi,hfix);
 
 ds = find(types' == dsID & driftDSI(:,1)>0.3)
 figure
-histrange = 0:30:360;
-h=hist(round(driftDSItheta(ds,1)*180/pi),histrange)
+histrange = 0:45:330;
+rose(round(driftDSItheta(ds,1)),histrange*pi/180)
+
+h=hist(round(driftDSItheta(ds,1)*180/pi),histrange);
 hfix= h;
 hfix(1)=h(1)+h(end);
 hfix(end) = h(1)+h(end);
@@ -1328,9 +1605,11 @@ for cell_n = c;
     end
 end
 figure
-allY=hist(depthY,50:100:550)
+allY=hist(depthY(~manual_outside & histSection'~=5),[150 450])
+bar(allY)
 hold on
-dsY=hist(depthY( find(types==dsID)),50:100:550);
+dsY=hist(depthY( find(types==dsID & histSection~=5)),[150 450]);
+bar(dsY)
 figure
 bar(dsY./allY)
 
@@ -1339,8 +1618,8 @@ figure
 allY=hist(normY,range);
 hist(normY,range);
 hold on
-dsY=hist(normY( find(types==miscwID)),range);
-hist(normY( find(types==miscwID)),range);
+dsY=hist(normY( find(types==dsID)),range);
+hist(normY( find(types==dsID)),range);
 figure
 bar(dsY./allY)
 
@@ -1427,7 +1706,7 @@ for c = 1:length(wn_all)
         yl = get(gca,'YLim');
         plot([0.25 0.5],0.9*[yl(2) yl(2)],'g')
         xlim([0 f.onset_bins(end-1)])
-        title(sprintf('tp=%d sust=%0.1f c=%0.1f',fl_type(cell_n),fl_sust(cell_n),fl_onoffcorr(cell_n)));
+        title(sprintf('tp=%d sust=%0.1f c=%0.1f',fl_type(cell_n),sustain(cell_n),fl_onoffcorr(cell_n)));
         
         subplot(5,4,11);
         plot(fl_sztune(i,:));

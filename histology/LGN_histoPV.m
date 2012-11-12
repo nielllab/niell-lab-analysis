@@ -79,7 +79,7 @@ electrodeLength=(maxY-minY)/sin(theta);
 paxSection
 if i == 22
     electrodeSpacing = 15;
-elseif i ==7 | i==19
+elseif i ==7 | i==19 | i==6
     electrodeSpacing=35
 elseif  paxSection==3 | paxSection==4
     electrodeSpacing=30;
@@ -153,15 +153,25 @@ figure(Render3D);
 hold on;
 color = {'r.','g.','c.','m.','y.','k.'};
 plot3(ones(size(x))*AP*1000,x, y, color{mod(i,6)+1});
-plot3(AP*1000,x(end), y(end),'k*')
+%plot3(AP*1000,x(end), y(end),'k*')
 %axis([-600 600 -600 600 -3000 -1500])
-axis equal
+if i==1
+    axis equal
+end
 % xlabel('medial/lateral');
 % ylabel('dorsal/ventral');
 % zlabel('anterior/posterior');
 axis off
 
+LGNmovie(i)=getframe(gcf);
+
 end
+
+vid = VideoWriter('LGNmovie slow');
+vid.FrameRate=6;
+open(vid);
+writeVideo(vid,LGNmovie);
+close(vid)
 
 %rotate 3D
 for az = -30 :10:330;
