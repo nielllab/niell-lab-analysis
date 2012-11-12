@@ -26,7 +26,7 @@ if SU
     use_afile=1;
     cells
 else
-    pname = uigetdir('C:\data\','block data')
+    pname = uigetdir('D:\','block data')
     delims = strfind(pname,'\');
     selected_path = pname(1 :delims(length(delims))-1)
     Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)

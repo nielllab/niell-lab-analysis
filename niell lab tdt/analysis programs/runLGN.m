@@ -56,23 +56,29 @@ ipsiblock = input('which block for  ipsi movie (0=none) ? ');
 
 
 
-bars_analysis(clustfile,afile,pdfFile,Block_Name,barblock)   %%%% moving spots
-close all
+if barblock~=0
+    bars_analysis(clustfile,afile,pdfFile,Block_Name,barblock)   %%%% moving spots
+    close all
+end
 
 drift_analysis(clustfile,afile,pdfFile,Block_Name,driftblock);
 close all
+fclose all
 
 noise_analysis(clustfile,afile,pdfFile,wnfile,Block_Name,contrablock,1, 1);  %%% white noise contra
 close all
+fclose all
 
 if ipsiblock~=0
     noise_analysis(clustfile,afile,pdfFile,wnfile,Block_Name,ipsiblock,1, 2)  %%% white noise ipsi
     close all
+    fclose all
 end
 
 noise_analysis(clustfile,afile,pdfFile,flfile,Block_Name,flblock,2)  %%% flashing spots
 close all
+fclose all
 
 noise_analysis(clustfile,afile,pdfFile,mvfile,Block_Name,mvblock,3)   %%%% moving spots
 close all
-
+fclose all
