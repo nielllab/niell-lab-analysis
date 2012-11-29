@@ -142,7 +142,7 @@ for tet=use_tets
         
 
     %%% in case of no data
-    if N<10
+    if N<50
         N=100;
         X= -1*(10^-5)*rand(N,30,4);
     end

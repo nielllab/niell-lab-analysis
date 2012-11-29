@@ -424,7 +424,7 @@ for cell_n = cell_range;
         
         
         %%% interpolate F0, F1 values
-        theta_pref = driftorient_theta(cell_n);
+        theta_pref = drift(cell_n,rep).theta;
         %% to avoid interpolating past end of theta
         %%%(for angles between 2pi-pi/8 and  and 2pi
         if theta_pref > max(max(theta))
@@ -454,12 +454,12 @@ for cell_n = cell_range;
 
         xlabel('secs');
         % saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-%         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-%         saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+        saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
 %         %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
         cell_n
-        close(rast_fig);
-        clear rast_fig;
+%         close(rast_fig);
+%         clear rast_fig;
         
      
     end %%% rep
@@ -469,7 +469,7 @@ for cell_n = cell_range;
     plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,1).spont,':')
     plot(theta_ind*180/pi,drift(cell_n,2).thetatuning+drift(cell_n,2).spont,'g')
     plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,2).spont,'g:')
-%     saveas(both_theta,fullfile(apname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+     saveas(both_theta,fullfile(apname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
     
     both_sf=figure
     plot(interp_sfs,drift(cell_n,1).sftuning+drift(cell_n,1).spont);
@@ -477,7 +477,7 @@ for cell_n = cell_range;
     plot(interp_sfs,ones(25,1)*drift(cell_n,1).spont,':')
     plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
     plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
-%     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
 end
 
 
@@ -491,6 +491,3 @@ if use_afile
     
     save(afile, 'drift','-append');
 end
-
-invoke(TTX, 'CloseTank');
-invoke(TTX, 'ReleaseServer');
