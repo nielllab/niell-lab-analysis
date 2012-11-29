@@ -424,7 +424,7 @@ for cell_n = cell_range;
         
         
         %%% interpolate F0, F1 values
-        theta_pref = driftorient_theta(cell_n);
+        theta_pref = drift(cell_n).theta;
         %% to avoid interpolating past end of theta
         %%%(for angles between 2pi-pi/8 and  and 2pi
         if theta_pref > max(max(theta))
