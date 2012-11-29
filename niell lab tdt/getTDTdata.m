@@ -37,7 +37,7 @@ if isfield(flags,'analog') && flags.analog
 end
 
 invoke(TTX,'CreateEpocIndexing');
-ep = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0, 1000);
+ep = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0, 10^6);
 
 
 max_events = 10^6;
@@ -78,6 +78,8 @@ end
 
 if isfield(flags,'visStim') && flags.visStim
     tdtData.frameEpocs = invoke(TTX, 'GetEpocsV', 'fTrg',0,0,max_events);
+    max_events
+    size(tdtData.frameEpocs)
     tdtData.stimEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0,max_events);
 end
 

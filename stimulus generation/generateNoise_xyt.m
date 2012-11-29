@@ -16,7 +16,7 @@ end
 cmod=1; step=2; bar = 3;  %%%% movietypes
 
 imsize = 128;                %% size in pixels
-framerate = 60;             %% Hz
+framerate = 30;             %% Hz
 imageMag=10;                 %% magnification that movie will be played at
 
 screenWidthPix = 1280        %% Screen width in Pixels
