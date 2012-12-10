@@ -71,9 +71,9 @@ latency =  str2num(answer{5})
 if useArgin
     psfilename = [pdfFile(1:end-4) 'drift.ps'];
 else
-    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
+    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
 end
-if exist(psfilename,'file')==2;delete(psfilename);end
+if exist(psfilename,'file')==2;delete(psfilename);end %%% 
 
 
 panels= length(tf);
