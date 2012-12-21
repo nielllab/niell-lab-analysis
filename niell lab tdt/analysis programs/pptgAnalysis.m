@@ -1,5 +1,7 @@
 function pptgAnalysis(clustfile,afile,pdfFile,Block_Name,blocknum,uselaser, framerate);
 
+dbstop if error
+
 if exist('clustfile','var');
     SU=1;
     nchan=32;chans = 1:4:nchan;
@@ -46,9 +48,9 @@ if uselaser
     flags = struct('lfpTseries',1,'lfpSpectra',1','mouseOn',1,'laserOn',1,'MUspike',1,'visStim',1)
 else
     if SU
-        flags = struct('mouseOn',1,'visStim',1);
+        flags = struct('mouseOn',1,'visStim',1,'lfpTseries',1,'lfpSpectra',1);
     else
-        flags = struct('mouseOn',1,'MUspike',1,'visStim',1);
+        flags = struct('lfpTseries',1,'lfpSpectra',1,'mouseOn',1,'MUspike',1,'visStim',1);
     end
 end
 
@@ -415,14 +417,14 @@ for cell_n = cell_range
     
     
     preThresh = 0.1;
-    postThresh=0.005;
+    postThresh=0.004;
     
     burst = zeros(size(times));
     burstInit = find(preISI>preThresh &postISI<postThresh);
     for i = 1:length(burstInit);
         burst(burstInit(i))=1;
         nextspike = burstInit(i)+1;
-        while preISI(nextspike)<postThresh & nextspike<=length(times);
+        while  nextspike<length(times) & preISI(nextspike)<postThresh ;
             
             burst(nextspike)=1;
             nextspike=nextspike+1;
@@ -451,13 +453,10 @@ for cell_n = cell_range
             sp = spikespeeds<1;
         else
             sp = spikespeeds>1;
-        end
-        
+        end     
         burstfraction(cell_n,rep) = sum(burst(sp))/sum(sp);
     end
-    
-    
-    
+
     
     if SU
         title(sprintf('unit %d %d burst = %0.2f %0.2f',cells(ch,1),cells(ch,2),burstfraction(cell_n,1),burstfraction(cell_n,2)));
@@ -466,6 +465,47 @@ for cell_n = cell_range
     end
     
     wn_movement(ch).burst = burstfraction(cell_n,:);
+    
+     freqs{ch} = tdtData.spectF{channel_no};
+        df = median(diff(tdtData.spectF{channel_no}));
+        specdata = tdtData.spectData{channel_no};
+        normalizer = 1:size(specdata,2);
+        normalizer = repmat(normalizer,size(specdata,1),1);
+        specdata = specdata.*normalizer;
+        
+        tdata = tdtData.spectT{channel_no};
+       
+        lfpfig(ch)=figure;
+        for mv = 1:2
+            
+            mouse_resamp = interp1(tdtData.mouseT,tdtData.mouseV,tdata);
+            if mv ==1
+                timepts = mouse_resamp<1;
+            else
+                timepts = mouse_resamp>1;
+            end
+               mv_lfp(ch,mv,:)= nanmean(specdata(timepts,:));
+        end
+
+        plot(tdtData.spectF{channel_no}, squeeze(mv_lfp(ch,:,:)));
+        ylim([0 1.5*prctile(mv_lfp(ch,1,:),95)])
+        xlim([0 90])
+    if SU
+        title(sprintf('unit %d %d',cells(ch,1),cells(ch,2)));
+    else
+        title(sprintf('movement %s  ch %d',Block_Name,ch));
+    end
+
+    
+    wn_movement(ch).freqs = freqs{ch};
+    wn_movement(ch).mv_lfp = squeeze(mv_lfp(ch,:,:));
+    wn_movement(ch).mvlfp_tdata = tdata;
+    wn_movement(ch).speed = mouse_resamp;
+    wn_movement(ch).spikes = times;
+    wn_movement(ch).lfpV = tdtData.lfpData{channel_no};
+    wn_movement(ch).lfpT = tdtData.lfpT{channel_no};
+    wn_movement(ch).frameNum = f;
+    wn_movement(ch).frameT = t;
     
 end
 
@@ -488,6 +528,10 @@ for i = 1:length(spikefig)
     print('-dpsc',psfname,'-append');
     
     figure(burstfig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfname,'-append');
+    
+      figure(lfpfig(i))
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfname,'-append');
 end

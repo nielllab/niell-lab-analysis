@@ -81,6 +81,9 @@ if isfield(flags,'visStim') && flags.visStim
     max_events
     size(tdtData.frameEpocs)
     tdtData.stimEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0,max_events);
+       % tdtData.stimEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 50,100,100);
+        tdtData.stimEpocs
+
 end
 
 if isfield(flags,'laserOn') && flags.laserOn

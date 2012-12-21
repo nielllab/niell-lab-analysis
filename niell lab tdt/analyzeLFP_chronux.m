@@ -3,7 +3,9 @@ function [lfpT lfpData spectT spectF spectData] = analyzeLFP_chronux(TTX,chans,t
 % performing running spectrum analysis with chronux
 % cmn 06/2011
 
-oldFormat = input('old TDT format (pre-UO) ? 0/1 : ')
+%oldFormat = input('old TDT format (pre-UO) ? 0/1 : ')
+%%% need to switch this to read in old UCSF data
+oldFormat = 0;
 if oldFormat == [];
     oldFormat = 0;
 end

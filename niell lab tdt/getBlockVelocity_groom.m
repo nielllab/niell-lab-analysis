@@ -38,7 +38,10 @@ M2_dY = dData(4,Mouse2_Idx);
 M2_X = cumsum(M2_dX);
 M2_Y = cumsum(M2_dY);
 
-sw= input(' optical mice = horizontal (0) or vertical (1) : ');
+%%sw= input(' optical mice = horizontal (0) or vertical (1) : ');
+display('using vertical mice')
+sw = 1;
+
 if sw ==0;
     m = M1_X;
     M1_X= M1_Y;
@@ -55,6 +58,18 @@ Tmax = max(max(M1_T),max(M2_T))
 Tmin =max(min(M1_T),min(M2_T))
 
 tsamp = Tmin:dt:Tmax;
+if M2_T(1) == M2_T(2);
+    M2_T = M2_T(2:end); %%% somehow first samp can get duplicated
+    M2_X = M2_X(2:end);
+    M2_Y = M2_Y(2:end);
+end
+
+if M1_T(1) == M1_T(2);
+    M1_T = M1_T(2:end); %%% somehow first samp can get duplicated
+    M1_X = M1_X(2:end);
+    M1_Y = M1_Y(2:end);
+end
+
 M1_Xsamp = interp1(M1_T,M1_X,tsamp);
 M2_Xsamp = interp1(M2_T,M2_X,tsamp);
 M1_Ysamp = interp1(M1_T,M1_Y,tsamp);
