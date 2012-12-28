@@ -297,7 +297,7 @@ for cell_n = cell_range
                     ntrial(f(i))=ntrial(f(i))+1;
                     Rcycle(mod(f(i),cycframes)+1) = Rcycle(mod(f(i),cycframes)+1) + fspikes;
                     cyctrials(mod(f(i),cycframes)+1) = cyctrials(mod(f(i),cycframes)+1) +1;
-                    if mouseInterp(i)<1
+                    if mouseInterp(i)>1
                         statlaserntrial(f(i))=statlaserntrial(f(i))+1;
                         statlaserRcycle(mod(f(i),cycframes)+1) = statlaserRcycle(mod(f(i),cycframes)+1) + fspikes;
                         statlasercyctrials(mod(f(i),cycframes)+1) = statlasercyctrials(mod(f(i),cycframes)+1) +1;
@@ -306,7 +306,7 @@ for cell_n = cell_range
                     ntrial(f(i))=ntrial(f(i))+1;
                     Rcycle(mod(f(i),cycframes)+1) = Rcycle(mod(f(i),cycframes)+1) + fspikes;
                     cyctrials(mod(f(i),cycframes)+1) = cyctrials(mod(f(i),cycframes)+1) +1;
-                    if mouseInterp(i)<1
+                    if mouseInterp(i)>1
                         statlaserntrial(f(i))=statlaserntrial(f(i))+1;
                         statlaserRcycle(mod(f(i),cycframes)+1) = statlaserRcycle(mod(f(i),cycframes)+1) + fspikes;
                         statlasercyctrials(mod(f(i),cycframes)+1) = statlasercyctrials(mod(f(i),cycframes)+1) +1;
@@ -374,7 +374,7 @@ for cell_n = cell_range
         % legend('off','on');
         xlabel('contrast');
         ylabel('sp/sec');
-        title('laser effect (stopped)');
+        title('laser effect (running)');
         
         subplot(nx,ny,3) ;
         bar([mean(d(1:2)) mean(d2(1:2));mean(d(8:10))-mean(d(1:2)) mean(d2(8:10))-mean(d2(1:2))])

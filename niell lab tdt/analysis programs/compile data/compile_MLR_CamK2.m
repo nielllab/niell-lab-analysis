@@ -1,6 +1,7 @@
 afile = {...
    % 'C:\data\ephys matlab data\021412_awake_chr2\wndrift1\analysis.mat', ...
-    'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...
+    %'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat',
+    'C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...
     'C:\data\ephys matlab data\021612_awake\wn2b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn3\analysis.mat',...
     'C:\data\ephys matlab data\021612_awake\wn4bdrift5\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn2\analysis.mat',...
     'C:\data\ephys matlab data\021812_awake_pptg\wn3e_drift2\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn5\analysis.mat',...
@@ -44,10 +45,14 @@ for i = 1:length(afile)
             
             for state=1:2
                 d = condenseData(data{find(cell_range==c),state}',15)/frame_duration;
+                R(state,:)=d;
                 d = (d(1:10) + d(20:-1:11))/2;               
                 spont(c,rep,state) = mean(d(1:2));
                 evoked(c,rep,state)=mean(d(8:10))-mean(d(1:2));
             end
+            
+            %%% put fit of Rm = alpha*(Rs-R0) + beta here
+            
         end
     end
 end
@@ -59,16 +64,36 @@ for i= 1:n
 
     lfp = squeeze(laser_lfp_all{i});
    f=laser_lfp_freqs{i};
+   f = f(f<80);
    
-%    figure
-%    hold on
-%    plot(f(f<59),lfp(1,f<59),'b');
-%    plot(f(f<59),lfp(2,f<59),'r');
-   gammaF = find(f>50 & f<58);
-   alphaF = find(f>1 & f<8);
+   noiserange = (f>56 & f<63) | (f>49 &f<51) | (f>39 & f<41);
+   
+   figure
+   hold on
+   plot(f( ~noiserange),lfp(1,~noiserange),'b');
+   plot(f(~noiserange),lfp(2,~noiserange),'r');
+   
+   gammaF = find(f>40 & f<70 & ~noiserange);
+   alphaF = find(f>10 & f<30);
    gamma(i,:)= mean(lfp(:,gammaF),2);
+   [peakgamma(i,:) freqs] = max(lfp(:,gammaF),[],2);
+   peakgammaF(i,:) = f(gammaF(freqs));
    alpha(i,:) = mean(lfp(:,alphaF),2);
+   title(sprintf('peak = %0.1f %0.1f; peakF = %0.1f %0.1f area = %0.1f %0.1f',peakgamma(i,1),peakgamma(i,2),peakgammaF(i,1),peakgammaF(i,2),gamma(i,1),gamma(i,2)))
 end
+
+figure
+plot(peakgamma(:,1),peakgamma(:,2),'o');
+title('peak value');
+
+figure
+plot(peakgammaF(:,1),peakgammaF(:,2),'o');
+title('freq of peak value');
+
+figure
+plot(peakgamma(:,1),peakgamma(:,2),'o');
+title('peak value');
+
 
 figure
 plot(gamma(:,1),gamma(:,2),'o');
@@ -132,9 +157,11 @@ for rep=1:3;
         [nanmean(spont(used,rep,1),1) nanmean(spont(used,rep,2),1) ; nanmean(evoked(used,rep,1),1) nanmean(evoked(used,rep,2),1)] ); 
     title(title_str{rep});
     [p t] = ranksum(spont(used,rep,1),spont(used,rep,2));
-    sprintf('%s spont p = %f',title_str{rep},p)
+    [psr t] = signrank(spont(used,rep,1),spont(used,rep,2));
+    sprintf('%s spont p = %f p(signrank) = %f',title_str{rep},p,psr)
      [p t] = ranksum(evoked(used,rep,1),evoked(used,rep,2));
-    sprintf('%s evoked p = %f',title_str{rep},p)
+     [psr t] = signrank(evoked(used,rep,1),evoked(used,rep,2));
+    sprintf('%s evoked p = %f p(signrank) = %f',title_str{rep},p,psr)
 end
 % 
 % for rep=1:3;

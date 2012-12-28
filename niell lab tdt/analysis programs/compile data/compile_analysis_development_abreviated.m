@@ -3,13 +3,9 @@ for dataset = 1:2
     
     cells=0;
     if dataset ==1
-        afiles = {'D:\wayne ephys data\101712_adult_1\record_2\analysis_2.mat',...
-           'D:\wayne ephys data\101712_adult_1\record_3\analysis_3.mat'};
+        afiles = {'D:\Jen_ephys_data\developmental_periods\12_3_12\record_1\analysis_1.mat'};
     elseif dataset ==2
-        afiles = {'D:\Jen_ephys_data\developmental_periods\10_13_12_P15_EO2\1st_record\analysis_1.mat',...
-            'D:\Jen_ephys_data\developmental_periods\10_15_12_EO4\record_1\amalysis_1_10_15_12_EO2_cluster_1.mat',...
-           'D:\Jen_ephys_data\developmental_periods\10_15_12_EO4\record_2\analysis_2_10_15_12_EO2_cluster_2.mat',...
-           'D:\Jen_ephys_data\developmental_periods\10_15_12_EO4\record_3\analysis_3.mat'}; %%% tg
+        afiles = {'D:\Jen_ephys_data\developmental_periods\12_1_12\record_1a\analysis_1a.mat'}; %%% tg
     end
     
     N =0;
