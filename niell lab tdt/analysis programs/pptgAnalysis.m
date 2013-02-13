@@ -4,11 +4,17 @@ dbstop if error
 
 if exist('clustfile','var');
     SU=1;
-    nchan=32;chans = 1:4:nchan;
+    
     load(clustfile);
     load(afile);
         Block_Name = Block_Name{blocknum}
         block=blocknum;
+        if max(cells(1,:))>32
+            nchan=64;
+        else
+           nchan=32;
+        end
+        chans = 1:4:nchan;
     use_afile=1;
     useArgin=1;
 else
