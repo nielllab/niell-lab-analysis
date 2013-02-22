@@ -1,6 +1,6 @@
 afile = {...
-   % 'C:\data\ephys matlab data\021412_awake_chr2\wndrift1\analysis.mat', ...
-    %'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat',
+%    'C:\data\ephys matlab data\021412_awake_chr2\wndrift1\analysis.mat', ...     %%LFP problems
+%     'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat', ...        %%LFP problems
     'C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...
     'C:\data\ephys matlab data\021612_awake\wn2b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn3\analysis.mat',...
     'C:\data\ephys matlab data\021612_awake\wn4bdrift5\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn2\analysis.mat',...
@@ -15,43 +15,58 @@ lfp_channel = [  ];
 n=0
 frame_duration = 1/30;
 
-for i = 1:length(afile)
+for i = 1:length(afile)                             %%%Loop to go through each exp (i-th exp)
     load(afile{i});
-    cell_range = n+(1:size(cells,1));
-    n=cell_range(end);
+    cell_range = n+(1:size(cells,1));            %%%Creates index number for each unit in 
+    n=cell_range(end);                           %%%the i-th experiment so all data can be in one vector
     
-    site(cell_range)=i;
-    cell_id(cell_range,:) = cells;
-    wvform(cell_range,:) = wv';
+    %Unit Data
+    site(cell_range)=i;                          %%Pulls out experiment num-id for each unit in i-th exp
+    cell_id(cell_range,:) = cells;               %%Pulls out tetrode id and unit-id for each unit in it-th exp
+    wvform(cell_range,:) = wv';                  %%Pulls out waveform for each unit in i-th exp
     peaksite(cell_range)=peakchan;
     
+    %Speed Data
     laser_speed_all(i,:)=laserspeed;
     laser_speed_all_std(i,:)=laserspeed_std;
     
-    for c=cell_range
-        ch=ceil(peaksite(c)/4)*4 -3;
+    %Supra/Infra
+%     display(afile{i})  
+%     LayerFour = input('Which channel is Layer 4? : ');
+%     infra(cell_range)= (cell_id(cell_range,1)>LayerFour);
+ 
+    
+    for c=cell_range                                %%%Loop to go through each unit (c) in i-th exp
+        ch=ceil(peaksite(c)/4)*4 -3;                %%%Pulls out channel/tetrode for LFPs
         laser_lfp_all{c} = laserlfp(ch,:,:);
-        laser_lfp_freqs{c}=freqs{ch}
+        laser_lfp_freqs{c}=freqs{ch};
         
         
-        for rep=1:3
+        for rep=1:3                         %%Types of Comparisons
             if rep==1
-                data=Rcyclerep;  %%% laser off/on
+                data=Rcyclerep;              %%% laser off/on
             elseif rep==2
-                data = movRcyclerep; %%%stationary vs moving
+                data = movRcyclerep;         %%% stationary vs moving
             elseif rep==3
-                data=statlaserRcyclerep;    %%%% laser off/on, but only stationary
+                data=statlaserRcyclerep;     %%% laser off/on, but only stationary
             end          
             
             for state=1:2
                 d = condenseData(data{find(cell_range==c),state}',15)/frame_duration;
-                R(state,:)=d;
                 d = (d(1:10) + d(20:-1:11))/2;               
                 spont(c,rep,state) = mean(d(1:2));
-                evoked(c,rep,state)=mean(d(8:10))-mean(d(1:2));
+                evoked(c,rep,state)= mean(d(8:10))-mean(d(1:2));
+                if state==1
+                    fr1 = d(1:10);
+                elseif state==2
+                    fr2 = d(1:10);
+                end
             end
             
             %%% put fit of Rm = alpha*(Rs-R0) + beta here
+                Bs = polyfit(fr1,fr2,1);
+                B1(c,rep) = Bs(2);
+                B0(c,rep) = Bs(1);
             
         end
     end
@@ -62,16 +77,16 @@ clear gamma alpha
 
 for i= 1:n
 
-    lfp = squeeze(laser_lfp_all{i});
+   lfp = squeeze(laser_lfp_all{i});
    f=laser_lfp_freqs{i};
    f = f(f<80);
    
    noiserange = (f>56 & f<63) | (f>49 &f<51) | (f>39 & f<41);
    
-   figure
-   hold on
-   plot(f( ~noiserange),lfp(1,~noiserange),'b');
-   plot(f(~noiserange),lfp(2,~noiserange),'r');
+%    figure
+%    hold on
+%    plot(f( ~noiserange),lfp(1,~noiserange),'b');
+%    plot(f(~noiserange),lfp(2,~noiserange),'r');
    
    gammaF = find(f>40 & f<70 & ~noiserange);
    alphaF = find(f>10 & f<30);
@@ -134,22 +149,39 @@ barwitherr([std(laser_speed_all(:,1)) std(laser_speed_all(:,2))]/sqrt(length(las
 legend({'laser off','laser on'});
 title_str = {'laser','movement','laser no move'};
 
+used= find((evoked(:,2,2)>2));
+usedInfra = find((evoked(:,2,2)>2) & (spont(:,2,1)>=2));                                                                    
+usedSupra = find((evoked(:,2,2)>2) & (spont(:,2,1)<2));    
 
-used = find(evoked(:,2,2)>2);
-sprintf('used fraction = %d / %d  = %f',length(used),length(evoked),length(used)/length(evoked))
+sprintf('used fraction = %d / %d  = %f',length(used),length(evoked),length(used)/length(evoked))    %Prints fraction of units used
+sprintf('number of infra = %d',length(usedInfra))    
+sprintf('number of supra = %d',length(usedSupra))    
 
 for rep=1:3;
    
     figure
-    plot(spont(used,rep,1),spont(used,rep,2),'o');
+    plot(spont(used,rep,1),spont(used,rep,2),'ko');hold on;
+    plot(spont(usedInfra,rep,1),spont(usedInfra,rep,2),'ro');hold on;
+    plot(spont(usedSupra,rep,1),spont(usedSupra,rep,2),'bo');hold on;
     axis square; axis equal;hold on
-    plot([0 max(spont(:))], [0 max(spont(:))])
+    plot([0 max(spont(used))], [0 max(spont(used))]);hold on;
     title(sprintf('spont %s',title_str{rep}));
     
+   figure
+    plot(B0(used,rep),B1(used,rep),'ko');hold on;
+    plot(B0(usedInfra,rep),B1(usedInfra,rep),'ro');hold on;
+    plot(B0(usedSupra,rep),B1(usedSupra,rep),'bo');hold on;
+    plot([1 1],[-6 10],'k-'); hold on;
+    plot([.5 5],[0 0],'k-'); hold on;
+%     plot([0 max(Betas(2)(used))], [0 max(Betas(2)(used))]);hold on;
+    title(sprintf('spont B %s',title_str{rep}));
+    
     figure
-    plot(evoked(used,rep,1),evoked(used,rep,2),'o');
-     axis square; axis equal; hold on
-     plot([0 max(evoked(:))], [0 max(evoked(:))])
+    plot(evoked(used,rep,1),evoked(used,rep,2),'ko');hold on;
+    plot(evoked(usedInfra,rep,1),evoked(usedInfra,rep,2),'ro');hold on;
+    plot(evoked(usedSupra,rep,1),evoked(usedSupra,rep,2),'bo');hold on;
+    axis square; axis equal; hold on
+    plot([0 max(evoked(used))], [0 max(evoked(used))]); hold on;
     title(sprintf('evoked %s',title_str{rep}));
   
     figure
@@ -163,22 +195,3 @@ for rep=1:3;
      [psr t] = signrank(evoked(used,rep,1),evoked(used,rep,2));
     sprintf('%s evoked p = %f p(signrank) = %f',title_str{rep},p,psr)
 end
-% 
-% for rep=1:3;
-%     figure
-%     plot(spont(:,rep,1),spont(:,rep,2),'o');
-%     axis square; axis equal;hold on
-%     plot([0 max(spont(:))], [0 max(spont(:))])
-%     title(sprintf('spont %s',title_str{rep}));
-%     
-%     figure
-%     plot(evoked(:,rep,1),evoked(:,rep,2),'o');
-%      axis square; axis equal; hold on
-%      plot([0 max(evoked(:))], [0 max(evoked(:))])
-%     title(sprintf('evoked %s',title_str{rep}));
-%   
-%     figure
-%     barwitherr( [std(spont(:,rep,1),1) std(spont(:,rep,2),1) ; std(evoked(:,rep,1),1) std(evoked(:,rep,2),1)]/sqrt(n),...
-%         [nanmean(spont(:,rep,1),1) nanmean(spont(:,rep,2),1) ; nanmean(evoked(:,rep,1),1) nanmean(evoked(:,rep,2),1)] ); 
-%     title(title_str{rep});
-% end

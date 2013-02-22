@@ -57,7 +57,7 @@ close all
    d=0;
      p=0;
      
-for cell_n = cell_range
+for cell_n = cell_range                     %runs through each unit
     ch= cell_n;
     if SU
         channel_no = cells(cell_n,1);
@@ -75,19 +75,17 @@ for cell_n = cell_range
     R = hist(times,histbins);
     speedfig(cell_n) = figure;
     subplot(2,1,1)
-    plot(histbins,R);
+    plot(histbins,R);                       %firing rate vs time
     hold on
-    plot(histbins, mousehist,'g');
+    plot(histbins, mousehist,'g');          %speed vs time
     legend('rate','cm/sec')
     title(sprintf('ch = %d',ch));
-    %mousehist = interp1(tdtData.mouseT,tdtData.mouseV,histbins);
-
-    
+    %mousehist = interp1(tdtData.mouseT,tdtData.mouseV,histbin)
 %     figure
 %     plot(mousehist,mousehist2,'o')
     %subplot(2,1,2)
    subplot(2,1,2)
-    plot(mousehist,R,'o');
+    plot(mousehist,R,'o');                  %firing rate vs speed
    hold on
     xlabel('cm/sec')
     ylabel('hz')
@@ -97,9 +95,12 @@ for cell_n = cell_range
     [c,pvals] = corrcoef(mousehist_nonan,R);
      title(sprintf('ch %d - corr = %f',ch,c(1,2)))
      co(cell_n) = c(1,2);
+     allPvals(cell_n)=pvals(1,2);
      
-     shuffle_c = corrcoef(mousehist_nonan(end:-1:1),R);
+     
+     [shuffle_c,shuffle_p] = corrcoef(mousehist_nonan(randperm(length(mousehist_nonan))),R);
      shuffle_co(cell_n) = shuffle_c(1,2);
+     allShuffle_p(cell_n)=shuffle_p(1,2);
      
      interval = [0 0.5 1 2 4 8 16 32 64];
   

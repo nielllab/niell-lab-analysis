@@ -9,6 +9,12 @@
 
 
 
+
+[fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
+%psfilename = 'c:/test.ps';   %%% default location
+if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
+
+
 SU = 1;
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
@@ -31,6 +37,7 @@ selected_path = pname(1 :delims(length(delims))-1)
 Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
 Block_Name = pname(delims(length(delims))+1 :length(pname))
 end
+
 
 chans = 1:4:max(cells,1);
 
@@ -188,7 +195,11 @@ for cell_n = cell_range;
                     title_text = sprintf('ch%d c%d',channel_no,clust_no);
                     text(0,3,title_text,'FontSize',8);
                 end
+                
             end
+      
+            
+          
             %% histograms
             rate_hist = hist(Spike_Timing, hist_range)/(hist_int*numtrials);
             if cond<n_rows*n_col
@@ -198,6 +209,8 @@ for cell_n = cell_range;
                 axis(axis_range);
                 set(gca,'XTickLabel',[])
                 set(gca,'YTickLabel',[])
+                
+                
                 if cond==0
                     title_text = sprintf('%s',Tank_Name);
                     text(0,20,title_text,'FontSize',8);
@@ -206,7 +219,11 @@ for cell_n = cell_range;
                     title_text = sprintf('ch%d c%d',channel_no,clust_no);
                     text(0,20,title_text,'FontSize',8);
                 end
+                
             end
+              figure(hist_fig)
+              set(gcf, 'PaperPositionMode', 'auto');
+              print('-dpsc',psfilename,'-append');      
             
             if cond>=n_rows*n_col & full_field%%% blank frame or full-field, but only plot if full-field is on
                 %                 figure(spont_full)
@@ -296,8 +313,9 @@ for cell_n = cell_range;
         end
         title(title_text);
         legend('.01 cpd','.02cpd','.04cpd','.08cpd','.16cpd','.32cpd')
+       
         %set(gca,'XTickLabel',['0' '45' '90' '135' '180' '225' '270' '315']);
-        
+             
         
         %% calculate tuning parameters
         
@@ -322,6 +340,9 @@ for cell_n = cell_range;
         orient_tuning(cell_n,:) = orientfreq(:,pref_freq(cell_n))';
         subplot(2,1,2);
         plot(orient_tuning(cell_n,:));
+        
+       
+        
         % f1f0(cell_n) = F1(cell_n,(pref_orient-1)*n_col +pref_freq)/ F0(cell_n,(pref_orient-1)*n_col +pref_freq)
         
         
@@ -453,13 +474,16 @@ for cell_n = cell_range;
         end
 
         xlabel('secs');
-        % saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+        
+%         saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
 %         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
 %         saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
-%         %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+       
+        %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+        
         cell_n
-        close(rast_fig);
-        clear rast_fig;
+%         close(rast_fig);
+%         clear rast_fig;
         
      
     end %%% rep
@@ -478,6 +502,25 @@ for cell_n = cell_range;
     plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
     plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
 %     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+% for i = 1:length(hist_fig)
+%     figure(hist_fig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+%     
+%     figure(rast_fig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+%     
+%     figure(tuning_fig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+    
+ 
+%end
+
+%convert ps file to PDfs
+  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+  delete(psfilename);
 end
 
 
