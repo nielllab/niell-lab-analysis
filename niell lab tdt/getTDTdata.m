@@ -92,7 +92,12 @@ if isfield(flags,'laserOn') && flags.laserOn
 end
 
 if isfield(flags,'mouseOn') && flags.mouseOn
-    [tdtData.mouseT tdtData.mouseV groomstate] =getBlockVelocity_groom(Tank_Name,Block_Name);
+    version = input('old (0) or new (1) mouse format: ');
+    if isempty(version)
+        version=1;
+    end
+    version
+    [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,version);
 end
 
 invoke(TTX, 'CloseTank');
