@@ -13,13 +13,13 @@ if ~exist('movtype','var') | isempty(movtype)
     movtype=0;
 end
 
-cmod=1; step=2; bar = 3;  %%%% movietypes
+cmod=1; step=2; bar = 3;  Xpatches=4; Ypatches=5; %%%% movietypes
 
 imsize = 128;                %% size in pixels
 framerate = 30;             %% Hz
-imageMag=10;                 %% magnification that movie will be played at
+imageMag=18;                 %% magnification that movie will be played at
 
-screenWidthPix = 1280        %% Screen width in Pixels
+screenWidthPix = 1920        %% Screen width in Pixels
 screenWidthCm = 50;         %% Width in cm
 screenDistanceCm = 25;      %% Distance in cm
 
@@ -138,7 +138,32 @@ for f = 1:nframes
         le = loweredge(mod(f-1,contrast_period*framerate)+1);
         ue = upperedge(mod(f-1,contrast_period*framerate)+1);
         imscaled(1:le,:,f)=0.5; imscaled(ue:imsize,:,f)=0.5;
-    end 
+    elseif movtype==Xpatches | movtype==Ypatches
+        if movtype==Xpatches
+       % wx = 0.25;  xpos = 0.25; ypos = 0.5;   
+       wx = 0.2; xpos = 0.4; ypos=0.5;
+        widthpix = 2*round(wx*imsize/2);  yposPix = ypos*imsize;
+        if mod((f-1)/(contrast_period*framerate),1)<0.5
+            xposPix = xpos*imsize;
+        else 
+            xposPix=(1-xpos)*imsize
+        end
+        elseif movtype==Ypatches
+          % wx = 0.25;  xpos = 0.5; ypos = 0.35;  
+           wx = 0.2;  xpos = 0.5; ypos = 0.4;   
+        widthpix = 2*round(wx*imsize/2);  xposPix = xpos*imsize;
+        if mod((f-1)/(contrast_period*framerate),1)<0.5
+            yposPix = ypos*imsize;
+        else 
+            yposPix=(1-ypos)*imsize
+        end
+        
+        end
+        xposPix=round(xposPix); yposPix=round(yposPix);
+        imscaled(1:(xposPix-widthpix/2),:,f)=0.5; imscaled(xposPix+widthpix/2:imsize,:,f)=0.5; 
+        imscaled(:,1:(yposPix-widthpix/2),f)=0.5; imscaled(:,(yposPix+widthpix/2):imsize,f)=0.5; 
+    end
+        
     %imscaled(:,:,f) = (imscaled(:,:,f)-.5).*(contrast(mod(f-1,1800)+1));
 end
 if movtype ==cmod | movtype==step
