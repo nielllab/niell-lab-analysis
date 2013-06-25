@@ -108,7 +108,7 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         dt =dt(dt<.02);
         hist(dt,.0005:0.001:.02);
           set(gcf,'Position',[50 50 800 400], 'Color',linecolor(c,:));
-          
+         
          if exist('wave_all','var')
              wvall = wave_all{tet};
            wvclust = wvall(find(idx_all{tet_ch}==c),:,:);

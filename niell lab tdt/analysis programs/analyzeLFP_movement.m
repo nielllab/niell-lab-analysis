@@ -62,8 +62,8 @@ for ch = 1:nChan;
     %     figure
     %     plot(v_interp,theta(t),'o');
     Smean = mean(lfpnorm,2)';
-    stationary = find(v_interp<1 & Smean<(5*median(Smean)));
-    moving = find(v_interp>5  & Smean<(5*median(Smean)));
+    stationary = find(v_interp<.2 & Smean<(5*median(Smean)));
+    moving = find(v_interp>.5  & Smean<(5*median(Smean)));
 
     figure
     plot(mean(lfpnorm(stationary,:),1));

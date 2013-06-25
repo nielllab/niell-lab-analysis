@@ -509,7 +509,7 @@ output_path
 
 if bname~=0
     fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname))
-    save(fname);
+    save(fname,'-v7.3');
     for t=use_tets
         fname = fullfile(output_path,sprintf('hist%s_%s_t%d',Tank_Name,bname,t));
         saveas(histfig(t),fname,'fig');
