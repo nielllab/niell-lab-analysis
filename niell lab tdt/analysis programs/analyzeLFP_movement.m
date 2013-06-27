@@ -38,6 +38,9 @@ for ch = 1:nChan;
     normalizer = repmat(normalizer,size(lfp,1),1);
     lfpnorm = lfp.*normalizer;
     
+    H = fspecial('average',[4 6])
+    lfpnorm = imfilter(lfpnorm,H);
+    
     figure
     imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]);
     axis xy
@@ -52,7 +55,8 @@ for ch = 1:nChan;
         tsamp = tdtData.mouseT;
         vsmooth = tdtData.mouseV;
         
-        plot(tsamp,(vsmooth/1.3-40),'g');
+        %plot(tsamp,(vsmooth/1.3-40),'g');
+        plot(tsamp,(vsmooth/.2-40),'g');
         axis([0 max(tsamp) -40 80/df])
         
         set(gcf, 'PaperPositionMode', 'auto');
@@ -73,8 +77,8 @@ for ch = 1:nChan;
     %     figure
     %     plot(v_interp,theta(t),'o');
     Smean = mean(lfpnorm,2)';
-    stationary = find(v_interp<1 & Smean<(5*median(Smean)));
-    moving = find(v_interp>5  & Smean<(5*median(Smean)));
+    stationary = find(v_interp<0.3 & Smean<(5*median(Smean)));
+    moving = find(v_interp>0.35  & Smean<(5*median(Smean)));
 
     figure
     plot(mean(lfpnorm(stationary,:),1));
