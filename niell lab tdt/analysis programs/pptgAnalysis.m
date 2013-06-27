@@ -9,7 +9,7 @@ if exist('clustfile','var');
     load(afile);
         Block_Name = Block_Name{blocknum}
         block=blocknum;
-        if max(cells(1,:))>32
+        if max(cells(:,1))>32
             nchan=64;
         else
            nchan=32;

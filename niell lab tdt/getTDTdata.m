@@ -71,7 +71,7 @@ elseif isfield(flags,'newCluster') && flags.newCluster
     
 end
 
-if isfield(flags,'lfpTseries') && (flags.lfpTseries | flags.lfpSpectra)
+if isfield(flags,'lfpTseries') && (flags.lfpTseries || flags.lfpSpectra)
     [tdtData.lfpT tdtData.lfpData tdtData.spectT tdtData.spectF tdtData.spectData] =...
         analyzeLFP_chronux(TTX,chans,flags.lfpTseries,flags.lfpSpectra);
 end
