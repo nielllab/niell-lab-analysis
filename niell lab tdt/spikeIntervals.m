@@ -2,16 +2,13 @@ close all
 
 nblocks = round(max(spikeT{1}/10^5))+1;
 
-for block= 1:1
+for block= 1:nblocks
 
 
 for c = 1:length(spikeT);
-    sp{c} = wn_movement(c).spikes;
-    if exist('wn_movement','var')
-        spikespeed{c} = interp1(wn_movement(c).mvlfp_tdata,wn_movement(c).speed,wn_movement(c).spikes);
-    end
-  % s=spikeT{c};
-   %sp{c} = s(s>(block-1)*10^5 & s<(block-1 + 0.01)*10^5)-(block-1)*10^5;
+   % sp{c} = wn_movement(c).spikes;
+   s=spikeT{c};
+   sp{c} = s(s>(block-1)*10^5 & s<(block-1 + 0.01)*10^5)-(block-1)*10^5;
 end
 
 figure
@@ -35,8 +32,8 @@ ylim([0 c+1]);
 
 hist_int = 0.004;
 for c1 = 1:length(sp)
-    spikehist{c1} = hist(sp{c1}(spikespeed{c1}<1),0:hist_int:1000);
-    bursthist{c1} = hist(sp{c1}(spikespeed{c1}>1),0:hist_int:1000);
+    spikehist{c1} = hist(sp{c1},0:hist_int:1000);
+    bursthist{c1} = hist(burst_times{c1},0:hist_int:1000);
     spikehist{c1} = spikehist{c1}(1:end-1);
     bursthist{c1} = bursthist{c1}(1:end-1);
 end
@@ -44,10 +41,8 @@ end
 
 spike_fig = figure;
 set(gcf,'Name',sprintf('spike block %d',block))
-
-set(gcf,'Name','stationary')
 burst_fig = figure;
-set(gcf,'Name','moving')
+set(gcf,'Name',sprintf('burst block %d',block))
 
 clear xc burst_xc
 
@@ -68,7 +63,7 @@ for c1=1:n_cells
                 burst_xc(c1,c2,lag-lag_range(1)+1)=0;
             else
             xc(c1,c2,lag-lag_range(1)+1)=spikehist{c1}*circshift(spikehist{c2},[0 lag])';
-            burst_xc(c1,c2,lag-lag_range(1)+1)=bursthist{c1}*circshift(bursthist{c2},[0 lag])';
+           % burst_xc(c1,c2,lag-lag_range(1)+1)=bursthist{c1}*circshift(bursthist{c2},[0 lag])';
             end
         end
         figure(spike_fig);
@@ -76,12 +71,12 @@ for c1=1:n_cells
         plot(squeeze(xc(c1,c2,:)));
         xlim([1 length(lag_range)])
        set(gca,'xtick',[]);set(gca,'ytick',[]);
-        
-          figure(burst_fig);
-        subplot(n_cells,n_cells,c1+(c2-1)*n_cells);
-        plot(squeeze(burst_xc(c1,c2,:)))  
-          xlim([1 length(lag_range)])
-       set(gca,'xtick',[]);set(gca,'ytick',[]);
+%         
+%           figure(burst_fig);
+%         subplot(n_cells,n_cells,c1+(c2-1)*n_cells);
+%         plot(squeeze(burst_xc(c1,c2,:)))  
+%           xlim([1 length(lag_range)])
+%        set(gca,'xtick',[]);set(gca,'ytick',[]);
     end
 end
 
