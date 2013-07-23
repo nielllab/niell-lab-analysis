@@ -1,21 +1,31 @@
+clear all
 afile = {...
 %    'C:\data\ephys matlab data\021412_awake_chr2\wndrift1\analysis.mat', ...     %%LFP problems
 %     'C:\data\ephys matlab data\021512_awake_pptg\wn1b\analysis.mat', ...        %%LFP problems
-    'C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...
-    'C:\data\ephys matlab data\021612_awake\wn2b\analysis.mat','C:\data\ephys matlab data\021612_awake\wn3\analysis.mat',...
-    'C:\data\ephys matlab data\021612_awake\wn4bdrift5\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn2\analysis.mat',...
-    'C:\data\ephys matlab data\021812_awake_pptg\wn3e_drift2\analysis.mat','C:\data\ephys matlab data\021812_awake_pptg\wn5\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn1fg\analysis.mat','C:\data\ephys matlab data\070112_awake_mlr\wn2a\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn3d\analysis.mat','C:\data\ephys matlab data\070112_awake_mlr\wn4\analysis.mat',...
-    'C:\data\ephys matlab data\070112_awake_mlr\wn5b\analysis.mat','C:\data\ephys matlab data\070312_awake_mlr\wn2e\analysis.mat',...
-    'C:\data\ephys matlab data\070312_awake_mlr\wn3a\analysis.mat','C:\data\ephys matlab data\070312_awake_mlr\wn4c\analysis.mat'}
-
+     'C:\data\ephys matlab data\021612_awake\wn1drift1\analysis.mat', ...         % MLRstim #1; great desynchronization
+    'C:\data\ephys matlab data\021612_awake\wn2b\analysis.mat',...                % MLRstim #2; good desychronization
+    'C:\data\ephys matlab data\021612_awake\wn3\analysis.mat',...                 % MLRstim #3; good desychronization at 50Hz
+    'C:\data\ephys matlab data\021612_awake\wn4bdrift5\analysis.mat',...          % MLRstim #4    
+    'C:\data\ephys matlab data\021812_awake_pptg\wn2\analysis.mat',...            % MLRstim #5    
+    'C:\data\ephys matlab data\021812_awake_pptg\wn3e_drift2\analysis.mat',...    % MLRstim #6 % bad lfp
+    'C:\data\ephys matlab data\021812_awake_pptg\wn5\analysis.mat',...            % MLRstim #7
+    'C:\data\ephys matlab data\070112_awake_mlr\wn1fg\analysis.mat',...           % MLRstim #8  % bad lfp
+    'C:\data\ephys matlab data\070112_awake_mlr\wn2a\analysis.mat',...            % MLRstim #9  % bad lfp
+    'C:\data\ephys matlab data\070112_awake_mlr\wn3d\analysis.mat',...            % MLRstim #10
+    'C:\data\ephys matlab data\070112_awake_mlr\wn4\analysis.mat',...             % MLRstim #11  %%% bad lfp
+    'C:\data\ephys matlab data\070112_awake_mlr\wn5b\analysis.mat',...            % MLRstim #12
+    'C:\data\ephys matlab data\070312_awake_mlr\wn1h\analysis.mat',...            % MLRstim #13
+    'C:\data\ephys matlab data\070312_awake_mlr\wn2e\analysis.mat',...            % MLRstim #14
+    'C:\data\ephys matlab data\070312_awake_mlr\wn3a\analysis.mat',...            % MLRstim #15
+   'C:\data\ephys matlab data\070312_awake_mlr\wn4c\analysis.mat'...              % MLRstim #16
+}
 lfp_channel = [  ];
 
 n=0
 frame_duration = 1/30;
 
-for i = 1:length(afile)                             %%%Loop to go through each exp (i-th exp)
+for i = 1:length(afile)                          %%%Loop to go through each exp (i-th exp)
+%for i =1:8
     load(afile{i});
     cell_range = n+(1:size(cells,1));            %%%Creates index number for each unit in 
     n=cell_range(end);                           %%%the i-th experiment so all data can be in one vector
@@ -42,13 +52,15 @@ for i = 1:length(afile)                             %%%Loop to go through each e
         laser_lfp_freqs{c}=freqs{ch};
         
         
-        for rep=1:3                         %%Types of Comparisons
+        for rep=1:4                       %%Types of Comparisons
             if rep==1
                 data=Rcyclerep;              %%% laser off/on
             elseif rep==2
                 data = movRcyclerep;         %%% stationary vs moving
             elseif rep==3
                 data=statlaserRcyclerep;     %%% laser off/on, but only stationary
+            elseif rep==4
+            data = movnolaserRcyclerep;
             end          
             
             for state=1:2
@@ -74,42 +86,87 @@ end
     
 
 clear gamma alpha
-
+badnoise = zeros(1,n);
+close all
 for i= 1:n
-
+%for i = 83:93
    lfp = squeeze(laser_lfp_all{i});
    f=laser_lfp_freqs{i};
    f = f(f<80);
    
-   noiserange = (f>56 & f<63) | (f>49 &f<51) | (f>39 & f<41);
+   noise(i) = max(lfp(:))
+   if max(lfp(:))>10^6
+       badnoise(i)=1;
+   else 
+       badnoise(i)=0;
+   end
+   
+   figure
+   plot(f,lfp(:,f<80)')
+   ylim([0 10^4])
+   noiserange = (f>57 & f<63) | (f>49 &f<51) | (f>39 & f<41);
    
 %    figure
 %    hold on
 %    plot(f( ~noiserange),lfp(1,~noiserange),'b');
 %    plot(f(~noiserange),lfp(2,~noiserange),'r');
    
-   gammaF = find(f>40 & f<70 & ~noiserange);
-   alphaF = find(f>10 & f<30);
+   gammaF = find(f>45 & f<60 & ~noiserange); %%% was 40 - 70 
+   alphaF = find(f>2 & f<12);
    gamma(i,:)= mean(lfp(:,gammaF),2);
    [peakgamma(i,:) freqs] = max(lfp(:,gammaF),[],2);
    peakgammaF(i,:) = f(gammaF(freqs));
+   
+      [peakalpha(i,:) freqs] = max(lfp(:,alphaF),[],2);
+   peakalphaF(i,:) = f(alphaF(freqs));
+   
    alpha(i,:) = mean(lfp(:,alphaF),2);
    title(sprintf('peak = %0.1f %0.1f; peakF = %0.1f %0.1f area = %0.1f %0.1f',peakgamma(i,1),peakgamma(i,2),peakgammaF(i,1),peakgammaF(i,2),gamma(i,1),gamma(i,2)))
 end
 
 figure
-plot(peakgamma(:,1),peakgamma(:,2),'o');
+plot(peakgamma(~badnoise,1),peakgamma(~badnoise,2),'o');
 title('peak value');
 
 figure
 plot(peakgammaF(:,1),peakgammaF(:,2),'o');
 title('freq of peak value');
 
+
 figure
-plot(peakgamma(:,1),peakgamma(:,2),'o');
+plot(peakalpha(~badnoise,1),peakalpha(~badnoise,2),'o');
 title('peak value');
 
+figure
+plot(peakalphaF(~badnoise,1),peakalphaF(~badnoise,2),'o');
+title('freq of peak value');
 
+clear normgamma normalpha
+for rep =2:size(gamma,2);
+    
+%normgamma(:,rep-1) = gamma(:,rep)./gamma(:,1)
+%normalpha(:,rep-1) = alpha(:,rep)./alpha(:,1)
+
+
+ normgamma(:,rep-1) = peakgamma(:,rep)./peakgamma(:,1)
+ normalpha(:,rep-1) = peakalpha(:,rep)./peakalpha(:,1)
+end
+
+normgamma = normgamma(~badnoise,:);
+normgalpha = normalpha(~badnoise,:);
+
+figure
+% barwitherr([0 nanstd(normalpha,[],1)./sqrt(sum(~isnan(normalpha))); 0 nanstd(normgamma,[],1)./sqrt(sum(~isnan(normgamma)))],...
+%     [1 nanmedian(normalpha,1); 1 nanmedian(normgamma,1)]);
+
+barwitherr([0 nanstd(bootstrp(1000,@(x) nanmedian(x,1),normalpha)); 0 nanstd(bootstrp(1000,@(x) nanmedian(x,1),normgamma))],...
+    [1 nanmedian(normalpha,1); 1 nanmedian(normgamma,1)]);
+
+
+legend({'laser off stat','laser on stat','laser off mov','laser on mov'});
+set(gca,'xTickLabel',{'alpha','gamma'});
+
+ 
 figure
 plot(gamma(:,1),gamma(:,2),'o');
 hold on
@@ -146,8 +203,9 @@ plot([0 10],[0 10])
 figure
 barwitherr([std(laser_speed_all(:,1)) std(laser_speed_all(:,2))]/sqrt(length(laser_speed_all)), ...
    [ mean(laser_speed_all(:,1)) mean(laser_speed_all(:,2))]);
+
 legend({'laser off','laser on'});
-title_str = {'laser','movement','laser no move'};
+title_str = {'laser','movement','laser no move','move no laser'};
 
 used= find((evoked(:,2,2)>2));
 usedInfra = find((evoked(:,2,2)>2) & (spont(:,2,1)>=2));                                                                    
@@ -157,7 +215,7 @@ sprintf('used fraction = %d / %d  = %f',length(used),length(evoked),length(used)
 sprintf('number of infra = %d',length(usedInfra))    
 sprintf('number of supra = %d',length(usedSupra))    
 
-for rep=1:3;
+for rep=1:4;
    
     figure
     plot(spont(used,rep,1),spont(used,rep,2),'ko');hold on;
@@ -185,9 +243,16 @@ for rep=1:3;
     title(sprintf('evoked %s',title_str{rep}));
   
     figure
-    barwitherr( [std(spont(used,rep,1),1) std(spont(used,rep,2),1) ; std(evoked(used,rep,1),1) std(evoked(used,rep,2),1)]/sqrt(n),...
-        [nanmean(spont(used,rep,1),1) nanmean(spont(used,rep,2),1) ; nanmean(evoked(used,rep,1),1) nanmean(evoked(used,rep,2),1)] ); 
+%     barwitherr( [std(spont(used,rep,1),1) std(spont(used,rep,2),1) ; std(evoked(used,rep,1),1) std(evoked(used,rep,2),1)]/sqrt(n),...
+%         [nanmedian(spont(used,rep,1),1) nanmedian(spont(used,rep,2),1) ; nanmedian(evoked(used,rep,1),1) nanmedian(evoked(used,rep,2),1)] ); 
+
+    barwitherr([nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,2))) ; nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,2)))],...
+        [nanmedian(spont(used,rep,1),1) nanmedian(spont(used,rep,2),1) ; nanmedian(evoked(used,rep,1),1) nanmedian(evoked(used,rep,2),1)] ); 
+    
+    
     title(title_str{rep});
+    set(gca,'Xticklabel',{'spont','evoked'});
+    
     [p t] = ranksum(spont(used,rep,1),spont(used,rep,2));
     [psr t] = signrank(spont(used,rep,1),spont(used,rep,2));
     sprintf('%s spont p = %f p(signrank) = %f',title_str{rep},p,psr)

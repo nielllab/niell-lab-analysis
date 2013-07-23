@@ -14,9 +14,13 @@ laser=laser(:);
 Wave_TS = invoke(TTX, 'ParseEvInfoV', 0, N, 6);  %   6  = Time Stamp
 size(Wave_TS)
 Wave_TS = Wave_TS(:);
+% 
+% form=  input('UO format laser 0/1 ');
+% if isempty(form) form=1; end
 
-form=  input('UO format laser 0/1 ');
-if isempty(form) form=1; end
+display('warning - using UO laser format')
+form = 1;
+
 if form
     bl_length = 256;
 else

@@ -6,11 +6,11 @@ for block= 1:1
 
 clear sp
     close all
-for c = 1:length(blockdata.spikes);
-    sp{c} = blockdata.spikes{c};
-    
-        spikespeed{c} = interp1(blockdata.mouseT,blockdata.mouseV,sp{c});
-   
+for c = 1:length(spikeT);
+    sp{c} = wn_movement(c).spikes;
+    if exist('wn_movement','var')
+        spikespeed{c} = interp1(wn_movement(c).mvlfp_tdata,wn_movement(c).speed,wn_movement(c).spikes);
+    end
   % s=spikeT{c};
    %sp{c} = s(s>(block-1)*10^5 & s<(block-1 + 0.01)*10^5)-(block-1)*10^5;
    
@@ -31,18 +31,18 @@ for c = 1:length(blockdata.spikes);
    ns = min(length(mvspikes),1000);
    for s = 1:ns
        s
-       lfp_avg=lfp_avg+interp1(blockdata.lfpT{c},blockdata.lfpV{c},mvspikes(s)+lfp_avg_range);
+       lfp_avg=lfp_avg+interp1(wn_movement(c).lfpT,wn_movement(c).lfpV,mvspikes(s)+lfp_avg_range);
    end
       
    cmap='rgk'
    subplot(1,2,1)
  hold on
    plot(lfp_avg_range,lfp_avg/ns,cmap(rep)); 
-   xlim([lfp_avg_range(1) lfp_avg_range(end)])
+   
    subplot(1,2,2)
 hold on
    plot(lfp_avg_range,fftshift(abs(fft(lfp_avg)))/ns,cmap(rep));
-   xlim([lfp_avg_range(1) lfp_avg_range(end)])
+
    getframe(gcf)
    
    end

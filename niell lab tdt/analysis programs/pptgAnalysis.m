@@ -7,14 +7,14 @@ if exist('clustfile','var');
     
     load(clustfile);
     load(afile);
-        Block_Name = Block_Name{blocknum}
-        block=blocknum;
-        if max(cells(:,1))>32
-            nchan=64;
-        else
-           nchan=32;
-        end
-        chans = 1:4:nchan;
+    Block_Name = Block_Name{blocknum}
+    block=blocknum;
+    if max(cells(:,1))>32
+        nchan=64;
+    else
+        nchan=32;
+    end
+    chans = 1:4:nchan;
     use_afile=1;
     useArgin=1;
 else
@@ -24,7 +24,7 @@ else
     chans = 1:4:nchan;
     SU = input('multiunit (0) or single-unit (1) : ');
     framerate = input('movie framerate : ');
-  
+    
     if SU
         [fname, pname] = uigetfile('*.mat','cluster data');
         load(fullfile(pname,fname));
@@ -187,12 +187,23 @@ if uselaser
         set(gca,'XTickLabel',{'-5','0','5','10','15','20','25','30'})
         title(sprintf('ch=%d',ch));
         figure(lfpfig)
-        for laser = 1:2
+        
+        
+        %%% selects timepoints for laser on/off and running speed
+        speeds = interp1(tdtData.mouseT,tdtData.mouseV,tsamps);
+        figure
+        plot(speeds);
+        ylabel('cm/sec')
+        for laser = 1:4
             
             if laser ==1
-                timepts = tsamps(laserdownsamp==0);
+                timepts = tsamps(laserdownsamp==0 &speeds<1);
+            elseif laser ==2
+                timepts = tsamps(laserdownsamp>0 & speeds<1);
+            elseif laser==3
+                timepts = tsamps(laserdownsamp==0 & speeds>1);
             else
-                timepts = tsamps(laserdownsamp>0);
+                timepts = tsamps(laserdownsamp>0 & speeds>1);
             end
             
             for f = 1:size(specdata,2)
@@ -203,8 +214,9 @@ if uselaser
         plot(tdtData.spectF{ch}, squeeze(laserlfp(ch,:,:)));
         ylim([0 1.5*prctile(laserlfp(ch,1,:),95)])
         xlim([0 90])
+        
     end
-    
+    legend({'laser off stationary','laseron stationary','laser off moving','laser on moving'})
 end
 
 
@@ -272,6 +284,9 @@ for cell_n = cell_range
         statlaserntrial = zeros(1,max(f));
         statlasercyctrials = zeros(1,cycframes);
         
+        movinglaserRcycle = zeros(1,cycframes);
+        movinglaserntrial = zeros(1,max(f));
+        movinglasercyctrials = zeros(1,cycframes);
         
         Rcycle = zeros(1,cycframes);
         ntrial = zeros(1,max(f));
@@ -280,6 +295,9 @@ for cell_n = cell_range
         movRcycle = zeros(1,cycframes);
         movntrial = zeros(1,max(f));
         movcyctrials = zeros(1,cycframes);
+        movnolaserntrial= zeros(1,max(f));
+        movnolaserRcycle= zeros(1,cycframes);
+        movnolasercyctrials= zeros(1,cycframes);
         
         for i = 1:length(f)-1
             fspikes = framespikes(i);
@@ -309,7 +327,11 @@ for cell_n = cell_range
                         statlaserntrial(f(i))=statlaserntrial(f(i))+1;
                         statlaserRcycle(mod(f(i),cycframes)+1) = statlaserRcycle(mod(f(i),cycframes)+1) + fspikes;
                         statlasercyctrials(mod(f(i),cycframes)+1) = statlasercyctrials(mod(f(i),cycframes)+1) +1;
-                    end
+                    else
+                        movinglaserntrial(f(i))=movinglaserntrial(f(i))+1;
+                        movinglaserRcycle(mod(f(i),cycframes)+1) = movinglaserRcycle(mod(f(i),cycframes)+1) + fspikes;
+                        movinglasercyctrials(mod(f(i),cycframes)+1) = movinglasercyctrials(mod(f(i),cycframes)+1) +1;
+                    end    
                 elseif rep==2 & laserInterp(i)>0.01;
                     ntrial(f(i))=ntrial(f(i))+1;
                     Rcycle(mod(f(i),cycframes)+1) = Rcycle(mod(f(i),cycframes)+1) + fspikes;
@@ -318,8 +340,22 @@ for cell_n = cell_range
                         statlaserntrial(f(i))=statlaserntrial(f(i))+1;
                         statlaserRcycle(mod(f(i),cycframes)+1) = statlaserRcycle(mod(f(i),cycframes)+1) + fspikes;
                         statlasercyctrials(mod(f(i),cycframes)+1) = statlasercyctrials(mod(f(i),cycframes)+1) +1;
+                    else
+                         movinglaserntrial(f(i))=movinglaserntrial(f(i))+1;
+                        movinglaserRcycle(mod(f(i),cycframes)+1) = movinglaserRcycle(mod(f(i),cycframes)+1) + fspikes;
+                        movinglasercyctrials(mod(f(i),cycframes)+1) = movinglasercyctrials(mod(f(i),cycframes)+1) +1;
                     end
                 end
+                if rep ==1 & laserInterp(i)==0 & mouseInterp(i)<1
+                    movnolaserntrial(f(i))=movnolaserntrial(f(i))+1;
+                    movnolaserRcycle(mod(f(i),cycframes)+1) = movnolaserRcycle(mod(f(i),cycframes)+1) + fspikes;
+                    movnolasercyctrials(mod(f(i),cycframes)+1) = movnolasercyctrials(mod(f(i),cycframes)+1) +1;
+                elseif rep ==2 & laserInterp(i)==0 & mouseInterp(i)>1
+                    movnolaserntrial(f(i))=movnolaserntrial(f(i))+1;
+                    movnolaserRcycle(mod(f(i),cycframes)+1) = movnolaserRcycle(mod(f(i),cycframes)+1) + fspikes;
+                    movnolasercyctrials(mod(f(i),cycframes)+1) = movnolasercyctrials(mod(f(i),cycframes)+1) +1;
+                end
+                
             end
             if rep ==1 & mouseInterp(i)<1
                 movntrial(f(i))=movntrial(f(i))+1;
@@ -334,9 +370,12 @@ for cell_n = cell_range
         R = R./ntrial;
         %         figure
         %         plot(R)
-        statlaserRcyclerep{cell_n,rep} = statlaserRcycle./statlasercyctrials;
-        Rcyclerep{cell_n,rep} = Rcycle./cyctrials;
-        movRcyclerep{cell_n,rep} = movRcycle./movcyctrials;
+        statlaserRcyclerep{cell_n,rep} = statlaserRcycle./statlasercyctrials;  %%%laser on vs off, stationary only
+           movinglaserRcyclerep{cell_n,rep} = movinglaserRcycle./movinglasercyctrials;  %%%laser on vs off, moving only
+
+           Rcyclerep{cell_n,rep} = Rcycle./cyctrials; %%% laser on vs off, regardless of movement
+        movRcyclerep{cell_n,rep} = movRcycle./movcyctrials;  %%% moving or not, regardless of laser
+        movnolaserRcyclerep{cell_n,rep} = movnolaserRcycle./movnolasercyctrials;  %%% moving or not, laser off
         %         figure
         %         plot(Rcycle)
         if rep ==1 & uselaser  %%% firing as function of laser timing
@@ -394,13 +433,13 @@ for cell_n = cell_range
     end
     
     subplot(nx,ny,1)
-    d = condenseData(movRcyclerep{cell_n,1}',framerate/2)*framerate;
+    d = condenseData(movnolaserRcyclerep{cell_n,1}',framerate/2)*framerate;
     d = (d(1:10) + d(20:-1:11))/2;
     wn_movement(ch).stopCRF = d;
     
     plot(0.5*(1-cos(2*pi*(1:10)/20)),d);
     hold on
-    d = condenseData(movRcyclerep{cell_n,2}',framerate/2)*framerate;
+    d = condenseData(movnolaserRcyclerep{cell_n,2}',framerate/2)*framerate;
     d = (d(1:10) + d(20:-1:11))/2;
     wn_movement(ch).moveCRF = d;
     plot(0.5*(1-cos(2*pi*(1:10)/20)),d,'g');
@@ -459,10 +498,10 @@ for cell_n = cell_range
             sp = spikespeeds<1;
         else
             sp = spikespeeds>1;
-        end     
+        end
         burstfraction(cell_n,rep) = sum(burst(sp))/sum(sp);
     end
-
+    
     
     if SU
         title(sprintf('unit %d %d burst = %0.2f %0.2f',cells(ch,1),cells(ch,2),burstfraction(cell_n,1),burstfraction(cell_n,2)));
@@ -472,36 +511,36 @@ for cell_n = cell_range
     
     wn_movement(ch).burst = burstfraction(cell_n,:);
     
-     freqs{ch} = tdtData.spectF{channel_no};
-        df = median(diff(tdtData.spectF{channel_no}));
-        specdata = tdtData.spectData{channel_no};
-        normalizer = 1:size(specdata,2);
-        normalizer = repmat(normalizer,size(specdata,1),1);
-        specdata = specdata.*normalizer;
+    freqs{ch} = tdtData.spectF{channel_no};
+    df = median(diff(tdtData.spectF{channel_no}));
+    specdata = tdtData.spectData{channel_no};
+    normalizer = 1:size(specdata,2);
+    normalizer = repmat(normalizer,size(specdata,1),1);
+    specdata = specdata.*normalizer;
+    
+    tdata = tdtData.spectT{channel_no};
+    
+    lfpfig(ch)=figure;
+    for mv = 1:2
         
-        tdata = tdtData.spectT{channel_no};
-       
-        lfpfig(ch)=figure;
-        for mv = 1:2
-            
-            mouse_resamp = interp1(tdtData.mouseT,tdtData.mouseV,tdata);
-            if mv ==1
-                timepts = mouse_resamp<1;
-            else
-                timepts = mouse_resamp>1;
-            end
-               mv_lfp(ch,mv,:)= nanmean(specdata(timepts,:));
+        mouse_resamp = interp1(tdtData.mouseT,tdtData.mouseV,tdata);
+        if mv ==1
+            timepts = mouse_resamp<1;
+        else
+            timepts = mouse_resamp>1;
         end
-
-        plot(tdtData.spectF{channel_no}, squeeze(mv_lfp(ch,:,:)));
-        ylim([0 1.5*prctile(mv_lfp(ch,1,:),95)])
-        xlim([0 90])
+        mv_lfp(ch,mv,:)= nanmean(specdata(timepts,:));
+    end
+    
+    plot(tdtData.spectF{channel_no}, squeeze(mv_lfp(ch,:,:)));
+    ylim([0 1.5*prctile(mv_lfp(ch,1,:),95)])
+    xlim([0 90])
     if SU
         title(sprintf('unit %d %d',cells(ch,1),cells(ch,2)));
     else
         title(sprintf('movement %s  ch %d',Block_Name,ch));
     end
-
+    
     
     wn_movement(ch).freqs = freqs{ch};
     wn_movement(ch).mv_lfp = squeeze(mv_lfp(ch,:,:));
@@ -515,6 +554,13 @@ for cell_n = cell_range
     
 end
 
+
+if SU & uselaser
+    save(afile,'laserspeed','laserspeed_std','statlaserRcyclerep','movinglaserRcyclerep','Rcyclerep','movRcyclerep','movnolaserRcyclerep','RtcAll','laserlfp','freqs','-append');
+elseif SU & ~uselaser
+    
+    save(afile,'Rcyclerep','movRcyclerep','wn_movement','-append');
+end
 
 
 if useArgin
@@ -537,16 +583,16 @@ for i = 1:length(spikefig)
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfname,'-append');
     
-      figure(lfpfig(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfname,'-append');
+    %       figure(lfpfig(i))
+    %     set(gcf, 'PaperPositionMode', 'auto');
+    %     print('-dpsc',psfname,'-append');
 end
 
 if uselaser
     figure(spectrafig)
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfname,'-append');
-    figure(lfpfig)
+    figure(lfpfig(1))
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfname,'-append');
 end
@@ -558,12 +604,7 @@ else
 end
 
 
-if SU & uselaser
-    save(fullfile(apname,afname),'laserspeed','laserspeed_std','statlaserRcyclerep','Rcyclerep','movRcyclerep','RtcAll','laserlfp','freqs','-append');
-elseif SU & ~uselaser
-    
-    save(afile,'Rcyclerep','movRcyclerep','wn_movement','-append');
-end
+
 
 
 
