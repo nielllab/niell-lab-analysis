@@ -1,4 +1,7 @@
+clear all
+
 n=0;
+
 
 afile = {    'C:\data\lgn rf project\lgn_analysis\030912_rec3_analysis3_final.mat',...
     'C:\data\lgn rf project\lgn_analysis\030912_rec4_analysis_4final.mat',...
@@ -35,43 +38,71 @@ afile = {    'C:\data\lgn rf project\lgn_analysis\030912_rec3_analysis3_final.ma
 
 
 
-for i = 1:length(afile)
-    analysisFile = afile{i};
+for fnum = 1:length(afile)
+    fnum
+    analysisFile = afile{fnum}
     load(analysisFile);
-    clusterFile = clusterfilename((length(pname)+1):end);
+    clusterfilename
+    pname
+    if exist(clusterfilename,'file')
+        clusterFile = clusterfilename;
+    elseif exist(clusterfilename((length(pname)+1):end),'file')
+        clusterFile = clusterfilename((length(pname)+1):end);
+    elseif exist([clusterfilename((length(pname)+1):end) '.mat'],'file')
+        clusterFile = [clusterfilename((length(pname)+1):end) '.mat'];
+    else
+        [fname pname] = uigetfile('*.mat','cluster file');
+        clusterFile = fullfile(pname,fname);
+        clusterfilename = clusterFile;
+        if fname~=0
+            save(analysisFile,'clusterfilename','-append');
+        end
+    end
+    clusterFile
     load(clusterFile);
-    for i = 1:length(Block_Name)
-        if strcmp('wn',Block_Name{i}(1:2))
-            blocknum=i;
+    blocknum=0;
+    for b = 1:length(Block_Name)
+        if strcmpi('wn',Block_Name{b}(1:2))
+            blocknum=b;
         end
     end
     
+    blocknum
+    Block_Name{blocknum}
     flags = struct('visStim',1);
     
     
-    data = getTDTdata(Tank_Name,Block_Name{i},1:4:max(cells(:,1)),flags);
-    
+    data = getTDTdata(Tank_Name,Block_Name{blocknum},1:4:max(cells(:,1)),flags);
+    if isnan(data.frameEpocs)
+        sprintf('check if tank %s is registered',Tank_Name)
+        break
+    end
     % blockdata.mouseT = data.mouseT;
     % blockdata.mouseV = data.mouseV;
-    exptdata(i).block = Block_Name;
-    exptdata(i).tank = Tank_Name;
-    exptdata(i).analysis_file = afile;
-    exptdata(i).cluster_file = clustfile;
-    exptdata(i).stimEpocs=data.stimEpocs;
-    exptdata(i).frameEpocs = data.frameEpocs;
+    exptdata(fnum).block = Block_Name{blocknum};
+    exptdata(fnum).tank = Tank_Name;
+    exptdata(fnum).analysis_file = afile;
+    exptdata(fnum).cluster_file = clusterFile;
+    exptdata(fnum).stimEpocs=data.stimEpocs;
+    exptdata(fnum).frameEpocs = data.frameEpocs;
     
     for cell_n = 1:size(cells,1);
-        unitdata.spikes{cell_n+n} =spikeT{cell_n}(spikeT{cell_n}>(blocknum-1)*10^5 & spikeT{cell_n}<(blocknum-1 + 0.5)*10^5) - (blocknum-1)*10^5;
-        unitdata.expnum{cell_n+n} = i;
+        unitdata(cell_n+n).spikes =spikeT{cell_n}(spikeT{cell_n}>(blocknum-1)*10^5 & spikeT{cell_n}<(blocknum-1 + 0.5)*10^5) - (blocknum-1)*10^5;
+        unitdata(cell_n+n).expnum = fnum;
         %     blockdata.lfpT{cell_n} = data.lfpT{cells(cell_n,1)};
         %     blockdata.lfpV{cell_n} = data.lfpData{cells(cell_n,1)};
     end
     n=n+size(cells,1);
 end
 
+manual_type = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 091412.xlsx','A1:A294');
 manual_outside = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 091412.xlsx','B1:B294');
 manual_outside(isnan(manual_outside))=0;
-outsideLGN = manual_outside;
+
+used =(manual_type~=0);
+unitdata = unitdata(used);
+
+
 load('C:\data\movie files\wn016alpha1_10hzLg60Hz.mat');
 
-save('Piscopo_wn_data','exptdata','unitdata','outsideLGN','moviedata');
+save('Piscopo_wn_data072513','exptdata','unitdata','moviedata');

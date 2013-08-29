@@ -14,6 +14,7 @@ afile = {'C:\data\ephys matlab data\070612_awake_mlr\wn4b\analysis.mat',...    %
     'D:\Moses_ephys_data\082312_awake_MLR\wn5a\analysis.mat',...            %MLR2BFstim#13
     'D:\Moses_ephys_data\082312_awake_MLR\wn6b\analysis.mat'}               %MLR2BFstim#14
     
+
 lfp_channel = [  ];
 
 n=0
@@ -47,7 +48,7 @@ for i = 1:length(afile)                          %%%Loop to go through each exp 
         laser_lfp_freqs{c}=freqs{ch};
         
         
-        for rep=1:4                       %%Types of Comparisons
+        for rep=1:5                       %%Types of Comparisons
             if rep==1
                 data=Rcyclerep;              %%% laser off/on
             elseif rep==2
@@ -55,7 +56,9 @@ for i = 1:length(afile)                          %%%Loop to go through each exp 
             elseif rep==3
                 data=statlaserRcyclerep;     %%% laser off/on, but only stationary
             elseif rep==4
-            data = movnolaserRcyclerep;
+            data = movnolaserRcyclerep;     %%% stationary vs moving, laser off
+            elseif rep==5
+                data=movinglaserRcyclerep;     %%% laser off/on, but only moving
             end          
             
             for state=1:2
@@ -98,7 +101,7 @@ for i= 1:n
    
 %    figure
 %    plot(f,lfp(:,f<80)')
-   ylim([0 10^4])
+%    ylim([0 10^4])
    noiserange = (f>57 & f<63) | (f>49 &f<51) | (f>39 & f<41);
    
 %    figure
@@ -112,7 +115,7 @@ for i= 1:n
    [peakgamma(i,:) freqs] = max(lfp(:,gammaF),[],2);
    peakgammaF(i,:) = f(gammaF(freqs));
    
-      [peakalpha(i,:) freqs] = max(lfp(:,alphaF),[],2);
+   [peakalpha(i,:) freqs] = max(lfp(:,alphaF),[],2);
    peakalphaF(i,:) = f(alphaF(freqs));
    
    alpha(i,:) = mean(lfp(:,alphaF),2);
@@ -158,13 +161,12 @@ barwitherr([0 nanstd(bootstrp(1000,@(x) nanmedian(x,1),normalpha)); 0 nanstd(boo
     [1 nanmedian(normalpha,1); 1 nanmedian(normgamma,1)]);
 
 
-
 legend({'laser off stat','laser on stat','laser off mov','laser on mov'});
 set(gca,'xTickLabel',{'alpha','gamma'});
 
  
 figure
-plot(gamma(:,1),gamma(:,4),'o');
+plot(gamma(:,1),gamma(:,2),'o');
 hold on
 title('gamma')
 xlabel('laser off');
@@ -201,9 +203,9 @@ barwitherr([std(laser_speed_all(:,1)) std(laser_speed_all(:,2))]/sqrt(length(las
    [ mean(laser_speed_all(:,1)) mean(laser_speed_all(:,2))]);
 
 legend({'laser off','laser on'});
-title_str = {'laser','movement','laser no move','move no laser'};
+title_str = {'laser','movement','laser no move','move no laser','laser effect, moving'};
 
-used= find((evoked(:,2,2)>2));
+used= find((evoked(:,2,2)>1));
 usedInfra = find((evoked(:,2,2)>2) & (spont(:,2,1)>=2));                                                                    
 usedSupra = find((evoked(:,2,2)>2) & (spont(:,2,1)<2));    
 
@@ -211,15 +213,37 @@ sprintf('used fraction = %d / %d  = %f',length(used),length(evoked),length(used)
 sprintf('number of infra = %d',length(usedInfra))    
 sprintf('number of supra = %d',length(usedSupra))    
 
+display('BF')
+cond{1} = spont(used,3,1); cond{2} = spont(used,3,2); cond{3} = spont(used,4,2); cond{4} = spont(used,5,2);
+for c = 1:4
+    for d = 1:4;
+        p(c,d) = signrank(cond{c},cond{d})*6;
+    end
+end
+sprintf('p values spont')
+p
+
+cond{1} = evoked(used,3,1); cond{2} = evoked(used,3,2); cond{3} = evoked(used,4,2); cond{4} = evoked(used,5,2);
+for c = 1:4
+    for d = 1:4;
+        p(c,d) = signrank(cond{c},cond{d})*6;
+    end
+end
+sprintf('p values evoked')
+p
 
 
+%%% plot four conditions (no stim, stim, move, move+stim)
 figure
-bar([ nanmedian(spont(used,3,1)) nanmedian(spont(used,3,2)) nanmedian(spont(used,4,2)); nanmedian(evoked(used,3,1)) nanmedian(evoked(used,3,2)) nanmedian(evoked(used,4,2))]);
-legend({'no move no laser','no move laser','move no laser'});
-set(gca,'Xticklabel',{'spont','evoked'});
-
-
-for rep=1:4;
+barwitherr([nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,3,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,3,2))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,4,2))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,5,2))); ...
+        nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,3,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,3,2))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,4,2))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,5,2)))], ...
+        [nanmedian(spont(used,3,1)) nanmedian(spont(used,3,2)) nanmedian(spont(used,4,2)) nanmedian(spont(used,5,2)); ...
+        nanmedian(evoked(used,3,1)) nanmedian(evoked(used,3,2)) nanmedian(evoked(used,4,2)) nanmedian(evoked(used,5,2))]);
+        
+    legend({'no stim','stim - no move','move - no stim','stim + move'})
+    set(gca,'Xticklabel',{'spont','evoked'})
+    
+for rep=1:5;
    
     figure
     plot(spont(used,rep,1),spont(used,rep,2),'ko');hold on;
@@ -250,13 +274,8 @@ for rep=1:4;
 %     barwitherr( [std(spont(used,rep,1),1) std(spont(used,rep,2),1) ; std(evoked(used,rep,1),1) std(evoked(used,rep,2),1)]/sqrt(n),...
 %         [nanmedian(spont(used,rep,1),1) nanmedian(spont(used,rep,2),1) ; nanmedian(evoked(used,rep,1),1) nanmedian(evoked(used,rep,2),1)] ); 
 
-%     barwitherr([nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,2))) ; nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,2)))],...
-%         [nanmedian(spont(used,rep,1),1) nanmedian(spont(used,rep,2),1) ; nanmedian(evoked(used,rep,1),1) nanmedian(evoked(used,rep,2),1)] ); 
-%     
-        barwitherr([nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,2))) ; nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,2)))],...
-        [nanmean(spont(used,rep,1),1) nanmean(spont(used,rep,2),1) ; nanmean(evoked(used,rep,1),1) nanmean(evoked(used,rep,2),1)] ); 
-    
-    
+    barwitherr([nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),spont(used,rep,2))) ; nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,1))) nanstd(bootstrp(1000,@(x) nanmedian(x,1),evoked(used,rep,2)))],...
+        [nanmedian(spont(used,rep,1),1) nanmedian(spont(used,rep,2),1) ; nanmedian(evoked(used,rep,1),1) nanmedian(evoked(used,rep,2),1)] ); 
     
     
     title(title_str{rep});
