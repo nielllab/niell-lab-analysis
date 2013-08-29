@@ -56,7 +56,7 @@ end
 
 prompt = {'duration','# orients','# sfs','temp freqs','latency'};
 num_lines = 1;
-def = {'1','8','6','[2 8]','0.05'};
+def = {'1.5','12','6','[2 8]','0.1'};
 if ~useArgin
     answer = inputdlg(prompt,'grating parameters',num_lines,def);
 else

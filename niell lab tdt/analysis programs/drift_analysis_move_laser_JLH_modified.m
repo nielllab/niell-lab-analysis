@@ -10,11 +10,6 @@
 
 
 
-[fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
-%psfilename = 'c:/test.ps';   %%% default location
-if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
-
-
 SU = 1;
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
@@ -56,7 +51,9 @@ else
 end
 
 
-
+[fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
+%psfilename = 'c:/test.ps';   %%% default location
+if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
 thresh_velocity = 1;
 figure
@@ -221,9 +218,7 @@ for cell_n = cell_range;
                 end
                 
             end
-              figure(hist_fig)
-              set(gcf, 'PaperPositionMode', 'auto');
-              print('-dpsc',psfilename,'-append');      
+                
             
             if cond>=n_rows*n_col & full_field%%% blank frame or full-field, but only plot if full-field is on
                 %                 figure(spont_full)
@@ -484,9 +479,21 @@ for cell_n = cell_range;
         cell_n
 %         close(rast_fig);
 %         clear rast_fig;
-        
-     
+    
+  for i = 1:length(cell_n)
+    figure(hist_fig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+    figure(rast_fig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+  end
+  
+   
     end %%% rep
+    
     both_theta=figure
     plot(theta_ind*180/pi,drift(cell_n,1).thetatuning+drift(cell_n,1).spont)
     hold on
@@ -502,28 +509,25 @@ for cell_n = cell_range;
     plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
     plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
 %     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
-% for i = 1:length(hist_fig)
-%     figure(hist_fig(i))
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
-%     
-%     figure(rast_fig(i))
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
-%     
-%     figure(tuning_fig(i))
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
+  
     
- 
-%end
+for i = 1:length(cell_n)
+    figure(both_theta(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+    figure(both_sf(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+  end
+
+ close all
+end
 
 %convert ps file to PDfs
   ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
   delete(psfilename);
-end
-
-
 
 if use_afile
     

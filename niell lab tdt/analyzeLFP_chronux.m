@@ -38,7 +38,7 @@ for ch = chans
 
          
         [S t f] = mtspecgramc(lfp',[3 1],params);
-
+        %[S t f] = mtspecgramc(lfp',[10 2],params);
         spectData{ch} = S;
         spectT{ch} = t;
         spectF{ch} = f;

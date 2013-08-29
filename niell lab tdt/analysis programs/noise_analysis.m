@@ -1061,6 +1061,7 @@ elseif movietype==fl_noise
 elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
+close all
 end
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);

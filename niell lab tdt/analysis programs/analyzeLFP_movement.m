@@ -8,6 +8,10 @@
 %%% read in cluster data, (only needed to get block name and start/stop time)
 %%% then connect to the tank and read the block
 
+[fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
+%psfilename = 'c:/test.ps';   %%% default location
+if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
+
 
 pname = uigetdir('C:\data\tdt tanks','block data')
 delims = strfind(pname,'\');
@@ -34,6 +38,9 @@ for ch = 1:nChan;
     normalizer = repmat(normalizer,size(lfp,1),1);
     lfpnorm = lfp.*normalizer;
     
+    H = fspecial('average',[4 6])
+    lfpnorm = imfilter(lfpnorm,H);
+    
     figure
     imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]);
     axis xy
@@ -41,16 +48,24 @@ for ch = 1:nChan;
     dt = median(diff(tdtData.spectT{ch}));
     set(gca,'YTick',(10:10:80)/df);
     set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'})
+    
+       
     if movement
         hold on
         tsamp = tdtData.mouseT;
         vsmooth = tdtData.mouseV;
         
-        plot(tsamp,(vsmooth/1.3-40),'g');
+        %plot(tsamp,(vsmooth/1.3-40),'g');
+        plot(tsamp,(vsmooth/.2-40),'g');
         axis([0 max(tsamp) -40 80/df])
+        
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
     end
     title(sprintf('channel = %d',ch));
     
+   
+    %%%%
 
     theta = mean(lfpnorm(:,ceil(7/df):ceil(10/df)),2);
     gamma = mean(lfpnorm(:,ceil(55/df):ceil(65/df)),2);
@@ -62,8 +77,8 @@ for ch = 1:nChan;
     %     figure
     %     plot(v_interp,theta(t),'o');
     Smean = mean(lfpnorm,2)';
-    stationary = find(v_interp<.2 & Smean<(5*median(Smean)));
-    moving = find(v_interp>.5  & Smean<(5*median(Smean)));
+    stationary = find(v_interp<0.3 & Smean<(5*median(Smean)));
+    moving = find(v_interp>0.35  & Smean<(5*median(Smean)));
 
     figure
     plot(mean(lfpnorm(stationary,:),1));
@@ -74,7 +89,13 @@ for ch = 1:nChan;
     set(gca,'XTickLabel',{'10','20','30','40','50','60','70','70'})
     
     title(sprintf('site %d',ch));
+     set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
 
+    close all
 end %% tet
+
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);
 
 
