@@ -10,9 +10,12 @@ if size(file,2)==2;
 else
     twoshank=0;
 end
+
+file
 %read in all files
 for i = 1:length(file);
-    if isempty(file{i,1})
+   sprintf('filenum %d',i)
+   if isempty(file{i,1})
         anatomy(i).AP = [];
         anatomy(i).siteXY = [];
         anatomy(i).LGN=[];
@@ -21,10 +24,15 @@ for i = 1:length(file);
         anatomy(i).section = [];
     else
         for shank=1:2
+            sprintf('%d shank',shank)
             if shank==1 || (shank==2 && ~isempty(file{i,2}))
                 
                 rgbImage=imread(file{i,shank});
                 
+                
+                if i==6
+                    keyboard
+                end
                 for c = 1:3
                     rgbImage(:,:,c) = fliplr(rgbImage(:,:,c));
                 end

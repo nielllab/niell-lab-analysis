@@ -4,8 +4,12 @@ function [tsamp vsmooth] = getBlockVelocity_general(tank,block,version);
 %%% updated to use both versions of mouse sender software 
 %%% ie. original for TDT (0), and update for contstim (1) which packs data
 
-
+if version==0
 C=18000;  %%% circumference in ticks
+else
+    C=9800;  %%% circumference in ticks
+end
+
 scale_factor = C/(pi*8*2.54);  %%% ball is 8 inches, so this is ticks/cm
 
 %%% read data
