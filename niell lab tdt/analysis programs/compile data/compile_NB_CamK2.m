@@ -1,3 +1,4 @@
+clear all
 afile = {'C:\data\ephys matlab data\070612_awake_mlr\wn4b\analysis.mat',...    %MLR2BFstim#1
     'C:\data\ephys matlab data\070612_awake_mlr\wn5b\analysis.mat',...      %MLR2BFstim#2
     'C:\data\ephys matlab data\070612_awake_mlr\wn6b\analysis.mat',...      %MLR2BFstim#3
@@ -99,9 +100,9 @@ for i= 1:n
        badnoise(i)=0;
    end
    
-%    figure
-%    plot(f,lfp(:,f<80)')
-%    ylim([0 10^4])
+   figure
+   plot(f,lfp(:,f<80)')
+   ylim([0 10^4])
    noiserange = (f>57 & f<63) | (f>49 &f<51) | (f>39 & f<41);
    
 %    figure
@@ -139,6 +140,9 @@ figure
 plot(peakalphaF(~badnoise,1),peakalphaF(~badnoise,2),'o');
 title('freq of peak value');
 
+sprintf('lfp recordings %d',sum(~badnoise))
+keyboard
+
 clear normgamma normalpha
 for rep =2:size(gamma,2);
     
@@ -150,8 +154,13 @@ for rep =2:size(gamma,2);
  normalpha(:,rep-1) = peakalpha(:,rep)./peakalpha(:,1)
 end
 
-normgamma = normgamma(~badnoise,:);
-normgalpha = normalpha(~badnoise,:);
+meangamma = mean(normgamma,2);
+
+normgamma = normgamma(~badnoise &~isnan(meangamma'),:);
+normgamma = unique(normgamma,'rows');
+
+normalpha = normalpha(~badnoise&~isnan(meangamma'),:);
+normalpha = unique(normalpha,'rows');
 
 figure
 % barwitherr([0 nanstd(normalpha,[],1)./sqrt(sum(~isnan(normalpha))); 0 nanstd(normgamma,[],1)./sqrt(sum(~isnan(normgamma)))],...
@@ -164,6 +173,32 @@ barwitherr([0 nanstd(bootstrp(1000,@(x) nanmedian(x,1),normalpha)); 0 nanstd(boo
 legend({'laser off stat','laser on stat','laser off mov','laser on mov'});
 set(gca,'xTickLabel',{'alpha','gamma'});
 
+sprintf('lfp N = %d',length(normgamma))
+
+for i = 1:3;
+    gammaP(i) = ranksum(ones(size(normgamma(:,i))),normgamma(:,i));
+    alphaP(i) =ranksum(ones(size(normgamma(:,i))),normalpha(:,i));
+end
+display('p values for gamma')
+gammaP
+display('p values for alpha')
+alphaP
+
+gammaAll(:,2:4) = normgamma; gammaAll(:,1)=1;
+
+alphaAll(:,2:4) = normalpha; alphaAll(:,1)=1;
+
+for i= 1:4
+    for j=1:4
+        rankgamma(i,j) = ranksum(gammaAll(:,i),gammaAll(:,j));
+        rankalpha(i,j) = ranksum(alphaAll(:,i),alphaAll(:,j));
+    end
+end
+
+rankalpha
+rankgamma
+
+ keyboard
  
 figure
 plot(gamma(:,1),gamma(:,2),'o');
@@ -213,6 +248,8 @@ sprintf('used fraction = %d / %d  = %f',length(used),length(evoked),length(used)
 sprintf('number of infra = %d',length(usedInfra))    
 sprintf('number of supra = %d',length(usedSupra))    
 
+
+keyboard
 display('BF')
 cond{1} = spont(used,3,1); cond{2} = spont(used,3,2); cond{3} = spont(used,4,2); cond{4} = spont(used,5,2);
 for c = 1:4

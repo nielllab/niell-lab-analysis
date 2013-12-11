@@ -29,6 +29,7 @@ else
     flags =struct('lfpTseries',1,'lfpSpectra',1,'mouseOn',1);
 end
 
+
 tdtData= getTDTdata(Tank_Name, Block_Name, 1:nChan, flags);
 
 for ch = 1:nChan;
@@ -38,7 +39,7 @@ for ch = 1:nChan;
     normalizer = repmat(normalizer,size(lfp,1),1);
     lfpnorm = lfp.*normalizer;
     
-    H = fspecial('average',[4 6])
+    H = fspecial('average',[4 4])
     lfpnorm = imfilter(lfpnorm,H);
     
     figure
@@ -77,8 +78,8 @@ for ch = 1:nChan;
     %     figure
     %     plot(v_interp,theta(t),'o');
     Smean = mean(lfpnorm,2)';
-    stationary = find(v_interp<0.3 & Smean<(5*median(Smean)));
-    moving = find(v_interp>0.35  & Smean<(5*median(Smean)));
+    stationary = find(v_interp<2 & Smean<(5*median(Smean)));
+    moving = find(v_interp>2.05  & Smean<(5*median(Smean)));
 
     figure
     plot(mean(lfpnorm(stationary,:),1));

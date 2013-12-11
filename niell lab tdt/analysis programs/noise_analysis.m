@@ -996,6 +996,8 @@ for cell_n = cell_range
             wn(cell_n,stim_eye).svd_xy = svdt;
             wn(cell_n,stim_eye).svd_t = v;
             wn(cell_n,stim_eye).sta=sta_t;
+            
+            close all
         elseif movietype == fl_noise
             
             saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
@@ -1049,6 +1051,8 @@ for cell_n = cell_range
             mv(cell_n).onset_bins=onset_bins;
             mv(cell_n).sta_pos=[x y];
         end
+        
+       close all
     end
 end  %%%cell
 
@@ -1061,7 +1065,9 @@ elseif movietype==fl_noise
 elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
+    
 close all
+
 end
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);

@@ -17,6 +17,7 @@ end
 if (invoke(TTX, 'OpenTank', Tank_Name, 'R') ~= 1)
   err = 'error opening tank'
 end
-if (invoke(TTX, 'SelectBlock', ['~' Block_Name]) ~= 1)
+%if (invoke(TTX, 'SelectBlock', ['~' Block_Name]) ~= 1)
+    if (invoke(TTX, 'SelectBlock', Block_Name) ~= 1)
   err = 'error selecting block'
 end

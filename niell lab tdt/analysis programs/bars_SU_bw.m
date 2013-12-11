@@ -58,11 +58,12 @@ for cell_n = 1:size(cells,1)
     clust_no = cells(cell_n,2)
     channel_times =spikeT{cell_n} - (block-1)*10^5;
     times = channel_times(channel_times>0 & channel_times<10^5);
-
-   for rep =1:bw
+end
+    for rep =1:bw
        hist_fig = figure;
         rast_fig = figure;    
-       for orientation =orient_list;
+       
+        for orientation =orient_list;
         
         if rep ==1  &bw==1
         [Spike_Timing index numtrials] = getTrials(stimEpocs{block},times, orientation+1, stim_duration);
@@ -159,7 +160,7 @@ for cell_n = 1:size(cells,1)
         saveas(rast_fig,fullfile(pname,sprintf('bar_rast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
     saveas(hist_fig,fullfile(pname,sprintf('bar_hist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
 
-   
+            end
 %     figure
 %     rates = amp(cell_n,1:16);
 %     rates(17)=amp(cell_n,1);
@@ -222,7 +223,7 @@ for cell_n = 1:size(cells,1)
  barwidth(cell_n,rep,:)=width(cell_n,1:16);
  
  end   %rep
-
+        end
 %  tuningfig=figure
 %  plot(squeeze(bartuning(cell_n,1,:))+barspont(cell_n,1));
 %  hold on

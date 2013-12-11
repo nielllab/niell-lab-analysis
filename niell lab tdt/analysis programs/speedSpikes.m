@@ -17,6 +17,7 @@ SU = input('multiunit (0) or single-unit (1) : ');
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
     load(fullfile(pname,fname));
+
     for i =1:length(Block_Name);
         sprintf('%d : %s ',i,Block_Name{i})
     end
@@ -30,9 +31,12 @@ if SU
     cells
 end
 
+if SU
 
-    flags = struct('mouseOn',1,'MUspike',1)
-
+    flags = struct('mouseOn',1)
+else    
+     flags = struct('mouseOn',1,'MUspike',1)
+end
 
 tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
 %tdtData= getTDTdata(Tank_Name, Block_Name, nChan, 0, 0, 0, 1,1, 0, 0, 0);
@@ -93,9 +97,34 @@ for cell_n = cell_range                     %runs through each unit
     mousehist_nonan = mousehist(~isnan(mousehist));
     
     [c,pvals] = corrcoef(mousehist_nonan,R);
-     title(sprintf('ch %d - corr = %f',ch,c(1,2)))
+    [rankc ] = corr(mousehist_nonan',R','type','Spearman')
+     title(sprintf('ch %d - corr = %f rho =%f',ch,c(1,2),rankc))
      co(cell_n) = c(1,2);
      allPvals(cell_n)=pvals(1,2);
+     
+     shifts=-30:30;
+     xc=zeros(size(shifts));
+     for shift=1:length(shifts);
+         xc(shift)=corr(circshift(mousehist_nonan',shifts(shift)),R','type','Spearman');
+     end
+     figure
+     plot(shifts*2,xc); xlabel('lag (secs)'); ylabel('rank corr');
+     
+     shiftC=zeros(length(R)-1,1);
+     for shift=1:length(R)-1;
+         shiftC(shift) = corr(circshift(mousehist_nonan',shift),R','type','Spearman');
+     end
+     figure
+     hist(shiftC)
+     %%% calculate prctile and p-value
+     
+     rankCorr(cell_n) = rankc;
+     if rankc<prctile(shiftC,2.5) | rankc>prctile(shiftC,97.5)
+    sigCorr(cell_n) = 1;
+     else
+         sigCorr(cell_n)=0;
+     end
+     rankpctile(cell_n) = length(find(shiftC<rankc))/length(shiftC);
      
      
      [shuffle_c,shuffle_p] = corrcoef(mousehist_nonan(randperm(length(mousehist_nonan))),R);
@@ -111,7 +140,19 @@ for cell_n = cell_range                     %runs through each unit
  
    plot(p(cell_n,:),d(cell_n,:),'g');    
      
+   Rall{cell_n} = R;
+   mouseVall{cell_n}=mousehist_nonan;
 end
+
+for i = 1:length(rankCorr);
+    sprintf('rankCorr %f prctile %f sig %f', rankCorr(i),rankpctile(i),sigCorr(i))
+end
+
+histfig=figure
+h1 = hist(rankCorr(sigCorr==1)' , -0.4:0.2:0.8);
+h2 = hist(rankCorr(sigCorr==0)' , -0.4:0.2:0.8);
+bar( -0.4:0.2:0.8, [h1; h2]')
+legend({'significant','nonSig'})
 
 
 histfig=figure
@@ -123,9 +164,9 @@ wvfig = figure
 hold on
 for i = 1:length(co);
     
-if co(i)>0.5;
+if rankCorr(i)>0.3;
     plot(wv(:,i),'g');
-elseif co(i)<-0.5
+elseif rankCorr(i)<-0.1
     plot(wv(:,i),'r');
     else
          plot(wv(:,i),'b');
@@ -134,7 +175,7 @@ end
 
 
 if SU
-    save(fullfile(apname,afname),'co','shuffle_co' ,'p','d','-append');
+    save(fullfile(apname,afname),'co','shuffle_co' ,'p','d','Rall','mouseVall','-append');
 end
 
 
