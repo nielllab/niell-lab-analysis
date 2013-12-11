@@ -1,7 +1,10 @@
 afile = {...%'C:\data\ephys matlab data\022012_awake_pptg\mlr1\analysis.mat',...
-    'C:\data\ephys matlab data\022012_awake_pptg\mlr_rec2\analysis.mat','C:\data\ephys matlab data\070512_awake_mlr\MLRrec2a\analysis.mat',...
-    'C:\data\ephys matlab data\070512_awake_mlr\MLRrec3\analysis.mat','C:\data\ephys matlab data\070712_awake_mlr\MLRrec1\analysis.mat',...
-    'C:\data\ephys matlab data\071212_awake_mlr\MLRrec5_nostim\analysis.mat','C:\data\ephys matlab data\071212_awake_mlr\MLRrec6_nostim\analysis.mat',...
+    'C:\data\ephys matlab data\022012_awake_pptg\mlr_rec2\analysis.mat', ...   %updated
+    'C:\data\ephys matlab data\070512_awake_mlr\MLRrec2a\analysis.mat',... %%% updated
+    'C:\data\ephys matlab data\070512_awake_mlr\MLRrec3\analysis.mat', ... %%%updated
+    'C:\data\ephys matlab data\070712_awake_mlr\MLRrec1\analysis.mat',... %%% updated
+    'C:\data\ephys matlab data\071212_awake_mlr\MLRrec5_nostim\analysis.mat', ...  %%%updated
+    'C:\data\ephys matlab data\071212_awake_mlr\MLRrec6_nostim\analysis.mat',... %%%updated
     'D:\Moses_ephys_data\082112_awake_mlr\MLRrec1b\analysis.mat'};
 
 hist_all=0;
