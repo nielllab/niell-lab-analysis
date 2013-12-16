@@ -56,7 +56,7 @@ end
 
 prompt = {'duration','# orients','# sfs','B&W'};
 num_lines = 1;
-def = {'3.5','16','1','[1 2]'};
+def = {'3.5','8','1','[1 2]'};
 if ~useArgin
     answer = inputdlg(prompt,'grating parameters',num_lines,def);
 else
@@ -136,7 +136,8 @@ for cell_n = cell_range;
         print('-dpsc',psfilename,'-append');
         
      for rep = 1:panels
-    bars(cell_n,rep).spont = length(Spike_Timing)/(stim_duration*numtrials);
+         
+         bars(cell_n,rep).spont = length(Spike_Timing)/(stim_duration*numtrials);
    
      end
     

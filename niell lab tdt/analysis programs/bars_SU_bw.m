@@ -19,16 +19,21 @@ Block_Name = Block_Name{block}
 
 bw = input('white bars (0) or white/black (1)')+1;
 
-plot_duration=3; %in second
-hist_int = 0.1;
-hist_range=[0:hist_int:9];
-axis_range=[0 plot_duration 0 20];
+plot_duration=3.5; %in second
+hist_int = plot_duration/10;
+hist_range=[0:hist_int:plot_duration];
+axis_range=[0 plot_duration 0 25];
+panels = 2 %for black and white stim, only 1 for white
 
 deg_per_sec=30;
 
 stim_duration = 3.015;
-bar_orients = 0:22.5:337.5
-blank_stim=1;
+bar_orients = 8 %may need to change if using different # orients or make it an input argument
+space_freq = 1 %can change to multiple if using gratings
+orient_list = linspace(0,360,bar_orients*space_freq+1);
+orient_list = orient_list(1:end-1);
+
+blank_stim=1; % may need to set to 0 if no blank stim used
    if blank_stim
        orient_list = [size(bar_orients,2)  0:size(bar_orients,2)-1]
        %orient_list = [size(bar_orients,2)*2  (0:size(bar_orients,2)-1)+16]
@@ -175,7 +180,7 @@ end
     end
 
 
-    A(1:8) = amp(cell_n,9:16);
+    A(1:8) = amp(cell_n,9:16); %what does "A" do? not used elsewhere
     A(9:16) = amp(cell_n,1:8);
 
     %%%  [bars_theta(cell_n) bars_OSI(cell_n) bars_A1(cell_n) bars_A2(cell_n) bars_w(cell_n) bars_B(cell_n) y] = ...
