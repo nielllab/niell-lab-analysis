@@ -19,7 +19,9 @@ for age=1:2
             uselist = (ageList==age &mid & used);
         end
         if sum(uselist)>0
-            plot(data(uselist),ones(size(data(uselist)))*(group + (age-1)*0.3),'o','Color',colorlist(age))
+            plot(data(uselist),(rand(size(data(uselist)))*0.15 - 0.075)+ones(size(data(uselist)))*(group + (age-1)*0.4 - 0.2),'o','Color',colorlist(age)); hold on
+            m  = nanmedianMW(data(uselist));
+            plot([m m], group + (age-1)*0.4 -0.2 + [ -0.2 0.2],'Color',colorlist(age),'LineWidth',4)
         end
     end
 end

@@ -76,7 +76,7 @@ for dataset = 1:2  %%% adult vs eye opening
         alldata( cellrange,7:25)= wv';
         
         age(cellrange)=3-dataset;
-        for dontuse =1:0
+        for dontuse =1:1
             %     for c = 1:n_units;
             %         ch = alldata(c,1);
             %         cl = alldata(c,2);
@@ -95,15 +95,15 @@ for dataset = 1:2  %%% adult vs eye opening
             %     end;
             
             
-            %         A1(cellrange,:)=bars_A1;
-            %         A2(cellrange,:)=bars_A2;
-            %         w(cellrange,:)=bars_w;
-            %         theta(cellrange,:)=bars_theta;
-            %         bspont(cellrange,:)=barspont;
-            %
-            %         size(rf_width)
-            %
-            %         rfw(cellrange,:) = rf_width*30;
+%                     A1(cellrange,:)=bars_A1;
+%                     A2(cellrange,:)=bars_A2;
+%                     w(cellrange,:)=bars_w;
+%                     theta(cellrange,:)=bars_theta;
+%                     bspont(cellrange,:)=barspont;
+%             
+%                     size(rf_width)
+%             
+%                     rfw(cellrange,:) = rf_width*30;
         end
         
         driftA1(cellrange,:)= field2array(drift,'A1');
@@ -126,7 +126,7 @@ for dataset = 1:2  %%% adult vs eye opening
         %size(wvform)
         wvform(cellrange,:) = wv';
         
-        ev=[]; sp=[];lfp = [];
+        ev=[]; sp=[];lfp = []; stopcrf=[];mvcrf=[];
         if exist('wn','var')
             for j = 1:length(wn);
              
@@ -137,26 +137,30 @@ for dataset = 1:2  %%% adult vs eye opening
                         for mv = 1:2
                         lfp(j,mv,:) = interp1(wn_movement(j).freqs,wn_movement(j).mv_lfp(mv,:),1:120);
                         end
+                                            stopcrf(j,:)=wn_movement(j).stopCRF;
+                   mvcrf(j,:) = wn_movement(j).moveCRF;
                     else
-                        lfp=NaN;
+                        lfp=NaN; stopcrf=NaN; mvcrf=NaN;
                         sprintf('no wn movement!!')
                     end
-%                     stopcrf(i,:)=wn_movement(i).stopCRF;
-%                     mvcrf(i,:) = wn_movement(i).moveCRF;
+
                 else
                     
                     ev(j)=NaN;
                     sp(j)=NaN;
-                    lfp(j,:,:)=NaN;
+                    lfp(j,:,:)=NaN; mvcrf(j,:)=NaN;stopcrf(j,:)=NaN;
                 end
             end
             moveLFP(cellrange,:,:)=lfp;
             wn_evoked(cellrange)=ev;
             wn_spont(cellrange)=sp;
+            wn_mv(cellrange,:)=mvcrf;
+            wn_stop(cellrange,:)=stopcrf;
         else
             display('no wn!!')
             afiles{i}
-            keyboard
+         wn_mv(cellrange,:)=NaN;
+         wn_stop(cellrange,:)=NaN;
            moveLFP(cellrange,:,:)=NaN;
            wn_evoked(cellrange)=NaN;
             wn_spont(cellrange)=NaN;
@@ -197,7 +201,7 @@ legend('EO','adult');
 figure
 plot(latent);
 figure
-plot(score(:,3),score(:,4),'o');
+plot(score(:,1),score(:,2),'o');
 
 
 inh = alldata(:,6)<1.65 & alldata(:,5)<9;  %%% directly based on wvform; k-means includes another inh group?
@@ -284,256 +288,95 @@ layerAgePlot(OSI(:,2),age,lyr,inh,responsive,'OSI',midnarrow);
 layerAgePlot(driftwpref(:,2),age,lyr,inh,responsive,'wpref',midnarrow);
 layerAgeScatter(driftwpref(:,2),age,lyr,inh,responsive,'wpref',midnarrow);
 keyboard
-layerAgePlot(wn_evoked/30,age,lyr,inh,1,'wn evoked',midnarrow);
-layerAgePlot(wn_spont,age,lyr,inh,1,'wn spont',midnarrow);
-layerAgeScatter(wn_spont,age,lyr,inh,1,'wn spont',midnarrow);
-layerAgeScatter(wn_evoked,age,lyr,inh,1,'wn evoked',midnarrow);
+layerAgePlot(wn_evoked'/30,age,lyr,inh,1,'wn evoked',midnarrow);
+layerAgePlot(wn_spont'/30,age,lyr,inh,1,'wn spont',midnarrow);
+layerAgeScatter(wn_spont',age,lyr,inh,1,'wn spont',midnarrow);
+layerAgeScatter(wn_evoked',age,lyr,inh,1,'wn evoked',midnarrow);
 layerAgeScatter(peak(:,2),age,lyr,inh,1,'moving peak',midnarrow);
 figure
 hist(wn_evoked); xlabel('wn_evoked')
 figure
 %%% SF
 
-%%% fix normalization
 figure
-for ly = 2:5
-    plot(1:120,squeeze(nanmean(moveLFP(age'==1 & lyr==ly,1,:),1)));
+plot(wn_stop(:,1),wn_mv(:,1),'.'); axis equal; hold on
+plot([0 20],[0 20],'g'); xlabel('stationary'); ylabel('moving')
+title('spont')
+
+figure
+use = ~midnarrow;
+plot(wn_stop(use,10)-wn_stop(use,1),wn_mv(use,10)-wn_mv(use,1),'b.'); axis equal;hold on
+use = midnarrow;
+plot(wn_stop(use,10)-wn_stop(use,1),wn_mv(use,10)-wn_mv(use,1),'r.'); axis equal;hold on
+plot([0 20],[0 20],'g');xlabel('stationary'); ylabel('moving')
+title('evoked')
+
+layerAgeActivity(wn_stop(:,10)-wn_stop(:,1),wn_mv(:,10)-wn_mv(:,1),age,lyr,inh,1,{'stationary','moving'},'evoked',midnarrow);
+
+
+LFPmax = max(nanmax(moveLFP,[],3),[],2);
+figure
+hist(LFPmax)
+moveLFP(:,:,59:61)=NaN;
+
+
+
+layerAgePlotMv([wn_stop(:,1) wn_mv(:,1)],age,lyr,inh,1,'spont',midnarrow);
+
+%%% peak firing rate in gratings by age and movement)
+layerAgeActivity(peak(:,1),peak(:,2),age,lyr,inh,1,{'stationary','moving'},'drift evoked',midnarrow);
+
+
+figure
+hist(peak(:,2),-40:40)
+xlabel('drift peak moving');
+
+%%% spont firing rate for gratings by age and movement
+layerAgeActivity(driftspont(:,1),driftspont(:,2),age,lyr,inh,1,{'stationary','moving'},'drift spont',midnarrow);
+
+
+[ m e n] =layerAgePlotMv([wn_stop(:,10)-wn_stop(:,1),wn_mv(:,10)-wn_mv(:,1)],age,lyr,inh,1,'evoked',midnarrow);
+
+[ m e n] =layerAgePlotMv([peak(:,1),peak(:,2)],age,lyr,inh,peak(:,1)>1 & peak(:,2)>1,'drift evoked',midnarrow);
+
+[ m e n] =layerAgePlotMv([driftspont(:,1),driftspont(:,2)],age,lyr,inh,1,'drift spont',midnarrow);
+
+figure
+imagesc(squeeze(moveLFP(:,2,:)))
+
+figure
+imagesc(squeeze(moveLFP(LFPmax<2*10^4,2,:)))
+
+figure
+for ly = 2:6
+    plot(1:120,squeeze(nanmedianMW(moveLFP(age'==1 & lyr==ly & LFPmax<2*10^4,1,:),1)),'Linewidth',1+ly/3);
 hold on
-plot(1:120,squeeze(nanmean(moveLFP(age'==1& lyr==ly,2,:),1)),'g');
+plot(1:120,squeeze(nanmedianMW(moveLFP(age'==1& lyr==ly& LFPmax<2*10^4,2,:),1)),'g','Linewidth',1+ly/3);
 end
+title('median EO')
 
 figure
-for ly = 2:5
-    plot(1:120,squeeze(nanmean(moveLFP(age'==2 & lyr==ly,1,:),1)));
+for ly = 2:6
+    plot(1:120,squeeze(nanmeanMW(moveLFP(age'==1 & lyr==ly & LFPmax<2*10^4,1,:),1)),'Linewidth',1+ly/3);
 hold on
-plot(1:120,squeeze(nanmean(moveLFP(age'==2 & lyr==ly,2,:),1)),'g');
+plot(1:120,squeeze(nanmeanMW(moveLFP(age'==1& lyr==ly& LFPmax<2*10^4,2,:),1)),'g','Linewidth',1+ly/3);
 end
+title('mean EO')
 
-OSI_adult_stationary = bothOSI_E{1};
-[f,x,Flo,Fup]= ecdf(OSI_adult_stationary);
-plot(x,f,'lineWidth',4,'color','b');
-hold on
-plot(x,Flo,'b');plot(x,Fup,'b'); %confidence interval for distrib.
-
-hold on
-
-clear f
-clear x
-clear Flo
-clear Fup
-
-OSI_EO1_stationary = bothOSI_E{2}; %%% bug here - was bothOSI_I{2}
-[f,x,Flo,Fup]= ecdf(OSI_EO1_stationary);
-plot(x,f,'lineWidth',4,'color','r');
-hold on
-plot(x,Flo,'r');plot(x,Fup,'r');
-title 'OSI_Excitatory_L2_L3'
-
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-
-[pValues_OSI] = ks(OSI_adult_stationary,OSI_EO1_stationary);
-
-% % spatial frequency pref population data comparison
 
 figure
-wpref_adult_stationary = bothwpref{1};
-[f,x,Flo,Fup]= ecdf(wpref_adult_stationary);
-plot(x,f,'lineWidth',4,'color','b');
+for ly = 2:6
+    plot(1:120,squeeze(nanmedianMW(moveLFP(age'==2 & lyr==ly & LFPmax<2*10^4,1,:),1)),'Linewidth',1+ly/3);
 hold on
-plot(x,Flo,'b');plot(x,Fup,'b');
-hold on
-
-wpref_EO1_stationary = bothwpref{2};
-[f,x,Flo,Fup]= ecdf(wpref_EO1_stationary);
-stairs(x,f,'lineWidth',4,'color','r');
-hold on
-plot(x,Flo,'r');plot(x,Fup,'r');
-hold on
-title 'Preferred spatial Frequency'
-
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-
-
-
-%population data on tuning width
-
-figure
-tuning_width_adult_stationary = bothwidth{1};
-[f,x,Flo,Fup]= ecdf(tuning_width_adult_stationary);
-plot(x,f,'lineWidth',4,'color','b');
-hold on
-plot(x,Flo,'b');plot(x,Fup,'b');
-hold on
-
-tuning_width_adult_running = bothwidth{3};
-[f,x,Flo,Fup]= ecdf(tuning_width_adult_running);
-plot(x,f,'lineWidth',4,'color','g');
-hold on
-plot(x,Flo,'g');plot(x,Fup,'g');
-hold on
-
-tuning_width_EO1_stationary = bothwidth{2};
-[f,x,Flo,Fup]= ecdf(tuning_width_EO1_stationary);
-stairs(x,f,'lineWidth',4,'color','r');
-hold on
-plot(x,Flo,'r');plot(x,Fup,'r');
-hold on
-
-tuning_width_EO1_running = bothwidth{4};
-[f,x,Flo,Fup]= ecdf(tuning_width_EO1_running);
-stairs(x,f,'lineWidth',4,'color','m');
-hold on
-plot(x,Flo,'m');plot(x,Fup,'m');
-hold on
-title 'OSI tuning width'
-
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-
-
-%Bar graphs of the mean
-figure
-barweb(meanpeak',peak_err');
-title('Mean Peak Amplitude')
-%%% print this fig to ps file
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-%%%%
-
-figure
-barweb(meanOSI',OSI_err');
-title('Mean OSI')
-%%% print this fig to ps file
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-%%%%
-
-figure
-barweb(meanwidth',width_err');
-title('Mean Width of Orientation Selective Response')
-%%% print this fig to ps file
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-%%%%
-
-figure
-barweb(meanwpref',wpref_err');
-title('Mean Preferred Spatial Frequency')
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-
-figure
-barweb(medianwpref',wpref_err');
-title('Median Preferred Spatial Frequency')
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-
-figure
-barweb(meanspont',spont_err');
-title('Mean Spontaneous Activity')
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-
-clear h
-figure
-histbins= 0:2:50;
-for rep=1:2
-    h(rep,:) = hist(bothspont{rep},histbins)/length(bothspont{rep});
+plot(1:120,squeeze(nanmedianMW(moveLFP(age'==2 & lyr==ly & LFPmax<2*10^4,2,:),1)),'g','Linewidth',1+ly/3);
 end
-bar(histbins,h')
-legend('Adult','EO1/2')
-title('histogram of spontaneous activity')
-ylabel('firing rate')
-
-%figure
-%histbins= -30:2:30;
-%for rep=1:2
-%   h(rep,:) = hist(bothpeak{rep})/length(bothpeak{rep});
-%end
-%bar(histbins,h')
-%legend('wt','tg')
-
-clear h
-figure
-histbins= 0:0.1:1;
-for rep=1:2
-    h(rep,:) = hist(bothOSI{rep},histbins)/length(bothOSI{rep});
-end
-bar(histbins,h')
-legend('Adult','EO1/2')
-title('OSI')
-
-%figure
-%histbins= 0:0.2:1;
-%for rep=1:2
-%   h(rep,:) = hist(bothwidth{rep},histbins)/length(bothwidth{rep});
-%end
-%bar(histbins,h')
-%legend('wt','tg')
-
+title('median adult')
 
 figure
-histbins= [0.01 0.02 0.04 0.08 0.16 0.32];
-for rep=1:2
-    wh(rep,:) = hist(bothwpref{rep},histbins)/length(bothwpref{rep});
+for ly = 2:6
+    plot(1:120,squeeze(nanmeanMW(moveLFP(age'==2 & lyr==ly & LFPmax<2*10^4,1,:),1)),'Linewidth',1+ly/3);
+hold on
+plot(1:120,squeeze(nanmeanMW(moveLFP(age'==2 & lyr==ly & LFPmax<2*10^4,2,:),1)),'g','Linewidth',1+ly/3);
 end
-bar(1:6,wh')
-set(gca,'Xtick',1:6);
-set(gca,'Xticklabel',histbins)
-legend('Adult','EO1/2')
-title('spatial frequency preference')
+title('mean adult')
 
-figure
-histbins= linspace(0,2,10);
-for rep=1:2
-    linh(rep,:) = hist(bothF1F0{rep},histbins)/length(bothF1F0{rep});
-end
-bar(histbins,linh')
-legend('Adult','EO1/2')
-title('F1F0')
-
-%%% convert ps to pdf and delete old ps
-ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-delete(psfilename);
-
-
-% figure
-% barweb(meanF1F0,F1F0_err);
-% title('Mean Periodicity')
-
-
-
-% Create the area plot using the area function
-
-
-
-% figure
-% OSI_bins= 0:0.1:1;
-% for rep=1:2
-%     h(rep,:) = hist(bothOSI{rep},histbins)/length(bothOSI{rep});
-% end
-% area(OSI_bins,h')
-% legend('Adult','EO1/2')
-% title('OSI')
-%
-%
-% % Add a legend
-% legend(groups, 'Location', 'NorthWest');
-%
-% % Add title and axis labels
-% title('US Population by Age (1860 - 2000)');
-% xlabel('Years');
-% ylabel('Population in Millions');
-
-
-ranksum(bothpeak{1},bothpeak{2})
-ranksum(bothOSI{1},bothOSI{2})
-ranksum(bothOSI_E{1},bothOSI_E{2})
-ranksum(bothOSI_I{1},bothOSI_I{2})
-
-% ranksum(bothwpref{1},bothwpref{2})
-% ranksum(bothwidth{1},bothwidth{2})
-% ranksum(bothspont{1},bothspont{2})
-% ranksum(bothF1F0{1},bothF1F0{2})
