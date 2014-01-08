@@ -161,12 +161,12 @@ for dataset = 1:2  %%% adult vs eye opening
         else
             display('no wn!!')
             afiles{i}
-<<<<<<< HEAD
+
          wn_mv(cellrange,:)=NaN;
          wn_stop(cellrange,:)=NaN;
-=======
+
             %keyboard
->>>>>>> 160c0cebef96e05de28c5d9f5854ed64fd9595dc
+
            moveLFP(cellrange,:,:)=NaN;
            wn_evoked(cellrange)=NaN;
             wn_spont(cellrange)=NaN;
@@ -293,19 +293,19 @@ title('adult layer distribution')
 layerAgePlot(OSI(:,2),age,lyr,inh,responsive,'OSI',midnarrow);
 layerAgePlot(driftwpref(:,2),age,lyr,inh,responsive,'wpref',midnarrow);
 layerAgeScatter(driftwpref(:,2),age,lyr,inh,responsive,'wpref',midnarrow);
-<<<<<<< HEAD
+
 keyboard
 layerAgePlot(wn_evoked'/30,age,lyr,inh,1,'wn evoked',midnarrow);
 layerAgePlot(wn_spont'/30,age,lyr,inh,1,'wn spont',midnarrow);
 layerAgeScatter(wn_spont',age,lyr,inh,1,'wn spont',midnarrow);
 layerAgeScatter(wn_evoked',age,lyr,inh,1,'wn evoked',midnarrow);
-=======
+
 %keyboard
 layerAgePlot(wn_evoked/30,age,lyr,inh,1,'wn evoked',midnarrow);
 layerAgePlot(wn_spont,age,lyr,inh,1,'wn spont',midnarrow);
 layerAgeScatter(wn_spont,age,lyr,inh,1,'wn spont',midnarrow);
 layerAgeScatter(wn_evoked,age,lyr,inh,1,'wn evoked',midnarrow);
->>>>>>> 160c0cebef96e05de28c5d9f5854ed64fd9595dc
+
 layerAgeScatter(peak(:,2),age,lyr,inh,1,'moving peak',midnarrow);
 figure
 hist(wn_evoked); xlabel('wn_evoked')
