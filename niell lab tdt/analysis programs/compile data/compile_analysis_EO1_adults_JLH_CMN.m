@@ -7,7 +7,7 @@ dbstop if error
 psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
-apath = 'C:\data\jen ephys\';
+apath = 'D:\Jen_ephys_data\developmental_periods\';
 N =0; cells=0;
 for dataset = 1:2  %%% adult vs eye opening
     
@@ -28,6 +28,8 @@ for dataset = 1:2  %%% adult vs eye opening
             'Good recordings\Adults\11_11_13\rec2\analysis_11_11_13_adult_rec2.mat',...
             'Good recordings\Adults\11_13_13\rec1\analysis_adult_11_13_13_rec1.mat',...
             'Good recordings\Adults\11_13_13\rec2\analysis_11_13_13_rec2.mat',...
+            'Good recordings\Adults\11_14_13\rec1\analysis_11_14_13_adult_rec1.mat',...
+            'Good recordings\Adults\11_14_13\rec2\analysis_11_14_13_adult_rec2.mat',...
             'Good recordings\Adults\11_15_13\rec1\analysis_11_15_13_adult_rec1.mat',...
             'Good recordings\Adults\11_15_13\rec2\analysis_11_15_13_adult_rec2.mat'}; %% no wn
     elseif dataset ==2
@@ -159,8 +161,12 @@ for dataset = 1:2  %%% adult vs eye opening
         else
             display('no wn!!')
             afiles{i}
+<<<<<<< HEAD
          wn_mv(cellrange,:)=NaN;
          wn_stop(cellrange,:)=NaN;
+=======
+            %keyboard
+>>>>>>> 160c0cebef96e05de28c5d9f5854ed64fd9595dc
            moveLFP(cellrange,:,:)=NaN;
            wn_evoked(cellrange)=NaN;
             wn_spont(cellrange)=NaN;
@@ -287,11 +293,19 @@ title('adult layer distribution')
 layerAgePlot(OSI(:,2),age,lyr,inh,responsive,'OSI',midnarrow);
 layerAgePlot(driftwpref(:,2),age,lyr,inh,responsive,'wpref',midnarrow);
 layerAgeScatter(driftwpref(:,2),age,lyr,inh,responsive,'wpref',midnarrow);
+<<<<<<< HEAD
 keyboard
 layerAgePlot(wn_evoked'/30,age,lyr,inh,1,'wn evoked',midnarrow);
 layerAgePlot(wn_spont'/30,age,lyr,inh,1,'wn spont',midnarrow);
 layerAgeScatter(wn_spont',age,lyr,inh,1,'wn spont',midnarrow);
 layerAgeScatter(wn_evoked',age,lyr,inh,1,'wn evoked',midnarrow);
+=======
+%keyboard
+layerAgePlot(wn_evoked/30,age,lyr,inh,1,'wn evoked',midnarrow);
+layerAgePlot(wn_spont,age,lyr,inh,1,'wn spont',midnarrow);
+layerAgeScatter(wn_spont,age,lyr,inh,1,'wn spont',midnarrow);
+layerAgeScatter(wn_evoked,age,lyr,inh,1,'wn evoked',midnarrow);
+>>>>>>> 160c0cebef96e05de28c5d9f5854ed64fd9595dc
 layerAgeScatter(peak(:,2),age,lyr,inh,1,'moving peak',midnarrow);
 figure
 hist(wn_evoked); xlabel('wn_evoked')

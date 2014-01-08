@@ -19,16 +19,21 @@ Block_Name = Block_Name{block}
 
 bw = input('white bars (0) or white/black (1)')+1;
 
-plot_duration=3; %in second
-hist_int = 0.1;
-hist_range=[0:hist_int:9];
-axis_range=[0 plot_duration 0 20];
+plot_duration=3.5; %in second
+hist_int = plot_duration/10;
+hist_range=[0:hist_int:plot_duration];
+axis_range=[0 plot_duration 0 25];
+panels = 2 %for black and white stim, only 1 for white
 
 deg_per_sec=30;
 
 stim_duration = 3.015;
-bar_orients = 0:22.5:337.5
-blank_stim=1;
+bar_orients = 8 %may need to change if using different # orients or make it an input argument
+space_freq = 1 %can change to multiple if using gratings
+orient_list = linspace(0,360,bar_orients*space_freq+1);
+orient_list = orient_list(1:end-1);
+
+blank_stim=1; % may need to set to 0 if no blank stim used
    if blank_stim
        orient_list = [size(bar_orients,2)  0:size(bar_orients,2)-1]
        %orient_list = [size(bar_orients,2)*2  (0:size(bar_orients,2)-1)+16]
@@ -58,11 +63,12 @@ for cell_n = 1:size(cells,1)
     clust_no = cells(cell_n,2)
     channel_times =spikeT{cell_n} - (block-1)*10^5;
     times = channel_times(channel_times>0 & channel_times<10^5);
-
-   for rep =1:bw
+end
+    for rep =1:bw
        hist_fig = figure;
         rast_fig = figure;    
-       for orientation =orient_list;
+       
+        for orientation =orient_list;
         
         if rep ==1  &bw==1
         [Spike_Timing index numtrials] = getTrials(stimEpocs{block},times, orientation+1, stim_duration);
@@ -159,7 +165,7 @@ for cell_n = 1:size(cells,1)
         saveas(rast_fig,fullfile(pname,sprintf('bar_rast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
     saveas(hist_fig,fullfile(pname,sprintf('bar_hist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
 
-   
+            end
 %     figure
 %     rates = amp(cell_n,1:16);
 %     rates(17)=amp(cell_n,1);
@@ -174,7 +180,7 @@ for cell_n = 1:size(cells,1)
     end
 
 
-    A(1:8) = amp(cell_n,9:16);
+    A(1:8) = amp(cell_n,9:16); %what does "A" do? not used elsewhere
     A(9:16) = amp(cell_n,1:8);
 
     %%%  [bars_theta(cell_n) bars_OSI(cell_n) bars_A1(cell_n) bars_A2(cell_n) bars_w(cell_n) bars_B(cell_n) y] = ...
@@ -222,7 +228,7 @@ for cell_n = 1:size(cells,1)
  barwidth(cell_n,rep,:)=width(cell_n,1:16);
  
  end   %rep
-
+        end
 %  tuningfig=figure
 %  plot(squeeze(bartuning(cell_n,1,:))+barspont(cell_n,1));
 %  hold on

@@ -55,7 +55,7 @@ end
 %psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
-thresh_velocity = 1;
+thresh_velocity = 0.5;
 figure
 plot(tsamp,vsmooth);
 
@@ -350,7 +350,7 @@ for cell_n = cell_range;
         n_w = n_col+1;
         orient_tuning_mn = mean(orientfreq,2)';
         
-        theta_ind = orients*pi/180;
+        theta_ind = orients*pi/180; %converts degress to radians
         [theta_pref OSI A1 A2 w B yfit] = fit_tuningcurve(orient_tuning_mn,theta_ind);
 
         
@@ -413,10 +413,10 @@ for cell_n = cell_range;
         %%% fit orientation tuning curve at optimal SF
         w_pref_col = ones(size(1:n_orient)).*w_pref;
         theta_tuning = interp2(w,theta,orientfreq,w_pref_col,theta_ind);
-        
+                
         [drift(cell_n,rep).theta drift(cell_n,rep).osi drift(cell_n,rep).A1 drift(cell_n,rep).A2 ...
             drift(cell_n,rep).thetawidth drift(cell_n,rep).B drift(cell_n,rep).null yfit]= fit_tuningcurve(theta_tuning,theta_ind);
-        
+                
         i=sqrt(-1);
         mu = (sum(theta_tuning.*exp(i*theta_ind)))/sum(theta_tuning);
         if isnan(mu);

@@ -38,8 +38,8 @@ p0
 
 dtheta = 2*pi/32;
 clear x
-x(1,:) = 0:dtheta:2*pi-dtheta
-y = interp1(theta_ind,R,x(1,:),'spline');
+x(1,:) = 0:dtheta:2*pi-dtheta % angle/stim at which you get the response
+y = interp1(theta_ind,R,x(1,:),'spline'); %firing response magnitude
 x(2,:) = theta_pref;
 
 p = nlinfit(x,y,@wrapped_gaussian,p0);
