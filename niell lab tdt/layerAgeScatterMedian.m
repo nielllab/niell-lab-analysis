@@ -1,4 +1,4 @@
-function layerAgeScatter(data,ageList,layer,inh,used,label);
+function layerAgeScatterMedian(data,ageList,layer,inh,used,label);
 ageList=ageList';
 figure
 hold on
@@ -20,13 +20,11 @@ for age=1:2
         end
         if sum(uselist)>0
             plot(data(uselist),(rand(size(data(uselist)))*0.15 - 0.075)+ones(size(data(uselist)))*(group + (age-1)*0.4 - 0.2),'o','Color',colorlist(age)); hold on
-            m  = nanmean(data(uselist));
-%             N =  sum(~isnan(data(uselist)));
-%             err = nanstd(data(uselist))/sqrt(N);
-            
+            m  = nanmedian(data(uselist));
+            s = semedian(data(uselist));
             plot([m m], group + (age-1)*0.4 -0.2 + [ -0.2 0.2],'Color',colorlist(age),'LineWidth',4);
-%             plot ([(m-err) (m-err)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color',colorlist(age),'LineWidth',2);
-%             plot ([(m+err) (m+err)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color',colorlist(age),'LineWidth',2);
+            plot ([(m-s) (m-s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color',colorlist(age),'LineWidth',2);
+            plot ([(m+s) (m+s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color',colorlist(age),'LineWidth',2);
         end
             
     end  
@@ -37,5 +35,3 @@ set(gca,'ytick',1:6);
 set(gca,'yticklabel',{'2/3','4','5','6','inh','All'});
 xlabel(label)
 
-
-    
