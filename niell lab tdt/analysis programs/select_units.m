@@ -108,8 +108,9 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         dt =dt(dt<.02);
         hist(dt,.0005:0.001:.02);
           set(gcf,'Position',[50 50 800 400], 'Color',linecolor(c,:));
-          
-          wvall = wave_all{tet};
+         
+         if exist('wave_all','var')
+             wvall = wave_all{tet};
            wvclust = wvall(find(idx_all{tet_ch}==c),:,:);
             
           dt = diff(t1);
@@ -118,7 +119,8 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
                   amps =squeeze(min(wvclust(:,5:10,:),[],2));
         subplot(2,2,3:4)
         plot([0 tmerge],amps,'.','MarkerSize',2 );
-        
+         end
+         
           %%% call Erik's code to calculate cluster separation
           %%%showClusterSeparation(wave_all{tet},idx_all{tet_ch},i);
     end

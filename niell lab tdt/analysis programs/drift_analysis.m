@@ -56,7 +56,7 @@ end
 
 prompt = {'duration','# orients','# sfs','temp freqs','latency'};
 num_lines = 1;
-def = {'1','8','6','[2 8]','0.05'};
+def = {'1.5','12','6','[2 8]','0.1'};
 if ~useArgin
     answer = inputdlg(prompt,'grating parameters',num_lines,def);
 else
@@ -71,9 +71,9 @@ latency =  str2num(answer{5})
 if useArgin
     psfilename = [pdfFile(1:end-4) 'drift.ps'];
 else
-    [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
 end
-if exist(psfilename,'file')==2;delete(psfilename);end
+if exist(psfilename,'file')==2;delete(psfilename);end %%% 
 
 
 panels= length(tf);
@@ -159,7 +159,7 @@ for cell_n = cell_range;
             sf_ind = mod(c-1,ncols)+1;
             orient_ind= ceil(c/ncols);
             if SU
-                [Spike_Timing index numtrials] = getTrialsSU(stimEpocs{blocknum},times, cond, stim_duration);
+                [Spike_Timing index numtrials] = getTrialsSU(stimEpocs{blocknum},times+0.1, cond, stim_duration);
             else
                 [Spike_Timing index numtrials] = getTrialsSU(data.stimEpocs,data.MUspikeT{cell_n}, cond, stim_duration);
             end

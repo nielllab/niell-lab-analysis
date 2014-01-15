@@ -7,7 +7,7 @@
 clear all;
 pack
 clear all;  % something in matlab memory management requires 2 clears ...???
-pname = uigetdir('C:\data\TDT tanks','block data')
+pname = uigetdir('D:\','block data')
 delims = strfind(pname,'\');
 selected_path = pname(1 :delims(length(delims))-1)
 Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
@@ -44,7 +44,7 @@ maxfreqIndex = round(maxFreq/freqInt);
 freq(maxfreqIndex:size(phi,2)-maxfreqIndex,:)=0;
 figure(csdfig)
 subplot(2,2,2)
-plot(abs(freq(1:200,:)));
+plot(abs(freq(1:50,:)));
 phi = real(ifft(freq)');
 
 % figure
@@ -58,7 +58,7 @@ for c= 0:(nchan/4-1)
     if nchan==16
         subplot(2,2,c+1);
     else
-        subplot(4,2,c+1)
+        subplot(4,2,c+1)%enter "32" for 64 channel recording to plot one shank's CSD
     end
     plot((phi((4*c+1):(4*c+4),1:duration_samps)'));
     axis([0 duration_samps minV*1.1 maxV*1.1])
@@ -101,6 +101,7 @@ newc = imresize(CSD,[700 5*size(CSD,2)],'bilinear');
 figure(csdfig)
 subplot(2,2,4);
 imagesc(newc(:,1:duration_samps*5),1.5*[-prctile(CSD(:),95) prctile(CSD(:),95)]);
+colorbar
 title(Tank_Name);
 
 [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);

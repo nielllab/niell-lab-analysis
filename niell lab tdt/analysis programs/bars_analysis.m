@@ -54,9 +54,9 @@ end
 % tf = input('temp freqs [2 8] : ');
 % latency = input('latency (0.05) : ');
 
-prompt = {'duration','# orients','# sfs','temp freqs'};
+prompt = {'duration','# orients','# sfs','B&W'};
 num_lines = 1;
-def = {'4','2','4','[1 2]'};
+def = {'3.5','8','1','[1 2]'};
 if ~useArgin
     answer = inputdlg(prompt,'grating parameters',num_lines,def);
 else
@@ -80,9 +80,9 @@ panels= length(bw);
 
 plot_duration=stim_duration; %in second
 
-hist_int = plot_duration/20;
+hist_int = plot_duration/10;
 hist_range=[0:hist_int:plot_duration];
-axis_range=[0 plot_duration 0 30];
+axis_range=[0 plot_duration 0 25];
 
 if SU
     cell_range = 1:size(cells,1)
@@ -109,8 +109,8 @@ for cell_n = cell_range;
     end
     
     %%% spont and flicker
-    spontfig=figure
-    emax = max(epocs(1,:));
+    spontfig=figure('Name',sprintf('unit %d %d',channel_no,clust_no))
+    emax = max(epocs(1,:)); % finds max firing rate over whole recording
     
     extra_range = 1:(emax-panels*nrows*ncols)
     
@@ -133,9 +133,12 @@ for cell_n = cell_range;
         axis([0 plot_duration 0 numtrials+1]);
         plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
         set(gca,'XTickLabel',[]);     set(gca,'YTickLabel',[])
+        print('-dpsc',psfilename,'-append');
         
      for rep = 1:panels
-    bars(cell_n,rep).spont = length(Spike_Timing)/(stim_duration*numtrials);
+         
+         bars(cell_n,rep).spont = length(Spike_Timing)/(stim_duration*numtrials);
+   
      end
     
     for rep =1:panels
@@ -169,6 +172,7 @@ for cell_n = cell_range;
             plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
             set(gca,'XTickLabel',[])
             set(gca,'YTickLabel',[])
+            
             
             %% histograms
             figure(hist_fig);
@@ -221,20 +225,20 @@ for cell_n = cell_range;
             width(cell_n,orientation) = fit_coeff(3);
 
             %% look for aberrant results, and set all values to zero
-            if abs(fit_coeff(3)>stim_duration) | (fit_coeff(1)<0) | fit_coeff(3)<.045 | sum(isnan(fit_coeff))>0
-                fit_coeff(2)=0;
-                amp(cell_n,orientation)=0;
-                x0(cell_n,orientation) = 0;
-                width(cell_n,orientation) = 0;
-                baseline(cell_n,orientation) = mean(obs);
-                fit_coeff(1)=mean(obs);
-            end
+%             if abs(fit_coeff(3)>stim_duration) | (fit_coeff(1)<0) | fit_coeff(3)<.045 | sum(isnan(fit_coeff))>0
+%                 fit_coeff(2)=0;
+%                 amp(cell_n,orientation)=0;
+%                 x0(cell_n,orientation) = 0;
+%                 width(cell_n,orientation) = 0;
+%                 baseline(cell_n,orientation) = mean(obs);
+%                 fit_coeff(1)=mean(obs);
+%             end
 
 
             hold on
-            plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1.5);
+            plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1);
 
-            
+        
             
         end %orientation
         
@@ -242,14 +246,18 @@ for cell_n = cell_range;
         bars(cell_n,rep).x0 = squeeze(x0(cell_n,:));
         bars(cell_n,rep).width = squeeze(amp(cell_n,:));
        
-        
+        title(sprintf('ch %d cl %d',channel_no,clust_no));
         
     end  %%% panel
+    
+    figure(rast_fig)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
     
     figure(hist_fig) 
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
-    
+     
     figure
     plot(orient_list, bars(cell_n,1).amp);
     hold on
@@ -258,10 +266,13 @@ for cell_n = cell_range;
     plot(orient_list,bars(cell_n,2).amp,'r');
    % plot(orient_list,bars(cell_n,2).Rmax-bars(cell_n,1).spont,'r--');
 
-     set(gca,'XTick',orient_list)
+    set(gca,'XTick',orient_list)
     xlabel('orientation -deg');
-    
-    
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+  
+    close all
+ 
 end
 
 save(afile,'bars','-append');

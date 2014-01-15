@@ -7,11 +7,7 @@
 
 %%% read in cluster data, then connect to the tank and read the block
 
-pname = uigetdir('C:\data\TDT tanks','block data')
-delims = strfind(pname,'\');
-selected_path = pname(1 :delims(length(delims))-1)
-Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
-Block_Name = pname(delims(length(delims))+1 :length(pname))
+
 
 % Tank_Name='06222011_mlr_stim_awake'
 % Block_Name='wn3_72hz'
@@ -34,6 +30,12 @@ if SU
     load(afile);
     use_afile=1;
     cells
+else
+    pname = uigetdir('C:\data\TDT tanks','block data')
+delims = strfind(pname,'\');
+selected_path = pname(1 :delims(length(delims))-1)
+Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
+Block_Name = pname(delims(length(delims))+1 :length(pname))
 end
 
 laser = input('movement (0) or laser (1) : ');
@@ -53,7 +55,7 @@ end
 
 
 
-thresh_velocity = 0.001;
+thresh_velocity = 1;
 figure
 plot(tsamp,vsmooth);
 

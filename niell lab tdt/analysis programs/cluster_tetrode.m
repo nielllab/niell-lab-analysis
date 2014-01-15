@@ -17,9 +17,9 @@ nblock=0;
 % option to redo an old clustering
 recluster= input('reclustering? (y/n) ','s');
 if recluster~='y'
-    while ~done
+    while ~done       
         if nblock==0
-            pname = uigetdir('C:\data\tdt tanks','block data')   %%% start location of tanks for search
+            pname = uigetdir('D:\','block data')   %%% start location of tanks for search
         else
             pname = uigetdir(selected_path,'block data')
         end
@@ -142,7 +142,7 @@ for tet=use_tets
         
 
     %%% in case of no data
-    if N<10
+    if N<50
         N=100;
         X= -1*(10^-5)*rand(N,30,4);
     end
@@ -228,6 +228,9 @@ for tet=use_tets
         n_pca=8;
     else
         n_pca =8;
+    end
+    if N<100
+        n_pca=3;
     end
     mn = mean(X,3);
     pc_data = [X(:,:,1) X(:,:,2) X(:,:,3) X(:,:,4)];  %%% concatenate waveforms to send to ICA
@@ -506,7 +509,7 @@ output_path
 
 if bname~=0
     fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname))
-    save(fname);
+    save(fname,'-v7.3');
     for t=use_tets
         fname = fullfile(output_path,sprintf('hist%s_%s_t%d',Tank_Name,bname,t));
         saveas(histfig(t),fname,'fig');

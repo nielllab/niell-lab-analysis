@@ -13,7 +13,7 @@ f=figure;
 for i = range
     hold on
     if use_subplot
-        subplot(3,4,i)
+        subplot(2,3,i)
     end
     plot(sections(i).coords(:,1),sections(i).coords(:,2) ,'b.','MarkerSize',2)
     axis([-500 500 -500 500])
