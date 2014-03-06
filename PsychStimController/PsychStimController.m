@@ -112,6 +112,10 @@ guidata(hObject, handles);
 % UIWAIT makes PsychStimController wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+[a b]=getMACaddress;
+if strcmp(b,'C8600060B768') %portrait mode 
+Screen('Preference', 'VBLEndlineOverride', 2080)
+end
 ScreenNum_Callback(handles.ScreenNum,eventdata,handles);
 StimType_Callback(handles.StimType,eventdata,handles);
 Var1_Callback(handles.Var1,eventdata,handles);
@@ -229,11 +233,14 @@ if ~exist(date,'dir')
     s = sprintf('mkdir %s',date);
     dos(s);
 end
-fname = fullfile(date,datestr(clock,30));
-SaveParams(handles,fname);
+param_fname = fullfile(date,datestr(clock,30));
+SaveParams(handles,param_fname);
 
 InitializeMatlabOpenGL;   %%%necessary for OpenGL calls (like ClutBlit)
-
+[a b]=getMACaddress;
+if strcmp(b,'C8600060B768') %portrait mode 
+Screen('Preference', 'VBLEndlineOverride', 2080)
+end
 %%% display description
 Duration = str2double(get(handles.Duration,'String'));
 FrameHz = round(str2double(get(handles.FrameHz,'String')));
@@ -350,17 +357,17 @@ switch stim
     case 2
         textures = zeros(nCond,1);
         for c = 1:nCond
-            %           frm = generateBars_blit(handles.orient(c),handles.freq(c),handles.speed(c),handles.contrast(c),handles.length(c), handles.positionX(c),Duration, degPerPix,imageRect(3),imageRect(4),FrameHz,black,white,2048);
-            %         nFrames = size(frm,1);
-            %         for f = 1:nFrames
-            %              textures(c,f)=Screen('MakeTexture',window,squeeze(frm(f,:,:)));
-            %         end
-            %         MovieRate = FrameHz;
-            %         destRect = windowRect;
-            %         clut=0;
-            %         if c==1
-            %             save frames frm
-            %         end
+            %                       frm = generateBars_blit(handles.orient(c),handles.freq(c),handles.speed(c),handles.contrast(c),handles.length(c), handles.positionX(c),Duration, degPerPix,imageRect(3),imageRect(4),FrameHz,black,white,2048);
+            %                     nFrames = size(frm,1);
+            %                     for f = 1:nFrames
+            %                          textures(c,f)=Screen('MakeTexture',window,squeeze(frm(f,:,:)));
+            %                     end
+            %                     MovieRate = FrameHz;
+            %                     destRect = windowRect;
+            %                     clut=0;
+            %                     if c==1
+            %                         save frames frm
+            %                     end
             [img cl] = generateBars_lut(handles.orient(c),handles.freq(c),handles.speed(c),handles.contrast(c),handles.length(c), handles.positionX(c),Duration, degPerPix,imageRect(3),imageRect(4),FrameHz,black,white,sizeLut);
             fprintf('done generating')
             if c==1
@@ -368,8 +375,10 @@ switch stim
             end
             cluts(:,:,:,c)=floor(cl);
             textures(c,1)=Screen('MakeTexture',window,img);
-            % black background
+            %%black background
             %offclut(:) = grey - (white-grey)*handles.contrast(c);
+            offclut(:) = grey - (white-grey)*handles.contrast(c)-1
+            
         end % cond
         FrameWait = 1;
         
@@ -470,6 +479,7 @@ switch stim
         clear moviedata
         
         FrameWait = FrameHz/MovieRate;
+        clear moviedata
         
 end % of switch stim
 
@@ -568,13 +578,14 @@ elseif sync == ktdtPTUDP
     syncHost = tdtHost;
     syncPort = tdtPort;
 elseif sync==kWidefield
-   
-   % p.n = round(.75*numSecs*p.rate);
-   
-   p.msTolerance=5;
-   p.rate=11;
-   p.n=Duration*p.rate;
-   % p.addr = getPPaddr;
+    
+    % p.n = round(.75*numSecs*p.rate);
+    
+    p.msTolerance=1;
+    p.rate=11;
+    %p.n=Duration*p.rate;
+    p.n = 3000;
+    % p.addr = getPPaddr;
     p = init(pco(p));
 end
 
@@ -676,7 +687,7 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     stimRec.ts= zeros(maxframes,1);
     stimRec.f=zeros(maxframes,1);
     stimRec.cond= zeros(maxframes,1);
-    
+    stimRec.pos= zeros(maxframes,2);
     while ~doneStim
         
         %%% randomize conditions
@@ -776,6 +787,9 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
             stimRec.ts(frameNum)=flipDone;
             stimRec.f(frameNum)=f;
             stimRec.cond(frameNum)=c;
+            [stimRec.pos(frameNum,1) stimRec.pos(frameNum,2)] = GetMouse;
+            SetMouse(900,500);
+            
             s1(f) = flipDone;
             
             %% Send StimSync and FrameSync
@@ -813,62 +827,89 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
                 
                 p = exec(p);
             end
+            % look for stop message on keyboard
+            [keyIsDown, secs, keyCode] = KbCheck;
+            if keyIsDown %%% charavail would be much better, but doesn't seem to work
+                doneStim = 1;
+                keyspressed = KbName(find(keyCode));
+                break
+                % disp(sprintf('Exit on %s key pressed',keyspressed{1}));
+            end
+            
             
             
         end
-            
-            %% done with stimulus
-            if clearBkgrnd
-                if clut
-                    moglClutBlit(window,textures(c),offclut);
-                else % movie
-                    Screen('FillRect',window,grey);
-                end
-            else
-                if clut
-                    moglClutBlit(window,textures(c),clutcond(:,:,nFrames));
-                    % currentclut = squeeze(clutcond(:,:,nFrames));
-                end
+        
+        Screen('FillRect',window,grey);
+        
+        %         % done with stimulus
+        %         clearBkgrnd
+        %         if clearBkgrnd
+        %             if clut
+        %                 moglClutBlit(window,textures(c),offclut);
+        %                 sprintf('blitted offclut')
+        %                 offclut
+        %             else % movie
+        %                 Screen('FillRect',window,grey);
+        %             end
+        %         else
+        %             if clut
+        %                 moglClutBlit(window,textures(c),clutcond(:,:,nFrames));
+        %                 % currentclut = squeeze(clutcond(:,:,nFrames));
+        %             end
+        %         end
+        %         vbl = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+        %
+        frameNum=frameNum+1;
+        stimRec.ts(frameNum)=flipDone;
+        stimRec.f(frameNum)=f;
+        stimRec.cond(frameNum)=c;
+        [stimRec.pos(frameNum,1) stimRec.pos(frameNum,2)] = GetMouse;
+        SetMouse(900,500);
+        if sync==kWidefield
+            p = exec(p);
+        end
+        
+        % look for stop message on UDP
+        if pnet(stopudp,'readpacket',20,'noblock') > 0
+            msg = pnet(stopudp,'read','char')
+            if strcmp(msg,'stop')
+                doneStim = 1;
+                disp('Exit on UDP');
             end
-            vbl = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
-            
+        end
+        
+        
+        % Reset StimSynch
+        if sync == ktdtSync
+            % putvalue(parentuddobj,[bitOff bitOff],bitLine);
+            io32(ioObj,bitLine,stimoff_frameoff);
+        elseif sync == ktdsUDP
+            pnet(syncTDSUdp,'write',sprintf('C%c',0+0));
+            pnet(syncTDSUdp,'writepacket',shutterHost,shutterPort);
+        elseif sync == ktdtPT
+            lptwrite(888,0+0+(4*c));
+        elseif sync == ktdtPTUDP
+            lptwrite(888,0+0);
+        end
+        
+        Priority(0);
+        
+        startWait=GetSecs;
+        while GetSecs<startWait+WaitInt
+            [vbl onsetTime flipDone] = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
             frameNum=frameNum+1;
             stimRec.ts(frameNum)=flipDone;
             stimRec.f(frameNum)=f;
             stimRec.cond(frameNum)=c;
+            [stimRec.pos(frameNum,1) stimRec.pos(frameNum,2)] = GetMouse;
+            SetMouse(900,500);
             if sync==kWidefield
                 p = exec(p);
             end
-            
+        end
         
-            % Reset StimSynch
-            if sync == ktdtSync
-                % putvalue(parentuddobj,[bitOff bitOff],bitLine);
-                io32(ioObj,bitLine,stimoff_frameoff);
-            elseif sync == ktdsUDP
-                pnet(syncTDSUdp,'write',sprintf('C%c',0+0));
-                pnet(syncTDSUdp,'writepacket',shutterHost,shutterPort);
-            elseif sync == ktdtPT
-                lptwrite(888,0+0+(4*c));
-            elseif sync == ktdtPTUDP
-                lptwrite(888,0+0);
-            end
-            
-            Priority(0);
-            
-            startWait=GetSecs;
-            while GetSecs<startWait+WaitInt
-              [vbl onsetTime flipDone] = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
-               frameNum=frameNum+1;
-                stimRec.ts(frameNum)=flipDone;
-                stimRec.f(frameNum)=f;
-                stimRec.cond(frameNum)=c;
-                if sync==kWidefield
-                    p = exec(p);
-                end
-            end
-            
-      
+        
         
         if nFrames > 1
             ds = max(ds,diff(s1));
@@ -885,22 +926,6 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
             stimulusrep = mod(stimulusrep-1,nStimulusRepetitions)+1;
         end
         
-        % look for stop message on keyboard
-        [keyIsDown, secs, keyCode] = KbCheck;
-        if keyIsDown %%% charavail would be much better, but doesn't seem to work
-            doneStim = 1;
-            keyspressed = KbName(find(keyCode));
-            % disp(sprintf('Exit on %s key pressed',keyspressed{1}));
-        end
-        
-        % look for stop message on UDP
-        if pnet(stopudp,'readpacket',20,'noblock') > 0
-            msg = pnet(stopudp,'read','char')
-            if strcmp(msg,'stop')
-                doneStim = 1;
-                disp('Exit on UDP');
-            end
-        end
         
         % test for all stimuli complete
         if (iter >= numiters)
@@ -917,6 +942,8 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     
     Priority(0);
     
+    
+    
     %%%% cleanup   %%%%
     moglClutBlit;
     if sync == ktdtUDP
@@ -925,9 +952,27 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     pnet(shutterUdp,'close');
     ListenChar(1);
     pnet('closeall')
-    fclose(statusfile);
+    
     Screen('LoadNormalizedGammaTable',window,flat_clut);
     Screen('CloseAll');
+    
+    save(param_fname,'stimRec','-append');
+    if sync==kWidefield
+        save(param_fname,'p','-append');
+    end
+    
+    [fname pname] = uiputfile;
+    if ~isempty(fname);
+        save(fullfile(pname,fname),'stimRec')
+        
+        if sync==kWidefield
+            save(fullfile(pname,fname),'p','-append')
+        end
+    end
+    
+    fclose(statusfile);
+    
+    clear textures
     
     f = figure(1);
     set(f,'Position',[1 35 1024 130])
@@ -936,15 +981,13 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     
     ShowCursor;
     
-    if sync==kWidefield
-        [fname pname] = uiputfile;
-        if ~isempty(fname);
-            save(fullfile(pname,fname),'stimRec','p')
-        end
-    end
+    %if sync==kWidefield
+    
+    %end
     
     %%% if there's an error, clean up and rethrow the error
 catch
+    psychrethrow(psychlasterror);
     ShowCursor;
     pnet('closeall')
     fclose(statusfile)
@@ -957,7 +1000,7 @@ catch
     Screen('CloseAll');
     
     
-    psychrethrow(psychlasterror);
+    
 end
 
 kcsUDP
