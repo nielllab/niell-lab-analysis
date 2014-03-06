@@ -1,12 +1,15 @@
+function fit2dgabor(afile)
 
-% function fit2dgabor(afile)
-
+if ~exist('afile','var')   
 [afname, apname] = uigetfile('*.mat','analysis data');
 afile = fullfile(apname,afname);
+end
+
+wn=0;
 load(afile);
 
 
-[fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
+psfilename=[afile(1:end-4) '.ps'];
 if exist(psfilename,'file')==2;delete(psfilename);end
 
 
@@ -17,9 +20,9 @@ parfor w = 1:length(wn)
 %close all
 
 %%%Load STA data for all cells
-cells
-channel_no = cells(w,1);
-clust_no = cells(w,2);
+% cells
+% channel_no = cells(w,1);
+% clust_no = cells(w,2);
 
 STA = wn(w).sta;
 

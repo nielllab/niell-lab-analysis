@@ -14,40 +14,48 @@ Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
 Block_Name = pname(delims(length(delims))+1 :length(pname))
 
 nChan = input('number of chans : ');
-movement = input('movement data 0/1 : ');
+movement = 1;
 
 tic
-if movement==0
-    flags =struct('lfpTseries',1,'lfpSpectra',1);
-else
-    flags =struct('lfpTseries',1,'lfpSpectra',1,'mouseOn',1);
+
+flags =struct('lfpTseries',1,'lfpSpectra',1,'mouseOn',1);
+
+[afname, apname] = uigetfile('*.mat','analysis data');
+afile = fullfile(apname,afname);
+load(afile);
+use_afile=1;
+
+if exist('LFP_movement','var')
+ clear LFP_movement 
 end
 
 
-tdtData= getTDTdata(Tank_Name, Block_Name, 1:nChan, flags);
-
-        [fname, pname] = uigetfile('*.mat','cluster data');
-        load(fullfile(pname,fname));
-        for i =1:length(Block_Name);
-            sprintf('%d : %s ',i,Block_Name{i})
-        end
-        block = input('which block to analyze ? ');
-        Block_Name = Block_Name{block}
-        [afname, apname] = uigetfile('*.mat','analysis data');
-        noisepname = apname;
-        afile = fullfile(apname,afname);
-        load(afile);
-        use_afile=1;
-        cells;
+cells;
 
 cell_range = 1:size(cells,1)
+cell_range=(cells(:,1));
 
-for cell_n =1:cell_range;
-    ch= cell_n;
-    channel_no = cells(cell_n,1)
+tdtData= getTDTdata(Tank_Name, Block_Name, 1:nChan, flags);
+
+
+spectT_1= field2array(tdtData,'spectT');
+spectF_1=field2array(tdtData,'spectF');
+spectData_1=field2array(tdtData,'spectData');
+lfpData_1=field2array(tdtData,'lfpData');
+
+spectT_ch = spectT_1{1}(cell_range);
+spectF_ch=spectF_1{1}(cell_range);
+spectData_ch=spectData_1{1}(cell_range);
+lfpData_ch=lfpData_1{1}(cell_range);
+
+  
+
+
+for channel_no = 1:length(cell_range);
+    
     
     %%%
-    lfp = tdtData.spectData{channel_no};
+    lfp = spectData_ch{channel_no};
     normalizer = 1:size(lfp,2);
     normalizer = repmat(normalizer,size(lfp,1),1);
     lfpnorm = lfp.*normalizer;
@@ -58,8 +66,8 @@ for cell_n =1:cell_range;
     figure
     imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]);
     axis xy
-    df = median(diff(tdtData.spectF{channel_no}));
-    dt = median(diff(tdtData.spectT{channel_no}));
+    df = median(diff(spectF_ch{channel_no}));
+    dt = median(diff(spectT_ch{channel_no}));
     set(gca,'YTick',(10:10:80)/df);
     set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'})
     
@@ -84,7 +92,7 @@ for cell_n =1:cell_range;
     theta = mean(lfpnorm(:,ceil(7/df):ceil(10/df)),2);
     gamma = mean(lfpnorm(:,ceil(55/df):ceil(65/df)),2);
     
-    v_interp = interp1(tsamp,vsmooth,tdtData.spectT{channel_no});
+    v_interp = interp1(tsamp,vsmooth,spectT_ch{channel_no});
 
     %     figure
     %     plot(v_interp,gamma(t),'o');
@@ -109,14 +117,14 @@ for cell_n =1:cell_range;
     close all
     %%%%
     
-    freqs{channel_no} = tdtData.spectF{channel_no};
-    df = median(diff(tdtData.spectF{channel_no}));
-    specdata = tdtData.spectData{channel_no};
+    freqs{channel_no} = spectF_ch{channel_no};
+    df = median(diff(spectF_ch{channel_no}));
+    specdata = spectData_ch{channel_no};
     normalizer = 1:size(specdata,2);
     normalizer = repmat(normalizer,size(specdata,1),1);
     specdata = specdata.*normalizer;
     
-    tdata = tdtData.spectT{channel_no};
+    tdata = spectT_ch{channel_no};
     
    
     for mv = 1:2
@@ -131,7 +139,7 @@ for cell_n =1:cell_range;
     end
     
   
-    plot(tdtData.spectF{channel_no}, squeeze(mv_lfp(channel_no,:,:)));
+    plot(spectF_ch{channel_no}, squeeze(mv_lfp(channel_no,:,:)));
     ylim([0 1.5*prctile(mv_lfp(channel_no,1,:),95)])
     xlim([0 90])
     
@@ -144,9 +152,11 @@ for cell_n =1:cell_range;
     
 end
 
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);
 
- save(afile,'LFP_movement','-append');
+save(afile,'LFP_movement','-append');
  
- 
+
  
  

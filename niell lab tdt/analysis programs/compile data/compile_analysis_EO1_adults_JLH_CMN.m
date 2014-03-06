@@ -135,7 +135,7 @@ for dataset = 1:2  %%% adult vs eye opening
         driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
         driftF0(cellrange,:) = field2array(drift,'F0');
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
-        
+
         driftlayer =  field2array(drift,'layer');
         lyr(cellrange,:) = driftlayer(:,1);
         driftdsi(cellrange,:) = field2array(drift,'dsi');
