@@ -106,7 +106,19 @@ else
 end
 clear drift
 size(cell_range)
+
+
+s= stimEpocs{block};
+conds = s(1,:);
+if max(conds>100)   %%% two tfs
+    conds(conds<=145)=ceil(conds(conds<=145)/2);
+    conds(conds==146)=74;
+    conds(conds==147)=74;
+end
+s(1,:)=conds;
+stimEpocs{block}=s;
 keyboard
+
 for cell_n = cell_range;
    close all
    % for cell_n=9:9

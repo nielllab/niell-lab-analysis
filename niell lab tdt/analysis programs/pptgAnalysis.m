@@ -580,7 +580,7 @@ for cell_n = cell_range
 
 
 if SU & uselaser
-    save(afile,'laserspeed','laserspeed_std','statlaserRcyclerep','movinglaserRcyclerep','Rcyclerep','movRcyclerep','movnolaserRcyclerep','RtcAll','laserlfp','freqs','-append');
+    save(afile,'laserspeed','laserspeed_std','statlaserRcyclerep','movinglaserRcyclerep','Rcyclerep','movRcyclerep','movnolaserRcyclerep','RtcAll','laserlfp','freqs','vdata','-append');
 elseif SU & ~uselaser
     
     save(afile,'Rcyclerep','movRcyclerep','wn_movement','-append');
