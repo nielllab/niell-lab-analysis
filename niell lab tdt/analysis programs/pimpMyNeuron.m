@@ -57,13 +57,15 @@ end
 
 dt=0.001;
 histbins = -0.05:dt:0.05;
- longBins=-0.1:0.003:1;
+longdt=2;
+ longBins=-17:longdt:34;
 psth=zeros(length(cell_range),length(hist(0,histbins)));
 longPsth = zeros(length(cell_range),length(hist(0,longBins)));
 
 nfig=0;
 for c = 1:length(cell_range)
-    cell_n=cell_range(c);
+% for c=2:2
+     cell_n=cell_range(c);
     ch= cell_n;
     if SU
         channel_no = cells(cell_n,1)
@@ -106,18 +108,19 @@ for c = 1:length(cell_range)
        for t = 1:length(trainEdges);
         tdiff = times-trainEdges(t);
         tdiff = tdiff(tdiff<max(longBins) & tdiff>min(longBins));
-        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',1)
+        plot([tdiff;tdiff],[t*ones(size(tdiff));t*ones(size(tdiff))-1],'k')
         longPsth(c,:) = longPsth(c,:) + hist(tdiff,longBins);
     end
-    longPsth(c,:)=longPsth(c,:)/(dt*length(trainEdges));
-    
+    longPsth(c,:)=longPsth(c,:)/(longdt*length(trainEdges));
+    xlim([min(longBins) max(longBins)])
     subplot(3,2,5);
-    plot(longBins*1000,longPsth(c,:));
+    plot(longBins,longPsth(c,:));
     hold on
     plot([0 0],[0 max(longPsth(c,:))],'g');
-    xlabel('msec')
+    xlabel('sec')
     ylabel('sp/sec')
-    xlim([min(longBins) max(longBins)]*1000)
+    xlim([min(longBins) max(longBins)])
+   % ylim([0 7]); plot([0 17],[6 6],'g','Linewidth',4);
 end
 
 

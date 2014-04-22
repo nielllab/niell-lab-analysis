@@ -47,6 +47,14 @@ else
         Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
         Block_Name = pname(delims(length(delims))+1 :length(pname))
     end
+   
+    if useArgin
+        psfilename = [pdfFile(1:end-4) Block_Name '.ps'];
+    else
+        [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  
+    end
+    if exist(psfilename,'file')==2;delete(psfilename);end
+    
     
     
 end
@@ -75,6 +83,11 @@ subplot(nx,ny,1);
 plot(tdtData.mouseT,tdtData.mouseV); hold on;
 xlabel('secs');
 ylabel('cm/sec')
+
+    figure(mainfig)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+
 
 if ~SU
     bins = 0:0.25:max(tdtData.mouseT);
@@ -143,6 +156,8 @@ if uselaser
     ylabel('avg cm/sec');
     tsamps = 0:0.5:max(laserT);
     laserdownsamp = interp1(laserT,lasersmooth,tsamps);
+    
+    
     
     for laser =1:2
         if laser ==1
@@ -258,6 +273,8 @@ if uselaser
 else
     nx=1;ny=1;
 end
+
+
 
 nfig=0;
 for cell_n = cell_range
@@ -436,6 +453,7 @@ for cell_n = cell_range
         
     end
     
+    crf = figure
     subplot(nx,ny,1)
    if ~uselaser
        d = condenseData(movRcyclerep{cell_n,1}',framerate/2)*framerate;
@@ -444,16 +462,17 @@ for cell_n = cell_range
    end
    wn_movement(ch).stopCRFall=d;
    plot(0.5*(1-cos(2*pi*(1:20)/20)),d);
-  d = (d(1:10) + d(20:-1:11))/2;
-     wn_movement(ch).stopCRF = d;
-    
-    
-    hold on
+   d = (d(1:10) + d(20:-1:11))/2;
+   wn_movement(ch).stopCRF = d;
+  
+   hold on
+   
    if ~uselaser
        d = condenseData(movRcyclerep{cell_n,2}',framerate/2)*framerate;
    else
        d = condenseData(movnolaserRcyclerep{cell_n,2}',framerate/2)*framerate;
    end
+   
    wn_movement(ch).moveCRFall=d;
    plot(0.5*(1-cos(2*pi*(1:20)/20)),d,'g');
    d = (d(1:10) + d(20:-1:11))/2;
@@ -465,11 +484,13 @@ for cell_n = cell_range
     %legend('st','mv');
     xlabel('contrast');
     ylabel('sp/sec');
+    
     if SU
         title(sprintf('movement %s  unit %d %d',Block_Name,cells(ch,1),cells(ch,2)));
     else
         title(sprintf('movement %s  ch %d',Block_Name,ch));
     end
+    
     
     
     preISI = nan(length(times),1);
@@ -494,39 +515,40 @@ for cell_n = cell_range
     end
     
     
+    % to plot and claculate bursting, commented out by JLH
     
-    figure
-    loglog(preISI(burst==1),postISI(burst==1),'r.');
-    hold on
-    loglog(preISI(~burst),postISI(~burst),'b.');
-    axis([0.001 10 0.001 10])
-    
-    spikespeeds = interp1(tdtData.mouseT,tdtData.mouseV,times);
-    
-    burstfig(nfig) = figure;
-    loglog(preISI(spikespeeds<1),postISI(spikespeeds<1),'r.','MarkerSize',6);
-    hold on
-    loglog(preISI(spikespeeds>1),postISI(spikespeeds>1),'g.','MarkerSize',6);
-    axis([0.001 10 0.001 10])
-    
-    
-    for rep=1:2;
-        if rep ==1
-            sp = spikespeeds<1;
-        else
-            sp = spikespeeds>1;
-        end
-        burstfraction(cell_n,rep) = sum(burst(sp))/sum(sp);
-    end
+%     figure
+%     loglog(preISI(burst==1),postISI(burst==1),'r.');
+%     hold on
+%     loglog(preISI(~burst),postISI(~burst),'b.');
+%     axis([0.001 10 0.001 10])
+%     
+%     spikespeeds = interp1(tdtData.mouseT,tdtData.mouseV,times);
+%     
+%     burstfig(nfig) = figure;
+%     loglog(preISI(spikespeeds<1),postISI(spikespeeds<1),'r.','MarkerSize',6);
+%     hold on
+%     loglog(preISI(spikespeeds>1),postISI(spikespeeds>1),'g.','MarkerSize',6);
+%     axis([0.001 10 0.001 10])
     
     
-    if SU
-        title(sprintf('unit %d %d burst = %0.2f %0.2f',cells(ch,1),cells(ch,2),burstfraction(cell_n,1),burstfraction(cell_n,2)));
-    else
-        title(sprintf('movement %s  ch %d',Block_Name,ch));
-    end
+%     for rep=1:2;
+%         if rep ==1
+%             sp = spikespeeds<1;
+%         else
+%             sp = spikespeeds>1;
+%         end
+%         burstfraction(cell_n,rep) = sum(burst(sp))/sum(sp);
+%     end
+%     
+%     
+%     if SU
+%         title(sprintf('unit %d %d burst = %0.2f %0.2f',cells(ch,1),cells(ch,2),burstfraction(cell_n,1),burstfraction(cell_n,2)));
+%     else
+%         title(sprintf('movement %s  ch %d',Block_Name,ch));
+%     end
     
-    wn_movement(ch).burst = burstfraction(cell_n,:);
+%     wn_movement(ch).burst = burstfraction(cell_n,:);
     
     freqs{ch} = tdtData.spectF{channel_no};
     df = median(diff(tdtData.spectF{channel_no}));
@@ -549,7 +571,7 @@ for cell_n = cell_range
         mv_lfp(ch,mv,:)= nanmean(specdata(timepts,:));
     end
     
-    spec_plot = figure
+  
     plot(tdtData.spectF{channel_no}, squeeze(mv_lfp(ch,:,:)));
     ylim([0 1.5*prctile(mv_lfp(ch,1,:),95)])
     xlim([0 90])
@@ -572,66 +594,100 @@ for cell_n = cell_range
     wn_movement(ch).frameNum = f;
     wn_movement(ch).frameT = t;
     
- 
-  end
+    %added JLH 12-2-13
+    
+   for i = 1:length(cell_n)
+        
+    figure(crf(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+    
+   end
+%    
+%     figure(mainfig)
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+
+
+close all
+
+end
     
 
 
+% for i = 1:length(spikefig)
+%     figure(spikefig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+%     
+% %     figure(burstfig(i))
+% %     set(gcf, 'PaperPositionMode', 'auto');
+% %     print('-dpsc',psfileiname,'-append');
+%     
+%      figure(lfpfig(i))
+%      set(gcf, 'PaperPositionMode', 'auto');
+%      print('-dpsc',psfilename,'-append');
+%    
+% end
 
 
 if SU & uselaser
-    save(afile,'laserspeed','laserspeed_std','statlaserRcyclerep','movinglaserRcyclerep','Rcyclerep','movRcyclerep','movnolaserRcyclerep','RtcAll','laserlfp','freqs','vdata','-append');
+    save(afile,'laserspeed','laserspeed_std','statlaserRcyclerep','movinglaserRcyclerep','Rcyclerep','movRcyclerep','movnolaserRcyclerep','RtcAll','laserlfp','freqs','-append');
 elseif SU & ~uselaser
     
     save(afile,'Rcyclerep','movRcyclerep','wn_movement','-append');
 end
+  
 
-if useArgin
-        psfname = [pdfFile(1:end-4) Block_Name '.ps'];
-    else
-        [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
-end
-    if exist(psfname,'file')==2;delete(psfname);end
 
- 
-figure(mainfig)
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfname,'-append');
 
-for i = 1:length(spikefig)
-    figure(spikefig(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfname,'-append');
-    
-    figure(burstfig(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfname,'-append');
-    
+
+
+
+
+% 
+% figure(mainfig)
+% set(gcf, 'PaperPositionMode', 'auto');
+% print('-dpsc',psfname,'-append');
+
+% for i = 1:length(spikefig)
+%     figure(spikefig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfname,'-append');
+%     
+%     figure(burstfig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfname,'-append');
+%     
     %       figure(lfpfig(i))
     %     set(gcf, 'PaperPositionMode', 'auto');
     %     print('-dpsc',psfname,'-append');
-   
-end
-
-if uselaser
+  
+    if uselaser
     figure(spectrafig)
     set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfname,'-append');
-    
+    print('-dpsc',psfilename,'-append');
     figure(lfpfig(1))
     set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfname,'-append');
+    print('-dpsc',psfilename,'-append');
     
+    end
     
-end
-
 if SU
-    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
+    ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-3)) 'SU.pdf']);
 else
-    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']);
+    ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-3)) 'MU.pdf']);
+     
 end
 
 end
+
+
+    
+
+
+
 
 
 

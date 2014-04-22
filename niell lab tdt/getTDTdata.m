@@ -102,5 +102,5 @@ display('warning - using old mouse format!!!')
     [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,version);
 end
 
-invoke(TTX, 'CloseTank');
-invoke(TTX, 'ReleaseServer');
+% invoke(TTX, 'CloseTank');
+% invoke(TTX, 'ReleaseServer');

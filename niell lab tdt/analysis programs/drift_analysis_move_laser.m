@@ -8,7 +8,7 @@
 %%% read in cluster data, then connect to the tank and read the block
 
 
-
+close all
 
 [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
 %psfilename = 'c:/test.ps';   %%% default location
@@ -48,17 +48,15 @@ if laser
     tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
     tsamp  = tdtData.laserT;
     vsmooth = tdtData.laserTTL;
+    thresh_velocity = 0.1;
 else
     flags = struct('mouseOn',1,'visStim',1)
     tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
     tsamp = tdtData.mouseT;
     vsmooth = tdtData.mouseV;
+    thresh_velocity = 1;
 end
 
-
-
-
-thresh_velocity = 1;
 figure
 plot(tsamp,vsmooth);
 
@@ -106,8 +104,24 @@ if SU
 else
     cell_range=1:4:nchan;
 end
+clear drift
+size(cell_range)
+
+
+s= stimEpocs{block};
+conds = s(1,:);
+if max(conds>100)   %%% two tfs
+    conds(conds<=145)=ceil(conds(conds<=145)/2);
+    conds(conds==146)=74;
+    conds(conds==147)=74;
+end
+s(1,:)=conds;
+stimEpocs{block}=s;
+keyboard
+
 for cell_n = cell_range;
-    % for cell_n=9:9
+   close all
+   % for cell_n=9:9
     cell_n
     if SU
         channel_no = cells(cell_n,1)
@@ -329,19 +343,19 @@ for cell_n = cell_range;
             [max_resp pref_orient(cell_n)] = min(orient_tuning_all);
         end
         freq_tuning(cell_n,:) = orientfreq(pref_orient(cell_n),:);
-        figure
-        subplot(2,1,1);
-        plot(freq_tuning(cell_n,:));
+%         figure
+%         subplot(2,1,1);
+%         plot(freq_tuning(cell_n,:));
         if max(freq_tuning)>abs(min(freq_tuning))
             [max_resp pref_freq(cell_n)] = max(freq_tuning(cell_n,:));
         else
             [max_resp pref_freq(cell_n)] = min(freq_tuning(cell_n,:));
         end
         orient_tuning(cell_n,:) = orientfreq(:,pref_freq(cell_n))';
-        subplot(2,1,2);
-        plot(orient_tuning(cell_n,:));
-        
-       
+%         subplot(2,1,2);
+%         plot(orient_tuning(cell_n,:));
+%         
+%        
         
         % f1f0(cell_n) = F1(cell_n,(pref_orient-1)*n_col +pref_freq)/ F0(cell_n,(pref_orient-1)*n_col +pref_freq)
         
@@ -482,8 +496,8 @@ for cell_n = cell_range;
         %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
         
         cell_n
-%         close(rast_fig);
-%         clear rast_fig;
+        close(rast_fig);
+        clear rast_fig;
         
      
     end %%% rep
@@ -534,6 +548,3 @@ if use_afile
     
     save(afile, 'drift','-append');
 end
-
-invoke(TTX, 'CloseTank');
-invoke(TTX, 'ReleaseServer');

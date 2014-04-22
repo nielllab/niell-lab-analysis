@@ -287,11 +287,31 @@ for rep=1:5;
     plot(B0(used,rep),B1(used,rep),'ko');hold on;
     plot(B0(usedInfra,rep),B1(usedInfra,rep),'ro');hold on;
     plot(B0(usedSupra,rep),B1(usedSupra,rep),'bo');hold on;
+    plot(mean(B0(used,rep)),mean(B1(used,rep)),'g+');hold on;
+    plot(mean(B0(used,rep)),mean(B1(used,rep))+std(B1(used,rep)/sqrt(length(B1(used,rep)))),'g+');hold on;
+    plot(mean(B0(used,rep)),mean(B1(used,rep))-std(B1(used,rep)/sqrt(length(B1(used,rep)))),'g+');hold on;
+    plot(mean(B0(used,rep))+std(B0(used,rep)/sqrt(length(B0(used,rep)))),mean(B1(used,rep)),'g+');hold on;
+    plot(mean(B0(used,rep))-std(B0(used,rep)/sqrt(length(B0(used,rep)))),mean(B1(used,rep)),'g+');hold on;
     plot([1 1],[-6 10],'k-'); hold on;
     plot([.5 5],[0 0],'k-'); hold on;
 %     plot([0 max(Betas(2)(used))], [0 max(Betas(2)(used))]);hold on;
-    title(sprintf('spont B %s',title_str{rep}));
+    title(sprintf('B %s',title_str{rep}));
     
+    figure;
+    offset=(B1(used,rep)+(B0(used,rep)-1).*spont(used,rep,1));
+    plot(B0(used,rep),offset,'ko');hold on;
+    plot([1 1],[-4 10],'k-'); hold on;
+    plot([-1 3.5],[0 0],'k-'); hold on;
+    plot(nanmedian(B0(used,rep)),nanmedian(offset),'go');hold on;
+    plot([nanmedian(B0(used,rep)) nanmedian(B0(used,rep))],[nanmedian(offset)+nanstd(offset)/sqrt(length(offset)) nanmedian(offset)-nanstd(offset)/sqrt(length(offset))],'g');hold on;
+    plot([nanmedian(B0(used,rep))+nanstd(B0(used,rep))/sqrt(length(offset)) nanmedian(B0(used,rep))-nanstd(B0(used,rep))/sqrt(length(offset))],[nanmedian(offset) nanmedian(offset)],'g');
+
+%     plot([0 max(Betas(2)(used))], [0 max(Betas(2)(used))]);hold on;
+    axis([-1 3.5 -4 10]);
+    xlabel('Gain');
+    ylabel('Offset (Hz)');
+    title(sprintf('Gain vs Offset %s',title_str{rep}));
+  
     figure
     plot(evoked(used,rep,1),evoked(used,rep,2),'ko');hold on;
     plot(evoked(usedInfra,rep,1),evoked(usedInfra,rep,2),'ro');hold on;
@@ -318,3 +338,39 @@ for rep=1:5;
      [psr t] = signrank(evoked(used,rep,1),evoked(used,rep,2));
     sprintf('%s evoked p = %f p(signrank) = %f',title_str{rep},p,psr)
 end
+
+figure;
+offsets=(B1(used,:)+(B0(used,:)-1).*spont(used,:,1));
+bar([nanmean(B0(used,3)) nanmean(B0(used,4)) nanmean(B0(used,5))]);
+hold on;
+errorbar([nanmean(B0(used,3)) nanmean(B0(used,4)) nanmean(B0(used,5))],[nanstd(B0(used,3))/sqrt(length(B0(used,3))) nanstd(B0(used,4))/sqrt(length(B0(used,3))) nanstd(B0(used,5))/sqrt(length(B0(used,3)))])
+
+figure;
+offsets=(B1(used,:)+(B0(used,:)-1).*spont(used,:,1));
+bar([nanmean(offsets(:,3)) nanmean(offsets(:,4)) nanmean(offsets(:,5))]-1);
+hold on;
+errorbar([nanmean(offsets(:,3)) nanmean(offsets(:,4)) nanmean(offsets(:,5))],[nanstd(offsets(:,3))/sqrt(length(offsets(:,3))) nanstd(offsets(:,4))/sqrt(length(offsets(:,4))) nanstd(offsets(:,5))/sqrt(length(offsets(:,5)))])
+
+figure;
+offsets=(B1(used,:)+(B0(used,:)-1).*spont(used,:,1));
+[bootstat1,bootsam1]=bootstrp(1000,@nanmedian,[B0(used,3) B0(used,4) B0(used,5)]-1);
+se1=std(bootstat1);
+
+bar([nanmean(B0(used,3)) nanmean(B0(used,4)) nanmean(B0(used,5))]-1);
+hold on;
+errorbar([nanmean(B0(used,3)) nanmean(B0(used,4)) nanmean(B0(used,5))]-1,se1)
+signrank(B0(used,3)-1)
+signrank(B0(used,4)-1)
+signrank(B0(used,5)-1)
+
+figure;
+offsets=(B1(used,:)+(B0(used,:)-1).*spont(used,:,1));
+[bootstat2,bootsam2]=bootstrp(1000,@nanmedian,[offsets(:,3) offsets(:,4) offsets(:,5)]);
+se2=std(bootstat2);
+
+bar([nanmedian(offsets(:,3)) nanmedian(offsets(:,4)) nanmedian(offsets(:,5))]);
+hold on;
+errorbar([nanmedian(offsets(:,3)) nanmedian(offsets(:,4)) nanmedian(offsets(:,5))],se2);
+signrank(offsets(:,3))
+signrank(offsets(:,4))
+signrank(offsets(:,5))
