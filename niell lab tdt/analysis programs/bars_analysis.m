@@ -109,7 +109,11 @@ for cell_n = cell_range;
     end
     
     %%% spont and flicker
+    if SU
     spontfig=figure('Name',sprintf('unit %d %d',channel_no,clust_no))
+    else 
+      spontfig=figure('Name',sprintf('channel %d',cell_n))  
+    end
     emax = max(epocs(1,:)); % finds max firing rate over whole recording
     
     extra_range = 1:(emax-panels*nrows*ncols)
@@ -246,8 +250,11 @@ for cell_n = cell_range;
         bars(cell_n,rep).x0 = squeeze(x0(cell_n,:));
         bars(cell_n,rep).width = squeeze(amp(cell_n,:));
        
+        if SU
         title(sprintf('ch %d cl %d',channel_no,clust_no));
-        
+        else
+           title(sprintf('Name',sprintf('channel %d',cell_n))); 
+        end
     end  %%% panel
     
     figure(rast_fig)

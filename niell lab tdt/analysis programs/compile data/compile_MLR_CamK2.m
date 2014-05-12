@@ -90,7 +90,7 @@ end
 clear gamma alpha
 badnoise = zeros(1,n);
 close all
-for i= 1:n
+for i= 25:25
 %for i = 83:93
    lfp = squeeze(laser_lfp_all{i});
    f=laser_lfp_freqs{i};
@@ -103,10 +103,11 @@ for i= 1:n
        badnoise(i)=0;
    end
    
-%    figure
-%    plot(f,lfp(:,f<80)')
-%    ylim([0 10^4])
+   figure
+   plot(f,lfp(:,f<80)')
+   ylim([0 10^4])
    noiserange = (f>57 & f<63) | (f>49 &f<51) | (f>39 & f<41);
+   keyboard
    
 %    figure
 %    hold on
@@ -123,7 +124,7 @@ for i= 1:n
    peakalphaF(i,:) = f(alphaF(freqs));
    
    alpha(i,:) = mean(lfp(:,alphaF),2);
-   title(sprintf('peak = %0.1f %0.1f; peakF = %0.1f %0.1f area = %0.1f %0.1f',peakgamma(i,1),peakgamma(i,2),peakgammaF(i,1),peakgammaF(i,2),gamma(i,1),gamma(i,2)))
+   title(sprintf('%d peak = %0.1f %0.1f; peakF = %0.1f %0.1f area = %0.1f %0.1f',i,peakgamma(i,1),peakgamma(i,2),peakgammaF(i,1),peakgammaF(i,2),gamma(i,1),gamma(i,2)))
 end
 
 figure
@@ -159,7 +160,7 @@ for rep =2:size(gamma,2);
 end
 
 meangamma = mean(normgamma,2);
-
+ 
 normgamma = normgamma(~badnoise &~isnan(meangamma'),:);
 normgamma = unique(normgamma,'rows');
 
