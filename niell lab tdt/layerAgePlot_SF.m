@@ -1,23 +1,24 @@
-function [meandata errdata N mediandata]=layerAgePlot(data,ageList,layer,inh, used,label);
+function [meandata errdata N mediandata]=layerAgePlot(data,ageList,layer,inh,used,label);
 ageList=ageList';
 figure
 hold on
 
-colorlist='bgrm';
+colorlist='bmrg';
 
 for age=1:4
     for group = 1:6
         if group ==1
-            uselist = (ageList==age & (layer==2 | layer==3) & ~inh  & used);
+            uselist = (ageList==age & (layer==2 | layer==3) & ~inh & used);
         elseif group ==2
-            uselist = (ageList==age & (layer==4) & ~inh  & used);
+            uselist = (ageList==age & (layer==4) & ~inh & used);
         elseif group==3
-            uselist = (ageList==age & (layer==5) & ~inh &   used);
+            uselist = (ageList==age & (layer==5) & ~inh & used);
         elseif group==4
-            uselist = (ageList==age & (layer==6) & ~inh &   used);
+            uselist = (ageList==age & (layer==6) & ~inh &  used);
         elseif group==5
-            uselist = (ageList==age & inh  & used);
-      
+            uselist = (ageList==age & inh & used);
+        elseif group==6
+            uselist = (ageList==age & (layer<=6)& ~inh & used);
         end
 %         clear HSF M V M1 V1 x f
         
@@ -25,7 +26,7 @@ for age=1:4
         %figure
        % hist(data(uselist),0:0.02:.35); %%for use with SF_pref
         %hist(data(uselist),0:0.50:4.5); %%for use with SF_bandwidth
-      %  hist(data(uselist),0:1:10)
+        %hist(data(uselist),0:0.2:2)
         
         
    %      [f,x]=hist(data(uselist),0:0.02:.35);%# create histogram from the data
@@ -75,11 +76,11 @@ for age=1:4
              
        
             plot(data(uselist),(rand(size(data(uselist)))*0.15 - 0.075)+ones(size(data(uselist)))*(group + (age-1)*0.4 - 0.2),'o','Color',colorlist(age)); hold on
-            m  = nanmean(data(uselist));
+            m  = nanmedian(data(uselist));
             s = semedian(data(uselist));
             plot([m m], group + (age-1)*0.4 -0.2 + [ -0.2 0.2],'Color','k','LineWidth',4);
-            %plot ([(m-s) (m-s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color','k','LineWidth',2);
-            %plot ([(m+s) (m+s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color','k','LineWidth',2);
+            plot ([(m-s) (m-s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color','k','LineWidth',2);
+            plot ([(m+s) (m+s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color','k','LineWidth',2);
         end
              
     
@@ -87,7 +88,7 @@ for age=1:4
 
 
 axis ij
-set(gca,'ytick',1:5);
+set(gca,'ytick',1:6);
 set(gca,'yticklabel',{'2/3','4','5','6','inh','All'});
 xlabel(label)  
 
@@ -104,7 +105,7 @@ end
 figure
 barweb(meandata,errdata)
 ylabel(label);
-set(gca,'Xtick',1:5);
+set(gca,'Xtick',1:6);
 set(gca,'Xticklabel',{'2/3','4','5','6','inh','all'});
 legend('EO1','adult');
 % % 
