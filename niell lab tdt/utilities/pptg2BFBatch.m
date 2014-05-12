@@ -16,7 +16,7 @@ afile = {'C:\data\ephys matlab data\070612_awake_mlr\wn4b\analysis.mat',...    %
 
 for i = 11:length(afile);
     i
-close all
+    close all
 
     analysisFile = afile{i};
     load(analysisFile);
@@ -30,8 +30,9 @@ close all
     pdfname = [analysisFile(1:end-4) '.pdf'];
     
     
-    pptgAnalysis(clusterFile,analysisFile,pdfname,Block_Name{blocknum},blocknum,1, 30);
+    pptgSpeedAnalysis(clusterFile,analysisFile,pdfname,Block_Name{blocknum},blocknum,1, 30);
     toc
-    end
+    plot(vdata)
+end
     
     

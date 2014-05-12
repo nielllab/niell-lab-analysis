@@ -24,7 +24,8 @@ for i = 16:length(afile);
     analysisFile = afile{i};
     load(analysisFile);
 
-    clusterFile = clusterfilename((length(pname)+1):end);
+  %  clusterFile = clusterfilename((length(pname)+1):end);
+  
     load(clusterFile);
     for i = 1:length(Block_Name)
         if strcmp('wn',Block_Name{i}(1:2))
