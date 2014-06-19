@@ -1,6 +1,15 @@
 function moviedata=generateNoise_xyt(maxSpatFreq,maxTempFreq,contrastSigma,duration,movtype,binarize);
 %%% generates white noise movies with limited spatial and temporal
 %%% frequency, via inverse fourier transform
+%%% now with more options ...
+%%% binarize (0/1) = convert grayscale to binary, for higher contrast
+%%% movie type = allows noise patches, moving noise bars, etc.
+%%% movietype 1 = standard contrast modulated noise
+%%% movietype 2 = full-field step function of white noise
+%%% movietype 3= moving bar of white noise
+%%% movietype 4 = alternating patches of white noise along x-axis
+%%% movietype 5 = alternating patches of white noise along y-axis
+
 rand('state',sum(100*clock))
 tic
 
@@ -104,14 +113,9 @@ immin = -1*immax
 imscaled = (imraw - immin-immean) / (immax - immin);
 clear imfiltered;
 contrast_period =10;
-%    contrast(1:150) = 0;
-%    contrast(151:450) = 0.75;
-%    contrast(451:600) = 0;
-%    contrast(601:900) = .25;
-%    contrast(901:1050) = 0;
-%    contrast(1051:1350) = 1;
-%    contrast(1351:1500) = 0;
-%    contrast(1501:1800) = 0.5;
+
+
+%%% modify movie for different patterns (patches, bars, etc)
 if binarize
     imscaled(imscaled<0.5)=0;
     imscaled(imscaled>0.5)=1;
