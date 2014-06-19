@@ -178,3 +178,5 @@ end
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);
+
+close all

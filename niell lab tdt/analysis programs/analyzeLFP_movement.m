@@ -43,7 +43,7 @@ for ch = 1:nChan;
     lfpnorm = imfilter(lfpnorm,H);
     
     figure
-    imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]);
+    imagesc(lfpnorm',[0 prctile(lfpnorm(:),99)]);
     axis xy
     df = median(diff(tdtData.spectF{ch}));
     dt = median(diff(tdtData.spectT{ch}));

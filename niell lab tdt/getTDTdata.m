@@ -92,13 +92,13 @@ if isfield(flags,'laserOn') && flags.laserOn
 end
 
 if isfield(flags,'mouseOn') && flags.mouseOn
-    version =input('old (0) or new (1) mouse format: ');
-    if isempty(version)
-        version=1;
-    end
+%   %  version =input('old (0) or new (1) mouse format: ');
+%     if isempty(version)
+%         version=1;
+%     end
 display('warning - using old mouse format!!!')
-%version=0;
-    version
+version=1;
+ % version
     [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,version);
 end
 
