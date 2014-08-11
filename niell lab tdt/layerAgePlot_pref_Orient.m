@@ -1,17 +1,17 @@
 function [meandata errdata N mediandata]=layerAgePlot(data,ageList,layer,inh,used,label,titlestr);
 ageList=ageList';
 for age=1:4
-    for group = 1:2
+    for group = 1:1
         if group ==1
-            uselist = (ageList==age & (layer==2 | layer==3) & ~inh & used);
+            uselist = (ageList==age & (layer<=6) & ~inh & used);
 %         elseif group ==2
 %             uselist = (ageList==age & (layer==4) & ~inh & used);
 %         elseif group==3
 %             uselist = (ageList==age & (layer==5) & ~inh & used);
 %         elseif group==4
 %             uselist = (ageList==age & (layer==6) & ~inh &  used);
-         elseif group==2
-             uselist = (ageList==age & inh & used);
+%          elseif group==2
+%              uselist = (ageList==age & inh & used);
 %        elseif group==6
 %            uselist = (ageList==age & (layer<=6)& ~inh & used);
         end
@@ -21,32 +21,31 @@ for age=1:4
         figure
         hist(data(uselist),0:45:330)
         N(group,age) = sum(~isnan(data(uselist)));
-        xlabel(label{1}); ylabel(label{2});
-        if age==1
-        title(sprintf('%s EO',titlestr));
-        elseif age==2
-        title(sprintf('%s EO3',titlestr));
-        elseif age==3
-        title(sprintf('%s EO7',titlestr));
-        elseif age==4
-        title(sprintf('%s adult',titlestr));
-        end
+%         xlabel(label{1}); ylabel(label{2});
+%         if age==1
+%         title(sprintf('%s EO',titlestr));
+%         elseif age==2
+%         title(sprintf('%s EO3',titlestr));
+%         elseif age==3
+%         title(sprintf('%s EO7',titlestr));
+%         elseif age==4
+%         title(sprintf('%s adult',titlestr));
+%         end
         
         [f,x]=hist(data(uselist),0:45:330);
         % g=1/sqrt(2*pi)*exp(-0.5*x.^2);%# pdf of the normal distribution
+        card = [1 3 5 7];
+        s_card(group,age)=sum(f(card));
+        frac_card(group,age)= s_card(group,age)/N(group,age);
+%           P_FF(group,age)= countdata_FF(group,age)/N(group,age) 
         
-        figure
-        bar(x,f/sum(f));
-         xlabel(label{1}); ylabel(label{2});
-        if age==1
-        title(sprintf('%s EO',titlestr));
-        elseif age==2
-        title(sprintf('%s EO3',titlestr));
-        elseif age==3
-        title(sprintf('%s EO7',titlestr));
-        elseif age==4
-        title(sprintf('%s adult',titlestr));
-        end
+        [fr,pci]= binofit(s_card(group,age),N(group,age));
+         errdata(group,age) = frac_card(group,age)-pci(1,1);
+         sem(group,age)=errdata(group,age)/sqrt(N(group,age))
+
+        
+          
+       
      
 
 %               meandata(group,age) = nanmean(data(uselist));
@@ -59,7 +58,9 @@ for age=1:4
     end
 
    
-
+figure
+errorbar(1:4,frac_card(1,:),sem(1,:),'k');hold on
+%errorbar(1:4,frac_card(2,:),prct_err_lin(2,:),'k');hold on
 
 
 % barweb(meandata,errdata)

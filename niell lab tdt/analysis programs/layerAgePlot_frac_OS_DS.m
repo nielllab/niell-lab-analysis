@@ -5,8 +5,8 @@ colorlist='bmkgrc';
 for age=1:4
     for group = 1:5
         if group ==1
-            uselist = (ageList==age & (layer<=3) & ~inh & used);
-            uselist1=(ageList==age & (layer<=3 | layer==3) & ~inh & used1);
+            uselist = (ageList==age & (layer<=3 ) & ~inh & used);
+            uselist1=(ageList==age & (layer<=3) & ~inh & used1);
         elseif group ==2
             uselist = (ageList==age & (layer==4) & ~inh & used);
             uselist1=(ageList==age & (layer==4) & ~inh & used1);
@@ -34,27 +34,26 @@ for age=1:4
         frac(group,age)= resp(group,age)/total(group,age);
 %           P_FF(group,age)= countdata_FF(group,age)/N(group,age) 
         
-        [M,V]= binostat(total(group,age),frac(group,age));
-          
-        errdata(group,age) =sqrt(V)/sqrt(total(group,age));
-        prct_err(group,age)= errdata(group,age)/resp(group,age);
-          
-        prct_err_lin(group,age)=prct_err(group,age)*frac(group,age);
-       
-%            figure
-%            hist(data(uselist),0:0.25:2);
+         [fr,pci]= binofit(resp(group,age),total(group,age));
+         errdata(group,age) = frac(group,age)-pci(1,1);
+         sem(group,age)=errdata(group,age)/sqrt(resp(group,age))
             
     end
 end
 
 figure
+errorbar(1:4,frac(1,:),sem(1,:),'b');hold on
+errorbar(1:4,frac(2,:),sem(2,:),'k');hold on
 
-for group = 1:4
- errorbar(1:4,frac(group,:),prct_err_lin(group,:),'color',colorlist(group),'LineWidth',2);
-    hold on;
-end
+% shadedErrorBar(1:4,frac(3,:),sem(3,:),'g');hold on
+
+
+% for group = 1:4
+%  errorbar(1:4,frac(group,:),sem(group,:),'color',colorlist(group),'LineWidth',2);
+%     hold on;
+% end
  
-errorbar(3:4,frac(5,3:4),prct_err_lin(5,3:4),'color','r','LineWidth',2);
+% errorbar(3:4,frac(5,3:4),sem(5,3:4),'color','r','LineWidth',2);
 
 %  ylabel(label{1,1});
 %  set(gca,'Xtick',1:4);
@@ -80,7 +79,7 @@ errorbar(3:4,frac(5,3:4),prct_err_lin(5,3:4),'color','r','LineWidth',2);
 
 
 figure
-barweb(frac,prct_err_lin)
+barweb(frac,sem)
 ylabel(label);
 set(gca,'Xtick',1:5);
 set(gca,'Xticklabel',{'2/3','4','5','6','inh','all'});

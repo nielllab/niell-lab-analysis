@@ -2,10 +2,10 @@ function [meandata se N1 ]=layerAgePlot_frac_simple(data,ageList,layer,inh,used,
 ageList=ageList';
 colorlist='bmkg';
 
-for age=1:4
+for age=1:2
     for group = 1:6
         if group ==1
-            uselist = (ageList==age & (layer==2 | layer==3) & ~inh & used);
+            uselist = (ageList==age & (layer<=3) & ~inh & used);
         elseif group ==2
             uselist = (ageList==age & (layer==4) & ~inh & used);
         elseif group==3
@@ -26,12 +26,10 @@ for age=1:4
         frac(group,age)= countdata_lin(group,age)/N(group,age);
 %           P_FF(group,age)= countdata_FF(group,age)/N(group,age) 
         
-        [M,V]= binostat(N(group,age),frac(group,age));
-          
-        errdata(group,age) =sqrt(V)/sqrt(N(group,age));
-        prct_err(group,age)= errdata(group,age)/countdata_lin(group,age);
-          
-        prct_err_lin(group,age)=prct_err(group,age)*frac(group,age);
+        [fr,pci]= binofit(countdata_lin(group,age),N(group,age));
+         errdata(group,age) = frac(group,age)-pci(1,1);
+         sem(group,age)=errdata(group,age)/sqrt(countdata_lin(group,age))        
+
        
 %            figure
 %            hist(data(uselist),0:0.25:2);
@@ -40,11 +38,12 @@ for age=1:4
 end
 
 figure
-
-for group = 1:4
- errorbar(1:4,frac(group,:),prct_err_lin(group,:),'color',colorlist(group),'LineWidth',2);
-    hold on;
-end
+errorbar(1:2,frac(1,:),sem(1,:),'k');hold on
+errorbar(1:2,frac(2,:),sem(2,:),'g');hold on
+% for group = 1:2
+%  shadedErrorBar(1:4,frac(group,:),prct_err_lin(group,:),'k');
+%     hold on;
+% end
  
 %  ylabel(label{1,1});
 %  set(gca,'Xtick',1:4);
@@ -70,7 +69,7 @@ end
 
 
 figure
-barweb(frac,prct_err_lin)
+barweb(frac,sem)
 ylabel(label);
 set(gca,'Xtick',1:6);
 set(gca,'Xticklabel',{'2/3','4','5','6','inh','all'});
