@@ -1,4 +1,4 @@
-function [theta_pref OSI A1 A2 w B null_rate yfit] = fit_tuningcurve(R, theta_ind);
+function [theta_pref cvOSI cvDSI A1 A2 w B orth_rate yfit ] = fit_tuningcurve(R, theta_ind);
 
 % temp_baseline =min(R); 
 % R=R-temp_baseline;  %%%need to keep things positive for fourier analysis
@@ -11,11 +11,24 @@ else
 end
 i=sqrt(-1);
 mu = (sum(R.*exp(2*i*theta_ind)))/sum(abs(R));
+dsi = (sum(R.*exp(i*theta_ind)))/sum(abs(R));
+
+%osi = sum(R.*exp(sqrt(-1)*theta'))/sum(R)
+%osi = sum(R.*exp(sqrt(-1)*theta))/sum(R);
+
 if isnan(mu);
     mu=0;
 end
-OSI = abs(mu)
+
+if isnan(dsi);
+    dsi=0;
+end
+cvOSI = abs(mu)
+cvDSI = abs(dsi)
 theta_pref = mod(angle(mu)/2,2*pi)
+ 
+  
+
 
 %R= R+temp_baseline;
 
@@ -81,7 +94,9 @@ elseif theta_pref>2*pi
     theta_pref = theta_pref-2*pi;
 end
 
-null_rate = interp1(theta_ind,yfit,mod(theta_pref+pi/2,2*pi));
+orth_rate = interp1(theta_ind,yfit,mod(theta_pref+pi/2,2*pi));
+%null_rate = interp1(theta_ind,yfit,mod(theta_pref+pi,2*pi));
+
 
 A1
 A2 

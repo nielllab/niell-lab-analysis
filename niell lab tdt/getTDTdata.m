@@ -82,7 +82,7 @@ if isfield(flags,'visStim') && flags.visStim
     size(tdtData.frameEpocs)
     tdtData.stimEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0,max_events);
        % tdtData.stimEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 50,100,100);
-        tdtData.stimEpocs
+        tdtData.stimEpocs;
 
 end
 
@@ -92,15 +92,17 @@ if isfield(flags,'laserOn') && flags.laserOn
 end
 
 if isfield(flags,'mouseOn') && flags.mouseOn
-%   %  version =input('old (0) or new (1) mouse format: ');
-%     if isempty(version)
-%         version=1;
-%     end
+   % version = input('old (0) or new (1) mouse format: ');
 display('warning - using old mouse format!!!')
-version=1;
- % version
-    [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,version);
+version=0;
+   
+  try
+      [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,0);
+  catch
+            [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,1);
+
+  end
 end
 
-% invoke(TTX, 'CloseTank');
-% invoke(TTX, 'ReleaseServer');
+invoke(TTX, 'CloseTank');
+invoke(TTX, 'ReleaseServer');

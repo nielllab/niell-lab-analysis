@@ -3,7 +3,7 @@ ageList=ageList';
 for age=1:4
     for group = 1:6
         if group ==1
-            uselist = (ageList==age & (layer==2 | layer==3) & ~inh & used);
+            uselist = (ageList==age & (layer<=4) & ~inh & used);
         elseif group ==2
             uselist = (ageList==age & (layer==4) & ~inh & used);
         elseif group==3
@@ -18,46 +18,54 @@ for age=1:4
         clear HSF M V M1 V1 x f
         
         
-        figure
-        hist(data(uselist),0:0.5:12)
+%         if sum(uselist)>2
         N(group,age) = sum(~isnan(data(uselist)));
-        xlabel(label{1}); ylabel(label{2});
-        if age==1
-        title(sprintf('%s EO',titlestr));
-        elseif age==2
-        title(sprintf('%s EO3',titlestr));
-        elseif age==3
-        title(sprintf('%s EO7',titlestr));
-        elseif age==4
-        title(sprintf('%s adult',titlestr));
+        [f,x]=hist(data(uselist),0:1:10);
+        LP(group,age)=f(1,10);
+        frac(group,age)= LP(group,age)/N(group,age);
 
-        end
         
-        [f,x]=hist(data(uselist),0:0.5:12);
+        
         % g=1/sqrt(2*pi)*exp(-0.5*x.^2);%# pdf of the normal distribution
         
-        figure
-        bar(x,f/sum(f));
-         xlabel(label{1}); ylabel(label{2});
-        if age==1
-        title(sprintf('%s EO',titlestr));
-    else
-        title(sprintf('%s adult',titlestr));
-        end
-     
+      
+%         [fr,pci]= binofit(resp(group,age),total(group,age));
+%          errdata(group,age) = frac(group,age)-pci(1,1);
+%          sem(group,age)=errdata(group,age)/sqrt(resp(group,age))
+        
+        [fr,pci]= binofit(LP(group,age),N(group,age)); 
+        errdata(group,age) =frac(group,age)-pci(1,1);
+        sem(group,age)=errdata(group,age)/sqrt(N(group,age))
+        
+        [f1,x1]=hist(data(uselist),0:1:10);
+        HP(group,age)=f1(1,11);
+        frac_H(group,age)= HP(group,age)/N(group,age);
+
+        [fr_1,pci_1]= binofit(HP(group,age),N(group,age)); 
+        errdata_H(group,age) =frac_H(group,age)-pci_1(1,1);
+        sem_H(group,age)=errdata_H(group,age)/sqrt(N(group,age))
 
 %               meandata(group,age) = nanmean(data(uselist));
 %               errdata(group,age)=nanstd(data(uselist))/sqrt(N(group,age));             
 %               mediandata(group,age) = nanmedian(data(uselist));
 % %              errdataMed(group,age) = mad(data(uselist),1);
 %              bothdata{group,age}= data(uselist);
-             
+%         end    
         end
     end
 
    
+figure
+barweb(frac,sem)
 
+figure
+barweb(frac,errdata)
 
+figure
+errorbar(1:4,frac(1,:),sem(1,:),'K');hold on
+
+figure
+barweb(frac_H,sem_H)
 
 % barweb(meandata,errdata)
 % ylabel(label);

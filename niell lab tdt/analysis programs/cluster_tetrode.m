@@ -175,11 +175,14 @@ for tet=use_tets
     vmax = squeeze(max(abs(X(:,:,:)),[],3));
     vmax = squeeze(max(vmax,[],2));
     
-    if threshold_voltage
+   
+       if threshold_voltage & use_tets>1
         used = find(v0< v0thresh & vmax <vmax_thresh);
     else
         used = find(v0>0);
-    end
+       end
+  
+
     figure
     hist(v0);
     
@@ -354,13 +357,20 @@ for tet=use_tets
         end
         set(gca,'XTickLabel',[])
         set(gca,'YTickLabel',[])
-        axis([0 25 -100 50])
+       if use_tets>1 
+           axis([0 25 -100 50])
+       else
+           axis([0 25 -100*10^3 50*10^3]);
+       end
     end
     title(tet_title);
 
 %%% plot histogram of spike amplitudes for all clusters
     clear hist_data;
     hist_int = 10^-6 * [-200:2:0];
+    if use_tets ==1
+        hist_int = hist_int*10^3;
+    end
     if plot_all
         histfig(tet)=figure;
         amp=zeros(n_clust,4);

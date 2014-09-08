@@ -80,7 +80,7 @@ full_field = 1;  %%% is there a full-field flicker?
 % set number of conditions and display setup (generally rows = orientation, columns = frequency)
 n_rows=12;
 n_col=6;
-orients = [0 45 90 135 180 225 270 315];
+%orients = [0 45 90 135 180 225 270 315];
 orients = 0:30:330;
 spatfreqs = [.01 .02 .04 .08 .16 .32];
 %
@@ -315,6 +315,7 @@ for cell_n = cell_range;
         %% calculate tuning parameters
         
         orientfreq = reshape(R(cell_n,1:n_col*n_rows),n_col,n_rows)'-spont_avg;
+        
         orient_tuning_all = mean(orientfreq,2);
         %  figure
         %  plot(orient_tuning_all);
@@ -351,8 +352,10 @@ for cell_n = cell_range;
         orient_tuning_mn = mean(orientfreq,2)';
         
         theta_ind = orients*pi/180; %converts degress to radians
-        [theta_pref OSI A1 A2 w B yfit] = fit_tuningcurve(orient_tuning_mn,theta_ind);
-
+        
+        [theta_pref cvOSI cvDSI A1 A2 w B null_rate orth_rate yfit ] = fit_tuningcurve(orient_tuning_mn,theta_ind);
+         
+%         [DI prefdir]= calcOSI(R',1);
         
         sf = [0:n_col];
         %%% find preferred SF at optimal theta
@@ -414,16 +417,16 @@ for cell_n = cell_range;
         w_pref_col = ones(size(1:n_orient)).*w_pref;
         theta_tuning = interp2(w,theta,orientfreq,w_pref_col,theta_ind);
                 
-        [drift(cell_n,rep).theta drift(cell_n,rep).osi drift(cell_n,rep).A1 drift(cell_n,rep).A2 ...
+        [drift(cell_n,rep).theta drift(cell_n,rep).cv_osi drift(cell_n,rep).cv_dsi drift(cell_n,rep).A1 drift(cell_n,rep).A2 ...
             drift(cell_n,rep).thetawidth drift(cell_n,rep).B drift(cell_n,rep).null yfit]= fit_tuningcurve(theta_tuning,theta_ind);
                 
-        i=sqrt(-1);
-        mu = (sum(theta_tuning.*exp(i*theta_ind)))/sum(theta_tuning);
-        if isnan(mu);
-            mu=0;
-        end
-        
-        drift(cell_n,rep).dsi = abs(mu);
+%         i=sqrt(-1);
+%         mu = (sum(theta_tuning.*exp(i*theta_ind)))/sum(theta_tuning);
+%         if isnan(mu);
+%             mu=0;
+%         end
+%         
+%         drift(cell_n,rep).dsi = abs(mu);
         
         
         if w_pref <1

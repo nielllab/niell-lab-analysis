@@ -83,6 +83,7 @@ for dataset = 1:4  %%% adult vs eye opening
         clear wn wn_movement
         clear LFP_movement
         clear bars
+        clear 'rf_width'
         
         load([apath afiles{i}]);
         n_units = length(L_ratio);
@@ -133,15 +134,16 @@ for dataset = 1:4  %%% adult vs eye opening
         
         %size(rf_width)
         
-%         if exist('rf_width');
-%             
-%         rfw(cellrange,:) = rf_width*30;
-%         
-%         else
-%             
-%         rfw(cellrange,:) = NaN;
-%         end
-%         clear 'rf_width';
+        if exist('rf_width');
+            
+        rfw(cellrange,:) = rf_width*30;
+        
+        else
+            
+        rfw(cellrange,:) = NaN;
+        end
+      
+      
 %         
         driftA1(cellrange,:)= field2array(drift,'A1');
         driftA2(cellrange,:)=field2array(drift,'A2');
@@ -160,7 +162,8 @@ for dataset = 1:4  %%% adult vs eye opening
 
         driftlayer =  field2array(drift,'layer');
         lyr(cellrange,:) = driftlayer(:,1);
-        driftdsi(cellrange,:) = field2array(drift,'dsi');
+        cvDSI(cellrange,:) = field2array(drift,'dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+        cvOSI(cellrange,:)=field2array(drift,'osi');
         %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
         
         if exist('bars');
@@ -172,7 +175,7 @@ for dataset = 1:4  %%% adult vs eye opening
         
         end
         
-        
+    
         
         if exist('params');
 
@@ -246,6 +249,7 @@ legend('EO','adult');
 % plot(score(:,1),score(:,2),'o');
 
 
+
 inh = alldata(:,6)<1.75 & alldata(:,5)<8.5;  %%% directly based on wvform; k-means includes another inh group?
 midnarrow = alldata(:,6)>1.75 & alldata(:,5)<10;  %%% could analyze these specifically at some point
 
@@ -268,14 +272,14 @@ plot(alldata(age'==2,5),alldata(age'==2,6),'mo')
 title 'EO4 vs. adults'
 
 figure
-hold on
-plot(wvform(find(~inh),:)','k');plot(wvform(find(inh),:)','r');
-
+plot(wvform(age'==1& ~inh,:)','color','k');hold on
+plot(wvform(age'==4& ~inh,:)','color','k');hold on
+plot(wvform(age'==1 & inh,:)','color','r');hold on
+plot(wvform(age'==4& inh,:)','color','r');hold on
+ 
 figure
-plot(wvform(age'==3,:)','color','r');hold on
-plot(wvform(age'==2,:)','color',[.4 .4 .4]);hold on
+plot(wvform(age'==2,:)','color',[.5 .5 .5]);hold on
 
-% plot(wvform(age'==2,:)','color',[.5 .5 .5]);hold on
 figure
  y=wvform(age'==1 ,:);
  %y=y';
@@ -343,7 +347,7 @@ for i = 1:size(driftA1,1)
         driftA2(i,j);
         driftB(i,j);
         drift_theta_w(i,j);
-        [OSI(i,j) width(i,j) peak(i,j)] = calculate_tuning(driftA1(i,j),driftA2(i,j),driftB(i,j),drift_theta_w(i,j));
+        [OSI(i,j) DSI(i,j) width(i,j) peak(i,j)] = calculate_tuning(driftA1(i,j),driftA2(i,j),driftB(i,j),drift_theta_w(i,j));
         
         
     end
@@ -354,10 +358,18 @@ end
 %%firing rate
 responsive_run = peak(:,2)>=2; 
 responsive_stat = peak(:,1)>=2;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
-responsive_either= peak(:,2)>=2| peak(:,1)>2;
+%responsive_either= peak(:,2)>=2| peak(:,1)>2;
 %responsive_run =  peak(:,2)>=2;
-% responsive_both =  peak(:,1)>2 & peak(:,2)>2;
+%responsive_both =  peak(:,1)>2 & peak(:,2)>1 ;
 
+
+d= ~inh & age'==2 & responsive_stat;
+g= ~inh & age'==3 & responsive_stat;
+e=age'==1 & inh & responsive_stat;
+f=age'==4 & inh & responsive_stat;
+sum(d)
+sum(g)
+sum(e)
 
 
 peak1=peak;
@@ -368,15 +380,68 @@ peak1(peak1 < 0)=0.01; %%transforms all negative to 0.01 and makes that an equiv
 % peak1 = log10(peak1); %%%log base 10 of evoked firing rates
 
 %evoked_either= responsive_either & peak1(:,1)>=0 & peak1(:,1)<=1.6;
-evoked_stat= responsive_stat & peak1(:,1)<=80;
-evoked_run= responsive_run & peak1(:,2)<=80;
+evoked_stat= peak(:,1)>=2.0  & peak(:,1)<=80;  %OSI(:,1)>0.5 
+evoked_run= responsive_run & peak(:,2)<=80;
 
-all=peak(:,1)>=2
-layerAgeCDF(peak1(:,1),age,lyr,inh,evoked_stat,'peak');
-layerAgePlot(peak1(:,1),age,lyr,inh,evoked_stat,'peak');
-layerAgePlot_frac_responsive(peak(:,1),age,lyr,inh,all,'peak response');
+all=peak(:,1)>=2;
+%layerAgeCDF(peak1(:,1),age,lyr,inh,evoked_stat,'peak');
+layerAgePlot(peak(:,1),age,lyr,inh,evoked_stat,'peak');
+layerAgePlot_frac_responsive(peak(:,1),age,lyr,inh,evoked_stat,'peak response');
+layer_age_line(peak(:,1),age,lyr,inh,evoked_stat,'drift_peak FR Stationary')
+
+%i=nanmedian(peak1(inh & age'==4 & peak1(:,1)>=2))
+%%%ratio of running peak to stat peak
+layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),age,lyr,inh,responsive_both,{'run','stat'},'run vs stat');
 
 
+%driftspont1=driftspont(:,1);
+spont_stat_drift =  peak(:,1)>=2 & peak(:,1)<=80 & driftspont(:,1)>=0.045  ;
+layerAgePlot_ratio_jlh(driftspont(:,1),driftspont(:,2),age,lyr,inh,spont_stat_drift ,{'run','stat'},'run vs stat');
+
+dr1=driftspont(:,1)
+dr2=driftspont(:,2)
+[p h]=kstest2(dr1(age'==1& spont_stat_drift),dr2(age'==4&spont_stat_drift))
+
+%%firing rate modulation
+
+figure
+plot(peak(find(~inh & responsive_both & age'==4),1),peak(find(~inh& responsive_both & age'==4),2),'go');hold on
+plot([0 60],[0 60])
+xlabel ('stationary firing rate')
+ylabel ('locomotion firing rate')
+
+%%by layers
+
+figure
+plot(peak(find(~inh & responsive_both & age'==1 & lyr<=3),1),peak(find(~inh & responsive_both & age'==1 & lyr<=3),2),'ko');hold on
+hold on
+plot(peak(find(~inh & responsive_both & age'==1 & lyr==4),1),peak(find(~inh & responsive_both & age'==1 & lyr==4),2),'ro');hold on
+hold on
+plot(peak(find(~inh & responsive_both & age'==1 & lyr==5),1),peak(find(~inh & responsive_both & age'==1 & lyr==5),2),'co');hold on
+hold on
+plot(peak(find(~inh & responsive_both & age'==1 & lyr==6),1),peak(find(~inh & responsive_both & age'==1 & lyr==6),2),'yo');hold on
+hold on
+plot([0 60],[0 60])
+xlabel ('stationary firing rate')
+ylabel ('locomotion firing rate')
+legend ('layer2/3', 'layer4','layer5', 'layer6')
+%[p h]=ranksum(exct,exct_run)
+
+figure
+plot(exct,exct_run,'go'); hold on
+plot([0 60], [0 60])
+plot(exct_E,exct_run_E,'bo'); hold on
+title 'layer6'
+%%conduct simple ranksum comparison of medians from two groups directly
+ x1=responsive_stat & ~inh & age'==1 & lyr<=3;
+ y1=responsive_stat & ~ inh & age'==4 & lyr<=3;
+
+ [p h]=ranksum(peak1_stat(x1),peak1_stat(y1))
+
+
+
+layerAgePlot(rfw(:,1),age,lyr,inh,responsive_stat,'RF size');
+layer_age_line(rfw(:,1),age,lyr,inh,responsive_stat,'RF size');
 
 peak1_stat=peak(:,1);
 age_peak=age(peak(:,1)>=2);
@@ -390,11 +455,14 @@ p_peak=anovan(peak1_stat(peak(:,1)>=2),g, 'interaction');
 driftspont1=driftspont(:,1);
 spont_stat_drift =  peak(:,1)>=2 & driftspont1(:,1)>=0.045  ;
 
-layerAgeCDF(driftspont1(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
-layerAgePlot(driftspont1(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
-layer_age_line(driftspont1(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
+%layerAgeCDF(driftspont1(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
+layerAgePlot(driftspont(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
+layer_age_line(driftspont(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
 
+x1=responsive_stat & ~inh & age'==1 & driftspont1(:,1)>=0.045 & lyr<=3;
+y1=responsive_stat & ~ inh & age'==4 & driftspont1(:,1)>=0.045 &lyr<=3;
 
+ [p h]=ranksum(driftspont1(x1),driftspont1(y1))
 
 %driftspont1(driftspont1<=.9)=1; %%%transforms zero and close to zero values to 1 for ease of taking log10
 %driftspont1=log10(driftspont1);
@@ -421,34 +489,24 @@ drift_theta_1(drift_theta_1>330)=0;
 %drift_theta_1(drift_theta_1>330)=0;
 
 
-clear top30prct_OSI OSI_stat_top30
+% clear top30prct_OSI OSI_stat_top30
+% 
+% top50prct_OSI = prctile(OSI(:,1),50);
+% OSI_stat_top50 = responsive_either & OSI(:,1)>= top50prct_OSI; 
+% 
+% top50prct_OSI_run = prctile(OSI(:,2),50);
+% OSI_run_top50 = responsive_run & OSI(:,2)>= top50prct_OSI_run;
 
-top50prct_OSI = prctile(OSI(:,1),50);
-OSI_stat_top50 = responsive_either & OSI(:,1)>= top50prct_OSI; 
-
-top50prct_OSI_run = prctile(OSI(:,2),50);
-OSI_run_top50 = responsive_run & OSI(:,2)>= top50prct_OSI_run;
-
+responsive_stat=peak(:,1)>=2;
 tunedOSI_stat = responsive_stat & OSI (:,1)>=0.5; %use=age'==2 & OSI (:,1)>=0.45 & lyr<=3;
 tunedOSI_run = responsive_run & OSI (:,2)>=0.5; % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
 tunedOSI_either = responsive_either & OSI (:,2)>=0.5|OSI (:,1)>=0.5 ;
 
 
-%%preferred oprientation top 30prct
+%%preferred oprientation 
 layerAgePlot_pref_Orient(drift_theta_1(:,1),age,lyr,inh,tunedOSI_stat ,{'pref Orient' 'Prct total'},'Prefered Orientation Stationary');
-%layerAgePlot_pref_Orient(drift_theta_1(:,2),age,lyr,inh,OSI_run_top50 ,{'pref Orient' 'Prct total'},'Prefered Orientation Running');
 
-% figure
-% hist(drift_theta_1(age'==1 & lyr<=3 & OSI_stat_top30),0:45:330);
-% [f,x]=hist(drift_theta_1(age'==1 & lyr<=3 & OSI_stat_top30),0:45:330);
-%         % g=1/sqrt(2*pi)*exp(-0.5*x.^2);%# pdf of the normal distribution
-%         
-%         figure
-%         bar(x,f/sum(f));
-%%preferred oprientation alll units
-% layerAgePlot_pref_Orient(drift_theta_1(:,1),age,lyr,inh,responsive_stat,{'pref Orient' 'Prct total'},'Prefered Orientation Running');
-% layerAgePlot_pref_Orient(drift_theta_1(:,2),age,lyr,inh,responsive_run ,{'pref Orient' 'Prct total'},'Prefered Orientation Running');
-
+%layerAgePlot_frac_OS_DS(peak1_stat,age,lyr,inh,OS,c_DS,'OS that as c_DS'); 
 
 %%%OS
 
@@ -460,38 +518,45 @@ layerAgePlot(OSI(:,1),age,lyr,inh,responsive_stat,'OSI all Stationary');
 layer_age_line(OSI(:,1),age,lyr,inh,responsive_stat,'OSI all Stationary');
 %layerAgeScatterMedian(OSI(:,1),age,lyr,inh,responsive_stat,'OSI all Stationary');
 % layerAgeScatterMedian(OSI(:,2),age,lyr,inh,responsive_run,'OSI all running');
+o=OSI(:,1)
+d=DSI(:,1)
+clear x1 x2
+x1=o(age'==2 & lyr<=5 & responsive_stat);
+x2=o(age'==3 & lyr<=5 & responsive_stat);
+[p h]= ranksum(x1,x2)
 
+clear x1 x2
+x1=d(age'==4 & lyr<=3 & responsive_stat);
+x2=d(age'==3 & lyr<=3 & responsive_stat);
+[p h]= ranksum(x1,x2)
+y=sum(~isnan(x1))
+y1=sum(~isnan(x2))
 %%
 % %%%DS
- DSI_stat = responsive_stat & driftdsi(:,1)>=0 & driftdsi(:,1)<1.05;
- DSI_run =  responsive_run & driftdsi(:,2)>=0.05 & driftdsi(:,2)<1.05;
- DSI_either = responsive_either & driftdsi(:,1)>=0 & driftdsi(:,1)<1.05;
+ DSI_stat =  responsive_stat & DSI(:,1)>=0 & DSI(:,1)<1.05;
+ DSI_run =  DSI(:,2)>=0.5 & DSI(:,2)<1.05;
+ DSI_either =  DSI(:,1)>=0 & DSI(:,1)<1.05;
 % 
- top50prct_stat = prctile(driftdsi(:,1),50);
- DSI_stat_top50 = responsive_stat & driftdsi(:,1)>= top50prct_stat & driftdsi(:,1)<1.05;
-% 
- top50prct_run = prctile(driftdsi(:,2),50);
- DSI_run_top50 = responsive_run & driftdsi(:,2)>= top50prct_run & driftdsi(:,2)<=1;
-% 
- 
-layerAgeCDF(driftdsi(:,1),age,lyr,inh,DSI_stat_top50,'DSI Stationary ');
-% layerAgeCDF(driftdsi(:,2),age,lyr,inh,DSI_run_top50,'DSI Running');
-% 
- layerAgeCDF(driftdsi(:,1),age,lyr,inh,DSI_stat,'tuned DSI Stationary ');
-% % layerAgeCDF(driftdsi(:,2),age,lyr,inh,DSI_run,'tuned DSI run ');
-% 
- layerAgePlot(driftdsi(:,1),age,lyr,inh,DSI_stat_top50,'DSI Stationary ');
-% %layerAgePlot(driftdsi(:,2),age,lyr,inh,DSI_run_top50,'DSI Running');
- layer_age_line(driftdsi(:,1),age,lyr,inh,DSI_stat_top50,'DSI top 50%');
- layer_age_line(driftdsi(:,1),age,lyr,inh,DSI_stat,'DSI ');
+%  d=DSI(:,1)
+% sf_H_ds=responsive_stat &  driftwpref(:,1) >=0.25 & driftwpref(:,1)<=0.40;
+%  sf_L_ds=responsive_stat &  driftwpref(:,1) <0.25 & driftwpref(:,1)<=0.40;
 
- layerAgePlot(driftdsi(:,1),age,lyr,inh,DSI_stat,'DSI Stationary ');
+%layerAgeCDF(cvDSI(:,1),age,lyr,inh,DSI_stat_top50,'DSI Stationary ');
+%layerAgeCDF(cvDSI(:,1),age,lyr,inh,DSI_stat,'tuned DSI Stationary ');
  
- OS=OSI(:,1)>=0.5;
- DS=driftdsi(:,1)>=0.5;
- OS_DS=OSI(:,1)>=0.5 & driftdsi(:,1)>=0.5;
+layerAgePlot(DSI(:,1),age,lyr,inh,DSI_stat,'DSI Stationary ');
+ 
+layer_age_line(cvDSI(:,1),age,lyr,inh,DSI_stat_top50,'DSI top 50%');
+layer_age_line(cvDSI(:,1),age,lyr,inh,DSI_stat,'DSI ');
 
- layerAgePlot_frac_OS_DS(driftdsi(:,1),age,lyr,inh,OS,DS,'OS that as DS');
+
+
+
+ OS=OSI(:,1)>=0.5 & responsive_stat;
+ c_DS=cvDSI(:,1)>=0.5 & responsive_stat;
+ OS_c_DS=OSI(:,1)>=0.5 & cvDSI(:,1)>=0.5 & responsive_stat;
+
+ layerAgePlot_frac_OS_DS(peak(:,1),age,lyr,inh,OS,c_DS,'OS that as c_DS');
 
 % part 1: create orientations variable
 ori = 0:30:330;
@@ -500,8 +565,8 @@ ori = ori * pi /180;
 %%%polar plot figure
  % use=age'==1 & responsive_stat & lyr==6;
  clear use
- %use=age'==2 & tunedOSI_stat  & DSI_stat_top50; %driftdsi(:,1)>=0.45
- use=age'==1 &  responsive_stat & driftdsi(:,1)>=.45% & lyr<=3;% & DSI_stat_top50;
+ %use=age'==2 & tunedOSI_stat  & DSI_stat_top50; %cvDSI(:,1)>=0.45
+ use=age'==1 &  tunedOSI_stat & lyr<=3;% & DSI_stat_top50;
  clear a  ma j a_norm
  
 %drift_os=(drift_all(use,1).orientfreq_all);
@@ -518,16 +583,17 @@ for j=1:length(a);
     if sum(a_norm<0)==0
         polar([ori ori(1)], [a_norm a_norm(1)],'b');hold on
     end
- end
+end
 
-       
+
+      
 
 %%%OS tuning width
-tuned_OS_w_stat = tunedOSI_stat & drift_theta_w(:,1) >=0.1 & drift_theta_w(:,1) <1.2;
+tuned_OS_w_stat = tunedOSI_stat & drift_theta_w(:,1) >=0.17 & drift_theta_w(:,1) <1.2;
 %tuned_OS_w_run = tunedOSI_run & drift_theta_w(:,2) >=0.1 & drift_theta_w(:,2) <1.04; % .2 radians =  ~12deg and 1.04radians = ~ 60deg 
 %tuned_OS_w_either = tunedOSI_either & drift_theta_w(:,1) >=0.1 & drift_theta_w(:,1) <1.2;
 
-
+OS_w_stat=drift_theta_w(:,1) >=0.1 & drift_theta_w(:,1) <1.2;
 
 
 OS_w_stat = responsive_stat & drift_theta_w(:,1) >=0.1 & drift_theta_w(:,1) <1.04;
@@ -538,116 +604,112 @@ layerAgeCDF(drift_theta_w(:,1),age,lyr,inh,OS_w_stat ,'OS tuning width Stationar
 
 % layerAgeCDF(drift_theta_w(:,2),age,lyr,inh,tuned_OS_w_run ,'OS tuning width Running');
 
-layerAgePlot(drift_theta_w(:,1),age,lyr,inh,tuned_OS_w_stat,'OS tuning width Stationary');
+layerAgePlot(drift_theta_w(:,1),age,lyr,inh,OS_w_stat,'OS tuning width Stationary');
 % layerAgePlot(drift_theta_w(:,2),age,lyr,inh,tuned_OS_w_run,'OS tuning width Running');
 
 layer_age_line(drift_theta_w(:,1),age,lyr,inh,OS_w_stat,'OS tuning width');
 % layerAgeScatterMedian(drift_theta_w(:,1),age,lyr,inh,tuned_OS_w_either,'OS tuning width Stationary');
 % layerAgeScatterMedian(drift_theta_w(:,2),age,lyr,inh,tuned_OS_w_run,'OS tuning width Running');
 
-%%spatial frequency preference and bandwidth
+drift=drift_theta_w(:,1);
+ 
+x1=responsive_stat & drift_theta_w(:,1) >=0.1 & drift_theta_w(:,1) <1.04 & ~inh & age'==1 & lyr==6;
+ y1=responsive_stat & drift_theta_w(:,1) >=0.1 & drift_theta_w(:,1) <1.04 & ~inh & age'==4 & lyr==6;
+ [p h]=ranksum(drift(x1),drift(y1))
+
+ 
+ %%spatial frequency preference and bandwidth
  
 driftwpref(driftwpref==0) = 0.005; %tranform SF pref = 0 to 0.005 in order to plot on log scale
 
 
- SF_pref_stat = responsive_stat & driftwpref(:,1) >=0.005 & driftwpref(:,1)<=0.40;
+ SF_pref_stat = peak(:,1)>=2 & driftwpref(:,1) >=0.004 & driftwpref(:,1)<=0.40;
 % SF_pref_run = responsive_run & driftwpref(:,2) >=0.005 & driftwpref(:,2)<=0.32;
 
-% SF_pref_stat_SF = responsive_stat & driftwpref(:,1) >=0 & driftwpref(:,1)<=8;
-% SF_pref_run_SF = responsive_run & driftwpref(:,2) >0 & driftwpref(:,2)<=.32;
-% 
-% SF_pref_stat = responsive_stat &  driftwpref(:,1)<=.32;
-% SF_pref_run = responsive_run  & driftwpref(:,2)<=.32;
-% 
-% SF_pref_tuned_stat = tunedOSI_stat & driftwpref(:,1)<=.32;
-% SF_pref_tuned_run = tunedOSI_run & driftwpref(:,2) <=.32;
-% 
-% SF_pref_tuned_stat_SF = tunedOSI_stat & driftwpref(:,1)>0 & driftwpref(:,1)<=.32;
-% SF_pref_tuned_run_SF = tunedOSI_run & driftwpref(:,2)>0 & driftwpref(:,2) <=.32;
-
-%SF_pref_stat = responsive_either & driftwpref(:,1)>=0.005;
-%SF_pref_stat_either = responsive_either & driftwpref(:,1)>=1 & driftwpref(:,1)<=8;
-% SF_pref_tuned_run = tunedOSI_run &  driftwpref(:,2) >=0.005 & driftwpref(:,2)<=0.32;
 
 layerAgeCDF(driftwpref(:,1),age,lyr,inh,SF_pref_stat,'wpref Stationary');
 %layerAgeCDF(driftwpref(:,2),age,lyr,inh,SF_pref_run,'wpref run');
 
-%layerAgeCDF(driftwpref(:,1),age,lyr,inh,SF_pref_stat_either ,'wpref Stationary');
-%layerAgeCDF(driftwpref(:,2),age,lyr,inh,SF_pref_tuned_run_SF,'wpref Running');
-
 layerAgePlot(driftwpref(:,1),age,lyr,inh,SF_pref_stat,'wpref_stat'); 
 layer_age_line(driftwpref(:,1),age,lyr,inh,SF_pref_stat,'SF_pref Stationary ');
+layerAgePlot_SF_line(driftwpref(:,1),age,lyr,inh,SF_pref_stat,'SF_pref Stationary ');
+
 all=peak(:,1);
 responsive_stat=peak(:,1)>=2;
 layerAgePlot_frac_responsive(driftwpref(:,1),age,lyr,inh,SF_pref_stat,'prct responsive');
 
-driftwpref_stat=driftwpref(:,1);
-dift=driftwpref_stat(SF_pref_stat);
+driftwpref_stat=driftwpref(:,1)
 
 age_peak=age(SF_pref_stat);
 lyr_peak=lyr(SF_pref_stat);
 g={age_peak';lyr_peak};
 p_wpref=anovan(dift,g, 'interaction');
+clear A
 
-[f,x]=hist(driftwpref(SF_pref_stat & age'==3),0:0.02:.32)
-[f1,x1]=hist(driftwpref(SF_pref_stat & age'==4),0:0.02:.32);
-sf=[(f/sum(f));(f1/sum(f1))];
-figure
-bar(x,sf',2)
-title 'EO1 vs afult bandwidth SF pref'
-
-% figure
-% [f,x]=hist(driftwpref(SF_pref_stat & age'==1),0:0.02:.32);
-% bar(x,f/sum(f))
-% title 'adult bandwidth SF pref'
-% hold on
-% 
-% figure
-% [f1,x1]=hist(driftwpref(SF_pref_stat & age'==4),0:0.02:.32);
-% bar(x1,f1/sum(f1))
-% title 'EO1 bandwidth SF pref'
-
-A={driftwpref(SF_pref_stat & age'==4 & lyr<=3),driftwpref(SF_pref_stat & age'==1&lyr<=3)};
-
+A={driftwpref_stat(SF_pref_stat & age'==4 & lyr<=6),driftwpref_stat(SF_pref_stat & age'==1&lyr<=6)};
 [h p]= kstest2(A{1},A{2})
+clear x1 y1
+x1=SF_pref_stat & age'==1 & lyr==6
+y1=SF_pref_stat & age'==4 & lyr==6
 
- %A={(f/sum(f));(f1/sum(f1))}';
+[p h]=ranksum(driftwpref_stat(x1),driftwpref_stat(y1))
+d=sum(x1)
+g=sum(y1)
 
-% % ranksum(A{1},A{2})
-% % %%%all layers
-% % % A={abs(STA_nx(age==1&good_STA)),abs(STA_nx(age==2&good_STA))};
-% % % A1={STA_nx(age==1&good_STA),STA_nx(age==2& good_STA)};
-% % 
-%  figure
-%  nhist(A,'legend',{'median=0','median=1'},'mean','noerror','separate','smooth');
-%  title 'all layers'
+figure
+[f,x]=hist(driftwpref_stat(age'==1 & lyr<=6 & ~inh & SF_pref_stat),0:0.03:0.32);
+H1=bar(x,f/sum(f),'b');
+title 'EO1 nx L4'
+hold on
+
+[f1,x1]=hist(driftwpref_stat(age'==4 & lyr<=6 & ~inh& SF_pref_stat),0:0.03:0.32);
+H2=bar(x,f1/sum(f1),'g');
+ch=get(H2,'child');
+set(ch,'facea',.5)
+title 'Eo1_vs adult _ny'
+hold on
 
 %%%SF_pref_bandwidth
 
 driftwbw_1=driftwbw(:,1);
 driftwbw_1(logical(imag(driftwbw_1)))=-1;
-%driftwbw_1(driftwbw_1>=7)=0;
-driftwbw_1=2*(driftwbw_1);
-driftwbw_1(driftwbw_1==-2)=10;
-driftwbw_1(driftwbw_1==0)=9;
-driftwbw_1(driftwbw_1<=7 & driftwbw_1>=6)=10;
-driftwbw_1(driftwbw_1<=0.4)=9;
+driftwbw_1=1.5*(driftwbw_1);
+%driftwbw_1(driftwbw_1==-1.5)=10;
+driftwbw_1(driftwbw_1<1)=8;
+% driftwbw_1(driftwbw_1<=7 & driftwbw_1>=6)=10;
+ driftwbw_1(driftwbw_1<=0.4 & driftwbw_1>=-.5)=9;
+driftwbw_1(driftwbw_1>8.5)=nan
+
+
+figure
+[f,x]=hist(driftwbw_1(age'==1 & ~inh & SF_pref_stat),0:0.5:9);
+H1=bar(x,f/sum(f),'b');
+title 'EO1 nx L4'
+hold on
+
+[f1,x1]=hist(driftwbw_1(age'==4 & lyr<=6 & ~inh & SF_pref_stat),0:0.5:9);
+H2=bar(x,f1/sum(f1),'g');
+ch=get(H2,'child');
+set(ch,'facea',.5)
+title 'Eo1_vs adult '
+hold on
 
 
 
-[f,x]=hist(driftwbw_1(age'==1 & SF_pref_stat ),0:0.5:10)
-[f1,x1]=hist(driftwbw_1(age'==4 & SF_pref_stat ),0:0.5:10)
+[f,x]=hist(driftwbw_1(age'==1 & SF_pref_stat ),0:0.5:9)
+[f1,x1]=hist(driftwbw_1(age'==4 & SF_pref_stat ),0:0.5:9)
 bw=[(f/sum(f));(f1/sum(f1))];
 figure
 bar(x,bw',2)
 title 'EO1 vs afult bandwidth SF pref'
 
-[f2,x2]=hist(driftwbw_1(age'==2 ),0:0.25:5);
+[f2,x2]=hist(driftwbw_1(age'==1 ),0:0.25:5);
 [f3,x3]=hist(driftwbw_1(age'==3 ),0:0.25:5)
 
-B={driftwbw_1(SF_pref_stat & age'==1 & lyr==6),driftwbw_1(SF_pref_stat & age'==4 & lyr==6)};
+B={driftwbw_1(SF_pref_stat & age'==1 & lyr<=6),driftwbw_1(SF_pref_stat & age'==4 & lyr<=6)};
 
 [h p]= kstest2(B{1},B{2})
+[h p]= ranksum(B{1},B{2})
 %driftwbw_1(driftwbw_1==0.05)=4;
 
 % driftwbw_2 =size(driftwbw_1)
@@ -665,12 +727,10 @@ layerAgePlot(driftwbw_1,age,lyr,inh,SF_pref_stat,'SF_pref tuning width Stationar
 % layerAgePlot(drift_theta_w(:,2),age,lyr,inh,tuned_OS_w_run,'OS tuning width Running');
 p_wpref_bw=anovan(driftwbw_1(peak(:,1)>=2),g, 'interaction');
 
-layerAgePlot(driftwbw_1,age,lyr,inh,responsive_stat,'SF_pref tuning width Stationary');
-% layerAgePlot(drift_theta_w(:,2),age,lyr,inh,tuned_OS_w_run,'OS tuning width Running');
 
 SF_pref_bw=SF_pref_stat & driftwbw_1<8;
-layer_age_line(driftwbw_1(:,1),age,lyr,inh,SF_pref_stat,'SF_pref BW');
-
+layer_age_line(driftwbw_1,age,lyr,inh,SF_pref_stat,'SF_pref BW');
+layerAgePlot(driftwbw_1,age,lyr,inh,SF_pref_stat,'SF_pref tuning width Stationary');
 p_wpref_bw=anovan(driftwbw_1(lp),g, 'interaction');
 
 layerAgePlot_SF_BW(driftwbw_1,age,lyr,inh,responsive_stat,{'pref Orient' 'Prct total'},'SF_pref tuning width Stationary');
@@ -686,113 +746,118 @@ layerAgePlot_SF_BW(driftwbw_1,age,lyr,inh,responsive_stat,{'pref Orient' 'Prct t
 
 %%%Nx data
 clear f x f2 x1
-good_STA =STA_exp_var>=0.6;
-%%%all layers
-[f,x]=hist(abs(STA_nx(age==1  & lyr'==4 & good_STA)));
-figure
-bar(x,f/sum(f));
-title 'EO1 nx L4'
+good_STA =STA_exp_var>=0.6 & STA_ny<0.39;
+responsive_stat = peak(:,1)>=2;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
+
+clear STA_nx_EO1 STA_nx_adult
+STA_nx_EO1=abs(STA_nx(age==1   & ~inh' & good_STA));
+STA_nx_adult=abs(STA_nx(age==4  & ~inh' & good_STA));
+
+n1=sum(~isnan(STA_nx_EO1))
+n2=sum(~isnan(STA_nx_adult))
+%[h p]=vartest2(STA_nx_EO1,STA_nx_adult);
+
+STA_ny_EO1=abs(STA_ny(age==1   & ~inh' & good_STA));
+STA_ny_adult=abs(STA_ny(age==4  & ~inh' & good_STA));
+
+[p h] = kstest2(STA_ny_EO1,STA_ny_adult)
+
+clear p h g f g_s age_peak lyr_peak x1 y1
+[p h]=lillietest(STA_nx_adult)
+g_s=skewness(STA_nx_adult)
+n=size(STA_nx_adult)
+
+[p h]=lillietest(STA_nx_EO1)
+g_s=skewness(STA_nx_EO1)
+n=size(STA_nx_EO1)
+%%calculate the binomial probability
  
-[f1,x1]=hist(abs(STA_nx(age==2 & lyr'==4 & good_STA)));
+%group1
+clear total resp frac errdata prct_err pci phat
+total=sum(age'==1  & lyr<=4  & ~inh & responsive_stat);
+resp = sum(~isnan(STA_nx_EO1));         
+frac= resp/total;
+        
+[phat,pci]= binofit(resp,total);        
+% errdata =pci/sqrt(total);
+% prct_err= errdata/resp;         
+% prct_err_lin=prct_err*frac;
+ %group 2
+ clear total_2 resp_2 frac_2 errdata_2 prct_err_2 M2 V2
+total_2=sum(age'==4  & lyr<=4  & ~inh & responsive_stat);
+resp_2 = sum(~isnan(STA_nx_adult));         
+frac_2= resp_2/total_2;
+        
+[M2,V2]= binofit(resp_2,total_2);        
+
+
+
+%%ranksum
+ %%%KS test
+ B={STA_ny(age==1 & lyr'==4 & ~inh' & good_STA),STA_ny(age==4 & lyr'==4 & ~inh' & good_STA)};
+[h p]= kstest2(B{1},B{2})
+
+B={STA_nx(age==1 & lyr'==4 & ~inh' & good_STA),STA_nx(age==4 & lyr'==4 & ~inh' & good_STA)};
+[h p]= kstest2(B{1},B{2})
+
+n1=size(STA_nx(age==1 & lyr'<=6 & ~inh' & good_STA))
+n2=size(STA_nx(age==4 & lyr'<=6 & ~inh' & good_STA))
+%%%all layers
 figure
-bar(x,f1/sum(f1));
-title 'adult L4'
-
-med_nx_EO1=nanmedian(abs(STA_nx(age==1 & good_STA)))
-s_nx_E = semedian(abs(STA_nx(age==1 & good_STA)))
-
-med_nx_adult=nanmedian(abs(STA_nx(age==4  & good_STA)))
-s_nx_a = semedian(abs(STA_nx(age==4  & good_STA)))
-
-medians=[med_nx_EO1;med_nx_adult];
-SM=[s_nx_E;s_nx_a];
-
-figure
-barweb(medians,SM);
-title 'median nx'
-
-mean_nx_EO1=nanmean(abs(STA_nx(age==1   & good_STA)))
-N=sum(~isnan(STA_nx(age==1  & good_STA)))
-SEM_nx_E=nanstd(abs(STA_nx(age==1  & good_STA))/sqrt(N))
-
-mean_nx_adult=nanmean(abs(STA_nx(age==2   & good_STA)))
-N=sum(~isnan(STA_nx(age==2  & good_STA)))
-SEM_nx_a=nanstd(abs(STA_nx(age==2 & good_STA))/sqrt(N))
-
-means=[mean_nx_EO1;mean_nx_adult];
-SEM=[SEM_nx_E;SEM_nx_a];
-
-figure
-barweb(means,SEM);
-title 'means nx'
-
-layerAgePlot(abs(STA_ny),age,lyr,inh,good_STA','sta_nx');
-
-%%%plot with fancy multiplot histogram function
-
- A={(f/sum(f));(f1/sum(f1))}';
-% [p h]=kstest2(A{1},A{2});
-% ranksum(A{1},A{2})
-% %%%all layers
-% % A={abs(STA_nx(age==1&good_STA)),abs(STA_nx(age==2&good_STA))};
-% % A1={STA_nx(age==1&good_STA),STA_nx(age==2& good_STA)};
-% 
- figure
- nhist(A,'legend',{'median=0','median=1'},'median','noerror','smooth');
- title 'all layers'
-
-
-%%%plots of Ny vs Nx by layer
-good_STA=STA_exp_var>=0.6 ;
-layerAgeNxNy(abs(STA_nx),abs(STA_ny),age,lyr,inh,good_STA,{'nx','ny'},'nx vs ny');
-
-%%% high SF pref
-STA_high =STA_exp_var>=0.6 & driftwpref(:,1)'>0.2;
-layerAgeNxNy(abs(STA_nx),abs(STA_ny),age,lyr,inh,STA_high,{'nx','ny'},'nx ratio vs high pref SF(>.10cpd)');
-
-%%% ny nx as a function of spatial frequency pref (regardless of age)
-figure
-jitterValuesX = 2*(rand(size(STA_nx(lyr'<=6 & STA_high)))-0.5)*.02;   % +/-jitterAmount max
-                     %jitterValuesY = 2*(rand(size(data2(uselist)))-0.5)*jitterAmount;   % +/-jitterAmount max
-scatter(abs(STA_nx(lyr'<=6 & STA_high))+jitterValuesX, abs(STA_ny(lyr'<=6 & STA_high)), 'ro');hold on
-axis square
-axis equal
-plot([0 0.75],[0 0.75]) 
+[f,x]=hist(abs(STA_nx(age==1 & lyr'<=6 & ~inh' & good_STA )));
+H1=bar(x,f/sum(f),'b');
 hold on
+[f1,x1]=hist(abs(STA_nx(age==4 & lyr'<=6 & ~inh'& good_STA )));
+H2=bar(x,f1/sum(f1),'g');
+ch=get(H2,'child');
+set(ch,'facea',.5)
+title 'Eo1_vs adult _nx'
 
-STA_low=STA_exp_var>=0.6 & driftwpref(:,1)'<0.02;
-jitterValuesX = 2*(rand(size(STA_nx(lyr'<=6 & STA_low)))-0.5)*.02;   % +/-jitterAmount max
-                     %jitterValuesY = 2*(rand(size(data2(uselist)))-0.5)*jitterAmount;   % +/-jitterAmount max
-scatter(abs(STA_nx(lyr'<=6 & STA_low))+jitterValuesX, abs(STA_ny(lyr'<=6 & STA_low)), 'ko');
-
-x=nanmedian(abs(STA_nx(lyr'<=6 & STA_low)));
-x1=nanmedian(abs(STA_nx(lyr'<=6 & STA_high)));
-
-y=nanmedian(abs(STA_ny(lyr'<=6 & STA_low)));
-y1=nanmedian(abs(STA_ny(lyr'<=6 & STA_high)));
-
-ranksum(STA_ny(lyr'==4 & STA_low),STA_ny(lyr'==4 & STA_high))
-
-%%%plots of Ny Nx ratios
-STA_x_ratio=abs(STA_nx)./abs(STA_ny);
-%STA_x_ratio(isnan(STA_x_ratio))=0;
-good_STA =STA_exp_var>=0.6 %& STA_x_ratio>0 ;
-good_STA=good_STA';
-
-%good_STA=good_STA';
-layerAgePlot(STA_x_ratio,age,lyr,inh,good_STA,'Nx Ny ratio');
+figure
+[f,x]=hist(abs(STA_ny(age==1 & lyr'<=6 & ~inh' & good_STA )));
+H1=bar(x,f/sum(f),'b');
+hold on
+[f1,x1]=hist(abs(STA_ny(age==4 & lyr'<=6 & ~inh'& good_STA )));
+H2=bar(x,f1/sum(f1),'g');
+ch=get(H2,'child');
+set(ch,'facea',.5)
+title 'Eo1_vs adult _ny'
+ranksum(abs(STA_ny(age==4 & lyr'<=6 & ~inh' & good_STA )),abs(STA_ny(age==2 & lyr'<=6 & ~inh'& good_STA )))
 
 
-STA_y_ratio=abs(STA_ny)./abs(STA_nx);
-%STA_y_ratio(isnan(STA_y_ratio))=0;
+STA_nx=STA_nx';
+STA_ny=abs(STA_ny)';
+good_STA =STA_exp_var>=0.6 & STA_ny<0.39;
 
-layerAgePlot(STA_y_ratio,age,lyr,inh,good_STA','Ny Nx ratio');
-age_sta=age(good_STA);
-lyr_sta=lyr(good_STA);
-g_sta={age_sta';lyr_sta};
-p_ny_ratio=anovan(STA_y_ratio(good_STA),g_sta, 'interaction');
+layerAgePlot(STA_nx,age,lyr,inh,good_STA','SF_pref tuning width Stationary nx');
+layerAgePlot(abs(STA_ny),age,lyr,inh,good_STA','SF_pref tuning width Stationary ny');
+
+jitterValuesX = 2*(rand(size(STA_nx))-0.5)*0.005;
+STA_nx_j= STA_nx + jitterValuesX
+
+layerAgeNxNy(abs(STA_nx),abs(STA_ny),age,lyr,inh,good_STA,{'nx','ny'},'nx vs ny');
+layerAgePlot_ratio_jlh(abs(STA_nx_j),abs(STA_ny),age,lyr,inh,good_STA,{'nx','ny'},'nx vs ny');
 
 
+% layer_age_line(STA_nx(:,1),age,lyr,inh,good_STA','nxStationary ');
+% layer_age_line(STA_ny(:,1),age,lyr,inh,good_STA','nxStationary ');
+
+
+x1=STA_x_ratio(age==1 & lyr'==4 & good_STA & STA_ny'<0.39);
+x2=STA_x_ratio(age==4 & lyr'==4 & good_STA & STA_ny'<0.39);
+[p h]= ranksum(x1,x2);
+
+x1=STA_x_ratio(age==1 & lyr'<=6 & ~inh' & good_STA & STA_ny'<0.39);
+x2=STA_x_ratio(age==4 & lyr'<=6 & ~inh' & good_STA & STA_ny'<0.39);
+[p h]= ranksum(x1,x2);
+
+clear f f1 x x1
+figure
+[f,x]=hist(STA_ny(age==1   & ~inh' & good_STA ),0:0.035:0.4)
+[f1,x1]=hist(STA_ny(age==4 & ~inh' & good_STA ),0:0.035:0.4)
+bw=[(f/sum(f));(f1/sum(f1))];
+figure
+bar(x,bw',2)
 
 
 %STA_phase=degtorad(STA_phase);
@@ -960,12 +1025,12 @@ layerAgePlot(B,age,lyr,inh,good_STA,'RF area');
 
 %%%simple cells F1F0
 tunedOSI_F1F0_stat =peak(:,1)>=1 & OSI(:,1)>=0.5 & driftF1F0(:,1) <2.2 ;
-F1F0_stat = peak(:,1)>=1 & driftF1F0(:,1) <2.2;
+F1F0_stat = peak(:,1)>=2 & driftF1F0(:,1) <2.2;
 
 % tunedOSI_F1F0_run = tunedOSI_run & driftF1F0(:,2) <=2.1 ;
  %F1F0_run = responsive_run & driftF1F0(:,2) <=2.1;
 
- 
+ F1= driftF1F0(:,1)>1;
 layerAgeCDF(driftF1F0(:,1),age,lyr,inh,F1F0_stat,'F1F0 Stationary');% F1F ratio of all units regardless of selectivity
 %layerAgeCDF(driftF1F0(:,2),age,lyr,inh,F1F0_run,'F1F0 Running');
  
