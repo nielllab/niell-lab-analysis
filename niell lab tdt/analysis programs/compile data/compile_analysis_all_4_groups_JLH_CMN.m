@@ -162,7 +162,8 @@ for dataset = 1:4  %%% adult vs eye opening
 
         driftlayer =  field2array(drift,'layer');
         lyr(cellrange,:) = driftlayer(:,1);
-        driftdsi(cellrange,:) = field2array(drift,'dsi');
+        cvDSI(cellrange,:) = field2array(drift,'dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+        cvOSI(cellrange,:)=field2array(drift,'osi');
         %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
         
         if exist('bars');
@@ -174,7 +175,7 @@ for dataset = 1:4  %%% adult vs eye opening
         
         end
         
-        
+    
         
         if exist('params');
 
@@ -346,7 +347,7 @@ for i = 1:size(driftA1,1)
         driftA2(i,j);
         driftB(i,j);
         drift_theta_w(i,j);
-        [OSI(i,j) width(i,j) peak(i,j)] = calculate_tuning(driftA1(i,j),driftA2(i,j),driftB(i,j),drift_theta_w(i,j));
+        [OSI(i,j) DSI(i,j) width(i,j) peak(i,j)] = calculate_tuning(driftA1(i,j),driftA2(i,j),driftB(i,j),drift_theta_w(i,j));
         
         
     end
@@ -356,10 +357,10 @@ end
 
 %%firing rate
 responsive_run = peak(:,2)>=2; 
-responsive_stat = peak(:,1)>=2 ;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
-responsive_either= peak(:,2)>=2| peak(:,1)>2;
+responsive_stat = peak(:,1)>=2;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
+%responsive_either= peak(:,2)>=2| peak(:,1)>2;
 %responsive_run =  peak(:,2)>=2;
- responsive_both =  peak(:,1)>2 & peak(:,2)>1 ;
+%responsive_both =  peak(:,1)>2 & peak(:,2)>1 ;
 
 
 d= ~inh & age'==2 & responsive_stat;
@@ -394,7 +395,7 @@ layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),age,lyr,inh,responsive_both,{'run','s
 
 
 %driftspont1=driftspont(:,1);
-spont_stat_drift =  peak(:,1)>=1.5 & peak(:,1)<=80 & driftspont(:,1)>=0.045  ;
+spont_stat_drift =  peak(:,1)>=2 & peak(:,1)<=80 & driftspont(:,1)>=0.045  ;
 layerAgePlot_ratio_jlh(driftspont(:,1),driftspont(:,2),age,lyr,inh,spont_stat_drift ,{'run','stat'},'run vs stat');
 
 dr1=driftspont(:,1)
@@ -452,7 +453,7 @@ p_peak=anovan(peak1_stat(peak(:,1)>=2),g, 'interaction');
  %%%%spontaneous rates during drift
 
 driftspont1=driftspont(:,1);
-spont_stat_drift =  peak(:,1)>=1.5 & driftspont1(:,1)>=0.045  ;
+spont_stat_drift =  peak(:,1)>=2 & driftspont1(:,1)>=0.045  ;
 
 %layerAgeCDF(driftspont1(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
 layerAgePlot(driftspont(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
@@ -488,13 +489,13 @@ drift_theta_1(drift_theta_1>330)=0;
 %drift_theta_1(drift_theta_1>330)=0;
 
 
-clear top30prct_OSI OSI_stat_top30
-
-top50prct_OSI = prctile(OSI(:,1),50);
-OSI_stat_top50 = responsive_either & OSI(:,1)>= top50prct_OSI; 
-
-top50prct_OSI_run = prctile(OSI(:,2),50);
-OSI_run_top50 = responsive_run & OSI(:,2)>= top50prct_OSI_run;
+% clear top30prct_OSI OSI_stat_top30
+% 
+% top50prct_OSI = prctile(OSI(:,1),50);
+% OSI_stat_top50 = responsive_either & OSI(:,1)>= top50prct_OSI; 
+% 
+% top50prct_OSI_run = prctile(OSI(:,2),50);
+% OSI_run_top50 = responsive_run & OSI(:,2)>= top50prct_OSI_run;
 
 responsive_stat=peak(:,1)>=2;
 tunedOSI_stat = responsive_stat & OSI (:,1)>=0.5; %use=age'==2 & OSI (:,1)>=0.45 & lyr<=3;
@@ -505,7 +506,7 @@ tunedOSI_either = responsive_either & OSI (:,2)>=0.5|OSI (:,1)>=0.5 ;
 %%preferred oprientation 
 layerAgePlot_pref_Orient(drift_theta_1(:,1),age,lyr,inh,tunedOSI_stat ,{'pref Orient' 'Prct total'},'Prefered Orientation Stationary');
 
-%layerAgePlot_frac_OS_DS(peak1_stat,age,lyr,inh,OS,DS,'OS that as DS'); 
+%layerAgePlot_frac_OS_DS(peak1_stat,age,lyr,inh,OS,c_DS,'OS that as c_DS'); 
 
 %%%OS
 
@@ -518,7 +519,7 @@ layer_age_line(OSI(:,1),age,lyr,inh,responsive_stat,'OSI all Stationary');
 %layerAgeScatterMedian(OSI(:,1),age,lyr,inh,responsive_stat,'OSI all Stationary');
 % layerAgeScatterMedian(OSI(:,2),age,lyr,inh,responsive_run,'OSI all running');
 o=OSI(:,1)
-d=driftdsi(:,1)
+d=DSI(:,1)
 clear x1 x2
 x1=o(age'==2 & lyr<=5 & responsive_stat);
 x2=o(age'==3 & lyr<=5 & responsive_stat);
@@ -532,30 +533,30 @@ y=sum(~isnan(x1))
 y1=sum(~isnan(x2))
 %%
 % %%%DS
- DSI_stat =  responsive_stat & driftdsi(:,1)>=0 & driftdsi(:,1)<1.05;
- DSI_run =  driftdsi(:,2)>=0.5 & driftdsi(:,2)<1.05;
- DSI_either =  driftdsi(:,1)>=0 & driftdsi(:,1)<1.05;
+ DSI_stat =  responsive_stat & DSI(:,1)>=0 & DSI(:,1)<1.05;
+ DSI_run =  DSI(:,2)>=0.5 & DSI(:,2)<1.05;
+ DSI_either =  DSI(:,1)>=0 & DSI(:,1)<1.05;
 % 
-%  d=driftdsi(:,1)
+%  d=DSI(:,1)
 % sf_H_ds=responsive_stat &  driftwpref(:,1) >=0.25 & driftwpref(:,1)<=0.40;
 %  sf_L_ds=responsive_stat &  driftwpref(:,1) <0.25 & driftwpref(:,1)<=0.40;
 
-layerAgeCDF(driftdsi(:,1),age,lyr,inh,DSI_stat_top50,'DSI Stationary ');
-%layerAgeCDF(driftdsi(:,1),age,lyr,inh,DSI_stat,'tuned DSI Stationary ');
+%layerAgeCDF(cvDSI(:,1),age,lyr,inh,DSI_stat_top50,'DSI Stationary ');
+%layerAgeCDF(cvDSI(:,1),age,lyr,inh,DSI_stat,'tuned DSI Stationary ');
  
-layerAgePlot(driftdsi(:,1),age,lyr,inh,DSI_stat,'DSI Stationary ');
+layerAgePlot(DSI(:,1),age,lyr,inh,DSI_stat,'DSI Stationary ');
  
-layer_age_line(driftdsi(:,1),age,lyr,inh,DSI_stat_top50,'DSI top 50%');
-layer_age_line(driftdsi(:,1),age,lyr,inh,DSI_stat,'DSI ');
+layer_age_line(cvDSI(:,1),age,lyr,inh,DSI_stat_top50,'DSI top 50%');
+layer_age_line(cvDSI(:,1),age,lyr,inh,DSI_stat,'DSI ');
 
 
 
 
  OS=OSI(:,1)>=0.5 & responsive_stat;
- DS=driftdsi(:,1)>=0.5 & responsive_stat;
- OS_DS=OSI(:,1)>=0.5 & driftdsi(:,1)>=0.5 & responsive_stat;
+ c_DS=cvDSI(:,1)>=0.5 & responsive_stat;
+ OS_c_DS=OSI(:,1)>=0.5 & cvDSI(:,1)>=0.5 & responsive_stat;
 
- layerAgePlot_frac_OS_DS(peak(:,1),age,lyr,inh,OS,DS,'OS that as DS');
+ layerAgePlot_frac_OS_DS(peak(:,1),age,lyr,inh,OS,c_DS,'OS that as c_DS');
 
 % part 1: create orientations variable
 ori = 0:30:330;
@@ -564,7 +565,7 @@ ori = ori * pi /180;
 %%%polar plot figure
  % use=age'==1 & responsive_stat & lyr==6;
  clear use
- %use=age'==2 & tunedOSI_stat  & DSI_stat_top50; %driftdsi(:,1)>=0.45
+ %use=age'==2 & tunedOSI_stat  & DSI_stat_top50; %cvDSI(:,1)>=0.45
  use=age'==1 &  tunedOSI_stat & lyr<=3;% & DSI_stat_top50;
  clear a  ma j a_norm
  

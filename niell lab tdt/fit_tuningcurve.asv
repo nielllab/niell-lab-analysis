@@ -1,4 +1,4 @@
-function [theta_pref cvOSI cvDSI A1 A2 w B orth_rate yfit ] = fit_tuningcurve(R, theta_ind);
+function [theta_pref cvOSI cvDSI A1 A2 w B null_rate orth_rate yfit ] = fit_tuningcurve(R, theta_ind);
 
 % temp_baseline =min(R); 
 % R=R-temp_baseline;  %%%need to keep things positive for fourier analysis
@@ -95,7 +95,7 @@ elseif theta_pref>2*pi
 end
 
 orth_rate = interp1(theta_ind,yfit,mod(theta_pref+pi/2,2*pi));
-%null_rate = interp1(theta_ind,yfit,mod(theta_pref+pi,2*pi));
+null_rate = interp1(theta_ind,yfit,mod(theta_pref+pi,2*pi));
 
 
 A1

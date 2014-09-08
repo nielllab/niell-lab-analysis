@@ -5,7 +5,7 @@ hold on
 
 colorlist='bgrm';
 
-for age=1:2
+for age=1:4
     for group = 1:6
         if group ==1
             uselist = (ageList==age & (layer<=3) & ~inh  & used);
