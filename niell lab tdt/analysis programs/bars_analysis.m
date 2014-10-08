@@ -282,7 +282,7 @@ for cell_n = cell_range;
  
 end
 
-save(afile,'bars','-append');
+%save(afile,'bars','-append');
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);

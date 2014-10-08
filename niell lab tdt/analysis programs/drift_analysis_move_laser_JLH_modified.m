@@ -55,7 +55,7 @@ end
 %psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
-thresh_velocity = 0.5;
+thresh_velocity = 1.0;
 figure
 plot(tsamp,vsmooth);
 
@@ -353,7 +353,7 @@ for cell_n = cell_range;
         
         theta_ind = orients*pi/180; %converts degress to radians
         
-        [theta_pref cvOSI cvDSI A1 A2 w B null_rate orth_rate yfit ] = fit_tuningcurve(orient_tuning_mn,theta_ind);
+        [theta_pref cvOSI cvDSI A1 A2 w B orth_rate yfit ] = fit_tuningcurve(orient_tuning_mn,theta_ind);
          
 %         [DI prefdir]= calcOSI(R',1);
         
