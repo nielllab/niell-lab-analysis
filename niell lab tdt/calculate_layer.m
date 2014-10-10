@@ -5,12 +5,14 @@ function [ layers ] = calculate_layer(tip_loc,theta)
     %'tip_loc' is location of electrode tip recovered in histology in uM
     %' theta' is angle of electrode to surface of cortex, number_sites is
    [fname, pname] = uigetfile('*.mat','analysis');
-   % load(fullfile(pname,fname));
     afile = fullfile(pname,fname)
     load(afile)
+   
+    
    tip_loc = input('depth in microns : ');
    theta=input('angle of penetration:');
-    %extracts first site of all tetrodes
+ 
+   %extracts first site of all tetrodes
     tet = cells(:,1);
     
     %converts tetrode location into phsyical distance from tip of electrode
