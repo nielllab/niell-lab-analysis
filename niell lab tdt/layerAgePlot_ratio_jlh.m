@@ -2,8 +2,8 @@ function [mediandata errdata ratio]  =layerAgePlot_ratio_jlh(data1,data2,ageList
 %plot ratio of data1 vs data2 with CIs by layer
 
 ageList=ageList';
- for age=1:4
-    for group = 1:5
+ for age=1:2
+    for group = 1:6
         if group ==1
             uselist = (ageList==age & (layer<=3) & ~inh & used);
         elseif group==2
@@ -12,9 +12,9 @@ ageList=ageList';
             uselist = (ageList==age & (layer==5) & ~inh & used);
         elseif group==4
             uselist = (ageList==age & (layer==6) & ~inh & used);
-%         elseif group==5   
-%             uselist = (ageList==age & inh & used');
-        elseif group==5
+        elseif group==5   
+             uselist = (ageList==age & inh & used);
+        elseif group==6
             uselist = (ageList==age & (layer<=6) & ~inh & used);
         end
    
@@ -45,8 +45,8 @@ ageList=ageList';
  
  
  
-Med_E_A=[ratio_D2_D1(:,1), ratio_D2_D1(:,4)]
-s_med_E_A=[err_ratio(:,1),err_ratio(:,4)]
+Med_E_A=[ratio_D2_D1(:,1), ratio_D2_D1(:,2)]
+s_med_E_A=[err_ratio(:,1),err_ratio(:,2)]
 
 figure
 barweb(Med_E_A,s_med_E_A);
@@ -64,8 +64,8 @@ barweb(ratio_D2_D1,err_ratio)
  errorbar(1:4,ratio_D2_D1(2,:),err_ratio(2,:),'r');hold on
 %  
 figure
-errorbar(1:4,mediandata_x(3,:),errdata_med_x(3,:),'k');hold on 
-errorbar(1:4,mediandata_y(3,:), errdata_med_y(3,:),'g');hold on
+errorbar(1:4,mediandata_x(5,:),errdata_med_x(5,:),'k');hold on 
+errorbar(1:4,mediandata_y(5,:), errdata_med_y(5,:),'g');hold on
 title ' layer 5 spont running_green stat_black'
 
 % figure

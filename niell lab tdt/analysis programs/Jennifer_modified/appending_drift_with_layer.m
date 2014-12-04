@@ -72,4 +72,4 @@ end
 %if you need to remove a corrupted field, 'layer' for example, evoke the following code:
 %  field = 'layer';
 %  drift = rmfield(drift,field);
-%  save(afile, 'drift','-append')
+ save(afile, 'drift','-append')

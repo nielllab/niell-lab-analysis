@@ -7,11 +7,11 @@ colorlist='bgrm';
 for age=1:4
     for group = 1:5
         if group ==1
-            uselist = (ageList==age & (layer<=5)   & used);
+            uselist = (ageList==age & (layer<=3)   & used);
         elseif group ==2
             uselist = (ageList==age & (layer==4)   & used);
         elseif group==3
-            uselist = (ageList==age & (layer==5)  &  used);
+            uselist = (ageList==age & (layer<=5)  &  used);
         elseif group==4
             uselist = (ageList==age & (layer==6)  &  used);
         elseif group==5

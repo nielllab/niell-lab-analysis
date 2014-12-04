@@ -13,6 +13,8 @@ i=sqrt(-1);
 mu = (sum(R.*exp(2*i*theta_ind)))/sum(abs(R));
 dsi = (sum(R.*exp(i*theta_ind)))/sum(abs(R));
 
+
+
 %osi = sum(R.*exp(sqrt(-1)*theta'))/sum(R)
 %osi = sum(R.*exp(sqrt(-1)*theta))/sum(R);
 

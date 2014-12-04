@@ -58,7 +58,7 @@ end
 % fieldnames(drift)
 %  drift = addfield(drift, 'layer')
 % drift.layer = setfield(drift,'layer1',layers)
-% rmfield(drift,'layer')
+%  rmfield(drift,'layer')
 
 save(afile,'drift','-append');
 end
