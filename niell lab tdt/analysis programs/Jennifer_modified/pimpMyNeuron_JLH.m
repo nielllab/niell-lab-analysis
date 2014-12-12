@@ -104,7 +104,7 @@ for c = 1:length(cell_range)
     base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
     Sdev(c)=nanstd(psth(c,1:48))%%between -50 and 0 ms
     PinpFR(c)=max(psth(c,52:64))%peak between laser onest (0) and 12ms
-    PINPed(c)= PinpFR(c)>= base(c)+(4*Sdev(c))
+    PINPed(c)= PinpFR(c)>= base(c)+(4*Sdev(c))& base(c)>1
     
     xlabel('msec')
     ylabel('sp/sec')
@@ -149,6 +149,7 @@ figure(mainfig)
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',fullfile(pname,fname),'-append');
 
+save(afile, 'PINPed','PinpFR','base','-append')
 
 for i = 1:length(histfig)
     figure(histfig(i))

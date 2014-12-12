@@ -355,8 +355,6 @@ speedlist = speedlist*9.8/7;
 speedlist(speedlist<0.25)=0.25;
 x=nanmedian(speedlist>1)
 
-
-
 speedlist = log10(speedlist);
 
 %[f3 h3]=hist(speedlist,0.5:1:20);
@@ -368,9 +366,6 @@ xlim([-0.5 2]); ylim([0 0.55])
 set(gca,'Xtick',[-0.5 :0.5 : 1.5])
 set(gca,'Xticklabel',{'0','1','3','10','30'})
 xlabel('speed cm/sec')
-
-
-
 
 end
 
