@@ -9,83 +9,130 @@ if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous fil
 
 apath = 'D:\Jen_ephys_data\developmental_periods\';
 N =0; cells=0;  all_img_STA={};
-for dataset = 1:4  %%% adult vs eye opening
+for dataset = 1:2  %%% adult vs eye opening
     
     if dataset ==1
         
-        afiles = {'Good recordings\Adults\1month_2month old\9_25_13\rec1\analysis_9_25_13_P31_rec1.mat',...
-            'Good recordings\Adults\1month_2month old\7_18_13_adult\analysis_07_18_13_cluster_rec1.mat',...
+        afiles = { 'Good recordings\Adults\9_12_13\rec1\analysis_9_12_13_adult_rec1.mat',...
+             'Good recordings\Adults\11_15_13\rec1\analysis_11_15_13_adult_rec1.mat',...
+             'Good recordings\Adults\1month_2month old\7_18_13_adult\analysis_07_18_13_cluster_rec1.mat',...
             'Good recordings\Adults\5_25_13_Adultmale3mo\Adult B\analysis_5_25_13_B_rec1_adult.mat',...
             'Good recordings\Adults\1month_2month old\4_22_13\analysis_adult.mat',...
             'Good recordings\Adults\7_19_13_adult\analysis_cluster_adult_rec2_7_19_13.mat',...
             'Good recordings\Adults\7_25_13_deep\MouseB\Rec1\analysis_7_25_13_mouseB_rec1.mat',...
-            'Good recordings\Adults\7_25_13_deep\MouseB\Rec2\analysis_cluster_data_07_25_13_mouseB_adult_rec2.mat',...
-            'Good recordings\Adults\1month_2month old\9_25_13\rec1\analysis_9_25_13_P31_rec1.mat',...
-            'Good recordings\Adults\9_12_13\rec1\analysis_9_12_13_adult_rec1.mat',...
-            'Good recordings\Adults\9_12_13\rec2\analysis_9_12_13_adult_rec2.mat',...
-            'Good recordings\Adults\11_11_13\rec1\analysis_11_11_13_adult_rec1.mat',... %%% no wn
-            'Good recordings\Adults\11_11_13\rec2\analysis_11_11_13_adult_rec2.mat',...
-            'Good recordings\Adults\11_13_13\rec1\analysis_adult_11_13_13_rec1.mat',...
-            'Good recordings\Adults\11_13_13\rec2\analysis_11_13_13_rec2.mat',...
-            'Good recordings\Adults\11_14_13\rec1\analysis_11_14_13_adult_rec1.mat',...
-            'Good recordings\Adults\11_14_13\rec2\analysis_11_14_13_adult_rec2.mat',...
-            'Good recordings\Adults\11_15_13\rec1\analysis_11_15_13_adult_rec1.mat',...
-            'Good recordings\Adults\11_15_13\rec2\analysis_11_15_13_adult_rec2.mat'}; %% no wn
-    elseif dataset==2
-        
-        afiles = {'Good recordings\EO7_EO9\8_6_13_EO7\analysis_EO7_rec1_8_6_13.mat',...
-              'Good recordings\EO7_EO9\8_6_13_EO7\rec2\analysis_8_6_13_rec2_EO7.mat',...
-              'Good recordings\EO7_EO9\9_2_13_EO7\rec2\analysis_9_2_13_EO9_rec2.mat',...
-              'Good recordings\EO7_EO9\9_6_13_EO11\analysis_9_6_13_EO11_rec1.mat',...
-              'Good recordings\EO7_EO9\9_6_13_EO11\rec2\analysis_9_6_13_EO11_rec2.mat',...
-              'Good recordings\EO7_EO9\11_27_13_EO7\rec1\analysis_11_27_13_EO7_rec1.mat',...
-              'Good recordings\EO7_EO9\11_27_13_EO7\rec2\analysis_11_27_13_EO7_rec2.mat',...
-              'Good recordings\EO7_EO9\05_10_13_EO7\Record1_upper\analysis_1.mat',...
-              'Good recordings\EO7_EO9\05_10_13_EO7\Record_1_deeper\analysis_EO8_deeper.mat'};
-    elseif dataset ==3
-       
-        afiles = { 'Good recordings\EO3_EO4\5_6_13_EO3\mouseC\analysis_mouseC_EO3_5_6_13.mat',...
-             'Good recordings\EO3_EO4\7_5_13P16_EO4\mouseB\analysis_07_5_13_cluster_7_5_13_mouseB_945uM_analysis.mat',...
-             'Good recordings\EO3_EO4\8_2_13_EO3\analysis_EO3_8_2_13_rec1.mat',...
-             'Good recordings\EO3_EO4\9_10_13_EO3\rec1\analysis_9_10_13_EO3_rec1.mat',...
-             'Good recordings\EO3_EO4\9_10_13_EO3\rec2\analysis_9_10_13_EO3_rec2.mat',...
-             'Good recordings\EO3_EO4\11_25_13_EO4\rec1\analysis_11_25_13_EO4_rec1.mat',...
-             'Good recordings\EO3_EO4\11_25_13_EO4\rec2\analysis_11_25_13_EO4_rec2.mat'}; %% no wn
+             'Good recordings\Adults\11_13_13\rec1\analysis_adult_11_13_13_rec1.mat',...
+              'Good recordings\Adults\11_14_13\rec1\analysis_11_14_13_adult_rec1.mat',...
+            'Good recordings\Adults\11_14_13\rec2\analysis_11_14_13_adult_rec2.mat'};
+%             'Good recordings\Adults\9_12_13\rec2\analysis_9_12_13_adult_rec2.mat',...
+%             'Good recordings\Adults\11_11_13\rec1\analysis_11_11_13_adult_rec1.mat',... %%% no wn
+%             'Good recordings\Adults\11_11_13\rec2\analysis_11_11_13_adult_rec2.mat',...
+             
+%             'Good recordings\Adults\11_15_13\rec2\analysis_11_15_13_adult_rec2.mat',... %% no wn
+ %           'Good recordings\Adults\1month_2month old\9_25_13\rec1\analysis_9_25_13_P31_rec1.mat',...
+            
+%             'Good recordings\Adults\7_25_13_deep\MouseB\Rec2\analysis_cluster_data_07_25_13_mouseB_adult_rec2.mat',...
+%             'Good recordings\Adults\1month_2month old\9_25_13\rec1\analysis_9_25_13_P31_rec1.mat',...
+       %      'Good recordings\Adults\11_13_13\rec1\analysis_adult_11_13_13_rec1.mat',...
+  %          'Good recordings\Adults\11_13_13\rec2\analysis_11_13_13_rec2.mat',...
+          
+            
+%     elseif dataset==2
+%         
+%         afiles = {'Good recordings\EO7_EO9\9_6_13_EO11\analysis_9_6_13_EO11_rec1.mat',...
+%               'Good recordings\EO7_EO9\11_27_13_EO7\rec1\analysis_11_27_13_EO7_rec1.mat',...
+%             'Good recordings\EO7_EO9\P24_9_11_14\analysis_9_11_14_rec1.mat',...
+%              'Good recordings\EO7_EO9\9_30_14_EO9\analysis_9_30_14_EO9_rec1.mat',...
+%              'Good recordings\EO7_EO9\8_6_13_EO7\analysis_EO7_rec1_8_6_13.mat',...
+%               'Good recordings\EO7_EO9\8_6_13_EO7\rec2\analysis_8_6_13_rec2_EO7.mat',...
+%               'Good recordings\EO7_EO9\9_2_13_EO7\rec2\analysis_9_2_13_EO9_rec2.mat',...
+%               'Good recordings\EO7_EO9\9_6_13_EO11\rec2\analysis_9_6_13_EO11_rec2.mat',...
+%               'Good recordings\EO7_EO9\11_27_13_EO7\rec2\analysis_11_27_13_EO7_rec2.mat',...
+%               'Good recordings\EO7_EO9\05_10_13_EO7\Record1_upper\analysis_1.mat',...
+%               'Good recordings\EO7_EO9\05_10_13_EO7\Record_1_deeper\analysis_EO8_deeper.mat',...
+%               'Good recordings\EO7_EO9\P26_9_15_14\analysis_9_15_14.mat',...
+%              'Good recordings\EO7_EO9\P24_9_11_14\rec2\analysis_9_11_14_rec2.mat',...
+%             'Good recordings\EO7_EO9\10_2_14_EO5\rec1\analysis_10_2_14_rec1_EO5.mat'};
+%     elseif dataset ==3
+%        
+%         afiles = { 'Good recordings\EO3_EO4\7_5_13P16_EO4\mouseB\analysis_07_5_13_cluster_7_5_13_mouseB_945uM_analysis.mat',...
+%              'Good recordings\EO3_EO4\8_2_13_EO3\analysis_EO3_8_2_13_rec1.mat',...
+%              'Good recordings\EO3_EO4\9_10_13_EO3\rec1\analysis_9_10_13_EO3_rec1.mat',...
+%              'Good recordings\EO3_EO4\9_10_13_EO3\rec2\analysis_9_10_13_EO3_rec2.mat',...
+%                          'Good recordings\EO3_EO4\EO4_9_25_14_rec1\analysis_9_25_14_EO4_rec1.mat',...
+%                          'Good recordings\EO3_EO4\5_6_13_EO3\mouseC\analysis_mouseC_EO3_5_6_13.mat',...
+%              'Good recordings\EO3_EO4\11_25_13_EO4\rec1\analysis_11_25_13_EO4_rec1.mat',...
+%              'Good recordings\EO3_EO4\11_25_13_EO4\rec2\analysis_11_25_13_EO4_rec2.mat',...
+%              'Good recordings\EO3_EO4\10_1_14_EO4\analysis_10_1_14_rec1_EO4_Altered.mat',...
+%             'Good recordings\EO3_EO4\10_1_14_EO4\rec2\analysis_10_1_14_rec2_EO4.mat',...
+%             'Good recordings\EO3_EO4\EO3_9_24_14\analysis_9_24_14_EO3.mat',...
+%             'Good recordings\EO3_EO4\EO4_9_25_14_rec1\rec2\analysis_9_25_14_EO4_rec2.mat'}; %% no wn
           
      
-    elseif dataset ==4
+    elseif dataset ==2
         afiles = {'Good recordings\EO1_EO2\8_7_13_EO1\rec1_full_clustering\analysis_8_7_13_EO1_rec1_more_strigent.mat',...
-            'Good recordings\EO1_EO2\8_7_13_EO1\rec2_full_clustering\analysis_8_7_13_rec2.mat',...
             'Good recordings\EO1_EO2\8_8_13_EO2\rec1_full_clustering\analysis.mat',...
             'Good recordings\EO1_EO2\5_22_13_EO1\analysis_rec1_A_5_22_13_strict_selection.mat',...
-            'Good recordings\EO1_EO2\4_29_13_EO1\mouseC\analysis_4_29_13_C.mat',...
             'Good recordings\EO1_EO2\7_17_13_EO1\Analysis_7_17_13_cluster_7_17_13_EO1.mat',...
             'Good recordings\EO1_EO2\7_17_13_EO1\Rec2\Analysis_7_17_13_rec2_EO1.mat',...
-            'Good recordings\EO1_EO2\9_9_13_EO1\rec1\analysis_9_9_13_EO1_rec1.mat',...
-            'Good recordings\EO1_EO2\9_30_13_EO1\rec1\analysis_9_30_13_EO1_rec1.mat',...
-            'Good recordings\EO1_EO2\9_30_13_EO1\rec2\analysis_9_30_13_EO1_rec2.mat',...
             'Good recordings\EO1_EO2\9_9_13_EO1\rec2\analysis_9_9_13_EO1_rec2.mat',...
             'Good recordings\EO1_EO2\10_1_13_EO2\rec1\analysis_10_1_13_EO2_rec1.mat',...
-            'Good recordings\EO1_EO2\11_20_13_EO0\rec1\analysis_11_20_13_rec1.mat',...
-            'Good recordings\EO1_EO2\11_20_13_EO0\rec2\analysis_11_20_13_EO0_rec2.mat',...
             'Good recordings\EO1_EO2\11_21_13_EO1_mouseA\analysis_11_21_13_mouseA_EO1.mat',...
-            'Good recordings\EO1_EO2\11_23_13_EO2\analysis_11_23_13_EO2.mat',...
-            'Good recordings\EO1_EO2\11_26_13_mouseA_EO1\rec1\analysis_11_26_13_EO1_mouseA_rec1.mat',...
-            'Good recordings\EO1_EO2\11_26_13_mouseA_EO1\rec2\analysis_11_26_13_EO1_rec2.mat',...
-            'Good recordings\EO1_EO2\11_26_13_mouseB_EO1\analysis_11_26_13_mouseB_EO1.mat',...
-            'Good recordings\EO1_EO2\11_27_13_mouseB_EO2\analysis_11_27_13_EO2_mouseB.mat'}; %%% tg
-    end
+            'Good recordings\EO1_EO2\11_23_13_EO2\analysis_11_23_13_EO2.mat'};
+      end  
+           % 'Good recordings\EO1_EO2\9_9_13_EO1\rec1\analysis_9_9_13_EO1_rec1.mat',...
+            %'Good recordings\EO1_EO2\9_30_13_EO1\rec1\analysis_9_30_13_EO1_rec1.mat',...
+            %'Good recordings\EO1_EO2\9_30_13_EO1\rec2\analysis_9_30_13_EO1_rec2.mat',...
+            
+            %'Good recordings\EO1_EO2\11_20_13_EO0\rec2\analysis_11_20_13_EO0_rec2.mat',...
+           
+           % 'Good recordings\EO1_EO2\11_26_13_mouseB_EO1\analysis_11_26_13_mouseB_EO1.mat',...
+           % 'Good recordings\EO1_EO2\11_27_13_mouseB_EO2\analysis_11_27_13_EO2_mouseB.mat'}; %%% tg
+      %           'Good recordings\EO1_EO2\11_20_13_EO0\rec1\analysis_11_20_13_rec1.mat',...
+%             'Good recordings\EO1_EO2\11_26_13_mouseA_EO1\rec1\analysis_11_26_13_EO1_mouseA_rec1.mat',...
+%             'Good recordings\EO1_EO2\11_26_13_mouseA_EO1\rec2\analysis_11_26_13_EO1_rec2.mat',...
+%             'Good recordings\EO1_EO2\8_7_13_EO1\rec2_full_clustering\analysis_8_7_13_rec2.mat',...
+ %       'Good recordings\EO1_EO2\4_29_13_EO1\mouseC\analysis_4_29_13_C.mat',...
+   
     
     
     for i = 1:length(afiles)
-        
+   
         clear params
         clear wn wn_movement
         clear LFP_movement
-        clear bars
-        clear 'rf_width'
-        
+        clear bars wave_all
+        clear rf_width
+        clear locomotion
         load([apath afiles{i}]);
+%         
+%        clusterfilename
+%        afiles{i}
+%     
+%         if exist(clusterfilename,'file')
+%             clusterFile = clusterfilename;
+%         elseif exist(clusterfilename((length(pname)+1):end),'file')
+%             clusterFile = clusterfilename((length(pname)+1):end);
+%         elseif exist([clusterfilename((length(pname)+1):end) '.mat'],'file')
+%             clusterFile = [clusterfilename((length(pname)+1):end) '.mat'];
+%         else
+%             [fname pname] = uigetfile('*.mat','cluster file');
+%             clusterFile = fullfile(pname,fname);
+%             clusterfilename = clusterFile;
+%             if fname~=0
+%                 save([apath afiles{i}],'clusterfilename','-append');
+%             end
+%         end
+%         clusterFile
+%         try
+%             load(clusterFile,'wave_all');
+%         catch
+%             display('no cluster file')
+%         end
+%         
+%     
+         
+        
+        
         n_units = length(L_ratio);
         cellrange = N+1:N+n_units;
         N=N+n_units;
@@ -103,7 +150,7 @@ for dataset = 1:4  %%% adult vs eye opening
         
      
         
-        age(cellrange)=5-dataset;
+        age(cellrange)=3-dataset;
 %         for dontuse =1:1
 %             %     for c = 1:n_units;
 %             %         ch = alldata(c,1);
@@ -151,12 +198,19 @@ for dataset = 1:4  %%% adult vs eye opening
         drift_theta_w(cellrange,:)=field2array(drift,'thetawidth');
         drift_theta(cellrange,:)=field2array(drift,'theta');
         
+        driftA1_th(cellrange,:)= field2array(drift_th,'A1');
+        driftA2_th(cellrange,:)=field2array(drift_th,'A2');
+        driftB_th(cellrange,:)= field2array(drift_th,'B');
+        drift_theta_w_th(cellrange,:)=field2array(drift_th,'thetawidth');
+        drift_theta_th(cellrange,:)=field2array(drift_th,'theta');
+        
+        
+        
         driftspont(cellrange,:) = field2array(drift,'spont');
-              
         driftwpref(cellrange,:) = field2array(drift,'wpref');
         driftwbw(cellrange,:) = field2array(drift,'bw') ;
         
-        driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
+%        driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
         driftF0(cellrange,:) = field2array(drift,'F0');
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
 
@@ -164,6 +218,9 @@ for dataset = 1:4  %%% adult vs eye opening
         lyr(cellrange,:) = driftlayer(:,1);
         cvDSI(cellrange,:) = field2array(drift,'dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
         cvOSI(cellrange,:)=field2array(drift,'osi');
+        
+        SNR(cellrange,:)=field2array(drift_sig_noise,'signoise');
+        SNR_err(cellrange,:)=field2array(drift_sig_noise,'signoise_SE');
         %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
         
         if exist('bars');
@@ -171,34 +228,65 @@ for dataset = 1:4  %%% adult vs eye opening
         bar_spont(cellrange,:)=field2array(bars,'spont');
        
         else
-        bar_spont(cellrange,:)= NaN;
+     %   bar_spont(cellrange,:)= NaN;
         
         end
         
-    
+       
         
-        if exist('params');
-
-            
-        all_img_STA(cellrange)= all_img;
+%         clear meanwaves snr stdwaves
+%         
+%         for c=1:length(cells);
+%             %%% get SNR
+%             tet =ceil(cells(c,1)/4);
+%             
+%             if exist('wave_all','var')
+%                 wvall = wave_all{tet};
+%                 wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
+%                 
+%                 amps =squeeze(min(wvclust(:,5:10,:),[],2));
+%                 mn = abs(nanmean(amps));
+%                 stdev = nanstd(amps);
+%                 [y ind] = max(mn);
+%                 snr(c) = mn(ind)/stdev(ind);
+%                 
+%                 meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
+%                 stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
+%             else
+%                 meanwaves=NaN;
+%                 snr=NaN
+%                 stdwaves=NaN
+%             end
+%             
+%             
+%         end
         
-        STA_nx(cellrange)=field2array(params,'nx');
-        STA_ny(cellrange)=field2array(params,'ny');
-        STA_phase(cellrange)=field2array(params,'phase');
-        STA_sigx(cellrange)=field2array(params,'sigx');
-        STA_sigy(cellrange)=field2array(params,'sigy');
-        STA_exp_var(cellrange)=field2array(params,'exp_var');
+%         SNRall(cellrange)=snr;
+%         meanWavesAll(cellrange,:,:) = meanwaves;
+%         stdWavesAll(cellrange,:,:) = stdwaves;
         
-        
-        else
-        STA_nx(cellrange)= NaN;
-        STA_ny(cellrange)=  NaN;
-        STA_phase(cellrange)= NaN;
-        STA_sigx(cellrange)= NaN;
-        STA_sigy(cellrange)= NaN; 
-        STA_exp_var(cellrange)=NaN;
-
-        end
+%         if exist('params');
+% 
+%             
+%         all_img_STA(cellrange)= all_img;
+%         
+%         STA_nx(cellrange)=field2array(params,'nx');
+%         STA_ny(cellrange)=field2array(params,'ny');
+%         STA_phase(cellrange)=field2array(params,'phase');
+%         STA_sigx(cellrange)=field2array(params,'sigx');
+%         STA_sigy(cellrange)=field2array(params,'sigy');
+%         STA_exp_var(cellrange)=field2array(params,'exp_var');
+%         
+%         
+%         else
+% %         STA_nx(cellrange)= NaN;
+% %         STA_ny(cellrange)=  NaN;
+% %         STA_phase(cellrange)= NaN;
+% %         STA_sigx(cellrange)= NaN;
+% %         STA_sigy(cellrange)= NaN; 
+% %         STA_exp_var(cellrange)=NaN;
+% 
+%         end
         
 
         
@@ -209,12 +297,87 @@ for dataset = 1:4  %%% adult vs eye opening
         %12 rows(orientations) by 7 columns(SpatialFreqs) for each cell
         
         drift_Ori_Sf(cellrange,:) = arrayfun(@(x)(getfield(x,'orientfreq_all')),drift,'UniformOutput',false);
-        drift_all(cellrange,:)=drift;
-        
+       % drift_all(cellrange,:)=drift';
+      
        
-    end %%% loop over adult vs EO
+       if exist('locomotion');
+           Vel(i,dataset)=arrayfun(@(x)(getfield(x,'mouseV')),locomotion,'UniformOutput',false);
+           
+           
+       end
+       
+       end %%% loop over adult vs EO
 end
-%replace all NaN in F1F0 with 0
+
+% figure
+% plot(squeeze(meanWavesAll(1,:,1)))
+% 
+% 
+% waveforms=figure
+% x=[1:19]
+% 
+% SNR_1=age==1 & SNRall>8 & SNRall<6
+% [x idx]=max(SNRall(SNR_1))
+% 
+% SNR_7 =SNRall(age==3);
+% SNR_3=SNRall(age==2);
+% SNR_1=SNRall(age==1);
+
+% for i=1:4
+%     clear m s
+%     
+% m=squeeze(meanWavesAll(25,:,i))
+% s =squeeze(stdWavesAll(25,:,i))   
+% figure(waveforms)
+% subplot(4,1,i); hold on
+% shadedErrorBar(x,m,s)
+% end
+%plot speed distributions
+
+Aspeed=zeros;
+
+
+
+
+
+
+figure
+colorlist='bgrm'
+for dev= 1:2
+speedlist=[]; 
+for i = 1:size(Vel,1);
+      frac_loc(i,dev)=(sum(Vel{i,dev}<1))/length(Vel{i,dev});
+    %if frac_loc(i,age)<0.82
+       speedlist=[speedlist Vel{i,dev}];
+    %end 
+end
+speedlist = speedlist*9.8/7;
+speedlist(speedlist<0.25)=0.25;
+x=nanmedian(speedlist>1)
+
+speedlist = log10(speedlist);
+
+%[f3 h3]=hist(speedlist,0.5:1:20);
+[f3 h3]=hist(speedlist,-0.5:0.25:2);
+f3=f3./sum(f3);
+
+plot(h3,f3,'color',colorlist(dev));hold on
+xlim([-0.5 2]); ylim([0 0.55])
+set(gca,'Xtick',[-0.5 :0.5 : 1.5])
+set(gca,'Xticklabel',{'0','1','3','10','30'})
+xlabel('speed cm/sec')
+
+end
+
+legend('E01','Adult')
+plot([log10(0.7) log10(0.7)],[0 0.55],'k--')
+
+
+
+
+
+
+
 
 % ind = find(isnan(driftF1F0));
 % driftF1F0(ind)=0;
@@ -223,13 +386,13 @@ end
 %define excitatory cell types versus inhibotory types based on trough
 %to peak versus troughdepth/peak height
 
-EI = [alldata(:,5:6)];
+EI = [size_speed_1];
 opts = statset('display','final');
 [idx,ctrs] = kmeans(EI,2,'distance','city','Replicates',5,'options',opts);
 if sum(idx==1)<sum(idx==2)
-    inh = (idx==1);
+    run = (idx==1);
 else
-    inh = (idx==2);
+   run = (idx==2);
 end
 
 
@@ -260,8 +423,8 @@ plot(alldata(find(~inh),5),alldata(find(~inh),6),'ko');
 hold on
 
 figure
-plot(alldata(age'==4,5),alldata(age'==4,6),'go');hold on
-plot(alldata(age'==3,5),alldata(age'==3,6),'ro');hold on
+%plot(alldata(age'==4,5),alldata(age'==4,6),'go');hold on
+%plot(alldata(age'==3,5),alldata(age'==3,6),'ro');hold on
 plot(alldata(age'==2,5),alldata(age'==2,6),'color',[.5,.5,.5 ]);hold on
 plot(alldata(age'==1,5),alldata(age'==1,6),'bo');
 title 'EO7 vs. adults'
@@ -272,9 +435,9 @@ plot(alldata(age'==2,5),alldata(age'==2,6),'mo')
 title 'EO4 vs. adults'
 
 figure
-plot(wvform(age'==1& ~inh,:)','color','k');hold on
 plot(wvform(age'==4& ~inh,:)','color','k');hold on
-plot(wvform(age'==1 & inh,:)','color','r');hold on
+plot(wvform(age'==4& ~inh,:)','color','k');hold on
+plot(wvform(age'==2 & ~inh,:)','color','r');hold on
 plot(wvform(age'==4& inh,:)','color','r');hold on
  
 figure
@@ -310,7 +473,7 @@ hold on
 
 
 figure
-plot(wvform(age'==4,:)','g');hold on
+plot(wvform(age'==1,:)','g');hold on
 plot(wvform(age'==2,:)','m');
 title 'EO3_4 vs. adults'
 
@@ -353,45 +516,60 @@ for i = 1:size(driftA1,1)
     end
 end
 
+for i = 1:size(driftA1_th,1)
+    for j=1:size(driftA1_th,2)
+        driftA1_th(i,j);
+        driftA2_th(i,j);
+        driftB_th(i,j);
+        drift_theta_w_th(i,j);
+        [OSI_th(i,j) DSI_th(i,j) width_th(i,j) peak_th(i,j)] = calculate_tuning(driftA1_th(i,j),driftA2_th(i,j),driftB_th(i,j),drift_theta_w_th(i,j));
+        
+        
+    end
+end
+
+
 %variables created to sift through data conditionally
 
 %%firing rate
 responsive_run = peak(:,2)>=2; 
-responsive_stat = peak(:,1)>=2;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
-%responsive_either= peak(:,2)>=2| peak(:,1)>2;
-%responsive_run =  peak(:,2)>=2;
-%responsive_both =  peak(:,1)>2 & peak(:,2)>1 ;
+responsive_stat = peak(:,1)>=2 & peak(:,2)>=2;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
+responsive_stat_th = peak_th(:,1)>=1.8 & peak_th(:,2)>=2;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
 
+responsive_SNR=SNR_err(:,1)>=2 & SNRall(:,1)>=2 
+good_units=SNRall(:,1)>=2;
 
-d= ~inh & age'==2 & responsive_stat;
-g= ~inh & age'==3 & responsive_stat;
+d= ~inh & age'==2 & lyr<=3 & responsive_stat;
+g= ~inh & age'==1 & lyr<=3 & responsive_stat;
 e=age'==1 & inh & responsive_stat;
-f=age'==4 & inh & responsive_stat;
+f=age'==1 & inh & responsive_stat;
 sum(d)
 sum(g)
 sum(e)
 
+[p h]=ranksum(peak(d,1),peak(g,1))
+% peak1=peak;
+% peak1(peak1 < 0)=0.01; %%transforms all negative to 0.01 and makes that an equivelent class
 
-peak1=peak;
-
-peak1(peak1 < 0)=0.01; %%transforms all negative to 0.01 and makes that an equivelent class
-%peak1(peak1>0.01 & peak1<1.5 )=1; %%%transforms all 0 values, as "unresponsive" cells to a single class "0.9"
-% peak1(peak1==0)=1;
-% peak1 = log10(peak1); %%%log base 10 of evoked firing rates
-
-%evoked_either= responsive_either & peak1(:,1)>=0 & peak1(:,1)<=1.6;
 evoked_stat= peak(:,1)>=2.0  & peak(:,1)<=80;  %OSI(:,1)>0.5 
 evoked_run= responsive_run & peak(:,2)<=80;
 
 all=peak(:,1)>=2;
 %layerAgeCDF(peak1(:,1),age,lyr,inh,evoked_stat,'peak');
 layerAgePlot(peak(:,1),age,lyr,inh,evoked_stat,'peak');
-layerAgePlot_frac_responsive(peak(:,1),age,lyr,inh,evoked_stat,'peak response');
+layerAgePlot_frac_responsive(peak(:,1),age,lyr,inh,responsive_SNR,good_units,'peak response');
 layer_age_line(peak(:,1),age,lyr,inh,evoked_stat,'drift_peak FR Stationary')
 
-%i=nanmedian(peak1(inh & age'==4 & peak1(:,1)>=2))
+
+
+
+figure
+
+plot(peak(responsive_SNR & responsive_stat ,1),SNR(responsive_SNR& responsive_stat ,1),'mo')
+
+i=nanmedian(peak1(inh & age'==4 & peak1(:,1)>=2))
 %%%ratio of running peak to stat peak
-layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),age,lyr,inh,responsive_both,{'run','stat'},'run vs stat');
+layerAgePlot_ratio_jlh(peak_th(:,1),peak_th(:,2),age,lyr,inh,responsive_stat_th,{'run','stat'},'run vs stat');
 
 
 %driftspont1=driftspont(:,1);
@@ -453,16 +631,16 @@ p_peak=anovan(peak1_stat(peak(:,1)>=2),g, 'interaction');
  %%%%spontaneous rates during drift
 
 driftspont1=driftspont(:,1);
-spont_stat_drift =  peak(:,1)>=2 & driftspont1(:,1)>=0.045  ;
+spont_stat_drift =  peak(:,1)>=2 & driftspont(:,1)>=0.00  ;
 
 %layerAgeCDF(driftspont1(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
 layerAgePlot(driftspont(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
 layer_age_line(driftspont(:,1),age,lyr,inh,spont_stat_drift,'drift_spont Stationary');
 
-x1=responsive_stat & ~inh & age'==1 & driftspont1(:,1)>=0.045 & lyr<=3;
-y1=responsive_stat & ~ inh & age'==4 & driftspont1(:,1)>=0.045 &lyr<=3;
+x1=responsive_stat & ~inh & age'==4 & driftspont(:,1)>=0 & lyr==5;
+y1=responsive_stat & ~ inh & age'==4 & driftspont(:,1)>=0 &lyr==4;
 
- [p h]=ranksum(driftspont1(x1),driftspont1(y1))
+ [p h]=ranksum(driftspont(x1,1),driftspont(y1,1))
 
 %driftspont1(driftspont1<=.9)=1; %%%transforms zero and close to zero values to 1 for ease of taking log10
 %driftspont1=log10(driftspont1);
@@ -521,10 +699,14 @@ layer_age_line(OSI(:,1),age,lyr,inh,responsive_stat,'OSI all Stationary');
 o=OSI(:,1)
 d=DSI(:,1)
 clear x1 x2
-x1=o(age'==2 & lyr<=5 & responsive_stat);
-x2=o(age'==3 & lyr<=5 & responsive_stat);
+x1=o(age'==4 & lyr==5 & responsive_stat);
+x2=o(age'==4 & lyr==6 & responsive_stat);
 [p h]= ranksum(x1,x2)
 
+nanmedian(x1)
+semedian(x1)
+nanmedian(x2)
+semedian(x2)
 clear x1 x2
 x1=d(age'==4 & lyr<=3 & responsive_stat);
 x2=d(age'==3 & lyr<=3 & responsive_stat);
@@ -755,7 +937,7 @@ STA_nx_adult=abs(STA_nx(age==4  & ~inh' & good_STA));
 
 n1=sum(~isnan(STA_nx_EO1))
 n2=sum(~isnan(STA_nx_adult))
-%[h p]=vartest2(STA_nx_EO1,STA_nx_adult);
+[h p]=vartest2(STA_nx_EO1,STA_nx_adult);
 
 STA_ny_EO1=abs(STA_ny(age==1   & ~inh' & good_STA));
 STA_ny_adult=abs(STA_ny(age==4  & ~inh' & good_STA));
@@ -834,9 +1016,10 @@ layerAgePlot(abs(STA_ny),age,lyr,inh,good_STA','SF_pref tuning width Stationary 
 
 jitterValuesX = 2*(rand(size(STA_nx))-0.5)*0.005;
 STA_nx_j= STA_nx + jitterValuesX
+STA_nx_j=STA_nx_j'
 
 layerAgeNxNy(abs(STA_nx),abs(STA_ny),age,lyr,inh,good_STA,{'nx','ny'},'nx vs ny');
-layerAgePlot_ratio_jlh(abs(STA_nx_j),abs(STA_ny),age,lyr,inh,good_STA,{'nx','ny'},'nx vs ny');
+layerAgePlot_ratio_jlh(abs(STA_nx_j),abs(STA_ny),age,lyr,inh,good_STA',{'nx','ny'},'nx vs ny');
 
 
 % layer_age_line(STA_nx(:,1),age,lyr,inh,good_STA','nxStationary ');
@@ -860,26 +1043,7 @@ figure
 bar(x,bw',2)
 
 
-%STA_phase=degtorad(STA_phase);
-% STA_phase_1=abs(STA_phase);
-% % STA_p=~isnan(STA_phase_1)& STA_phase>(pi/2);
-% % STA_phase_1(STA_p) = angle(cos(STA_phase_1(STA_p)) + (sin(STA_phase_1(STA_p))));
-% 
-% figure
-% hist(STA_phase_1)
 
-
-% figure
-% [f x]= hist(STA_phase_1(age'==1 & good_STA & lyr<=3 ));
-% bar(x,f/sum(f));
-% %bar(x,f);
-% title 'EO1'
-% 
-% 
-% figure
-% [f1 x1]= hist(STA_phase_1(age'==2 & good_STA & lyr<=3 ));
-% bar(x1,f1/sum(f1));
-% %bar(x1,f1);
 % title 'adult'
 
 

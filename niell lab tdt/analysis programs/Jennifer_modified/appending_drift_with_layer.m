@@ -12,7 +12,8 @@ afile = fullfile(apname,afname);
 load(afile)
 
 %histology variables
-tip_loc = input('depth in uM of electrode tip : '); %apply standard depth in uM for location of tip in top, middle or bottom third of any layer
+tip_loc_1 = input('depth in uM of electrode tip first shank : '); %apply standard depth in uM for location of tip in top, middle or bottom third of any layer
+tip_loc_2 = input('depth in uM of electrode tip second shank : ');
 angle = input('angle on electrode penetration : ');
 
  %extracts first site of all tetrodes
@@ -21,7 +22,7 @@ angle = input('angle on electrode penetration : ');
     
  %converts tetrode location into phsyical distance from tip of electrode
     
-    Distance = zeros(length(tet),1);
+    Distance = zeros(length(cells),1);
    
     Distance(tet==1)= 775;
     Distance(tet==5)= 675;
@@ -31,6 +32,7 @@ angle = input('angle on electrode penetration : ');
     Distance(tet==21)= 275;
     Distance(tet==25)= 175;
     Distance(tet==29)= 75;
+    
     Distance(tet==33)= 775;
     Distance(tet==37)= 675;
     Distance(tet==41)= 575;
@@ -40,36 +42,53 @@ angle = input('angle on electrode penetration : ');
     Distance(tet==57)= 175;
     Distance(tet==61)= 75;
     
-vert_dist = sind(angle)*Distance(:);
+vert_dist = sind(angle)*Distance(:); % distance of top tetrode site relative to the t"top" of cortex
+layer = zeros(length(cells),1);
+
+if tet<=29
+    depth_site = (tip_loc_1 - vert_dist);
+    if depth_site <= 0
+        error('layer less than 0')
+    else
+        
+        layer(depth_site<=50)=1;
+        layer((depth_site>50)&(depth_site<=125))=2;
+        layer((depth_site>125)&(depth_site<=300))=3;
+        layer((depth_site>300)&(depth_site<=425))=4;
+        layer((depth_site>425)&(depth_site<=625))=5;
+        layer(depth_site>625)=6;
+    end
     
-depth_site = (tip_loc - vert_dist);
-if depth_site <= 0
-    error('layer less than 0')
 else
+    depth_site = (tip_loc_2 - vert_dist);
+    if depth_site <= 0
+        error('layer less than 0')
+    else
+        
+        layer(depth_site<=50)=1;
+        layer((depth_site>50)&(depth_site<=125))=2;
+        layer((depth_site>125)&(depth_site<=300))=3;
+        layer((depth_site>300)&(depth_site<=425))=4;
+        layer((depth_site>425)&(depth_site<=625))=5;
+        layer(depth_site>625)=6;
+        
+    end
+end
     
-layer = zeros(length(tet),1);
-layer(depth_site<=50)=1;
-layer((depth_site>50)&(depth_site<=125))=2;
-layer((depth_site>125)&(depth_site<=250))=3;
-layer((depth_site>250)&(depth_site<=375))=4;
-layer((depth_site>375)&(depth_site<=650))=5;
-layer(depth_site>650)=6;
 
-
-%layer = calculate_layer(tip_loc,angle);% run function to calculate layer info if you have run the old drift
-
-[drift(length(cells)).layer]='layer'; %add new field 'layer' to structure "drift"
+% n=zeros(length(cells),1);
+% [drift(n).layer]='layer'; %add new field 'layer' to structure "drift"
 
 
 for i = 1:length(layer); % for loop to add layer info of each unit to each cell of the new field 'layer' in the structure 'drift'
     [drift(i,1).layer]=layer(i,1);
     [drift(i,2).layer]=layer(i,1);
 end
+
 save(afile, 'drift','-append')
 
-end
 
 %if you need to remove a corrupted field, 'layer' for example, evoke the following code:
-%  field = 'layer';
-%  drift = rmfield(drift,field);
-%  save(afile, 'drift','-append')
+ field = 'layer';
+ drift = rmfield(drift,field);
+% % save(afile, 'drift','-append')

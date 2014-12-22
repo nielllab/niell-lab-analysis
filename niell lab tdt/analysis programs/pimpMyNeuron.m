@@ -79,7 +79,7 @@ for c = 1:length(cell_range)
     end
     
     histfig(c)=figure;
-    set(gcf,'position',[200 200 600 700]);
+   set(gcf,'position',[200 200 600 700]);
    subplot(3,2,1);
    plot(laserT,tdtData.laserTTL,'g');
    hold on
@@ -96,21 +96,28 @@ for c = 1:length(cell_range)
         psth(c,:) = psth(c,:) + hist(tdiff,histbins);
     end
     psth(c,:)=psth(c,:)/(dt*length(edges));
-    subplot(3,2,3);
+    subplot(3,2,4);
     plot(histbins*1000,psth(c,:));
     hold on
     plot([0 0],[0 max(psth(c,:))],'g');
+    
     xlabel('msec')
     ylabel('sp/sec')
     
-   subplot(3,2,4)
+    base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
+    Sdev(c)=nanstd(psth(c,1:48))%%between -50 and 0 ms
+    PinpFR(c)=max(psth(c,52:64))%peak between laser onest (0) and 12ms
+    PINPed(c)= PinpFR(c)>= base(c)+(3*Sdev(c)) & base(c)>=0.5;
+    PINP_sup(c)=nanmean(psth(c,52:60))< (base(c)-(2*Sdev(c)));
+  
+    subplot(3,2,3)
    hold on
-       for t = 1:length(trainEdges);
-        tdiff = times-trainEdges(t);
-        tdiff = tdiff(tdiff<max(longBins) & tdiff>min(longBins));
-        plot([tdiff;tdiff],[t*ones(size(tdiff));t*ones(size(tdiff))-1],'k')
-        longPsth(c,:) = longPsth(c,:) + hist(tdiff,longBins);
-    end
+   for t = 1:length(trainEdges);
+       tdiff = times-trainEdges(t);
+       tdiff = tdiff(tdiff<max(longBins) & tdiff>min(longBins));
+       plot([tdiff;tdiff],[t*ones(size(tdiff));t*ones(size(tdiff))-1],'k')
+       longPsth(c,:) = longPsth(c,:) + hist(tdiff,longBins);
+   end
     longPsth(c,:)=longPsth(c,:)/(longdt*length(trainEdges));
     xlim([min(longBins) max(longBins)])
     subplot(3,2,5);
@@ -123,13 +130,14 @@ for c = 1:length(cell_range)
    % ylim([0 7]); plot([0 17],[6 6],'g','Linewidth',4);
 end
 
-
+%save(afile, 'base','Sdev','PinpFR','PINPed','PINP_sup','-append')
+histbins=histbins*1000
 
 mainfig=figure;
-plot(histbins*1000,psth);
+plot(histbins,psth(PINPed,:));hold on
 plot([0 0],[0 max(psth(:))],'g');
 xlabel('msec')
-    ylabel('sp/sec')
+ylabel('sp/sec')
 
 if SU
     save(fullfile(apname,afname),'psth','histbins','-append');

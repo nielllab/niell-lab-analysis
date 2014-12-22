@@ -119,6 +119,9 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
                   amps =squeeze(min(wvclust(:,5:10,:),[],2));
         subplot(2,2,3:4)
         plot([0 tmerge],amps,'.','MarkerSize',2 );
+        
+      
+        
          end
          
           %%% call Erik's code to calculate cluster separation
@@ -161,6 +164,10 @@ for cell = 1:size(cells,1);
     wv(:,cell) = mean_wvform(:,mainchan+cells(cell,1)-1,c);
     wv(:,cell) = wv(:,cell)/abs(min(wv(:,cell)));
     spikeT{cell} = event_times_all{cells(cell,1)}(find(idx_all{cells(cell,1)} == c));
+    
+    
+    
+    
 end
 xlswrite('fullwvform',wv');
 figure

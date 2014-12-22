@@ -155,8 +155,8 @@ for dataset = 1:2  %%% adult vs eye opening
         driftwpref(cellrange,:) = field2array(drift,'wpref');
         driftwbw(cellrange,:) = field2array(drift,'bw') ;
         
-        driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
-        driftF0(cellrange,:) = field2array(drift,'F0');
+      %  driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
+      %  driftF0(cellrange,:) = field2array(drift,'F0');
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
 
         driftlayer =  field2array(drift,'layer');
@@ -164,39 +164,39 @@ for dataset = 1:2  %%% adult vs eye opening
         driftdsi(cellrange,:) = field2array(drift,'dsi');
         %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
         
-        if exist('bars');
-
-        bar_spont(cellrange,:)=field2array(bars,'spont');
-       
-        else
-        bar_spont(cellrange,:)= NaN;
-        
-        end
-        
-        
-        
-        if exist('params');
-
-            
-        all_img_STA(cellrange)= all_img;
-        
-        STA_nx(cellrange)=field2array(params,'nx');
-        STA_ny(cellrange)=field2array(params,'ny');
-        STA_phase(cellrange)=field2array(params,'phase');
-        STA_sigx(cellrange)=field2array(params,'sigx');
-        STA_sigy(cellrange)=field2array(params,'sigy');
-        STA_exp_var(cellrange)=field2array(params,'exp_var');
+%         if exist('bars');
+% 
+%         bar_spont(cellrange,:)=field2array(bars,'spont');
+%        
+%         else
+%         bar_spont(cellrange,:)= NaN;
+%         
+%         end
         
         
-        else
-        STA_nx(cellrange)= NaN;
-        STA_ny(cellrange)=  NaN;
-        STA_phase(cellrange)= NaN;
-        STA_sigx(cellrange)= NaN;
-        STA_sigy(cellrange)= NaN; 
-        STA_exp_var(cellrange)=NaN;
-
-        end
+        
+%         if exist('params');
+% 
+%             
+%         all_img_STA(cellrange)= all_img;
+%         
+%         STA_nx(cellrange)=field2array(params,'nx');
+%         STA_ny(cellrange)=field2array(params,'ny');
+%         STA_phase(cellrange)=field2array(params,'phase');
+%         STA_sigx(cellrange)=field2array(params,'sigx');
+%         STA_sigy(cellrange)=field2array(params,'sigy');
+%         STA_exp_var(cellrange)=field2array(params,'exp_var');
+%         
+%         
+%         else
+%         STA_nx(cellrange)= NaN;
+%         STA_ny(cellrange)=  NaN;
+%         STA_phase(cellrange)= NaN;
+%         STA_sigx(cellrange)= NaN;
+%         STA_sigy(cellrange)= NaN; 
+%         STA_exp_var(cellrange)=NaN;
+% 
+%         end
         
 
         

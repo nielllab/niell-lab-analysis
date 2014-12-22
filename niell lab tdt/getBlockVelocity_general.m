@@ -8,6 +8,7 @@ if version==0
 C=18000;  %%% circumference in ticks
 else
     C=9800;  %%% circumference in ticks
+    %%% C=7000;
 end
 
 scale_factor = C/(pi*8*2.54);  %%% ball is 8 inches, so this is ticks/cm
