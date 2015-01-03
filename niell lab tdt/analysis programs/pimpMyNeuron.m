@@ -104,11 +104,11 @@ for c = 1:length(cell_range)
     xlabel('msec')
     ylabel('sp/sec')
     
-    base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
-    Sdev(c)=nanstd(psth(c,1:48))%%between -50 and 0 ms
-    PinpFR(c)=max(psth(c,52:64))%peak between laser onest (0) and 12ms
-    PINPed(c)= PinpFR(c)>= base(c)+(3*Sdev(c)) & base(c)>=0.5;
-    PINP_sup(c)=nanmean(psth(c,52:60))< (base(c)-(2*Sdev(c)));
+%     base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
+%     Sdev(c)=nanstd(psth(c,1:48))%%between -50 and 0 ms
+%     PinpFR(c)=max(psth(c,52:64))%peak between laser onest (0) and 12ms
+%     PINPed(c)= PinpFR(c)>= base(c)+(3*Sdev(c)) & base(c)>=0.5;
+%     PINP_sup(c)=nanmean(psth(c,52:60))< (base(c)-(2*Sdev(c)));
   
     subplot(3,2,3)
    hold on
@@ -134,7 +134,7 @@ end
 histbins=histbins*1000
 
 mainfig=figure;
-plot(histbins,psth(PINPed,:));hold on
+plot(histbins,psth(:,:));hold on
 plot([0 0],[0 max(psth(:))],'g');
 xlabel('msec')
 ylabel('sp/sec')
