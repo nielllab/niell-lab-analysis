@@ -8,27 +8,30 @@ psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
 apath = 'E:\Jennifer_analysis\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
-N =0; cells=0;  all_img_STA={};PINPed=0;
+N =0; cells=0;  all_img_STA={};PINPed=0; STA_peak={};stopCRF={}; moveCRF={};
 
-for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR5A1-cre
+
+for dataset = 1:1  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR5A1-cre
     
     if dataset ==1
         
         
-        afiles = { 'NR2A\WT\8_11_14_wt_control\analysis_8_11_14_wt.mat',...
-            'NR2A\WT\9_22_14_NR2A_wt\rec1\analysis_9_22_14_rec1A_wt.mat',...
-            'NR2A\WT\10_9_14\analysis_10_9_14_wt_rec1.mat',...
-            'NR2B\9_9_14_ctl\analysis_9_9_14_NR2B_wt_ctl.mat'};
-        
-    elseif dataset==2
-        
-        afiles = {'NR2A\KO\8_12_14_NR2A_KO\Rec2\analysis_8_12_14_rec2.mat',...
-            'NR2A\KO\9_19_14\rec2\analysis_9_19_14_NR2A_rec2.mat',...
-            'NR2A\KO\10_8_14\full clustering_rec1\analysis_10_8_14_NR2A_KO_rec1.mat'};
-        
-    elseif dataset==3
-        afiles = {'NR2B\KO\9_6_14_NR2B_homo_mu\analysis_9_6_14_NR2B_homo_mu.mat',...
-            'NR2B\KO\12_8_14_homo\analysis_12_8_14_NR2BKO.mat'};
+        afiles = { 'NR5A_Pinping\1_13_15_pos_ctl\1_13_15_analysis_pos_ctl.mat',...
+            'NR5A_Pinping\12_22_14_pos_ctl\analysis_12_22_14_1st_clust.mat',...
+            'NR5A_Pinping\12_23_14_neg_control\analysis_12_23_14_neg_control.mat'};
+%'NR2A\WT\8_11_14_wt_control\analysis_8_11_14_wt.mat',...%          
+%'NR2A\WT\9_22_14_NR2A_wt\rec1\analysis_9_22_14_rec1A_wt.mat',...
+%             'NR2A\WT\10_9_14\analysis_10_9_14_wt_rec1.mat',...
+%             'NR2B\9_9_14_ctl\analysis_9_9_14_NR2B_wt_ctl.mat'
+%     elseif dataset==2
+%         
+%         afiles = {'NR2A\KO\8_12_14_NR2A_KO\Rec2\analysis_8_12_14_rec2.mat',...
+%             'NR2A\KO\9_19_14\rec2\analysis_9_19_14_NR2A_rec2.mat',...
+%             'NR2A\KO\10_8_14\full clustering_rec1\analysis_10_8_14_NR2A_KO_rec1.mat'};
+%         
+%     elseif dataset==3
+%         afiles = {'NR2B\KO\9_6_14_NR2B_homo_mu\analysis_9_6_14_NR2B_homo_mu.mat',...
+%             'NR2B\KO\12_8_14_homo\analysis_12_8_14_NR2BKO.mat'};
         
     end
     
@@ -37,12 +40,14 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
     for i = 1:length(afiles)
         
         clear params
-        clear wn wn_movement
+        clear wn 
+        clear wn_movement
         clear LFP_movement
         clear bars
         clear wave_all
         clear rf_width
         clear locomotion
+        clear drift
         
         load([apath afiles{i}]);
         
@@ -83,7 +88,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         alldata( cellrange,1:2) = cells;
         alldata( cellrange,3) = L_ratio;
         
-        pinp(cellrange,:)=PINPed';
+        %pinp(cellrange,:)=PINPed';
         
         %%% waveform
         alldata( cellrange,4) = trough_width;
@@ -124,17 +129,18 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         
         %size(rf_width)
         
-        if exist('rf_width');
-            
-        rfw(cellrange,:) = rf_width*30;
-        
-        else
-            
-        rfw(cellrange,:) = NaN;
-        end
-      
-      
+%         if exist('rf_width');
+%             
+%         rfw(cellrange,:) = rf_width*30;
 %         
+%         else
+%             
+%         rfw(cellrange,:) = NaN;
+%         end
+      
+      
+        if  exist('drift', 'var'); 
+        
         driftA1(cellrange,:)= field2array(drift,'A1');
         driftA2(cellrange,:)=field2array(drift,'A2');
         driftB(cellrange,:)= field2array(drift,'B');
@@ -154,13 +160,38 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         driftF0(cellrange,:) = field2array(drift,'F0');
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
 
-        driftlayer =  field2array(drift,'layer');
-        lyr(cellrange,:) = driftlayer(:,1);
+       % driftlayer =  field2array(drift,'layer');
+       % lyr(cellrange,:) = driftlayer(:,1);
         cvDSI(cellrange,:) = field2array(drift,'cv_dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
         cvOSI(cellrange,:)=field2array(drift,'cv_osi');
         %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
+        else
+        driftA1(cellrange,:)= NaN;
+        driftA2(cellrange,:)=NaN;
+        driftB(cellrange,:)= NaN;
+        driftpeak(cellrange,:)=NaN;
+        driftstd(cellrange,:)=NaN;
+        driftSigNoise(cellrange,:)=NaN;
+         
+        drift_theta_w(cellrange,:)=NaN;
+        drift_theta(cellrange,:)=NaN;
         
-        if exist('bars');
+        driftspont(cellrange,:) = NaN;
+              
+        driftwpref(cellrange,:) = NaN;
+        driftwbw(cellrange,:) = NaN ;
+        
+        driftF1F0(cellrange,:) = NaN;
+        driftF0(cellrange,:) = NaN;
+        %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
+
+        driftlayer =  NaN;
+        lyr(cellrange,:) = NaN;
+        cvDSI(cellrange,:) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+        cvOSI(cellrange,:)=NaN; 
+        end
+        
+        if exist('bars','var'); %#ok<EXIST>
 
         bar_spont(cellrange,:)=field2array(bars,'spont');
        
@@ -171,36 +202,36 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         
      clear meanwaves snr stdwaves
 %         
-        for c=1:length(cells);
-            %%% get SNR
-            tet =ceil(cells(c,1)/4);
-            
-            if exist('wave_all','var')
-                wvall = wave_all{tet};
-                wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
-                
-                amps =squeeze(min(wvclust(:,5:10,:),[],2));
-                mn = abs(nanmean(amps));
-                stdev = nanstd(amps);
-                [y ind] = max(mn);
-                snr(c) = mn(ind)/stdev(ind);
-                
-                meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
-                stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
-            else
-                meanwaves=NaN;
-                snr=NaN
-                stdwaves=NaN
-            end
-            
+%         for c=1:length(cells);
+%             %%% get SNR
+%             tet =ceil(cells(c,1)/4);
 %             
-        end
+%             if exist('wave_all','var')
+%                 wvall = wave_all{tet};
+%                 wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
+%                 
+%                 amps =squeeze(min(wvclust(:,5:10,:),[],2));
+%                 mn = abs(nanmean(amps));
+%                 stdev = nanstd(amps);
+%                 [y ind] = max(mn);
+%                 snr(c) = mn(ind)/stdev(ind);
+%                 
+%                 meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
+%                 stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
+%             else
+%                 meanwaves=NaN;
+%                 snr=NaN
+%                 stdwaves=NaN
+%             end
+%             
+% %             
+%         end
+%         
+%         SNRall(cellrange)=snr;
+%         meanWavesAll(cellrange,:,:) = meanwaves;
+%         stdWavesAll(cellrange,:,:) = stdwaves;
         
-        SNRall(cellrange)=snr;
-        meanWavesAll(cellrange,:,:) = meanwaves;
-        stdWavesAll(cellrange,:,:) = stdwaves;
-        
-        if exist('params');
+        if exist('params','var');
 
             
         all_img_STA(cellrange)= all_img;
@@ -223,9 +254,38 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
 
         end
         
+        if exist ('wn_movement','var')
+           
+            stopCRF(cellrange)=field2array_false(wn_movement,'stopCRF');
+            moveCRF(cellrange)=field2array_false(wn_movement,'moveCRF');
+        else
+            stopCRF(cellrange)=NaN;
+            moveCRF(cellrange)=NaN;
+        end
 
-        
-        %size(wvform)
+clear m ind x y t_lag STA1
+
+if exist ('wn','var')
+    for w = 1:length(wn)
+    STA = wn(w).sta;
+    
+    %%%Dtermine time point with maximial response
+    [m ind] = max(abs(STA(:)-127));
+    [x y t_lag] = ind2sub(size(STA),ind);
+    
+    STA1{w} = STA(:,:,t_lag)-128;
+
+figure
+imagesc(STA1{1,w}'); axis equal
+    end
+    
+    STA_peak(cellrange)=STA1
+   
+else
+    STA_peak(cellrange)=NaN
+end
+close all
+%size(wvform)
         wvform(cellrange,:) = wv';
        
         %% get peristimulus histograms for PINPed units
@@ -235,8 +295,8 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         %get firing rate at all measured orients and SF, put into an array:
         %12 rows(orientations) by 7 columns(SpatialFreqs) for each cell
         
-        drift_Ori_Sf(cellrange,:) = arrayfun(@(x)(getfield(x,'orientfreq_all')),drift,'UniformOutput',false);
-       % drift_all(cellrange,:)=drift';
+%         drift_Ori_Sf(cellrange,:) = arrayfun(@(x)(getfield(x,'orientfreq_all')),drift,'UniformOutput',false);
+%        % drift_all(cellrange,:)=drift';
         
         if exist('locomotion');
            Vel(i,dataset)=arrayfun(@(x)(getfield(x,'mouseV')),locomotion,'UniformOutput',false);  
@@ -315,12 +375,12 @@ plot(alldata(find(inh),5),alldata(find(inh),6),'ro');
 hold on
 plot(alldata(find(exc),5),alldata(find(exc),6),'ko');
 hold on
-plot(alldata(find(pinp),5),alldata(find(pinp),6),'go');
+%plot(alldata(find(pinp),5),alldata(find(pinp),6),'go');
 
 figure
 plot(wvform(exc,:)','color','k');hold on
 plot(wvform(inh,:)','color','r');hold on
-plot(wvform(pinp,:)','color','b');
+%plot(wvform(pinp,:)','color','b');
 
 for i = 1:size(driftA1,1)
     for j=1:size(driftA1,2)
@@ -343,19 +403,19 @@ responsive_stat = peak(:,1)>=1;  % firing rate (responsiveness) criteria for whe
 
 good_units=SNRall(:,1)>=2;
 
- pinp1= double(pinp);
- pinp1(pinp1==1)=2;
- pinp1(pinp1==0)=1;
+ %pinp1= double(pinp);
+ %pinp1(pinp1==1)=2;
+ %pinp1(pinp1==0)=1;
  
-figure
-plot(histbins,psth_pinp(pinp,:));hold on
- 
+% figure
+% plot(histbins,psth_pinp(pinp,:));hold on
+%  
 evoked_stat= peak(:,1)>=2 & good_units;  %OSI(:,1)>0.5 
 evoked_run= responsive_run 
 responsive_both= peak(:,1)>=1  & peak(:,2)>=1;
 
 layerGTpinpPlot(peak(:,1),pinp1,GT,lyr,inh,good_units,'evoked FR');
-layer_GT_line_pinp(peak(:,1),GT,lyr,inh,exc,pinp,good_units,'evoked FR');
+%layer_GT_line_pinp(peak(:,1),GT,lyr,inh,exc,pinp,good_units,'evoked FR');
 
 j=pinp1==2 & GT'==2 & lyr==4 & exc & good_units
 

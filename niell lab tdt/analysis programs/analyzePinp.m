@@ -9,7 +9,7 @@ exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<4 ;
 figure
 col = 'bgrcm';
 for l=2:6
-    plot(histbins,mean(psth_pinp(lyr==l,:),1),col(l-1));
+    plot(histbins,mean(psth_pinp(:,:),1),col(l-1));
     hold on
 end
 xlim([-30 45]);
@@ -18,10 +18,19 @@ xlabel('msec')
 legend('lyr 2','3','4','5','6')
 title('avg pinp hist by layer')
 
+figure
+plot(histbins,mean(psth_pinp(:,:),1))
+
+figure
+plot(histbins,mean(psth_pinp(inh & pinp,:),1))
+
+figure
+plot(histbins,mean(psth_pinp(:,:),1))
+
 %%% calculate baseline, evoked, and artifact by choosing windows
 baseline = mean(psth_pinp(:,5:45),2);
 baseStd = std(psth_pinp(:,5:45),[],2);
-artifact = psth_pinp(:,52);
+artifact = psth_pinp(:,51);
 ev = mean(psth_pinp(:,56:60),2);
 evoked = ev-baseline;
 
@@ -159,13 +168,29 @@ title('peak')
 
 %%% waveform of pinped vs non
 figure
-plot(wvform','b');
+plot(nanmean(wvform(exc,:),'b'));
 hold on
-plot(wvform(inh,:)','r')
+plot(wvform(45,:)','r'); hold on
 plot(wvform(pinped,:)','g')
 figure
 plot(wvform(pinped,:)','g')
 title('pinped')
+
+I=find(inh)
+for j=length(I)
+figure
+imagesc(STA_peak{1,12});
+end
+
+for j=1:length(STA_peak)
+
+if ismember(STA_peak(j),I)
+
+figure
+imagesc(STA_peak{1,j});
+
+end
+end
 
 figure
 subplot(1,2,1);
