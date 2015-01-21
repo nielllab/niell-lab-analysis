@@ -2,7 +2,7 @@ function [theta_pref OSI A1 A2 w B null_rate yfit] = fit_tuningcurve(R, theta_in
 
 % temp_baseline =min(R); 
 % R=R-temp_baseline;  %%%need to keep things positive for fourier analysis
-theta_ind
+
 if abs(min(R))>max(R)  %%% check for units that are inhibited more than excited
     R = -R;
     inverted=1;
@@ -14,8 +14,8 @@ mu = (sum(R.*exp(2*i*theta_ind)))/sum(abs(R));
 if isnan(mu);
     mu=0;
 end
-OSI = abs(mu)
-theta_pref = mod(angle(mu)/2,2*pi)
+OSI = abs(mu);
+theta_pref = mod(angle(mu)/2,2*pi);
 
 %R= R+temp_baseline;
 
@@ -27,19 +27,20 @@ end
 theta_ind(1,size(theta_ind,2)+1) = 2*pi;
 R(1,size(R,2)+1)=R(1,1);
 
-p0(1) = interp1(theta_ind,R,theta_pref,'spline') ;  %%% A1
-p0(2) =  interp1(theta_ind,R,mod(theta_pref+pi,2*pi),'spline');  %%%A2
+p0(1) = interp1(theta_ind,R,theta_pref,'linear') ;  %%% A1
+p0(2) =  interp1(theta_ind,R,mod(theta_pref+pi,2*pi),'linear');  %%%A2
 p0(3) =pi/8; %%%width
-p0(4) = interp1(theta_ind,R,mod(theta_pref+pi/2,2*pi),'spline') ; %%%baseline
+p0(4) = interp1(theta_ind,R,mod(theta_pref+pi/2,2*pi),'linear') ; %%%baseline
 p0(1)= p0(1)-p0(4);
 p0(2) = p0(2)-p0(4);
 
-p0
+p0;
 
 dtheta = 2*pi/32;
 clear x
-x(1,:) = 0:dtheta:2*pi-dtheta
-y = interp1(theta_ind,R,x(1,:),'spline');
+x(1,:) = 0:dtheta:2*pi-dtheta;
+y = interp1(theta_ind,R,x(1,:),'linear');
+
 x(2,:) = theta_pref;
 
 p = nlinfit(x,y,@wrapped_gaussian,p0);
@@ -48,11 +49,11 @@ xfit(1,:)=theta_ind;
 xfit(2,:)=theta_pref;
 yfit = wrapped_gaussian(p,xfit);
 
-figure
-plot(x(1,1:31)*180/pi,y(1:31))
-hold on
-plot(x(1,1:2:31)*180/pi,y(1:2:31),'o');
-plot(x(1,:)*180/pi,wrapped_gaussian(p,x),'g');
+% figure
+% plot(x(1,1:31)*180/pi,y(1:31))
+% hold on
+% plot(x(1,1:2:31)*180/pi,y(1:2:31),'o');
+% plot(x(1,:)*180/pi,wrapped_gaussian(p,x),'g');
 
 
 A1=max(p(1),p(2));
@@ -83,7 +84,4 @@ end
 
 null_rate = interp1(theta_ind,yfit,mod(theta_pref+pi/2,2*pi));
 
-A1
-A2 
-B
 
