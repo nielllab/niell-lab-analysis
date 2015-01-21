@@ -8,7 +8,6 @@ if version==0
 C=18000;  %%% circumference in ticks
 else
     C=9800;  %%% circumference in ticks
-    %%% C=7000;
 end
 
 scale_factor = C/(pi*8*2.54);  %%% ball is 8 inches, so this is ticks/cm
@@ -41,7 +40,7 @@ else %%% new 30hz cumulative position
     [dTS, dData] = TankGetUDP_SyncEvents(tank,block);
 
     fprintf('Processing...\n');
-    dData
+    size(dData)
     
     Mouse1_Idx = find(dData(1,:)==2); % all events on channel 2
     dXY = dData(2,Mouse1_Idx);
