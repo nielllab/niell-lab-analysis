@@ -1,9 +1,12 @@
 close all
 
 %%% define inh
-inh = alldata(:,5)<8.5;
+inh = alldata(:,5)<8.0 & alldata(:,6)<1.6;
 mid = alldata(:,5)>8.5 & alldata(:,5)<10 ;
 exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<4 ;
+
+figure
+plot(alldata(inh,5),alldata(inh,6),'ro'); hold on
 
 %%% show pinp psth by layer
 figure
@@ -21,17 +24,13 @@ title('avg pinp hist by layer')
 figure
 plot(histbins,mean(psth_pinp(:,:),1))
 
-figure
-plot(histbins,mean(psth_pinp(inh & pinp,:),1))
 
-figure
-plot(histbins,mean(psth_pinp(:,:),1))
 
 %%% calculate baseline, evoked, and artifact by choosing windows
 baseline = mean(psth_pinp(:,5:45),2);
 baseStd = std(psth_pinp(:,5:45),[],2);
 artifact = psth_pinp(:,51);
-ev = mean(psth_pinp(:,56:60),2);
+ev = mean(psth_pinp(:,52:56),2);
 evoked = ev-baseline;
 
 zscore =evoked./baseStd;
@@ -54,13 +53,16 @@ xlabel('zscore'); ylabel('evoked')
 % hist(artscore',0:10)
 
 %%% choose pinped
-pinped = (zscore>3 & evoked>2.5); 
+pinped = (zscore>2& evoked>5); 
 
 figure
 plot(baseline,ev,'o')
 axis equal
 hold on
 plot(baseline(pinped),ev(pinped),'go');
+hold on
+plot(baseline(pinped&inh),ev(pinped&inh),'gs');
+
 legend('non','pinp')
 plot([0 40],[0 40])
 xlabel('baseline'); ylabel('laser')
@@ -127,16 +129,16 @@ peak_stat=nanmedian(driftpeak(GT'==3 & lyr==4 & ~pinped & exc,1))
 gain_ind=(peak_run-peak_stat)/(peak_run+peak_stat)
 %%% plot grating respons data
 
-plotPinpData(driftspont,wt,lyr<=4,pinped,inh,1)
+plotPinpData(driftspont,wt,lyr==0,pinped,inh,1)
 plot([0 20],[0 20])
 title('spont')
 
 
-plotPinpData(driftF1F0,wt,lyr<=4,pinped,inh,resp)
+plotPinpData(driftF1F0,wt,lyr==0,pinped,inh,resp)
 plot([0 2],[0 2])
 title('F1F0')
 
-plotPinpData(cvOSI,wt,lyr<=4,pinped,inh,resp)
+plotPinpData(cvOSI,wt,lyr==0,pinped,inh,resp)
 plot([0 1],[0 1])
 title('cv OSI')
 
@@ -168,28 +170,47 @@ title('peak')
 
 %%% waveform of pinped vs non
 figure
-plot(nanmean(wvform(exc,:),'b'));
+plot(wvform(exc,:)','b');
 hold on
-plot(wvform(45,:)','r'); hold on
+plot(wvform(inh,:)','r'); hold on
 plot(wvform(pinped,:)','g')
 figure
 plot(wvform(pinped,:)','g')
 title('pinped')
 
 I=find(inh)
-for j=length(I)
-figure
-imagesc(STA_peak{1,12});
-end
+k=find(pinped)
+% for j=length(I)
+% figure
+% imagesc(STA_peak{1,12});
+% end
 
+h=ismember(k,I)
+
+%generate STA for pinped cells
 for j=1:length(STA_peak)
 
-if ismember(STA_peak(j),I)
+    if ismember(j,k)
+figure
+imagesc(STA_peak{1,j},[-64 64]);
+    end
+end
 
+%generate STA for inhibitory cells
+for j=1:length(STA_peak)
+
+    if ismember(j,I)
 figure
 imagesc(STA_peak{1,j});
-
+    end
 end
+
+figure
+for j=1:length(STA_peak)
+
+    if ismember(j,I)
+plot(alldata(j,5),alldata(j,6),'ro'); hold on
+    end
 end
 
 figure
@@ -201,5 +222,5 @@ pie([sum(~wt&pinped&~inh) sum(~wt&pinped&inh)],{'broad','narrow'})
 title('2A/2B ko pinped')
 
 figure
-plot(wvform(pinped&wt&lyr<=4 & ~inh,:)')
+plot(wvform(pinped,:)')
 
