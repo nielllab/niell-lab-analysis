@@ -56,7 +56,10 @@ end
 
 prompt = {'duration','# orients','# sfs','temp freqs','latency'};
 num_lines = 1;
-def = {'1.5','12','6','[2 8]','0.1'};
+%LGN stim
+def = {'1','8','6','[2 8]','0.05'};
+% %RGC stim
+% def = {'1','8','6','1','0.05'};
 if ~useArgin
     answer = inputdlg(prompt,'grating parameters',num_lines,def);
 else
@@ -108,10 +111,10 @@ for cell_n = cell_range;
     
     %%% spont and flicker
     spontfig=figure
-    emax = max(epocs(1,:));
+    emax = max(epocs(1,:))
     
     extra_range = 1:(emax-panels*nrows*ncols)
-    
+
     for rep=extra_range
         cond = panels*nrows*ncols+rep;
         
@@ -189,7 +192,7 @@ for cell_n = cell_range;
             end
             plot(hist_range, hist(Spike_Timing, hist_range)/(hist_int*numtrials),color);
             hold on;
-            plot([0 max(hist_range)], [drift(cell_n).spont(1) drift(cell_n).spont(1)],'g')
+           % plot([0 max(hist_range)], [drift(cell_n).spont(1) drift(cell_n).spont(1)],'g')
             axis(axis_range);
             set(gca,'XTickLabel',[])
             set(gca,'YTickLabel',[])
@@ -220,6 +223,9 @@ for cell_n = cell_range;
     drift(cell_n).orient_tune = zeros(3,length(tf),nrows);
     drift(cell_n).sf_tune=zeros(3,length(tf),ncols+1);
     
+    
+ 
+        
     for f=1:3
         for rep = 1:length(tf)
             
@@ -284,6 +290,18 @@ for cell_n = cell_range;
     
     figure(hist_fig) 
     set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+      alltune = squeeze(drift(cell_n).R(:,:,1,1));  
+    figure
+    hold on
+    cols = 'bgrcmyk';
+    for sf = 1:size(alltune,2);
+        plot(0:45:315,alltune(:,sf),cols(sf));
+    end
+    xlabel('orientation'); ylabel('sp/sec');
+    legend('0.01cpd','0.02cpd','0.04cpd','0.08cpd','0.16cpd','0.32cpd');
+       set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
     
 end

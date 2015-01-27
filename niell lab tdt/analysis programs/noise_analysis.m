@@ -6,6 +6,7 @@ function noise_analysis(clustfile,afile,pdfFile,movieFile,Block_Name,blocknum,mo
 
 
 %%% read in cluster data, then connect to the tank and read the block
+close all
 
 if ~exist('Block_Name','var');
     SU = menu('recording type','multi-unit','single unit')-1;
@@ -106,13 +107,6 @@ else
 end
 if exist(psfilename,'file')==2;delete(psfilename);end
 
-if ~useArgin
-    [fname pname] = uigetfile('*.mat','movie file');
-    movieFile = fullfile(pname,fname);
-end
-movieFile
-
-load(movieFile);
 
 
 calculate_stc =0;    %%% whether or not to calculate STC (it's slow!)
@@ -173,6 +167,7 @@ end
 % figure
 % imagesc(movavg-127,[-64 64])
 
+matlabpool
 tic
 
 if movietype==mv_noise
@@ -502,6 +497,7 @@ for cell_n = cell_range
             else
                 p{2} = [2 4 8];
             end
+            %%% contrast and size at point x,y over course of movie
             d(1,:) = squeeze(round((double(moviedata(x,y,1:end-t_lag-1))-127)/127));
             d(2,:) = squeeze(sz_mov(x,y,1:end-t_lag-1));
             hist_all = zeros(length(p{1}),length(p{2}));
@@ -629,7 +625,7 @@ for cell_n = cell_range
             
             %%%%% histrograms relative to onset/offset
             timefig = figure;
-            
+            clear onset_hist
             sizes = [1 2 4 8 16 255];
             for rep = 1:2
                 for sz = 1:length(sizes);
@@ -707,6 +703,9 @@ for cell_n = cell_range
             
             
         end
+        
+  
+        
         nx = size(sta_t,1);
         ny = size(sta_t,2);
         nt = size(sta_t,3);
@@ -1052,9 +1051,13 @@ for cell_n = cell_range
             mv(cell_n).sta_pos=[x y];
         end
         
-       close all
+       
     end
+    
+        OnOffFlash
 end  %%%cell
+
+matlabpool close
 
 if movietype==cm_noise
     wn(cell_n,stim_eye).degperpix=degperpix;

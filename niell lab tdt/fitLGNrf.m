@@ -9,7 +9,7 @@ baseline = 0
 amp=z(ind);
 [max_x max_y] = ind2sub(size(z),ind);;
 
-peakarea = sum(abs(z(:))>0.6*abs(amp));
+peakarea = sum(abs(z(:))>0.4*abs(amp));
 sigx = sqrt(peakarea/pi);
 sigy= sigx;
 
