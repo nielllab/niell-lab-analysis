@@ -79,7 +79,7 @@ for dataset = 1:1  %%% control ("wt") Scnn1a-cre/CHR2 animals vs. NR2A deleted N
         number(i) = n_units;
         
         alldata( cellrange,1:2) = cells;
-        alldata( cellrange,3) = L_ratio;
+        alldata( cellrange,3) = L_ratio
         
         %pinp(cellrange,:)=PINPed';
         
@@ -88,6 +88,7 @@ for dataset = 1:1  %%% control ("wt") Scnn1a-cre/CHR2 animals vs. NR2A deleted N
         alldata( cellrange,5) = trough2peak;
         alldata( cellrange,6) = -trough_depth./peak_height;
         alldata( cellrange,7:25)= wv';
+        alldata(cellrange,26)=layer;
         
      
         
@@ -140,8 +141,7 @@ for dataset = 1:1  %%% control ("wt") Scnn1a-cre/CHR2 animals vs. NR2A deleted N
         driftF0(cellrange,:) = NaN;
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
 
-        driftlayer =  NaN;
-        lyr(cellrange,:) = NaN;
+%         lyr(cellrange,:) = NaN;
         cvDSI(cellrange,:) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
         cvOSI(cellrange,:)=NaN; 
         end
@@ -300,8 +300,8 @@ end
 %%% calculate baseline, evoked, and artifact by choosing windows
 baseline = mean(psth_pinp(:,5:45),2);
 baseStd = std(psth_pinp(:,5:45),[],2);
-artifact = psth_pinp(:,51);
-ev = mean(psth_pinp(:,52:56),2);
+artifact = psth_pinp(:,50);
+ev = mean(psth_pinp(:,51:55),2);
 evoked = ev-baseline;
 
 zscore =evoked./baseStd;
@@ -324,7 +324,7 @@ xlabel('zscore'); ylabel('evoked')
 % hist(artscore',0:10)
 
 %%% choose pinped
-pinped = (zscore>2& evoked>5); 
+pinped = (zscore>3& evoked>6); 
 
 figure
 plot(baseline,ev,'o')
@@ -332,7 +332,7 @@ axis equal
 hold on
 plot(baseline(pinped),ev(pinped),'go');
 hold on
-plot(baseline(pinped&inh),ev(pinped&inh),'gs');
+plot(baseline(pinped&inh),ev(pinped&inh),'rs');
 
 legend('non','pinp')
 plot([0 40],[0 40])
@@ -340,7 +340,7 @@ xlabel('baseline'); ylabel('laser')
 sprintf('%d pinped neurons total',sum(pinped))
 
 %%% define responsive
-resp = driftpeak(:,2)>2 & driftpeak(:,1)>2;
+resp = driftpeak(:,2)>1 & driftpeak(:,1)>1;
 
 %%% # spikes evoked
 nbins=8;
@@ -362,6 +362,8 @@ bar((-0.05:0.02:0.25)+0.01,[h1; h2]')
 
 %%% define wt
 wt = GT'==3;
+N2A=GT'==2;
+N2B = GT'==1;
 
 %%% fraction responsive
 frac_resp(1) = sum(resp& lyr==4 & GT'==2 & ~pinped)/sum( lyr==4 & GT'==2 & ~pinped);
@@ -370,28 +372,39 @@ figure
 bar(frac_resp); ylim([0 1]); ylabel('fraction resp >2'); title('lyr 4')
 set(gca,'xticklabel',{'non','pinp'})
 
-peak_run_p=nanmedian(driftpeak(GT'==3 & lyr==4 & pinped & exc,2))
-peak_stat_p=nanmedian(driftpeak(GT'==3 & lyr==4 & pinped & exc,1))
+peak_run_p=nanmedianMW(driftpeak(wt & pinped & resp & exc,2))
+peak_stat_p=nanmedianMW(driftpeak(wt & pinped & resp & exc,1))
 gain_ind_p=(peak_run_p-peak_stat_p)/(peak_run_p+peak_stat_p)
 
-peak_run=nanmedian(driftpeak(GT'==3 & lyr==4 & ~pinped & exc,2))
-peak_stat=nanmedian(driftpeak(GT'==3 & lyr==4 & ~pinped & exc,1))
+
+peak_run=nanmedianMW(driftpeak(wt & ~pinped & resp & exc,2))
+peak_stat=nanmedianMW(driftpeak(wt & ~pinped & resp & exc,1))
 gain_ind=(peak_run-peak_stat)/(peak_run+peak_stat)
 %%% plot grating respons data
 
-plotPinpData(driftspont,wt,1,pinped,inh,1)
+plotPinpData(driftspont,N2B,1,pinped,inh,1)
 plot([0 20],[0 20])
 title('spont')
 
+plotPinpData(peak,wt,1,pinped,inh,1)
+plot([0 20],[0 20])
+title('spont')
 
 plotPinpData(driftF1F0,wt,1,pinped,inh,resp)
 plot([0 2],[0 2])
 title('F1F0')
 
-plotPinpData(cvOSI,wt,lyr==0,pinped,inh,resp)
+plotPinpData(cvOSI,N2B,1,pinped,inh,resp)
 plot([0 1],[0 1])
-title('cv OSI')
+title('cvOSI')
 
+plotPinpData(OSI,N2B,1,pinped,inh,resp)
+plot([0 1],[0 1])
+title('OSI')
+
+plotPinpData(DSI,N2B,1,pinped,inh,resp)
+plot([0 1],[0 1])
+title('DSI')
 
 plotPinpData(cvDSI,wt,lyr<=4,pinped,inh,resp)
 plot([0 1],[0 1])
@@ -430,6 +443,8 @@ title('pinped')
 
 I=find(inh)
 k=find(pinped)
+l=find(pinped&exc)
+n=find(pinped&inh)
 % for j=length(I)
 % figure
 % imagesc(STA_peak{1,12});
@@ -451,22 +466,36 @@ for j=1:length(STA_peak)
 
     if ismember(j,I)
 figure
-imagesc(STA_peak{1,j});
+imagesc(STA_peak{1,j},[-64 64]);
     end
 end
 
 figure
 for j=1:length(STA_peak)
 
-    if ismember(j,I)
-plot(alldata(j,5),alldata(j,6),'ro'); hold on
+    if ismember(j,k)
+plot(alldata(j,5),alldata(j,6),'ko'); hold on
     end
 end
+
+hold on
 
 figure
 subplot(1,2,1);
 pie([sum(wt&pinped&~inh) sum(wt&pinped&inh)],{'broad','narrow'})
 title('wt pinped')
+
+
+figure
+subplot(1,2,1);
+pie([sum(N2B&pinped&~inh) sum(N2B&pinped&inh)],{'broad','narrow'})
+title('N2B pinped')
+
+figure
+subplot(1,2,1);
+pie([sum(N2A&pinped&~inh) sum(N2A&pinped&inh)],{'broad','narrow'})
+title('N2A pinped')
+
 
 % subplot(1,2,2);
 % pie([sum(~wt&pinped&~inh) sum(~wt&pinped&inh)],{'broad','narrow'})

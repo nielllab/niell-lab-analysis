@@ -548,8 +548,10 @@ end
 end
 
 %convert ps file to PDfs
-  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-  delete(psfilename);
+
+
+%   ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+%   delete(psfilename);
 
 if use_afile
     
@@ -560,6 +562,8 @@ if use_afile
     
     save(afile, 'drift','-append');
 end
+
+ps2pdf(fname);
 
 % invoke(TTX, 'CloseTank');
 % invoke(TTX, 'ReleaseServer');

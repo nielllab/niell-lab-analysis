@@ -80,12 +80,12 @@ end
 % [drift(n).layer]='layer'; %add new field 'layer' to structure "drift"
 
 
-for i = 1:length(layer); % for loop to add layer info of each unit to each cell of the new field 'layer' in the structure 'drift'
-    [drift(i,1).layer]=layer(i,1);
-    [drift(i,2).layer]=layer(i,1);
-end
+% for i = 1:length(layer); % for loop to add layer info of each unit to each cell of the new field 'layer' in the structure 'drift'
+%     [drift(i,1).layer]=layer(i,1);
+%     [drift(i,2).layer]=layer(i,1);
+% end
 
-save(afile, 'drift','-append')
+save(afile, 'layer','-append')
 
 
 %if you need to remove a corrupted field, 'layer' for example, evoke the following code:
