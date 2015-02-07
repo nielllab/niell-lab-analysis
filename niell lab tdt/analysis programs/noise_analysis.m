@@ -1074,7 +1074,7 @@ close all
 
 end
  save(afile,'wn','-append')
-ps2pdf(fname);
+% ps2pdf(fname);
 % ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 % delete(psfilename);
 

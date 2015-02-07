@@ -88,7 +88,7 @@ end
 save(afile, 'layer','-append')
 
 
-%if you need to remove a corrupted field, 'layer' for example, evoke the following code:
- field = 'layer';
- drift = rmfield(drift,field);
-% % save(afile, 'drift','-append')
+% %if you need to remove a corrupted field, 'layer' for example, evoke the following code:
+%  field = 'layer';
+%  drift = rmfield(drift,field);
+% % % save(afile, 'drift','-append')

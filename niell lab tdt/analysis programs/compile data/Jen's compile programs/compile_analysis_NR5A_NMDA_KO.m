@@ -27,7 +27,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
 %         
     elseif dataset==3
         afiles = {'NR2B\1_24_15_KO\analysis_1_24_15_KO.mat',...
-            'NR2B\KO\12_8_14_homo\analysis_12_8_14_NR2BKO.mat',...
+            'NR2B\12_8_14_homo\analysis_12_8_14_NR2BKO.mat',...
             'NR2B\1_26_15_NR2B_KO_NR5A\analysis_1_26_15_NR2B_KO_NR5A1.mat',...
             'NR2B\2_2_15\analysis_2_2_15_NR2B_KO.mat'};
         
@@ -46,6 +46,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         clear rf_width
         clear locomotion
         clear drift
+        clear layer
         
         load([apath afiles{i}]);
         
@@ -93,7 +94,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         alldata( cellrange,5) = trough2peak;
         alldata( cellrange,6) = -trough_depth./peak_height;
         alldata( cellrange,7:25)= wv';
-        
+        alldata(cellrange,26)=layer;
      
         
         GT(cellrange)=4-dataset;
@@ -158,8 +159,6 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         driftF0(cellrange,:) = field2array(drift,'F0');
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
 
-       % driftlayer =  field2array(drift,'layer');
-       % lyr(cellrange,:) = driftlayer(:,1);
         cvDSI(cellrange,:) = field2array(drift,'cv_dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
         cvOSI(cellrange,:)=field2array(drift,'cv_osi');
         %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
@@ -182,9 +181,6 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         driftF1F0(cellrange,:) = NaN;
         driftF0(cellrange,:) = NaN;
         %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
-
-        driftlayer =  NaN;
-        lyr(cellrange,:) = NaN;
         cvDSI(cellrange,:) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
         cvOSI(cellrange,:)=NaN; 
         end
@@ -200,7 +196,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         
      clear meanwaves snr stdwaves
 %         
-%         for c=1:length(cells);
+%          for c=1:length(cells);
 %             %%% get SNR
 %             tet =ceil(cells(c,1)/4);
 %             
@@ -221,8 +217,8 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
 %                 snr=NaN
 %                 stdwaves=NaN
 %             end
-%             
 % %             
+% % %             
 %         end
 %         
 %         SNRall(cellrange)=snr;
@@ -315,51 +311,10 @@ else
     inh = (idx==2);
 end
 
-figure
-colorlist='bgrm'
 
-% for dev= 1:2
-% speedlist=[]; 
-% for i = 1:size(Vel,1);
-%       frac_loc(i,dev)=(sum(Vel{i,dev}<1))/length(Vel{i,dev});
-%     %if frac_loc(i,age)<0.82
-%        speedlist=[speedlist Vel{i,dev}];
-%     %end 
-% end
-% speedlist = speedlist*9.8/7;
-% speedlist(speedlist<0.25)=0.25;
-% x=nanmedian(speedlist>1)
-% 
-% speedlist = log10(speedlist);
-% 
-% %[f3 h3]=hist(speedlist,0.5:1:20);
-% [f3 h3]=hist(speedlist,-0.5:0.25:2);
-% f3=f3./sum(f3);
-% 
-% plot(h3,f3,'color',colorlist(dev));hold on
-% xlim([-0.5 2]); ylim([0 0.55])
-% set(gca,'Xtick',[-0.5 :0.5 : 1.5])
-% set(gca,'Xticklabel',{'0','1','3','10','30'})
-% xlabel('speed cm/sec')
-% 
-% end
-
-figure
-plot(alldata(GT==1,5),alldata(GT==1,6),'bo'); hold on
-plot(alldata(GT==2,5),alldata(GT==2,6),'mo'); hold on
-plot(alldata(GT==3,5),alldata(GT==3,6),'ro'); hold on
-%plot(alldata(GT==4,5),alldata(GT==4,6),'go'); hold on
-
-
-% [coeff score latent] = princomp(wvform);
-% figure
-% plot(latent);
-% figure
-% plot(score(:,1),score(:,2),'o');
-
-inh = alldata(:,6)>0 & alldata(:,6)<2  & alldata(:,5)<8;  %%% directly based on wvform; k-means includes another inh group?
+inh = alldata(:,6)>0 & alldata(:,6)<1.6  & alldata(:,5)<8.0;  %%% directly based on wvform; k-means includes another inh group?
 midnarrow = alldata(:,6)>0 & alldata(:,6)<4 & alldata(:,5)<12 &  alldata(:,5)>8.5;  %%% could analyze these specifically at some point
-exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<10;
+exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<4;
 
 figure
 plot(alldata(find(inh),5),alldata(find(inh),6),'ro');
@@ -371,7 +326,7 @@ hold on
 figure
 plot(wvform(exc,:)','color','k');hold on
 plot(wvform(inh,:)','color','r');hold on
-%plot(wvform(pinp,:)','color','b');
+
 
 for i = 1:size(driftA1,1)
     for j=1:size(driftA1,2)
@@ -385,117 +340,255 @@ for i = 1:size(driftA1,1)
     end
 end
 
-
 %%% calculate baseline, evoked, and artifact by choosing windows
 baseline = mean(psth_pinp(:,5:45),2);
 baseStd = std(psth_pinp(:,5:45),[],2);
-artifact = psth_pinp(:,51);
-ev = mean(psth_pinp(:,52:55),2);
+artifact = psth_pinp(:,50);
+ev = mean(psth_pinp(:,51:55),2);
 evoked = ev-baseline;
 
 zscore =evoked./baseStd;
 zscore(zscore>10)=10;
+lyr=alldata(:,26);
 
 %%% plot zscore vs evoked
 figure
-plot(zscore,evoked,'o')
+plot(zscore,evoked,'mo')
 hold on
+plot(zscore(lyr==3),evoked(lyr==3),'bo')
 plot(zscore(lyr==4),evoked(lyr==4),'go')
 plot(zscore(lyr==5),evoked(lyr==5),'ro');
 plot(zscore(lyr==6),evoked(lyr==6),'yo');
-legend('lyr 2/3','4','5','6')
+legend('lyr 2','lyr3','4','5','6')
 xlabel('zscore'); ylabel('evoked')
 
-artscore = (artifact - baseline)./baseStd;
-artscore(artscore>10)=10;
-
-figure
-hist(artscore',0:10)
+% artscore = (artifact - baseline)./baseStd;
+% artscore(artscore>10)=10;
+% 
+% figure
+% hist(artscore',0:10)
 
 %%% choose pinped
 pinped = (zscore>2& evoked>5); 
 
 figure
-plot(baseline,ev,'o')
-axis equal
-hold on
-plot(baseline(pinped),ev(pinped),'go');
-hold on
-plot(baseline(pinped&inh),ev(pinped&inh),'gs');
+plot(baseline,ev,'ko')
+axis equal;hold on
+plot(baseline(pinped &lyr==4),ev(pinped&lyr==4),'go');hold on
+plot(baseline(pinped &lyr==3),ev(pinped&lyr==3),'bo');hold on
+plot(baseline(pinped &lyr<=2),ev(pinped&lyr<=2),'mo');hold on
+plot(baseline(pinped &lyr==5),ev(pinped&lyr==5),'ro');hold on
+plot(baseline(pinped&inh),ev(pinped&inh),'rs');
 
-legend('non','pinp')
+legend('non','pinp lyr 4','pinp lyr3','pinp lyr2','pinp lyr5', 'pinp inh')
 plot([0 40],[0 40])
 xlabel('baseline'); ylabel('laser')
 sprintf('%d pinped neurons total',sum(pinped))
-%%firing rate
-responsive_run = peak(:,2)>=1; 
-responsive_stat = peak(:,1)>=1;  % firing rate (responsiveness) criteria for whether cells enter subsequent statistical analysis
 
-good_units=SNRall(:,1)>=2;
 
- %pinp1= double(pinp);
- %pinp1(pinp1==1)=2;
- %pinp1(pinp1==0)=1;
- 
+figure
+plot(baseline,ev,'ko')
+axis equal; hold on
+plot(baseline(pinped &GT'==1),ev(pinped&GT'==1),'ro');hold on
+plot(baseline(pinped &GT'==2),ev(pinped&GT'==2),'go');hold on
+plot(baseline(pinped &GT'==3),ev(pinped&GT'==3),'bo');hold on
+legend('non','pinp 2B KO','pinp 2A KO','pinp wt')
+plot([0 40],[0 40])
+xlabel('baseline'); ylabel('laser')
+
+
+
+%%% define responsive
+resp = driftpeak(:,2)>2 & driftpeak(:,1)>2;
+
+%%% # spikes evoked
+nbins=8;
+ev_spikes = mean(psth_pinp(pinped,54 + (1:nbins)),2)-baseline(pinped);
+ev_spikes = nbins*ev_spikes/1000;
+figure
+hist(ev_spikes)
+xlabel('# evoked spikes - pinped');
+
+nbins=8;
+ev_spikes = mean(psth_pinp(pinped,54 + (1:nbins)),2)-baseline(pinped);
+ev_spikes = nbins*ev_spikes/1000;
+h1 = hist(ev_spikes,-0.05:0.02:0.25)/length(ev_spikes);
+ev_spikes = mean(~psth_pinp(~pinped,54 + (1:nbins)),2)-baseline(~pinped);
+ev_spikes = nbins*ev_spikes/1000;
+h2 = hist(ev_spikes,-0.05:0.02:0.25)/length(ev_spikes);
+figure
+bar((-0.05:0.02:0.25)+0.01,[h1; h2]')
+
+%%% define wt
+wt = GT'==3;
+N2A=GT'==2;
+N2B = GT'==1;
+
+%%% fraction responsive
+frac_resp(1) = sum(resp& lyr==4 & GT'==1 & pinped)/sum( lyr==4 & GT'==1 & pinped);
+frac_resp(2) = sum(resp& lyr==4 & GT'==3  & pinped)/sum( lyr==4 & GT'==3  & pinped);
+figure
+bar(frac_resp); ylim([0 2]); ylabel('fraction resp >2'); title('lyr 4')
+set(gca,'xticklabel',{'2B pinp','wt pinp'})
+
+
+%%wt gain modulation of pinped neurons
+peak_run_p=nanmedianMW(peak(wt & lyr<=4 & pinped & resp & exc,2))
+peak_stat_p=nanmedianMW(peak(wt & lyr<=4 & pinped & resp & exc,1))
+gain_ind_p=(peak_run_p-peak_stat_p)/(peak_run_p+peak_stat_p)
+
+
+peak_run=nanmedianMW(peak(wt & lyr <=4 & ~pinped & resp & exc,2))
+peak_stat=nanmedianMW(peak(wt &lyr<=4& ~pinped & resp & exc,1))
+gain_ind=(peak_run-peak_stat)/(peak_run+peak_stat)
+
+
+%%NR2B gain modualtion of pinped neurons
+
+peak_run_p=nanmedianMW(peak(N2B & lyr<=4 & pinped & resp & exc,2))
+peak_stat_p=nanmedianMW(peak(N2B & lyr<=4 & pinped & resp & exc,1))
+gain_ind_p=(peak_run_p-peak_stat_p)/(peak_run_p+peak_stat_p)
+
+
+peak_run=nanmedianMW(peak(N2B & lyr<=4 & ~pinped & resp & exc,2))
+peak_stat=nanmedianMW(peak(N2B & lyr<=4 & ~pinped & resp & exc,1))
+gain_ind=(peak_run-peak_stat)/(peak_run+peak_stat)
+
+layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),GT,lyr,inh,resp,{'run','stat'},'run vs stat');
+
+
+
+%%% plot grating respons data
+
+plotPinpData(driftspont,wt,1,pinped,inh,1)
+plot([0 20],[0 20])
+title('spont')
+
+plotPinpData(peak,wt,1,pinped,inh,1)
+plot([0 20],[0 20])
+title('peak')
+
+plotPinpData(driftF1F0,wt,1,pinped,inh,resp)
+plot([0 2],[0 2])
+title('F1F0')
+
+plotPinpData(cvOSI,N2B,1,pinped,inh,resp)
+plot([0 1],[0 1])
+title('cvOSI')
+
+plotPinpData(OSI,N2B,1,pinped,inh,resp)
+plot([0 1],[0 1])
+title('OSI')
+
+
+
+plotPinpData(driftF1F0,N2B,1,pinped,inh,resp)
+plot([0 2],[0 2])
+title('F1F0 2B pinp')
+
+plotPinpData(DSI,N2B,1,pinped,inh,resp)
+plot([0 1],[0 1])
+title('DSI')
+
+
+plotPinpData(cvDSI,wt,lyr<=4,pinped,inh,resp)
+plot([0 1],[0 1])
+title('cv DSI')
+
+plotPinpData(driftpeak,GT'==1,lyr==4,pinped,inh,resp)
+hold on
+plot([0 50],[0 50])
+title('peak')
+
+%%% show psth of all pinped cells
+%%% lots of figures but useful
+
+% pinplist = find(pinped);
+% for i=1:length(pinplist)
+% c = pinplist(i);
+% 
+%     figure
+% plot(psth_pinp(c,:)')
+% hold on
+% plot([0 100],[baseline(c) baseline(c)],'g')
+% plot([0 100],[baseline(c)+baseStd(c)*3 baseline(c)+baseStd(c)*3],'r')
+% title(sprintf('evoked = %f  zscore = %f layer = %d inh = %d gt = %d',evoked(c),zscore(c),lyr(c),inh(c),GT(c)))
+% end
+
+
+%%% waveform of pinped vs non
+figure
+plot(wvform(exc,:)','b');
+hold on
+plot(wvform(inh,:)','r'); hold on
+plot(wvform(pinped,:)','g')
+figure
+plot(wvform(pinped,:)','g')
+title('pinped')
+
+I=find(inh)
+k=find(pinped & wt)
+l=find(~pinped&N2B)
+n=find(pinped&inh)
+% for j=length(I)
 % figure
-% plot(histbins,psth_pinp(pinp,:));hold on
-%  
-evoked_stat= peak(:,1)>=2 & good_units;  %OSI(:,1)>0.5 
-evoked_run= responsive_run 
-responsive_both= peak(:,1)>=1  & peak(:,2)>=1;
+% imagesc(STA_peak{1,12});
+% end
 
-layerGTpinpPlot(peak(:,1),pinped,GT,lyr,inh,1,'evoked FR');
-%layer_GT_line_pinp(peak(:,1),GT,lyr,inh,exc,pinp,good_units,'evoked FR');
+h=ismember(k,I)
 
-j=pinp1==2 & GT'==2 & lyr==4 & exc & good_units
+%generate STA for pinped cells
+for j=1:length(STA_peak)
 
-%%%ratio of running peak to stat peak
-layerGenoPlot_pinp_ratio(peak(:,1),peak(:,2),pinp1,GT,lyr,inh,exc,evoked_stat,'gain-evokedFR');
-layer_GT_pinp_bar_ratio(peak(:,1),peak(:,2),GT,lyr,inh,exc,pinp,evoked_stat,'gain-evokedFR' );
+    if ismember(j,l)
+figure
+if ~isempty(STA_peak{1,j})
+    imagesc(STA_peak{1,j},[-64 64]);
+end
+    end
+end
+
+%generate STA for inhibitory cells
+for j=1:length(STA_peak)
+
+    if ismember(j,I)
+figure
+imagesc(STA_peak{1,j},[-64 64]);
+    end
+end
+
+figure
+plot(wvform(inh,:)','color','r');hold on
+for j=1:length(STA_peak)
+
+    if ismember(j,k)
+plot(wvform(j,:)','color','g'); hold on
+    end
+end
 
 
-layerGTpinpPlot(driftspont(:,1),pinp1,GT,lyr,inh,exc,evoked_stat,'spont FR');
-layerGTpinpPlot(driftspont(:,2),pinp1,GT,lyr,inh,exc,evoked_stat,'spont FR');
-
-layer_GT_line_pinp(driftspont(:,1),GT,lyr,inh,exc,pinp,evoked_stat,'spont FR');
-layer_GT_pinp_bar_ratio(driftspont(:,1),driftspont(:,2),GT,lyr,inh,exc,pinp,evoked_stat,'gain-spontFR' );
 
 
+figure
+subplot(1,2,1);
+pie([sum(wt&pinped&~inh) sum(wt&pinped&inh)],{'broad','narrow'})
+title('wt pinped')
 
-% layerAgePlot(rfw(:,1),GT,lyr,inh,responsive_stat,'RF size');
-% layer_age_line(rfw(:,1),GT,lyr,inh,responsive_stat,'RF size');
- 
-x1=responsive_stat & ~inh & GT'==1 & driftspont1(:,1)>=0.045 & lyr<=3;
-y1=responsive_stat & ~ inh & GT'==4 & driftspont1(:,1)>=0.045 &lyr<=3;
-[p h]=ranksum(driftspont1(x1),driftspont1(y1));
 
-%%preferred oprientation 
-tunedOSI_stat = evoked_stat & OSI (:,1)>=0.5; 
-drift_theta_1=(drift_theta*180)/pi;
-drift_theta_1(drift_theta_1>330)=0;
-layerGT_pinp_Plot_pref_Orient(drift_theta_1(:,1),pinp1,GT,lyr,inh,exc,tunedOSI_stat ,'Prefered Orientation Stationary');
+figure
+subplot(1,2,1);
+pie([sum(N2B&pinped&~inh) sum(N2B&pinped&inh)],{'broad','narrow'})
+title('N2B pinped')
 
-%%%OS
-%layerAgeCDF(OSI(:,1),GT,lyr,inh,responsive_stat,'OSI all Stationary');
-layerGTpinpPlot(OSI(:,1),pinp1,GT,lyr,inh,exc,evoked_stat,'OSI Stationary');
-layer_GT_line_pinp(OSI(:,1),GT,lyr,inh,exc,pinp,evoked_stat,'spont FR');
+figure
+subplot(1,2,1);
+pie([sum(N2A&pinped&~inh) sum(N2A&pinped&inh)],{'broad','narrow'})
+title('N2A pinped')
 
-%%
-% %%%DS
-layerGTpinpPlot(cvDSI(:,1),pinp1,GT,lyr,inh,exc,evoked_stat,'DSI Stationary');
 
-layer_GT_line(cvDSI(:,1),GT,lyr,inh,DSI_stat_top50,'DSI top 50%');
-layer_GT_line(cvDSI(:,1),GT,lyr,inh,DSI_stat,'DSI ');
-
-%%%                              simple cells F1F0
-tunedOSI_F1F0_stat =evoked_stat & OSI(:,1)>=0.5 ;
-
-layerGTpinpPlot(driftF1F0(:,1),pinp1,GT,lyr,inh, exc,tunedOSI_F1F0_stat,'F1F0 Stationary');
-%layerAgePlot(driftF1F0(:,2),age,lyr,inh, F1F0_run,'F1F0 Running');
-
-layerGT_pinp_Plot_frac_simple(driftF1F0(:,1),pinp1,GT,lyr,inh,exc, tunedOSI_F1F0_stat,'F1F0 Stationary');
-%layerAgePlot_frac_simple(driftF1F0(:,2),age,lyr,inh, F1F0_run,'F1F0 Running');
-
+% subplot(1,2,2);
+% pie([sum(~wt&pinped&~inh) sum(~wt&pinped&inh)],{'broad','narrow'})
+% title('2A/2B ko pinped')
 
 %%%                         Receptive field STA data
 
