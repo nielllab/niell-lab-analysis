@@ -1,6 +1,6 @@
 function togglegoodcell(src,eventdata)
 %%% used to toggle panels when using subplots for selection
-
+display('hello')
   global goodcells;
 
   cellnum = get(src,'UserData');

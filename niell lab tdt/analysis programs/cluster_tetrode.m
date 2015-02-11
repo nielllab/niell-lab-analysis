@@ -257,7 +257,7 @@ for tet=use_tets
         % layer a (semi-)transparent patch over the axes to trap clicks
         op = get(gca,'OuterPosition');
         axes('position',op); axis off;
-        a = patch([0 0 1 1],[0 1 1 0],'w');
+        a = patch([0 0 1 1],[0 1 1 0],'w','PickableParts','All');
         set(a,'FaceAlpha',0)
         set(a,'EdgeAlpha',0)
         set(a,'ButtonDownFcn',@togglegoodcell);

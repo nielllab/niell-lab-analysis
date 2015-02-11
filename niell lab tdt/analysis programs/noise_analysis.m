@@ -1054,7 +1054,7 @@ for cell_n = cell_range
        
     end
     
-        OnOffFlash
+%         OnOffFlash
 end  %%%cell
 
 matlabpool close
@@ -1072,6 +1072,8 @@ elseif movietype==mv_noise
 close all
 
 end
+
+save(afile, 'wn', '-append')
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);
