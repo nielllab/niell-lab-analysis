@@ -513,19 +513,19 @@ Tank_Name
 clear  Xshift Xica Xold Xraw used nonc_score s c_score clear group
 
 %%% save everything
-[bname output_path] = uiputfile('','data folder');
+[bname output_path] = uiputfile('.mat','data folder');
 bname
 output_path
 
 if bname~=0
     fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname))
-    save(fname,'-v7.3');
+    save(fname);
     for t=use_tets
-        fname = fullfile(output_path,sprintf('hist%s_%s_t%d',Tank_Name,bname,t));
+        fname = fullfile(output_path,sprintf('hist%s_%s_t%d.fig',Tank_Name,bname,t));
         saveas(histfig(t),fname,'fig');
-        fname = fullfile(output_path,sprintf('snip%s_%s_t%d',Tank_Name,bname,t));
+        fname = fullfile(output_path,sprintf('snip%s_%s_t%d.fig',Tank_Name,bname,t));
         saveas(snipfig(t),fname,'fig');
-        fname = fullfile(output_path,sprintf('clust%s_%s_t%d',Tank_Name,bname,t));
+        fname = fullfile(output_path,sprintf('clust%s_%s_t%d.fig',Tank_Name,bname,t));
         saveas(clustfig(t),fname,'fig');
     end
 end

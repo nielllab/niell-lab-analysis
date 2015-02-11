@@ -20,16 +20,22 @@ ageList=ageList';
    
         if sum(uselist)>2
         
-        ratio_D2_D1(group,age)=nanmedian(data2(uselist))/nanmedian(data1(uselist));
+        
+            
+       %ratio_D2_D1(group,age)=nanmedian(data2(uselist))/nanmedian(data1(uselist))
+       
+       p_run(group,age)=nanmedianMW(data2(uselist));
+       p_stat(group,age)=nanmedianMW(data1(uselist));
+       gain_ind(group,age)=(p_run-p_stat)/(p_run+p_stat);
        
         sem_ratio=semedian_ratio(data2(uselist),data1(uselist));
         err_ratio(group,age)=sem_ratio;
         
         %rat(group, age)=nanmedian(data2(uselist)./data1(uselist));
-        mx=nanmedian(data1(uselist));
+        mx=nanmedianMW(data1(uselist));
         sx= semedian(data1(uselist));
                      
-        my=nanmedian(data2(uselist));
+        my=nanmedianMW(data2(uselist));
         sy=semedian(data2(uselist));
 %                      
         mediandata_x(group,age)=mx;
@@ -45,14 +51,14 @@ ageList=ageList';
  
  
  
-Med_E_A=[ratio_D2_D1(:,1), ratio_D2_D1(:,2)]
-s_med_E_A=[err_ratio(:,1),err_ratio(:,2)]
-
-figure
-barweb(Med_E_A,s_med_E_A);
+% Med_E_A=[ratio_D2_D1(:,1), ratio_D2_D1(:,2)]
+% s_med_E_A=[err_ratio(:,1),err_ratio(:,2)]
+% 
+% figure
+% barweb(Med_E_A,s_med_E_A);
  
 figure
-barweb(ratio_D2_D1,err_ratio)
+barweb(gain_ind,err_ratio)
 
 
 

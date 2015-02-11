@@ -104,7 +104,11 @@ for c = 1:length(cell_range)
     xlabel('msec')
     ylabel('sp/sec')
     
- %    base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
+% <<<<<<< HEAD
+%     base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
+% =======
+%  %    base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
+%>>>>>>> 27ed1519e930dfb016f6b7101c33e90521e0c628
 %     Sdev(c)=nanstd(psth(c,1:48))%%between -50 and 0 ms
 %     PinpFR(c)=max(psth(c,52:64))%peak between laser onest (0) and 12ms
 %     PINPed(c)= PinpFR(c)>= base(c)+(3*Sdev(c)) & base(c)>=0.5;
