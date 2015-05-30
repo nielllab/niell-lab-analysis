@@ -569,7 +569,7 @@ plot(peak(responsive_SNR & responsive_stat ,1),SNR(responsive_SNR& responsive_st
 
 i=nanmedian(peak1(inh & age'==4 & peak1(:,1)>=2))
 %%%ratio of running peak to stat peak
-layerAgePlot_ratio_jlh(peak_th(:,1),peak_th(:,2),age,lyr,inh,responsive_stat_th,{'run','stat'},'run vs stat');
+layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),age,lyr,inh,responsive_stat_th,{'run','stat'},'run vs stat');
 
 
 %driftspont1=driftspont(:,1);

@@ -4,19 +4,7 @@ clear all
 n_obs=0;
 day = [1 1 1 2 3 3 ];
 
-PostnatalAge = [17 17 16 18 18 22 16 17 17 17 22 22 60 60 16 16 18 18 19 19 60 14 14 14 19 19 20 20 18 23 25 25 17 17 18 18 19 19 60 60 60]
-PostnatalAge(PostnatalAge==60)=30;
-figure
-hist(PostnatalAge,min(PostnatalAge):max(PostnatalAge))
-
-figure
-hist(PostnatalAge(PostnatalAge<60),14:25)
-
-agelist=sort(unique(PostnatalAge));
-agelist=agelist(agelist~=25);
-
-
-analysisPath ='C:\data\matlab data\Wayne Matlab data\analysis files\development lgn\'
+analysisPath = 'C:\data\matlab data\Wayne Matlab data\analysis files\development lgn\'
 afile = { 'analysis_05022013_P17_rec1.mat'...
     'analysis_05022013_P17_rec2.mat'...
     'analysis_05072013_P16_rec1.mat'...
@@ -45,19 +33,19 @@ afile = { 'analysis_05022013_P17_rec1.mat'...
     'analysis_08122013_P19_rec2.mat'...
     'analysis_08132013_P20_rec1.mat'...
     'analysis_08132013_P20_rec2.mat'...
+    'analysis_09052013_P18_rec1.mat'...
     'analysis_09052013_P18_rec2.mat'...
     'analysis_09102013_P23_rec1.mat'...
     'analysis_09122013_P25_rec1.mat'...
     'analysis_09122013_P25_rec2.mat'...
+    'analysis_09172013_P23_rec1.mat'...
+    'analysis_09172013_P23_rec2.mat'...
     'analysis_09242013_P17_rec1.mat'...
     'analysis_09242013_P17_rec2.mat'...
     'analysis_09252013_P18_rec1.mat'...
     'analysis_09252013_P18_rec2.mat'...
     'analysis_09262013_P19_rec1.mat'...
     'analysis_09262013_P19_rec2.mat'...
-    'analysis_03122013_rec2_new.mat'...
-    'analysis_0307a2013_rec1.mat'...
-    'analysis_12072012_rec1b.mat'...
     };
 
 
@@ -67,7 +55,7 @@ histfile = { '','';...
     '05072013_P16_sec2_sl2_recording_1_LGNsection3_electrode1to32.tif','05072013_P16_sec2_sl2_recording_1_LGNsection3_electrode33to64.tif';  ...
     '05092013_P18_sec1slide2_recording_1_LGN section3_electrode1to32.tif','05092013_P18_sec1slide2_recording_1_LGN section3_electrode33to64.tif';...
     '05092013_P18_sec2slide2_recording_2_LGN section4_electrode1to32.tif','05092013_P18_sec2slide2_recording_2_LGN section4_electrode33to64.tif';...
-    '','';... 
+    '05132013_P22_sec2slide2_recording_1_LGN section2_electrode1to32.tif','05132013_P22_sec2slide2_recording_1_LGN section2_electrode33to64.tif';... 
     '','';...
     '','';...
     '','';...
@@ -90,19 +78,19 @@ histfile = { '','';...
     '08122013_P17_sec6slide1_recording_2_LGN section_electrode1to32.tif','08122013_P17_sec6slide1_recording_2_LGN section_electrode33to64.tif';...
     '08132013_P18_sec2slide2_recording_1_LGN section_electrode1to32.tif','08132013_P18_sec2slide2_recording_1_LGN section_electrode33to64.tif';...
     '08132013_P18_sec1slide2_recording_2_LGN section_electrode1to32.tif','08132013_P18_sec1slide2_recording_2_LGN section_electrode33to64.tif';...
+    '09052013_P18_sec7slide1_recording_1_LGN section5_electrode1to32.tif','09052013_P18_sec7slide1_recording_1_LGN section5_electrode33to64.tif';...
     '09052013_P18_sec7slide1_recording_2_LGN section5_electrode1to32.tif','09052013_P18_sec7slide1_recording_2_LGN section5_electrode33to64.tif';...
     '09102013_P23_sec5slide1_recording_1_LGN section4_electrode1to32.tif','09102013_P23_sec5slide1_recording_1_LGN section4_electrode33to64.tif';...
     '09122013_P25_sec1slide2_recording_1_LGN section4_electrode1to32.tif','09122013_P25_sec1slide2_recording_1_LGN section4_electrode33to64.tif';...
     '09122013_P25_sec2slide2_recording_2_LGN section5_electrode1to32.tif','09122013_P25_sec2slide2_recording_2_LGN section5_electrode33to64.tif';...
+    '09172013_P23_sec2slide2_recording_1_LGN section5_electrode1to32.tif','09172013_P23_sec2slide2_recording_1_LGN section5_electrode33to64.tif';...
+    '09172013_P23_sec3slide2_recording_2_LGN section6_electrode1to32.tif','09172013_P23_sec3slide2_recording_2_LGN section6_electrode33to64.tif';...
     '09242013_P17_sec2slide1_recording_1_LGN section2_electrode1to32.tif','09242013_P17_sec2slide1_recording_1_LGN section2_electrode33to64.tif';...
     '09242013_P17_sec4slide1_recording_2_LGN section4_electrode1to32.tif','09242013_P17_sec4slide1_recording_2_LGN section4_electrode33to64.tif';...
     '09252013_P18_sec4slide1_recording_2_LGN section2_electrode1to32.tif','09252013_P18_sec4slide1_recording_2_LGN section2_electrode33to64.tif';...
     '09252013_P18_sec5slide1_recording_1_LGN section3_electrode1to32.tif','09252013_P18_sec5slide1_recording_1_LGN section3_electrode33to64.tif';...
     '09262013_P19_sec1slide2_recording_1_LGN section4_electrode1to32.tif','09262013_P19_sec1slide2_recording_1_LGN section4_electrode33to64.tif';...
     '09262013_P19_sec1slide2_recording_2_LGN section4_electrode1to32.tif','09262013_P19_sec1slide2_recording_2_LGN section4_electrode33to64.tif';...
-    '','';...
-    '','';...
-    '','';...
     };
 
 
@@ -120,9 +108,9 @@ end
 %%% WWT
 %%% note - this assumes both shanks are in roughly same A/P position
 
-lgnPos  = [0 0 3 3 4 0 0 0 0 0 0 0 3 0 0 0 2 3 1 3 0 0 0 0 2 1 4 3 1 1 2 2 1 4 2 4 3 2 2];
+lgnPos  = [0 0 3 3 4 0 0 0 0 0 0 0 3 0 0 0 2 3 1 3 0 0 0 0 2 1 4 3 1 1 2 2 1 1 1 4 2 4 3 2 2];
 
-%%% lgnPos = ceil(5*rand(length(afile),1));
+%%%lgnPos = ceil(5*rand(length(afile),1));
 
 length(afile)
 length(histfile)
@@ -167,7 +155,6 @@ for i = 1:length(afile);
         movement_all(cell_range)=wn_movement;
     end
     
-    age(cell_range) = PostnatalAge(i);
     site(cell_range)=i;
     cell_id(cell_range,:) = cells;
     if size(wv,1)>19
@@ -313,7 +300,7 @@ for eye=1:2;
                 end
                 z=abs(fit(1))/std(sta(background))
                 
-                if z>5
+                if z>6
                     wn_all(cell_n,eye).sta_t = wn_all(cell_n,eye).svd_t(:,s);
                     if wn_all(cell_n,eye).sta_t(6)<0;
                         wn_all(cell_n,eye).sta_t = wn_all(cell_n,eye).sta_t *-1;
@@ -343,45 +330,6 @@ for eye=1:2;
         end
     end
 end
-
-
-
-for cell_n=1:n
-wn_spont(cell_n) = mean(wn_all(cell_n,1).crf([1 20]))/600;
-end
-figure
-hist(wn_spont);
-% figure
-% plot(dr_spont,wn_spont,'o')
-
-% figure
-% plot(burst_fraction(:,1),sf_amp,'o')
-
-close all
-
-
-%%% set age bins
-ageBins = [14 16; 18 20; 22 24; 25 30]';
-[sp sperr] = sortbyage(wn_spont',age,ageBins,1);
-figure
-errorbar(mean(ageBins,1),sp,sperr);
-ylabel('wn spont rate (sp/sec)')
-
-[sp sperr] = sortbyage(wn_spont',age,agelist,1);
-figure
-errorbar(agelist,sp,sperr);
-ylabel('wn spont rate (sp/sec)')
-
-[wnamp wnerr] = sortbyage(wn_cr(:,1)/600,age,ageBins,1);
-figure
-errorbar(mean(ageBins,1),wnamp,wnerr)
-ylabel('evoked wn firing (sp/sec)')
-
-[wnamp wnerr] = sortbyage(wn_cr(:,1)/600,age,agelist,1);
-figure
-errorbar(agelist,wnamp,wnerr)
-ylabel('evoked wn firing (sp/sec)')
-
 
 ind=0;
 tmin=zeros(1,cell_n); tmax = tmin; wn_lat=tmin;
@@ -447,22 +395,6 @@ for cell_n = 1:length(histox)
 % %         plot(fre,s2)
 %     end   
 end
-age(age==60)=30;
-
-[burst bursterror] = sortbyage(burst_fraction,age,agelist,~isnan(burst_fraction(:,1)') );
-figure
-errorbar(agelist(2:end),burst(2:end,1),bursterror(2:end,1),'r','Linewidth',2);  %%% double-check movement for p14
-hold on
-errorbar(agelist(2:end),burst(2:end,2),bursterror(2:end,2),'g','Linewidth',2);
-legend({'stationary','moving'})
-
-[burst bursterror] = sortbyage(burst_fraction,age,ageBins,~isnan(burst_fraction(:,1)') );
-figure
-errorbar(mean(ageBins,1),burst(:,1),bursterror(:,1),'r','Linewidth',2);  %%% double-check movement for p14
-hold on
-errorbar(mean(ageBins,1),burst(:,2),bursterror(:,2),'g','Linewidth',2);
-legend({'stationary','moving'})
-
 
 figure
 hist(burst_fraction);
@@ -560,31 +492,31 @@ for cell_n=1:n
     end
 end
 
-% 
-% figure
-% plot (histox,x0,'o');
-% xlabel('histology X');
-% ylabel('RF X');
-% 
-% 
-% figure
-% plot (histoy,y0,'o');
-% xlabel('histology Y');
-% ylabel('RF Y');
-% 
-% labels=ones(n,3);
-% goodfit = find(~isnan(x0));
-% labels(goodfit,1)=0;
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% title('wn sta rfs');
-% 
-% [labels cmap clim]= makeColors(x0,nan,'div','RdBu');
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% colormap(cmap); colorbar; set(gca,'Clim',clim); title('x0');
-% 
-% [labels]= makeColors(y0,nan,'div','RdBu');
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% colormap(cmap); colorbar; set(gca,'Clim',clim); title('y0');
+
+figure
+plot (histox,x0,'o');
+xlabel('histology X');
+ylabel('RF X');
+
+
+figure
+plot (histoy,y0,'o');
+xlabel('histology Y');
+ylabel('RF Y');
+
+labels=ones(n,3);
+goodfit = find(~isnan(x0));
+labels(goodfit,1)=0;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('wn sta rfs');
+
+[labels cmap clim]= makeColors(x0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('x0');
+
+[labels]= makeColors(y0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('y0');
 
 
 % [labels]= makeColors(mv_x0,nan,'div','RdBu');
@@ -612,11 +544,11 @@ end
 % scatter(mv_x0,mv_y0,8, manual_type);
 % xlabel('mv x0'); ylabel('mv y0')
 
-% tratio=-tmin./tmax;
-% tratio(tratio>1)=1;
-% labels= makeColors(tratio,nan,'div','RdBu');
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% title('min max ratio');
+tratio=-tmin./tmax;
+tratio(tratio>1)=1;
+labels= makeColors(tratio,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('min max ratio');
 
 %%% flash spots
 for cell_n = 1:n
@@ -670,84 +602,15 @@ for cell_n = 1:n
     end
 end
 
-fl_thresh=1;
-
-%%% size suppression
-[supp supperr] = sortbyage(1-fl_supp',age,agelist,fl_amp>fl_thresh );
-figure
-errorbar(agelist,supp, supperr);
-ylabel('size suppression');
-
-[supp supperr] = sortbyage(1-fl_supp',age,ageBins,fl_amp>fl_thresh );
-figure
-errorbar(mean(ageBins,1),supp, supperr);
-ylabel('size suppression');
-
-%%% preferred spot size
-[sz szerr] = sortbyage(fl_sz',age,agelist,fl_amp>fl_thresh);
-figure
-errorbar(agelist,sz, szerr);
-ylabel('pref spot size')
- set(gca,'Ytick',1:6);
- set(gca,'Yticklabel',{'2','4','8','16','32','full'});
-
-[sz szerr] = sortbyage(fl_sz',age,ageBins,fl_amp>fl_thresh);
-figure
-errorbar(mean(ageBins,1),sz, szerr);
-ylabel('pref spot size')
- set(gca,'Ytick',1:6);
- set(gca,'Yticklabel',{'2','4','8','16','32','full'});
-
-
-% [lat laterr] = sortbyage(fl_lat',age,agelist,fl_amp>fl_thresh);
-% figure
-% errorbar(agelist,lat, laterr);
-% ylabel('flash spot latency (frames)')
-
-%%% RF width
-[resp resperr] = sortbyage(wx,age,agelist,1)
-figure
-errorbar(agelist,resp, resperr);
-ylabel('wx from wn (sp/sec)')
-
-[resp resperr] = sortbyage(wx,age,ageBins,1)
-figure
-errorbar(mean(ageBins,1),resp, resperr);
-ylabel('wx from wn (sp/sec)')
-
-%%% spot reponse amplitude
-[resp resperr] = sortbyage(fl_amp',age,agelist,1)
-figure
-errorbar(agelist,resp, resperr);
-ylabel('spot response (sp/sec)')
-
-[resp resperr] = sortbyage(fl_amp',age,ageBins,1)
-figure
-errorbar(mean(ageBins,1),resp, resperr);
-ylabel('spot response (sp/sec)')
-
-%%% fraction responsive to spots
-[resp resperr] = sortbyage(fl_amp'>fl_thresh,age,agelist,1)
-figure
-errorbar(agelist,resp, resperr);
-ylabel('% responsive flashing spots')
-
-[resp resperr] = sortbyage(fl_amp'>fl_thresh,age,ageBins,1)
-figure
-errorbar(mean(ageBins,1),resp, resperr);
-ylabel('% responsive flashing spots')
-
-
-
-% fl_type= nan(size(fl_lag));
-% fl_type(fl_lag==0)=1;
-% fl_type(fl_lag==1)=2;
-% labels= makeColors(fl_type,nan);
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% title('flash type')
+fl_type= nan(size(fl_lag));
+fl_type(fl_lag==0)=1;
+fl_type(fl_lag==1)=2;
+labels= makeColors(fl_type,nan);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('flash type')
 
 %n_obs=n_obs+1; obs_name{n_obs} = 'fl size supp'; obs(:,n_obs) = fl_supp;
-
+fl_thresh=1;
 
 fl_sz(fl_amp<fl_thresh)=nan;
 fl_lag(fl_amp<fl_thresh)=nan;
@@ -764,16 +627,16 @@ fl_y0(fl_amp<fl_thresh)=nan;
 sustain(sustain<0)=nan;
 sustain(sustain>1)=nan;
 
-% labels= makeColors(fl_type,nan,'seq','GnBu');
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% title('fl_type')
-% 
-% sustain_norm = sustain;
-% sustain_norm(sustain_norm<0)=0;
-% sustain_norm(fl_onset_amp<2)=nan;
-% labels= makeColors(sustain_norm);
-% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
-% title('normalized sustain')
+labels= makeColors(fl_type,nan,'seq','GnBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('fl_type')
+
+sustain_norm = sustain;
+sustain_norm(sustain_norm<0)=0;
+sustain_norm(fl_onset_amp<2)=nan;
+labels= makeColors(sustain_norm);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('normalized sustain')
 
 clear driftOSI driftDSI
 mv_osi=nan(size(histox)); mv_prefO=nan(size(histox));
@@ -872,7 +735,7 @@ for cell_n=1:length(histox)
         end
     end
     pref_tf = round(sign(tf_ratio(cell_n,1))/2 + 1.5);
-    if isnan(pref_tf)
+   if isnan(pref_tf)
         pref_tf = 1;
     end
     driftOSI(cell_n,:) = dr_osi(cell_n,pref_tf,:);
@@ -884,103 +747,6 @@ for cell_n=1:length(histox)
     lowpass(cell_n) = lowsf(cell_n,pref_tf);
 end
 
-%%% grating response amp
-[resp resperr] = sortbyage(sf_amp',age,agelist,1);
-figure
-errorbar(agelist,resp,resperr);
-ylabel('grating response (sp/sec)');
-
-[resp resperr] = sortbyage(sf_amp',age,ageBins,1);
-figure
-errorbar(mean(ageBins,1),resp,resperr);
-ylabel('grating response (sp/sec)');
-
-%%% grrating responsive fraction
-[resp resperr] = sortbyage(sf_amp'>1,age,agelist,1);
-figure
-errorbar(agelist,resp,resperr);
-ylabel('% responsive gratings (>1sp/sec)');
-
-[resp resperr] = sortbyage(sf_amp'>1,age,ageBins,1);
-figure
-errorbar(mean(ageBins,1),resp,resperr);
-ylabel('% responsive gratings (>1sp/sec)');
-
-%%% peak SF
-sfs = [0 0.01 0.02 0.04 0.08 0.16 0.32 nan];
-sf_inds = peak_sf;
-sf_inds(peak_sf ==0) = 7;
-sf_inds(isnan(peak_sf))=8;
-
-[sf sferr] = sortbyage(sfs(sf_inds)',age,agelist,sf_amp>2)
-figure
-errorbar(agelist,sf,sferr);
-ylabel('peak sf (cpd)');
-
-[sf sferr] = sortbyage(sfs(sf_inds)',age,ageBins,sf_amp>2)
-figure
-errorbar(mean(ageBins,1),sf,sferr);
-ylabel('peak sf (cpd)');
-
-%%% fraction lowpass (greatest response to 0cpd)
-[sf sferr] = sortbyage((peak_sf==1)',age,agelist,sf_amp>2)
-figure
-errorbar(agelist,sf,sferr);
-ylabel('fraction lowpass');
-
-[sf sferr] = sortbyage((peak_sf==1)',age,ageBins,sf_amp>2)
-figure
-errorbar(mean(ageBins,1),sf,sferr);
-ylabel('fraction lowpass');
-
-%%% gratings spont
-[sp sperr] = sortbyage(dr_spont',age,agelist,1)
-figure
-errorbar(agelist,sp,sperr);
-ylabel('spont rate gratings (sp/sec)');
-
-[sp sperr] = sortbyage(dr_spont',age,ageBins,1)
-figure
-errorbar(mean(ageBins,1),sp,sperr);
-ylabel('spont rate gratings(sp/sec)');
-
-%%% fraction OS
-[osi osierr] = sortbyage(driftOSI(:,1)>0.2,age,agelist,sf_amp>2);
-figure
-errorbar(agelist,osi,osierr);
-ylabel('fraction orientation selective >0.2')
-
-[osi osierr] = sortbyage(driftOSI(:,1)>0.2,age,ageBins,sf_amp>2);
-figure
-errorbar(mean(ageBins,1),osi,osierr);
-ylabel('fraction orientation selective >0.2')
-
-%%% fraction DS
-[dsi dsierr] = sortbyage(driftDSI(:,1)>0.2,age,agelist,sf_amp>2);
-figure
-errorbar(agelist,dsi,dsierr);
-ylabel('fraction direction selective >0.2')
-
-[dsi dsierr] = sortbyage(driftDSI(:,1)>0.2,age,ageBins,sf_amp>2);
-figure
-errorbar(mean(ageBins,1),dsi,dsierr);
-ylabel('fraction direction selective >0.2')
-
-%%% fraction SBC
-sbc= (wn_cr_dom<-1*10^3);
-
-[sbc_frac sbc_err] = sortbyage(sbc',age,agelist,1);
-figure
-errorbar(agelist,sbc_frac,sbc_err);
-ylabel('fraction sbc');
-
-[sbc_frac sbc_err] = sortbyage(sbc',age,ageBins,1);
-figure
-errorbar(mean(ageBins,1),sbc_frac,sbc_err);
-ylabel('fraction sbc');
-
-
-keyboard
 
 thresh=3;
 mv_osi(mv_amp<thresh)=nan;

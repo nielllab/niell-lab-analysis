@@ -107,7 +107,7 @@ for cell_n = cell_range;
             figure(hist_fig);
             subplot(nrows,ncols,c);
             hold on
-            color_list = 'brg';
+            color_list = 'brgm';
         color = color_list(rep);
             plot(hist_range, hist(Spike_Timing, hist_range)/(hist_int*numtrials),color);
             hold on;

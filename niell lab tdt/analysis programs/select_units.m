@@ -30,13 +30,13 @@ tet_data=1;
 clear wv
 
 % %%% merge two clusters
-%%%% this is a total hack! but can't think of a good gui to do this
+% %%% this is a total hack! but can't think of a good gui to do this
 % ch = 1;
-% c1=7;
-% c2=11;
-% idx=idx_all(4*(ch-1)+1,:);
+% c1=2;
+% c2=5;
+% idx=idx_all{4*(ch-1)+1};
 % idx(idx==c2)=c1;
-% idx_all(4*(ch-1)+1,:)=idx;
+% idx_all{4*(ch-1)+1}=idx;
 % csize(ch,c1) = csize(ch,c1)+csize(ch,c2);
 % Lratio(ch,c1) = 0.5*(Lratio(ch,c1)+Lratio(ch,c2));
 % trough(ch,c1) = 0.5*(trough(ch,c1)+trough(ch,c2));
@@ -76,7 +76,7 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         axis off
         op = get(gca,'OuterPosition');
         axes('position',op); axis off;
-        a = patch([0 0 1 1],[0 1 1 0],'w');
+        a = patch([0 0 1 1],[0 1 1 0],'w','PickableParts','All');
         set(a,'FaceAlpha',0)
         set(a,'EdgeAlpha',0)
         set(a,'ButtonDownFcn',@togglegoodcell);
@@ -119,9 +119,6 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
                   amps =squeeze(min(wvclust(:,5:10,:),[],2));
         subplot(2,2,3:4)
         plot([0 tmerge],amps,'.','MarkerSize',2 );
-        
-      
-        
          end
          
           %%% call Erik's code to calculate cluster separation
@@ -164,10 +161,6 @@ for cell = 1:size(cells,1);
     wv(:,cell) = mean_wvform(:,mainchan+cells(cell,1)-1,c);
     wv(:,cell) = wv(:,cell)/abs(min(wv(:,cell)));
     spikeT{cell} = event_times_all{cells(cell,1)}(find(idx_all{cells(cell,1)} == c));
-    
-    
-    
-    
 end
 xlswrite('fullwvform',wv');
 figure
