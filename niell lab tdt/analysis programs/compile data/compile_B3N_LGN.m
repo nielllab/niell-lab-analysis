@@ -1,10 +1,10 @@
-%function compile_B3N_lgn_fulldataset
+ %function compile_B3N_lgn_fulldataset
 close all
 clear all
 n_obs=0;
 day = [1 1 1 2 3 3 ];
 
-PostnatalAge = [30 30 30 30 30 30 15 15]
+PostnatalAge = [45 45 45 45 45 45 45 45 45 45 45 30 30 30 30 30 15 15 15 15]
 PostnatalAge(PostnatalAge==60)=30;
 figure
 hist(PostnatalAge,min(PostnatalAge):max(PostnatalAge))
@@ -18,22 +18,48 @@ agelist=agelist(agelist~=25);
 
 analysisPath ='E:\Wayne Matlab data\Wayne Matlab data_fromC\analysis files\B3N awake LGN\'
 afile = {
-    '10092014_B3N_adult_analysis_rec1.mat';...
-    '10292014_B3N_adult_analysis_rec1.mat';...
-    '11252014_B3N_P25_analysis_rec1a.mat';...
-    '12162014_B3N_P22_analysis_rec1.mat';...
-    '12182014_B3N_P24_analysis_rec1.mat';...
-    '12182014_B3N_P24_analysis_rec2.mat';...
-    'analysis_recording_2.mat';...
-    '01162013_adult_analysis_recording_3.mat';...
+    '10092014_analysis_rec1_B3N_adult.mat';...
+    '10282014_analysis_rec1_B3N_adult.mat';...
+    '10292014_analysis_rec1_B3N_adult.mat';...
+    '11252014_analysis_rec1a_B3N_P25.mat';...
+    '12162014_analysis_rec1_B3N_P22.mat';...
+%     '12172015_B3N_P23_analysis_rec1.mat';...
+    '12182014_analysis_rec1_B3N_P24.mat';...
+    '12182014_analysis_rec2_B3N_P24.mat';...
+%    '01232015_B3N__P17_analysis_rec1.mat';...
+    '03252015_analysis_rec1_B3N_P27.mat';...
+    '03262015_analysis_rec1_B3N_P28.mat';...
+    '03272015_analysis_rec1_B3N_P29.mat';...
+    '03102015_analysis_rec1_B3Nhet_P25.mat';...
+    '03112015_analysis_rec1_B3Nhet_P26.mat';...
+    '03112015_analysis_rec2_B3Nhet_P26.mat';...
+    '03122015_analysis_rec1_B3Nhet_P27.mat';...
+    '03192015_analysis_rec1_B3Nhet_P32.mat';...
+%    'analysis_recording_2.mat';...
+    '01162013_analysis_recording_3_WT_adult.mat';...
+    '02242015_analysis_rec1_WT_adult.mat';...
+    '02252015_analysis_rec1_WT_adult.mat';...
     };
 
 
 histoPath = 'E:\Wayne Matlab data\Wayne Matlab data_fromC\histology\Beta3Nulls_LGN\B3N histology\'
-histfile = {'','';...
+histfile = {'10_9_14_LGNtrace_with_electrode1to32.tif','10_9_14_LGNtrace_with_electrode33to64.tif';...
+    '10_28_14_LGNtrace_electrode1to32.tif','10_28_14_LGNtrace_electrode33to64.tif';...
+    '10_29_14_LGNtrace_with_electrode1to32.tif','10_29_14_LGNtrace_with_electrode33to64.tif';...
+    '11_25_14_LGNtrace_with_electrode1to32.tif','11_25_14_LGNtrace_with_electrode33to64.tif';...
+    '12_16_14_LGNtrace_with_electrode_1to32.tif','12_16_14_LGNtrace_with_electrode_33to64.tif';...
+%     '12_17_14_LGNtrace_with_electrode_1to32.tif','12_17_14_LGNtrace_with_electrode_33to64.tif';...
+    '12_18_14_LGNtrace_with_electrode_1to32(1).tif','12_18_14_LGNtrace_with_electrode_33to64(1).tif';...
+    '12_18_14_LGNtrace_with_electrode_1to32_A2.tif','12_18_14_LGNtrace_with_electrode_33to64_A2.tif';...
+    '1_23_15_LGNtrace_electrode_1to32_section3of6.tif','1_23_15_LGNtrace_electrode_33to64_section3of6.tif';...
     '','';...
     '','';...
     '','';...
+    '3_10_15_LGNtrace_with_electrode1to32.tif','3_10_15_LGNtrace_with_electrode33to64.tif';...
+    '3_11_15_animal1_LGNtrace_with_electrode1to32.tif','3_11_15_animal1_LGNtrace_with_electrode33to64.tif';...
+    '3_11_15_animal2_LGNtrace_with_electrode1to32.tif','3_11_15_animal2_LGNtrace_with_electrode33to64.tif';...
+    '3_12_15_LGNtrace_with_electrode1to32.tif','3_12_15_LGNtrace_with_electrode33to64.tif';...
+    '3_19_15_LGNtrace_with_electrode1to32.tif','3_19_15_LGNtrace_with_electrode33to64.tif';...
     '','';...
     '','';...
     '','';...
@@ -55,7 +81,7 @@ end
 %%% WWT
 %%% note - this assumes both shanks are in roughly same A/P position
 
-lgnPos  = [3 0 0 0 0 0 0 0];
+lgnPos  = [3 3 4 2 1 1 3 3 0 0 0 4 3 2 2 2 0 0 0 0];
 
 % lgnPos = ceil(5*rand(length(afile),1));
 
@@ -610,6 +636,8 @@ fl_thresh=1;
 %%% size suppression
 [supp supperr] = sortbyage(1-fl_supp',age,agelist,fl_amp>fl_thresh );
 figure
+hold on
+bar(agelist,supp)
 errorbar(agelist,supp, supperr);
 ylabel('size suppression');
 
@@ -621,7 +649,9 @@ ylabel('size suppression');
 %%% preferred spot size
 [sz szerr] = sortbyage(fl_sz',age,agelist,fl_amp>fl_thresh);
 figure
+hold on
 errorbar(agelist,sz, szerr);
+bar(agelist,sz)
 ylabel('pref spot size')
  set(gca,'Ytick',1:6);
  set(gca,'Yticklabel',{'2','4','8','16','32','full'});
@@ -642,6 +672,16 @@ ylabel('pref spot size')
 %%% RF width
 [resp resperr] = sortbyage(wx,age,agelist,1)
 figure
+errorbar(agelist,resp, resperr);
+ylabel('wx from wn (sp/sec)')
+
+%%Wayne
+%%% RF width
+[resp resperr] = sortbyage(wx.*wy,age,agelist,1)
+figure
+hold on
+% scatter(age,wx.*wy)
+bar(agelist,resp)
 errorbar(agelist,resp, resperr);
 ylabel('wx from wn (sp/sec)')
 
@@ -711,68 +751,7 @@ sustain(sustain>1)=nan;
 % title('normalized sustain')
 
 clear driftOSI driftDSI
-mv_osi=nan(size(histox)); mv_prefO=nan(size(histox));
-mv_dsi=nan(size(histox)); mv_prefD=nan(size(histox));
-mv_spd = nan(size(histox));
-mv_sz= nan(size(histox)); mv_spd_ratio=nan(size(histox));
-mv_amp = nan(size(histox)); mv_sz_tune= nan(length(histox),3);
-mv_sp_tune=nan(length(histox),5); mv_os_tune=nan(length(histox),8);
-%%% drifting gratings & moving spots
-for cell_n=1:length(x0)
-    %for cell_n = [24]
-    if isstruct(mv_all(cell_n))
-        m= mv_all(cell_n);
-        if ~isempty(m.N)
-            [dr_amp dr_onoff(cell_n)] =max(mean(nanmean(nanmean(m.hist_all,4),3),2))
-            onoff = fl_onoff(cell_n)*0.5 +1.5;
-            onoff = dr_onoff(cell_n);
-            
-            h=squeeze(m.hist_all(dr_onoff(cell_n),:,:,:));
-            %     if size(h,1)==5;
-            %         h= h(2:4,:,:);
-            %     end
-            [x y z] = meshgrid(1:size(h,2),1:size(h,1),1:8);
-            use = find(~isnan(h));
-            missing = find(isnan(h));
-            missingdata = griddatan([x(use) y(use) z(use)],h(use),[x(missing) y(missing) z(missing)]);
-            filled_h = h;
-            filled_h(missing) = missingdata;
-            
-            sz = squeeze(mean(nanmean(filled_h,3),2))-m.spont;
-            use_sz = find(sz>0.5*max(sz));
-            sp = squeeze(mean(nanmean(filled_h,3),1))-m.spont;
-            use_sp = find(sp>0.5*max(sp));
-            os_tune = squeeze(mean(nanmean(filled_h(use_sz,use_sp,:),2),1))-m.spont
-            os_N= squeeze(sum(nansum(m.n_unique(onoff,use_sz,use_sp,:),3),2));
-            
-            mv_sz_tune(cell_n,:)=sz;
-            mv_sp_tune(cell_n,:)=sp;
-            mv_os_tune(cell_n,:)=os_tune;
-            
-            [mv_amp(cell_n) mv_sz(cell_n)] =max(sz);
-            if length(sz)==5
-                mv_sz(cell_n)=mv_sz(cell_n)-1;
-            end
-            [empt mv_spd(cell_n)] = max(sp);
-            mv_spd_ratio(cell_n) = (sp(5)-sp(1))/(sp(5)+sp(1));
-            [mv_osi(cell_n) mv_prefO(cell_n)]= calcOSI(os_tune,0);
-            [mv_dsi(cell_n) mv_prefD(cell_n)]= calcOSI(os_tune,1);
-            
-            %         figure('Name',sprintf('cell %d',cell_n))
-            %         subplot(2,2,1)
-            %         plot(sz);
-            %         axis([1 3 min(0,min(sz)) max(1,max(sz))])
-            %         subplot(2,2,2)
-            %         plot(sp);
-            %         axis([1 5 min(0,min(sp)) max(1,max(sp))])
-            %         subplot(2,2,3)
-            %         plot(os_tune)
-            %         axis([1 8 min(0,min(os_tune)) max(1,max(os_tune))])
-            %         title(sprintf('OSI = %f DSI=%f',mv_osi(cell_n),mv_dsi(cell_n)))
-            
-        end
-    end   
-end
+
 
 %%% drifting gratings
 for cell_n=1:length(histox)

@@ -2,12 +2,13 @@
 clear onset_hist err_est baseline_hist baseline_resp flash_resp baseline_est onset err base
 nx =128; ny= 64;
 
-
+%%% find spikes
 for i=1:length(eps)
     epSpikes{i} = times(times>=eps(2,i) & times<eps(2,i)+0.8)-eps(2,i);
     nEpSpikes(i)=sum(epSpikes{i}>=0.3 & epSpikes{i}<=0.6);
 end
 
+%%% get timecourse at each location
 tic
 parfor xi=1:nx;
    xi
@@ -18,6 +19,7 @@ x =xi*2;
 end
 toc
 
+%%% recompile parallel variables
 for xi=1:nx
     onset_hist(xi,:,:,:,:) = onset{xi};
     err_est(xi,:,:,:) = err{xi};
@@ -28,13 +30,14 @@ for xi=1:nx
 end
 clear onset err base
 
+%%% get on/off responses, with baseline subtracted off
 stimbins = onset_bins>=0.3 & onset_bins<=0.6;
 for rep = 1:2
     resps(:,:,rep,:) = squeeze(mean(onset_hist(:,:,rep,2:5,stimbins),4))-baseline_hist(:,:,stimbins);
 end
 
 
-
+%%% show all traces
 sfactor=8;
 rf_fig = figure;
 for x = 1:nx/sfactor
@@ -59,6 +62,7 @@ datafig=figure;
 %     end
 % end
 
+%%% amplitude of response
 for rep = 1:2
     for sz = 1:6
         flash_resp(:,:,rep,sz) = flash_resp(:,:,rep,sz) - baseline_resp(:,:);
@@ -83,6 +87,7 @@ for rep = 1:2
     end
 end
 
+%%% on and off RFs, averaged over size 2:5
 figure
 for rep = 1:2
     subplot(2,2,rep)
@@ -108,7 +113,7 @@ cmap = cbrewer('div','RdBu',64);
 cmap = flipud(cmap);
 
 
-
+%%% get on/off bias over space
 figure
 rfz = rf./err;
 rfzAbs = abs(rfz(:,:,1))+ abs(rfz(:,:,2));
@@ -122,6 +127,7 @@ subplot(1,2,1)
 imshow(imresize(onoffIm .*amp,10));
 title('on off')
 
+%%% get sustain ratio over space 
 
 sustain = mean(resps(:,:,:,2:end),4)./max(resps(:,:,:,2:end),[],4);
 sustain(:,:,1)=medfilt2(sustain(:,:,1)); sustain(:,:,2)=medfilt2(sustain(:,:,2)); 
