@@ -1,85 +1,46 @@
-%function compile_rgc_fulldataset
+%function compile_lgn_fulldataset
 close all
 clear all
 n_obs=0;
 day = [1 1 1 2 3 3 ];
 
-PostnatalAge = [45 45 45 45 45 45 45 29 33 33 34 34 45 45 45 45 45 45 27 45 27 18 45 22 45 45 20 20 25 16]
-% PostnatalAge(PostnatalAge==60)=30;
-figure
-hist(PostnatalAge,min(PostnatalAge):max(PostnatalAge))
-
-figure
-hist(PostnatalAge(PostnatalAge<60),14:25)
-
-agelist=sort(unique(PostnatalAge));
-agelist=agelist(agelist~=25);
-
- 
-analysisPath = 'E:\Wayne Matlab data\Wayne data\analysis files\rgc\'
-afile = { 'analysis_01312014_anesRGC_rec1new_P45.mat'...
-    'analysis_02182014_anesRGC_rec1cluster2_P45.mat'...
-    'analysis_02212014_anesRGC_rec1c_P45.mat'...
-    'analysis_02272014_anesRGC_rec2b_P45.mat'...
-    'analysis_03142014_anesRGC_rec1_P45.mat'...
-    'analysis_03142014_anesRGC_rec2a_P45.mat'...
-    'analysis_03172014_anesRGC_rec1acluster2_P45.mat'...
-    'analysis_03212014_anesRGC_rec1_P29.mat'...
-    'analysis_03252014_anesRGC_rec1_P33.mat'...
-    'analysis_03252014_anesRGC_rec2_P33.mat'...
-    'analysis_03262014_anesRGC_rec1b_P34.mat'...
-    'analysis_03262014_anesRGC_rec2_P34.mat'...
-    'analysis_03312014_anesRGC_rec1_P45.mat'...
-    'analysis_04022014_anesRGC_rec1_P45.mat'...
-    'analysis_04022014_anesRGC_rec2_P45.mat'...
-    'analysis_04232014_anesRGC_rec1_P45.mat'...
-    'analysis_04252014_anesRGC_rec1_P45.mat'...
-    'analysis_04302014_anesRGC_rec1_P45.mat'...
-    'analysis_05012014_anesRGC_rec1b_P27.mat'...
-    'analysis_05142014_anesRGC_rec1_P45.mat'...
-    'analysis_05222014_anesRGC_rec1_P27.mat'...
-    'analysis_06032014_anesRGC_rec1_P18.mat'...
-    'analysis_06112014_anesRGC_rec1_P45.mat'...
-    'analysis_06242014_anesRGC_rec1_P22.mat'...
-    'analysis_06272014_anesRGC_rec1_P45.mat'...
-    'analysis_06272014_anesRGC_rec2_P45.mat'...
-    'analysis_07092014_anesRGC_rec1_P20.mat'...
-    'analysis_07102014_anesRGC_rec1new_P20.mat'...
-    'analysis_07282014_anesRGC_rec1_P25.mat'...
-    'analysis_08132014_anesRGC_rec1b_P16.mat'...
+analysisPath = 'E:\Wayne Matlab data\Wayne Matlab data_fromC\analysis files\awake lgn new\'
+afile = {     '11282012_rec1_analysis2'...
+    '11292012_rec1_analysis2'...
+    '11292012_rec_2'...
+    '11292012_rec3_analysis2'...
+    '11302012_rec1_analysis2'...
+    '12072012_rec2_analysis2'...
+    '01162013_analysis2_rec3'...
+    '01242013_analysis_rec_1'...
+    '01242013_analysis_rec_2'...
+    '02182013_rec1_analysis_2'...
+    '02192013_rec1_analysis_2'...
+    '02192013_rec2_analysis2'...
+    '02202013_rec1_analysis3'...
+    '02212013_rec1_analysis_2'...
+    '02212013_rec2_analysis2'...
+    '03122013_analysis_rec_2'...
     };
+% 'analysis_12062012_rec3.mat'...
 
-histoPath = 'C:\data\matlab data\Wayne Matlab data\histology\development histology\'
-histfile = { '','';...
+histoPath = 'E:\Wayne Matlab data\Wayne Matlab data_fromC\histology\1128_to1207_for_matlab_analysis/'
+histfile = { '11282012_penetration_1_recording_1_sec6sl1_Fig55.tif','';...
+    '11292012_penetration_1_recording_1_sec3sl2__Fig47.tif','';...
     '','';...
-    '','';... 
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
+    '11292012_penetration_5_recording_3_sec2sl2_Fig50_.tif','';...
+    '11302012_penetration_2_recording_1_sec6sl1_Fig53.tif','';...
+    '12072012_penetration1_recording1_sec4sl1_fig51.tif',''; ...
     '','';...
     '','';...
     '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
-    '','';...
+    '02182013_penetration_1_recording_1_sec3sl2_electrode_1to32_LGN.tif','02182013_penetration_1_recording_1_sec3sl2_electrode_33to64_LGN.tif';...
+    '02192013_penetration_1_recording_1_sec2sl2_electrode_1to32_LGN.tif','02192013_penetration_1_recording_1_sec2sl2_electrode_33to64_LGN.tif';...
+    '02192013_penetration_2_recording_2_sec4sl2_electrode_1to32_LGN.tif','02192013_penetration_2_recording_2_sec4sl2_electrode_33to64_LGN.tif';...
+    '02202013_penetration_2_recording_1_sec3sl2_electrode_1to32_LGN.tif','02202013_penetration_2_recording_1_sec3sl2_electrode_33to64_LGN.tif';...
+    '02212013_penetration_1_recording_1_sec2sl2_electrode_1to32_LGN.tif','02212013_penetration_1_recording_1_sec2sl2_electrode_33to64_LGN.tif';...
+    '02212013_penetration_2_recording_2_sec3sl2_electrode_1to32_LGN.tif','02212013_penetration_2_recoridng_2_sec3sl2_electrode_33to64_LGN.tif';...
+    '03122013_penetration_3_recording_2_sec2sl2_electrode1to32_LGN.tif','03122013_penetration_3_recording_2_sec2sl2_electrode33to64_LGN.tif';...
     };
 
 
@@ -97,26 +58,24 @@ end
 %%% WWT
 %%% note - this assumes both shanks are in roughly same A/P position
 
-% lgnPos  = [0 0 3 3 4 0 0 0 0 0 0 0 3 0 0 0 2 3 1 3 0 0 0 0 2 1 4 3 1 1 2 2 1 4 2 4 3 2 2];
-% 
-% %%% lgnPos = ceil(5*rand(length(afile),1));
-% 
-% length(afile)
-% length(histfile)
-% length(lgnPos)
-% 
-% [anatomy sections]=LGN_histo_twoshank(histfile, lgnPos);
-% 
-% 
- numsites = ones(1,length(histfile));
-% 
-% 
-% % manual_type = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 091412.xlsx','A1:A294');
-% % manual_outside = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 091412.xlsx','B1:B294');
-% % manual_outside(isnan(manual_outside))=0;
- n=0;
+lgnPos  = [1 4 0 3 2 3 0 0 0 4 4 2 3 4 3 2];
+%%%lgnPos = ceil(5*rand(length(afile),1));
 
- clear mv_all
+length(afile)
+length(histfile)
+length(lgnPos)
+
+[anatomy sections]=LGN_histo_twoshank(histfile, lgnPos);
+
+
+numsites = 32*ones(1,length(histfile));
+
+
+% manual_type = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 091412.xlsx','A1:A294');
+% manual_outside = xlsread('C:\data\lgn rf project_new0824\lgn_analysis\lgn types 091412.xlsx','B1:B294');
+% manual_outside(isnan(manual_outside))=0;
+n=0;
+
 for i = 1:length(afile);
     i
     clear displayOffset drift mv fl wn wn_movement
@@ -130,7 +89,11 @@ for i = 1:length(afile);
         wn_all(cell_range,1)=wn
     end
     drift_all(cell_range)=drift;
-
+    if exist('mv','var')
+        mv_all(cell_range)=mv;
+    else
+        mv_all(cell_range)=NaN;
+    end
     fl_all(cell_range)=fl;
     if exist('wn_movement','var')
         if ~isfield(wn_movement,'spikes')
@@ -141,7 +104,6 @@ for i = 1:length(afile);
         movement_all(cell_range)=wn_movement;
     end
     
-    age(cell_range) = PostnatalAge(i);
     site(cell_range)=i;
     cell_id(cell_range,:) = cells;
     if size(wv,1)>19
@@ -156,9 +118,111 @@ for i = 1:length(afile);
     end
     offsetX(cell_range)=displayOffset;
     offsetY(cell_range)=displayHeight*atand(1/25);
-
+    if numsites(i)==16;
+        peakchan= peakchan+16;
+    end
+    peaksite(cell_range)=peakchan;
+    clear x y z s
+    for j =1:length(peakchan)
+        if isempty(anatomy(i).AP)
+            x(j) = NaN;
+            y(j) = NaN;
+            z(j)=NaN;
+            s(j)=NaN;
+        else
+            x(j)=anatomy(i).siteXY(1,peakchan(j));
+            y(j)=anatomy(i).siteXY(2,peakchan(j));
+            z(j)=anatomy(i).AP;
+            s(j)=anatomy(i).section;
+        end
+    end
+    
+    histox(cell_range)=x;
+    histoy(cell_range)=y;
+    histoz(cell_range)=z;
+    histSection(cell_range)=s;
     
 end
+
+%%% align points on trace to reference
+alignedX= nan(size(histox));
+alignedY= nan(size(histox));
+for cell_n=1:length(histox)
+    if ~isnan(histox(cell_n))
+        
+        paxxy = sections(histSection(cell_n)).coords;
+        tracexy = anatomy(site(cell_n)).LGN;  %%% coords are reversed
+        widthX = max(tracexy(:,2))-min(tracexy(:,2));
+        normX(cell_n) = (histox(cell_n)-min(tracexy(:,2))) / widthX;
+        ypts = find(abs((tracexy(:,2))-(histox(cell_n)))<10);
+        if length(ypts)>1
+            normY(cell_n) = (histoy(cell_n)-min(tracexy(ypts,1))) / (max(tracexy(ypts,1)) - min(tracexy(ypts,1)));
+        else
+            normY(cell_n)=0;
+        end
+        alignedX(cell_n) = min(paxxy(:,1)) + normX(cell_n)*(max(paxxy(:,1))-min(paxxy(:,1)));
+        ypts = find(abs((paxxy(:,1))-(alignedX(cell_n)))<10);
+        if length(ypts)>1
+            alignedY(cell_n) = min(paxxy(ypts,2))+normY(cell_n)*(max(paxxy(ypts,2))-min(paxxy(ypts,2)));
+        else
+            alignedY(cell_n)=0;
+        end
+    end
+end
+
+originalX=histox;
+originalY=histoy;
+histox=alignedX;
+histoy=alignedY;
+
+%%% find inside points
+inside= zeros(n,1);
+for cell_n= 1:n
+    if ~isnan(histox(cell_n))
+        
+        sec = sections(histSection(cell_n)).coords;
+        y= sec(find(round(sec(:,1))==round(histox(cell_n))),2);
+        if ~(isempty(y) || histoy(cell_n)>max(y) || histoy(cell_n)<min(y))
+            inside(cell_n)=1;
+        end
+    end
+end
+
+labels = zeros(n,3);
+labels(:,3)=1;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+
+labels= ones(n,3);
+labels(~inside,2)=0;
+labels(~inside,3)=0;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+
+
+if ~exist('manual_outside','var')
+    manual_outside = 1-inside;
+end
+
+
+labels= ones(n,3);
+labels(~manual_outside,2)=0;
+labels(~manual_outside,3)=0;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+
+if ~exist('manual_type','var')
+    manual_type = ones(size(histox));
+end
+
+% %%% plot manual type on normal and aligned position
+% for i = [0 1]
+%     %for i = 0
+%     id = nan(size(manual_type));
+%     id(~isnan(manual_type))=0;
+%     id(manual_type==i)=1;
+%
+%     [labels cmap clim]= makeColors(id,nan,'qual','Set1');
+%     f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+%     colormap(cmap); set(gca,'Clim',clim); title(sprintf('type %d',i));
+% end
 
 wn_degperpix = wn(end).degperpix;
 
@@ -216,27 +280,6 @@ for eye=1:2;
     end
 end
 
-for cell_n=1:n
-wn_spont(cell_n) = mean(wn_all(cell_n,1).crf([1 20]))/600;
-end
-figure
-hist(wn_spont);
-% figure
-% plot(dr_spont,wn_spont,'o')
-
-
-
-
-[sp sperr] = sortbyage(wn_spont',age,agelist,1);
-figure
-errorbar(agelist,sp,sperr);
-ylabel('wn spont rate (sp/sec)')
-
-[wnamp wnerr] = sortbyage(wn_cr(:,1)/600,age,agelist,1);
-figure
-errorbar(agelist,wnamp,wnerr)
-ylabel('evoked wn firing (sp/sec)')
-
 ind=0;
 tmin=zeros(1,cell_n); tmax = tmin; wn_lat=tmin;
 
@@ -250,8 +293,106 @@ xlabel('contra eye response')
 ylabel('ipsi eye response');
 legend('contra unit','ipsi unit')
 
+for cell_n = 1:length(histox)
+    if ~isempty(movement_all(cell_n).moveCRF)
+    move_crf(cell_n,:) = movement_all(cell_n).moveCRF;
+    move_ev(cell_n) = (move_crf(cell_n,end) - move_crf(cell_n,1));
+    stop_crf(cell_n,:) = movement_all(cell_n).stopCRF;
+    stop_ev(cell_n) = (stop_crf(cell_n,end) - stop_crf(cell_n,1));
+    burst_fraction(cell_n,:) = movement_all(cell_n).burst;
+    spont_ratio(cell_n) = (move_crf(cell_n,1)-stop_crf(cell_n,1)) / (move_crf(cell_n,1)+stop_crf(cell_n,1));
+    evoke_ratio(cell_n) = (move_ev(cell_n) - stop_ev(cell_n))/ (move_ev(cell_n) + stop_ev(cell_n));
+    burst_ratio(cell_n) = (movement_all(cell_n).burst(2) - movement_all(cell_n).burst(1))/ (movement_all(cell_n).burst(2) + movement_all(cell_n).burst(1));
+    else
+     move_crf(cell_n,:)=NaN; move_gain(cell_n)=NaN; stop_crf(cell_n,:)=NaN; stop_gain(cell_n)=NaN;burst_fraction(cell_n,:)=NaN; burst_ratio(cell_n)=NaN;
+    end
+    if length(movement_all(cell_n).spikes)>1
+        clear params
+params.Fs = 0.25*1/median(diff(movement_all(cell_n).lfpT(1:1000)));
+        %params.tapers = [50*movement_all(cell_n).lfpT(end) 5];
+        params.tapers = [5 10  1];
+        params.fpass = [0 120];
+        [C ph s12 s1 s2 t fre] = cohgramcpt(movement_all(cell_n).lfpV(1:4:end)',movement_all(cell_n).spikes',[10 10],params);
+       spikespect{cell_n}=s2;
+        cell_n
+%         df = median(diff(fre)); dt = median(diff(t));
+%        figure
+%         subplot(2,2,1);
+%         imagesc(C'); 
+%         axis xy; set(gca,'Ytick',(0:20:90)/df); set(gca,'Yticklabel',num2str((0:20:90)'));
+%         set(gca,'Xtick',(0:300:max(t))/dt);set(gca,'Xticklabel',num2str((0:5:max(t)/60)'));
+%         xlabel('min'); ylabel('Hz');
+%         
+%         subplot(2,2,2);
+%         imagesc(s1',[0 prctile(s1(:),90)]);
+%          axis xy; set(gca,'Ytick',(0:20:90)/df); set(gca,'Yticklabel',num2str((0:20:90)'));
+%         set(gca,'Xtick',(0:300:max(t))/dt);set(gca,'Xticklabel',num2str((0:5:max(t)/60)'));
+%         xlabel('min'); ylabel('Hz');
+%        
+%         subplot(2,2,3)
+%         imagesc(s2',[0 prctile(s2(:),95)]);
+%          axis xy; set(gca,'Ytick',(0:20:90)/df); set(gca,'Yticklabel',num2str((0:20:90)'));
+%         set(gca,'Xtick',(0:300:max(t))/dt);set(gca,'Xticklabel',num2str((0:5:max(t)/60)'));
+%         xlabel('min'); ylabel('Hz');
+%         
+%         title(sprintf('cell %d',cell_n));
+%         subplot(2,2,4)
+%         plot(movement_all(cell_n).speed);
+        %         figure
+%         plot(fre, spikeLFPcoh(cell_n,:));
+%         figure
+%         plot(fre,s1)
+%             figure
+%         plot(fre,s2)
+    end   
+end
 
-age(age==60)=30;
+
+keyboard
+
+
+  plot(stop_crf(cell_n,:),'r');
+        hold on
+        plot(move_crf(cell_n,:),'b');
+        
+figure
+hist(burst_fraction);
+xlabel('burst fraction')
+
+figure
+hist(burst_ratio)
+xlabel('burst_ratio');
+
+figure
+plot(burst_fraction(:,1),burst_fraction(:,2),'o');
+xlabel('burst fraction stop')
+ylabel('burst fraction move');
+hold on
+plot([0 0.5],[0 0.5]);
+
+figure
+plot(stop_crf(:,1),move_crf(:,1),'o');
+xlabel('crf spont - stop')
+ylabel('crf spont - move');
+hold on
+plot([0 10],[0 10])
+
+figure
+plot(stop_ev,move_ev,'o');
+xlabel('crf evoked - stop');
+ylabel('crf evoked - move');
+hold on
+plot([-10 10],[-10 10])
+
+
+
+% gain used to be ev-spont/ ev + spont
+% figure
+% plot(stop_gain,move_gain,'o');
+% xlabel('stop gain');
+% ylabel('move gain');
+% hold on
+% plot([-1 1],[-1 1]);
 
 
 
@@ -287,7 +428,15 @@ for cell_n=1:n
                     wn_adapt(cell_n) = dn/up;
                 end
                 
-            
+                if ~isstruct(mv_all(cell_n))
+                    mv_x0(cell_n)=NaN; mv_y(cell_n)=NaN;
+                else
+                    if ~isempty(mv_all(cell_n).sta_pos)
+                        mv_x0(cell_n) = mv_all(cell_n).sta_pos(1)*mv_all(length(wn_all)).degperpix + offsetX(cell_n);
+                        mv_y0(cell_n) = -mv_all(cell_n).sta_pos(2)*mv_all(length(wn_all)).degperpix +offsetY(cell_n);
+                    end
+                end
+                
                 if ~isstruct(fl_all(cell_n))
                     fl_x0(cell_n) = NaN; fl_y0(cell_n)=NaN;
                 else
@@ -303,9 +452,62 @@ for cell_n=1:n
 end
 
 
+figure
+plot (histox,x0,'o');
+xlabel('histology X');
+ylabel('RF X');
+
+
+figure
+plot (histoy,y0,'o');
+xlabel('histology Y');
+ylabel('RF Y');
+
+labels=ones(n,3);
+goodfit = find(~isnan(x0));
+labels(goodfit,1)=0;
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('wn sta rfs');
+
+[labels cmap clim]= makeColors(x0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('x0');
+
+[labels]= makeColors(y0,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+colormap(cmap); colorbar; set(gca,'Clim',clim); title('y0');
+
+
+% [labels]= makeColors(mv_x0,nan,'div','RdBu');
+% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+% colormap(cmap); colorbar; set(gca,'Clim',clim); title('mv_x0');
+%
+% [labels]= makeColors(mv_y0,nan,'div','RdBu');
+% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+% colormap(cmap); colorbar; set(gca,'Clim',clim); title('mv_y0');
+%
+% [labels]= makeColors(fl_x0,nan,'div','RdBu');
+% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+% colormap(cmap); colorbar; set(gca,'Clim',clim); title('fl_x0');
+%
+% [labels]= makeColors(fl_y0,nan,'div','RdBu');
+% f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+% colormap(cmap); colorbar; set(gca,'Clim',clim); title('fl_y0');
+
+%
+% figure
+% scatter(x0,y0,8, manual_type);
+% xlabel('wn x0'); ylabel('wn y0')
+%
+% figure
+% scatter(mv_x0,mv_y0,8, manual_type);
+% xlabel('mv x0'); ylabel('mv y0')
+
 tratio=-tmin./tmax;
 tratio(tratio>1)=1;
-
+labels= makeColors(tratio,nan,'div','RdBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('min max ratio');
 
 %%% flash spots
 for cell_n = 1:n
@@ -359,65 +561,15 @@ for cell_n = 1:n
     end
 end
 
-fl_thresh=1;
-
-
-%%% set age bins
-ageBins = [14 20; 21 34; 45 50]';
-[sp sperr] = sortbyage(wn_spont',age,ageBins,1);
-figure
-errorbar(mean(ageBins,1),sp,sperr);
-ylabel('wn spont rate (sp/sec)')
-
-
-[supp supperr] = sortbyage(fl_supp',age,agelist,fl_amp>fl_thresh );
-figure
-errorbar(agelist,supp, supperr);
-ylabel('size suppression');
-
-[sz szerr] = sortbyage(fl_sz',age,agelist,fl_amp>fl_thresh);
-figure
-errorbar(agelist,sz, szerr);
-ylabel('pref size')
-
-[lat laterr] = sortbyage(fl_lat',age,agelist,fl_amp>fl_thresh);
-figure
-errorbar(agelist,lat, laterr);
-ylabel('flash spot latency (frames)')
-
-[resp resperr] = sortbyage(wx,age,agelist,1)
-figure
-errorbar(agelist,resp, resperr);
-ylabel('wx white noise)')
-
-%%wayne
-[resp resperr] = sortbyage(wx,age,ageBins,1)
-figure
-hold on
-errorbar(mean(ageBins,1),resp, resperr);
-bar(mean(ageBins,1),resp);
-ylabel('wx from wn (sp/sec)')
-
-[resp resperr] = sortbyage(fl_amp',age,agelist,1)
-figure
-errorbar(agelist,resp, resperr);
-ylabel('spot response (sp/sec)')
-
-
-[resp resperr] = sortbyage(fl_amp'>fl_thresh,age,agelist,1)
-figure
-errorbar(agelist,resp, resperr);
-ylabel('% responsive')
-
-
-
 fl_type= nan(size(fl_lag));
 fl_type(fl_lag==0)=1;
 fl_type(fl_lag==1)=2;
-
+labels= makeColors(fl_type,nan);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('flash type')
 
 %n_obs=n_obs+1; obs_name{n_obs} = 'fl size supp'; obs(:,n_obs) = fl_supp;
-
+fl_thresh=1;
 
 fl_sz(fl_amp<fl_thresh)=nan;
 fl_lag(fl_amp<fl_thresh)=nan;
@@ -434,13 +586,80 @@ fl_y0(fl_amp<fl_thresh)=nan;
 sustain(sustain<0)=nan;
 sustain(sustain>1)=nan;
 
+labels= makeColors(fl_type,nan,'seq','GnBu');
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('fl_type')
 
 sustain_norm = sustain;
 sustain_norm(sustain_norm<0)=0;
 sustain_norm(fl_onset_amp<2)=nan;
-
+labels= makeColors(sustain_norm);
+f = plotSections(sections,anatomy,histox,histoy,histSection,labels);
+title('normalized sustain')
 
 clear driftOSI driftDSI
+mv_osi=nan(size(histox)); mv_prefO=nan(size(histox));
+mv_dsi=nan(size(histox)); mv_prefD=nan(size(histox));
+mv_spd = nan(size(histox));
+mv_sz= nan(size(histox)); mv_spd_ratio=nan(size(histox));
+mv_amp = nan(size(histox)); mv_sz_tune= nan(length(histox),3);
+mv_sp_tune=nan(length(histox),5); mv_os_tune=nan(length(histox),8);
+%%% drifting gratings & moving spots
+for cell_n=1:length(x0)
+    %for cell_n = [24]
+    if isstruct(mv_all(cell_n))
+        m= mv_all(cell_n);
+        if ~isempty(m.N)
+            [dr_amp dr_onoff(cell_n)] =max(mean(nanmean(nanmean(m.hist_all,4),3),2))
+            onoff = fl_onoff(cell_n)*0.5 +1.5;
+            onoff = dr_onoff(cell_n);
+            
+            h=squeeze(m.hist_all(dr_onoff(cell_n),:,:,:));
+            %     if size(h,1)==5;
+            %         h= h(2:4,:,:);
+            %     end
+            [x y z] = meshgrid(1:size(h,2),1:size(h,1),1:8);
+            use = find(~isnan(h));
+            missing = find(isnan(h));
+            missingdata = griddatan([x(use) y(use) z(use)],h(use),[x(missing) y(missing) z(missing)]);
+            filled_h = h;
+            filled_h(missing) = missingdata;
+            
+            sz = squeeze(mean(nanmean(filled_h,3),2))-m.spont;
+            use_sz = find(sz>0.5*max(sz));
+            sp = squeeze(mean(nanmean(filled_h,3),1))-m.spont;
+            use_sp = find(sp>0.5*max(sp));
+            os_tune = squeeze(mean(nanmean(filled_h(use_sz,use_sp,:),2),1))-m.spont
+            os_N= squeeze(sum(nansum(m.n_unique(onoff,use_sz,use_sp,:),3),2));
+            
+            mv_sz_tune(cell_n,:)=sz;
+            mv_sp_tune(cell_n,:)=sp;
+            mv_os_tune(cell_n,:)=os_tune;
+            
+            [mv_amp(cell_n) mv_sz(cell_n)] =max(sz);
+            if length(sz)==5
+                mv_sz(cell_n)=mv_sz(cell_n)-1;
+            end
+            [empt mv_spd(cell_n)] = max(sp);
+            mv_spd_ratio(cell_n) = (sp(5)-sp(1))/(sp(5)+sp(1));
+            [mv_osi(cell_n) mv_prefO(cell_n)]= calcOSI(os_tune,0);
+            [mv_dsi(cell_n) mv_prefD(cell_n)]= calcOSI(os_tune,1);
+            
+            %         figure('Name',sprintf('cell %d',cell_n))
+            %         subplot(2,2,1)
+            %         plot(sz);
+            %         axis([1 3 min(0,min(sz)) max(1,max(sz))])
+            %         subplot(2,2,2)
+            %         plot(sp);
+            %         axis([1 5 min(0,min(sp)) max(1,max(sp))])
+            %         subplot(2,2,3)
+            %         plot(os_tune)
+            %         axis([1 8 min(0,min(os_tune)) max(1,max(os_tune))])
+            %         title(sprintf('OSI = %f DSI=%f',mv_osi(cell_n),mv_dsi(cell_n)))
+            
+        end
+    end   
+end
 
 %%% drifting gratings
 for cell_n=1:length(histox)
@@ -475,9 +694,6 @@ for cell_n=1:length(histox)
         end
     end
     pref_tf = round(sign(tf_ratio(cell_n,1))/2 + 1.5);
-    if isnan(pref_tf)
-        pref_tf = 1;
-    end
     driftOSI(cell_n,:) = dr_osi(cell_n,pref_tf,:);
     driftDSI(cell_n,:) = dr_dsi(cell_n,pref_tf,:);
     driftOSItheta(cell_n,:) = dr_prefO(cell_n,pref_tf,:);
@@ -486,45 +702,6 @@ for cell_n=1:length(histox)
     %         driftF1F0(cell_n)=max(d.orient_tune(pref_tf,2,:)) / max(d.orient_tune(pref_tf,1,:)); %%% replace with max?
     lowpass(cell_n) = lowsf(cell_n,pref_tf);
 end
-
-
-[resp resperr] = sortbyage(sf_amp',age,agelist,1);
-figure
-errorbar(agelist,resp,resperr);
-ylabel('grating response (sp/sec)');
-
-[resp resperr] = sortbyage(sf_amp'>1,age,agelist,1);
-figure
-errorbar(agelist,resp,resperr);
-ylabel('% responsive (>1sp/sec)');
-
-[sf sferr] = sortbyage(peak_sf',age,agelist,sf_amp>2)
-figure
-errorbar(agelist,sf,sferr);
-ylabel('peak sf (cpd)');
-
-[sp sperr] = sortbyage(dr_spont',age,agelist,1)
-figure
-errorbar(agelist,sp,sperr);
-ylabel('spont rate (sp/sec)');
-
-[osi osierr] = sortbyage(driftOSI(:,1)>0.2,age,agelist,sf_amp>2);
-figure
-errorbar(agelist,osi,osierr);
-ylabel('fraction orientation selective >0.2')
-
-
-[dsi dsierr] = sortbyage(driftDSI(:,1)>0.2,age,agelist,sf_amp>2);
-figure
-errorbar(agelist,dsi,dsierr);
-ylabel('fraction direction selective >0.2')
-
-sbc= (wn_cr_dom<-1*10^3);
-
-[sbc_frac sbc_err] = sortbyage(sbc',age,agelist,1);
-figure
-errorbar(agelist,sbc_frac,sbc_err);
-ylabel('fraction sbc');
 
 
 thresh=3;
@@ -1701,8 +1878,10 @@ for c = 1:length(wn_all)
     end
     else
         subplot(5,4,13)
-        bar(burst_fraction(cell_n,:));
-        ylim([0 0.4]);
+%         bar(burst_fraction(cell_n,:));
+%         ylim([0 0.4]);
+	spct = spikespect{cell_n}';
+    imagesc(spct,[0 prctile(spct(:),95)]);
         title(sprintf('burst %0.2f %0.2f',burst_fraction(cell_n,1),burst_fraction(cell_n,2)));
         subplot(5,4,14);
         plot(stop_crf(cell_n,:),'r');

@@ -1023,6 +1023,14 @@ for cell_n = cell_range
             fl(cell_n).onset_bins=onset_bins;
             fl(cell_n).sta_pos=[x y];
             
+               OnOffFlash;
+     fl(cell_n).sustainBias=sustain;
+     fl(cell_n).onoffbias = onoffbias;
+     fl(cell_n).RFzcore = rfz;
+     fl(cell_n).rf = rf;
+     fl(cell_n).resps = resps; %%% timecourse averaged over sizes
+     fl(cell_n).flash_resp = flash_resp;  %%% mean response for on/off and size
+            
         elseif movietype==mv_noise
             
             saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
@@ -1053,12 +1061,12 @@ for cell_n = cell_range
         
        
     end
+
     
-        OnOffFlash
 end  %%%cell
 
-matlabpool close
-
+% matlabpool close
+% 
 if movietype==cm_noise
     wn(cell_n,stim_eye).degperpix=degperpix;
     save(afile,'wn','-append')
