@@ -724,50 +724,50 @@ end
 if exist('drift_mv_all','var')
     clear drift_amp_mv dr_spont
     for rep=1:2
-for cell_n=1:length(histox)
-    d = drift_mv_all(cell_n,rep);
-    dr_spont_mv(cell_n,rep,1:3)=d.spont(1:3);
-    tfs = squeeze(nanmean(d.orient_tune(1:2,:,:),3));
-   % tf_ratio(cell_n,:) = (tfs(2,:)-tfs(1,:))./(tfs(2,:) + tfs(1,:));
-    %figure('Name',sprintf('cell %d',cell_n))
-    color = {'b','r'};
-    [sf_amp_mv(cell_n,rep) peak_sf_mv(cell_n,rep)] = max(squeeze(mean(nanmean(d.sf_tune(:,1:2,:),2),1)));
-    
-    for tf=1:2
-        for f = 1:2
-        drift_amp_mv(cell_n,rep,tf,f) = max(d.orient_tune(tf,f,:));
-    end
-    end
-      
-  
-        %drift_amp_mv(cell_n,rep) = max(max(max(d.orient_tune)));
-    
-    
-%     for r=1:2  %%% tempfreq
-%         lowsf(cell_n,r)=d.sf_tune(r,1,1);
-%         for f=1:2  %%% F0 F1
-%             [peak_amp peak_tf(cell_n)] = max(squeeze(nanmean(d.sf_tune(:,f,:),3)));
-%             drift_os = squeeze(d.orient_tune(r,f,:));
-%             [dr_osi(cell_n,r,f) dr_prefO(cell_n,r,f)]= calcOSI(drift_os,0);
-%             [dr_dsi(cell_n,r,f) dr_prefD(cell_n,r,f)]= calcOSI(drift_os,1);            
-%             drift_sf= squeeze(d.sf_tune(r,f,:));
-%         end
-%     end
-%     pref_tf = round(sign(tf_ratio(cell_n,1))/2 + 1.5);
-%     driftOSI(cell_n,:) = dr_osi(cell_n,pref_tf,:);
-%     driftDSI(cell_n,:) = dr_dsi(cell_n,pref_tf,:);
-%     driftOSItheta(cell_n,:) = dr_prefO(cell_n,pref_tf,:);
-%     driftDSItheta(cell_n,:) = dr_prefD(cell_n,pref_tf,:);
-%     driftF1F0(cell_n)=sum(d.orient_tune(pref_tf,2,:)) / sum(d.orient_tune(pref_tf,1,:)); %%% replace with max?
-%     %         driftF1F0(cell_n)=max(d.orient_tune(pref_tf,2,:)) / max(d.orient_tune(pref_tf,1,:)); %%% replace with max?
-%     lowpass(cell_n) = lowsf(cell_n,pref_tf);
-end
+        for cell_n=1:length(histox)
+            d = drift_mv_all(cell_n,rep);
+            dr_spont_mv(cell_n,rep,1:3)=d.spont(1:3);
+            tfs = squeeze(nanmean(d.orient_tune(1:2,:,:),3));
+            % tf_ratio(cell_n,:) = (tfs(2,:)-tfs(1,:))./(tfs(2,:) + tfs(1,:));
+            %figure('Name',sprintf('cell %d',cell_n))
+            color = {'b','r'};
+            [sf_amp_mv(cell_n,rep) peak_sf_mv(cell_n,rep)] = max(squeeze(mean(nanmean(d.sf_tune(:,1:2,:),2),1)));
+            
+            for tf=1:2
+                for f = 1:2
+                    drift_amp_mv(cell_n,rep,tf,f) = mean(d.orient_tune(tf,f,:));
+                end
+            end
+            
+            
+            %drift_amp_mv(cell_n,rep) = max(max(max(d.orient_tune)));
+            
+            
+            %     for r=1:2  %%% tempfreq
+            %         lowsf(cell_n,r)=d.sf_tune(r,1,1);
+            %         for f=1:2  %%% F0 F1
+            %             [peak_amp peak_tf(cell_n)] = max(squeeze(nanmean(d.sf_tune(:,f,:),3)));
+            %             drift_os = squeeze(d.orient_tune(r,f,:));
+            %             [dr_osi(cell_n,r,f) dr_prefO(cell_n,r,f)]= calcOSI(drift_os,0);
+            %             [dr_dsi(cell_n,r,f) dr_prefD(cell_n,r,f)]= calcOSI(drift_os,1);
+            %             drift_sf= squeeze(d.sf_tune(r,f,:));
+            %         end
+            %     end
+            %     pref_tf = round(sign(tf_ratio(cell_n,1))/2 + 1.5);
+            %     driftOSI(cell_n,:) = dr_osi(cell_n,pref_tf,:);
+            %     driftDSI(cell_n,:) = dr_dsi(cell_n,pref_tf,:);
+            %     driftOSItheta(cell_n,:) = dr_prefO(cell_n,pref_tf,:);
+            %     driftDSItheta(cell_n,:) = dr_prefD(cell_n,pref_tf,:);
+            %     driftF1F0(cell_n)=sum(d.orient_tune(pref_tf,2,:)) / sum(d.orient_tune(pref_tf,1,:)); %%% replace with max?
+            %     %         driftF1F0(cell_n)=max(d.orient_tune(pref_tf,2,:)) / max(d.orient_tune(pref_tf,1,:)); %%% replace with max?
+            %     lowpass(cell_n) = lowsf(cell_n,pref_tf);
+        end
     end
 end
 
 for f = 1:2
     figure
-plot(drift_amp_mv(:,1,2,f),drift_amp_mv(:,2,2,f),'o')
+plot(drift_amp_mv(:,1,1,f),drift_amp_mv(:,2,1,f),'o')
 axis equal
 hold on
 plot([0 20],[0 20],'g')
