@@ -76,7 +76,7 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         axis off
         op = get(gca,'OuterPosition');
         axes('position',op); axis off;
-        a = patch([0 0 1 1],[0 1 1 0],'w');
+        a = patch([0 0 1 1],[0 1 1 0],'w','PickableParts','All');
         set(a,'FaceAlpha',0)
         set(a,'EdgeAlpha',0)
         set(a,'ButtonDownFcn',@togglegoodcell);

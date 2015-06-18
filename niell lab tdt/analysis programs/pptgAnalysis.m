@@ -47,6 +47,15 @@ else
         Block_Name = pname(delims(length(delims))+1 :length(pname))
     end
     
+<<<<<<< HEAD
+    if useArgin
+        psfname = [pdfFile(1:end-4) Block_Name '.ps'];
+    else
+        [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+    end
+    if exist(psfname,'file')==2;delete(psfname);end
+=======
+>>>>>>> 27ed1519e930dfb016f6b7101c33e90521e0c628
 end
 
 
@@ -433,22 +442,56 @@ for cell_n = cell_range
     end
     
     subplot(nx,ny,1)
+<<<<<<< HEAD
+   if ~uselaser
+       d = condenseData(movRcyclerep{cell_n,1}',framerate/2)*framerate;
+   else
+       d = condenseData(movnolaserRcyclerep{cell_n,1}',framerate/2)*framerate;
+   end
+   wn_movement(ch).stopCRFall=d;
+   plot(0.5*(1-cos(2*pi*(1:20)/20)),d);
+  d = (d(1:10) + d(20:-1:11))/2;
+  wn_movement(ch).stopCRF = d;
+  
+=======
     d = condenseData(movnolaserRcyclerep{cell_n,1}',framerate/2)*framerate;
     d = (d(1:10) + d(20:-1:11))/2;
     wn_movement(ch).stopCRF = d;
+>>>>>>> 27ed1519e930dfb016f6b7101c33e90521e0c628
     
     plot(0.5*(1-cos(2*pi*(1:10)/20)),d);
     hold on
+<<<<<<< HEAD
+   if ~uselaser
+       d2 = condenseData(movRcyclerep{cell_n,2}',framerate/2)*framerate;
+   else
+       d2 = condenseData(movnolaserRcyclerep{cell_n,2}',framerate/2)*framerate;
+   end
+   wn_movement(ch).moveCRFall=d2;
+   plot(0.5*(1-cos(2*pi*(1:20)/20)),d2,'g');
+   d2 = (d2(1:10) + d2(20:-1:11))/2;
+    wn_movement(ch).moveCRF = d2;
+    
+=======
     d = condenseData(movnolaserRcyclerep{cell_n,2}',framerate/2)*framerate;
     d = (d(1:10) + d(20:-1:11))/2;
     wn_movement(ch).moveCRF = d;
     plot(0.5*(1-cos(2*pi*(1:10)/20)),d,'g');
+>>>>>>> 27ed1519e930dfb016f6b7101c33e90521e0c628
     yl = get(gca,'YLim');
     ylim([min(yl(1),0) yl(2)]);
     
     %legend('st','mv');
     xlabel('contrast');
     ylabel('sp/sec');
+   
+  figure
+  bar([mean(d(1:2)) mean(d2(1:2));mean(d(8:10))-mean(d(1:2)) mean(d2(8:10))-mean(d2(1:2))])
+        
+        xlim([0.5 2.5])
+        set(gca,'Xtick',1:2);
+        set(gca,'Xticklabel',{'spont','evoked'})
+    
     if SU
         title(sprintf('movement %s  unit %d %d',Block_Name,cells(ch,1),cells(ch,2)));
     else
@@ -554,6 +597,9 @@ for cell_n = cell_range
     wn_movement(ch).frameNum = f;
     wn_movement(ch).frameT = t;
     
+<<<<<<< HEAD
+    
+=======
 end
 
 
@@ -572,10 +618,13 @@ else
 end
 if exist(psfname,'file')==2;delete(psfname);end
 
+>>>>>>> 27ed1519e930dfb016f6b7101c33e90521e0c628
 figure(mainfig)
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfname,'-append');
 
+<<<<<<< HEAD
+=======
 for i = 1:length(spikefig)
     figure(spikefig(i))
     set(gcf, 'PaperPositionMode', 'auto');
@@ -589,6 +638,7 @@ for i = 1:length(spikefig)
     %     set(gcf, 'PaperPositionMode', 'auto');
     %     print('-dpsc',psfname,'-append');
 end
+>>>>>>> 27ed1519e930dfb016f6b7101c33e90521e0c628
 
 if uselaser
     figure(spectrafig)
@@ -598,6 +648,57 @@ if uselaser
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfname,'-append');
 end
+ close all
+ 
+  end
+    
+
+
+if SU & uselaser
+    save(afile,'laserspeed','laserspeed_std','statlaserRcyclerep','movinglaserRcyclerep','Rcyclerep','movRcyclerep','movnolaserRcyclerep','RtcAll','laserlfp','freqs','vdata','-append');
+elseif SU & ~uselaser
+    
+    save(afile,'Rcyclerep','movRcyclerep','wn_movement','-append');
+end
+
+% if useArgin
+%         psfname = [pdfFile(1:end-4) Block_Name '.ps'];
+%     else
+%         [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);
+% end
+%     if exist(psfname,'file')==2;delete(psfname);end
+
+ 
+% figure(mainfig)
+% set(gcf, 'PaperPositionMode', 'auto');
+% print('-dpsc',psfname,'-append');
+% 
+% for i = 1:length(spikefig)
+%     figure(spikefig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfname,'-append');
+%     
+%     figure(burstfig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfname,'-append');
+%     
+%     %       figure(lfpfig(i))
+%     %     set(gcf, 'PaperPositionMode', 'auto');
+%     %     print('-dpsc',psfname,'-append');
+%    
+% end
+% 
+% if uselaser
+%     figure(spectrafig)
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfname,'-append');
+%     
+%     figure(lfpfig(1))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfname,'-append');
+%     
+%     
+% end
 
 if SU
     ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);

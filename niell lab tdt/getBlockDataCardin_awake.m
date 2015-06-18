@@ -7,61 +7,45 @@ n=0;
 
 %%% 'analysis_11302012_rec1c.mat'...
 %%% 'analysis_03122013_rec1.mat'...
-
+ analysisPath = 'D:\Jen_analysis\analysis_files\'
+ 
+for dataset =1:2
    
-analysisPath = 'C:\data\matlab data\Wayne Matlab data\analysis files\awake lgn\'
-afile = {     'analysis_11282012_rec1c.mat'...
-    'analysis_11282012_rec2c.mat'...
-    'analysis_11282012_rec3c.mat'...
-    'analysis_11292012_rec1c.mat'...
-    'analysis_11292012_rec3c.mat'...
-   'analysis_11302012_rec2c.mat'...
-    'analysis_12062012_rec1c.mat'...
-    'analysis_12072012_rec1b.mat'...
-    'analysis_12072012_rec2c.mat'...
-    'analysis_12072012_rec3c.mat'...
-    'analysis_01092013_rec3.mat'...
-    'analysis_01162013_rec3.mat'...
-    'analysis_01232013_rec3.mat'...
-    'analysis_01242013_rec2.mat'...
-    'analysis_02182013_rec1.mat'...
-    'analysis_02182013_rec2.mat'...
-    'analysis_02192013_rec1.mat'...
-    'analysis_02192013_rec2.mat'...
-    'analysis_02202013_rec1.mat'...
-    'analysis_02212013_rec1.mat'...
-    'analysis_02212013_rec2.mat'...
-    'analysis_0307a2013_rec1.mat'...
-    'analysis_0307a2013_rec2.mat'...
-    'analysis_03082013_rec1.mat'...
-    'analysis_03112013_rec1.mat'...
-    'analysis_03122013_rec2.mat'...
+    if dataset ==1
+
+afile = {'1_13_15_analysis_pos_ctl_new.mat'...
+    'analysis_12_22_14_1st_clust_new.mat'...
     };
-
-
-extraPath = 'C:\data\matlab data\Wayne Matlab data\analysis files\awake lgn new\'
+    elseif dataset ==2
+        afile = {     'analysis_1_24_15_KO_new.mat'...
+    'analysis_1_26_15_NR2B_KO_NR5A1_new.mat'...
+    'analysis_2_2_15_NR2B_KO_new.mat'...
+    };
+        
+    end
+% extraPath = 'C:\data\matlab data\Wayne Matlab data\analysis files\awake lgn new\'
 for fnum = 1:length(afile)
     %for fnum=26:26
     close all
     fnum
-    fullfile(extraPath,[afile{fnum}(1:end-4) '_new.mat'])
-    fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat'])
-    
-   if exist(fullfile(extraPath,[afile{fnum}(1:end-4)  '_new.mat']),'file') | exist(fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat']),'file')
-     if exist(fullfile(extraPath,[afile{fnum}(1:end-4) '_new.mat']),'file')   
-       load(fullfile(extraPath,[afile{fnum}(1:end-4) '_new.mat']))
-   elseif exist(fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat']),'file')
-     load(fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat']))
-     end
+%     fullfile(extraPath,[afile{fnum}(1:end-4) '_new.mat'])
+%     fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat'])
+%     
+%    if exist(fullfile(extraPath,[afile{fnum}(1:end-4)  '_new.mat']),'file') | exist(fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat']),'file')
+%      if exist(fullfile(extraPath,[afile{fnum}(1:end-4) '_new.mat']),'file')   
+%        load(fullfile(extraPath,[afile{fnum}(1:end-4) '_new.mat']))
+%    elseif exist(fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat']),'file')
+%      load(fullfile(extraPath,[afile{fnum}(1:end-5) '_new.mat']))
+%      end
      
-     useCells=cells
-
+    
         
         analysisFile = fullfile(analysisPath,afile{fnum})
         load(analysisFile);
-         cells
+        cells
         clusterfilename
         pname
+        useCells=cells
         
         if exist(clusterfilename,'file')
             clusterFile = clusterfilename;
@@ -83,10 +67,10 @@ for fnum = 1:length(afile)
         end
         clusterFile
         load(clusterFile);
-        blocknum=0;
+        blocknum=4; % just to load white noise blocks
        
         
-        for blocknum = 1:length(Block_Name)
+%         for blocknum = 1:length(Block_Name)
             
             
             blocknum
@@ -102,19 +86,19 @@ for fnum = 1:length(afile)
                 sprintf('check if tank %s is registered',Tank_Name)
                 break
             end
-            exptdata{fnum}.mouseT{blocknum} = data.mouseT;
-            exptdata{fnum}.mouseV{blocknum} = data.mouseV;
-            exptdata{fnum}.block{blocknum} = Block_Name{blocknum};
-            exptdata{fnum}.tank = Tank_Name;
-            exptdata{fnum}.analysis_file = afile{fnum};
-            exptdata{fnum}.cluster_file = clusterFile;
-            exptdata{fnum}.stimEpocs{blocknum}=data.stimEpocs;
-            exptdata{fnum}.frameEpocs{blocknum} = data.frameEpocs;
+            exptdata{fnum,dataset}.mouseT{blocknum} = data.mouseT;
+            exptdata{fnum,dataset}.mouseV{blocknum} = data.mouseV;
+            exptdata{fnum,dataset}.block{blocknum} = Block_Name{blocknum};
+            exptdata{fnum,dataset}.tank = Tank_Name;
+            exptdata{fnum,dataset}.analysis_file = afile{fnum};
+            exptdata{fnum,dataset}.cluster_file = clusterFile;
+            exptdata{fnum,dataset}.stimEpocs{blocknum}=data.stimEpocs;
+            exptdata{fnum,dataset}.frameEpocs{blocknum} = data.frameEpocs;
             for i = 1:length(ch)
-                exptdata{fnum}.lfpT{blocknum}{i} = data.lfpT{ch(i)};
-            exptdata{fnum}.lfpV{blocknum}{i} = data.lfpData{ch(i)};
+                exptdata{fnum,dataset}.lfpT{blocknum}{i} = data.lfpT{ch(i)};
+            exptdata{fnum,dataset}.lfpV{blocknum}{i} = data.lfpData{ch(i)};
             end
-            exptdata{fnum}.lfpChans = ch;
+            exptdata{fnum,dataset}.lfpChans = ch;
             %         exptdata{fnum}.displayHeight = displayHeight;
             %         exptdata{fnum}.displayOffset = displayOffset;
             for cell_n = 1:size(useCells,1);
@@ -142,13 +126,14 @@ for fnum = 1:length(afile)
                 end
                 
             end
-        end
+%         end
         n=n+size(useCells,1);
-   else
-        sprintf('couldnt find file %d %s',fnum,afile{fnum})
-    end
+%    else
+%         sprintf('couldnt find file %d %s',fnum,afile{fnum})
+%     end
 end
 
+end
 % manual_type = xlsread('C:\data\lgn rf project\lgn_analysis\lgn types 091412.xlsx','A1:A294');
 % manual_outside = xlsread('C:\data\lgn rf project\lgn_analysis\lgn types 091412.xlsx','B1:B294');
 % manual_outside(isnan(manual_outside))=0;
@@ -163,4 +148,4 @@ end
 %  unitdata=unitdata_select;
 
 %
-save('Tschetter_adult_awake032614','exptdata','unitdata','-v7.3');
+save('Hoy_adult_awake_NR5A_NR2B_KO_and_control','exptdata','unitdata');
