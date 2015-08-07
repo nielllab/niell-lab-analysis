@@ -4,7 +4,7 @@ clear all
 n_obs=0;
 day = [1 1 1 2 3 3 ];
 
-PostnatalAge = [17 17 16 18 18 22 16 17 17 17 22 22 60 60 16 16 18 18 19 19 60 14 14 14 19 19 20 20 18 23 25 25 17 17 18 18 19 19 60 60 60]
+PostnatalAge = [17 17 16 18 18 22 16 17 17 17 22 22 60 60 16 16 18 18 19 19 60 14 14 14 19 19 20 20 18 23 25 25 17 17 18 18 19 19 60 60 60 60 60]
 PostnatalAge(PostnatalAge==60)=30;
 figure
 hist(PostnatalAge,min(PostnatalAge):max(PostnatalAge))
@@ -18,7 +18,7 @@ agelist=agelist(agelist~=25);
 %%added by Jen
 all_img_STA={};STA_peak={};
 
-analysisPath ='C:\data\matlab data\Wayne Matlab data\analysis files\development lgn\'
+analysisPath ='E:\Wayne Matlab data\Wayne Matlab data_fromC\analysis files\development lgn\'
 afile = { 'analysis_05022013_P17_rec1.mat'...
     'analysis_05022013_P17_rec2.mat'...
     'analysis_05072013_P16_rec1.mat'...
@@ -60,6 +60,8 @@ afile = { 'analysis_05022013_P17_rec1.mat'...
     'analysis_03122013_rec2_new.mat'...
     'analysis_0307a2013_rec1.mat'...
     'analysis_12072012_rec1b.mat'...
+    '02242015_analysis_rec1.mat'...
+    '02252015_analysis_rec1.mat'...
     };
 
 
@@ -105,6 +107,8 @@ histfile = { '','';...
     '','';...
     '','';...
     '','';...
+    '','';...
+    '','';...
     };
 
 
@@ -122,7 +126,7 @@ end
 %%% WWT
 %%% note - this assumes both shanks are in roughly same A/P position
 
-lgnPos  = [0 0 3 3 4 0 0 0 0 0 0 0 3 0 0 0 2 3 1 3 0 0 0 0 2 1 4 3 1 1 2 2 1 4 2 4 3 2 2];
+lgnPos  = [0 0 3 3 4 0 0 0 0 0 0 0 3 0 0 0 2 3 1 3 0 0 0 0 2 1 4 3 1 1 2 2 1 4 2 4 3 2 2 0 0];
 
 %%% lgnPos = ceil(5*rand(length(afile),1));
 
@@ -754,7 +758,9 @@ ylabel('wx from wn (sp/sec)')
 
 [resp resperr] = sortbyage(wx,age,ageBins,1)
 figure
+hold on
 errorbar(mean(ageBins,1),resp, resperr);
+bar(mean(ageBins,1),resp);
 ylabel('wx from wn (sp/sec)')
 
 %%% spot reponse amplitude

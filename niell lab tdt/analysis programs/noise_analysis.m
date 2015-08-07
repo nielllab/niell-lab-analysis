@@ -75,7 +75,7 @@ mv_noise=3;
 if movietype==cm_noise
     prompt = {'contrast modulated','frame rate','correct spectrum','crop to screen size','contra(1) or ipsi(2) eye'};
     num_lines = 1;
-    def = {'1','30','1','1','1'};
+    def = {'1','60','1','1','1'};
     if ~useArgin
         answer = inputdlg(prompt,'wn parameters',num_lines,def);
     else
@@ -127,7 +127,7 @@ if calculate_stc
     
     tic
     covmat_prior = cov(double(m)');
-    figure;
+    figure
     imagesc(covmat_prior);
     toc
 end
@@ -151,7 +151,7 @@ if correct_spectrum
     mean_spectrum = mean(abs(spectrum(:,:,:)),3);
     mean_spectrum = mean_spectrum / max(max(mean_spectrum));
     toc
-    figure;
+    figure
     imagesc(fftshift(mean_spectrum))
     inv_spectrum = (1./mean_spectrum).*(mean_spectrum>spectrum_thresh);
     
@@ -170,8 +170,8 @@ end
 % figure
 % imagesc(movavg-127,[-64 64])
 
-% matlabpool
-% tic
+matlabpool
+tic
 
 if movietype==mv_noise
     th_mov=single(th_mov);
@@ -182,7 +182,7 @@ if movietype==mv_noise
     th_mov= uint8(round((th_mov)/(pi/4)+1));
     th_mov(sz_mov==0)=255;
 end
-% toc
+toc
 %moviedata=single(moviedata);
 
 sta_length = 16;contrast_period=10;
@@ -441,7 +441,7 @@ for cell_n = cell_range
             movavg=0;
         end
         %%% plot STA at each time point
-        stafig=figure;
+        stafig=figure
         for t = 1:16
             subplot(4, 4, t);
             
@@ -463,7 +463,7 @@ for cell_n = cell_range
         drawnow;
         
         if movietype == mv_noise | movietype==fl_noise
-            figure;
+            figure
             for t = 1:16
                 subplot(4, 4, t);
                 imagesc(sta_diff(:,:,t)' ,[0 .15]);
@@ -571,7 +571,7 @@ for cell_n = cell_range
             spont = sum(n_spikes(f_null+t_lag).*ntrials(f_null+t_lag)')/sum(ntrials(f_null+t_lag));
             
             if movietype==mv_noise
-                figure;
+                figure
                 h = (squeeze(nanmean(hist_all,4)));
                 h(isnan(h))=-0.1*max(h(:));
                 for i= 1:2
@@ -589,7 +589,7 @@ for cell_n = cell_range
                 sz_tune = nanmean(nanmean(hist_all,4),3);
             end
             
-            tuningfig=figure;
+            tuningfig=figure
             subplot(2,2,1);
             plot(sz_tune');
             hold on
@@ -728,7 +728,7 @@ for cell_n = cell_range
             sta_col =reshape(sta_t,nx*ny,nt);
             [u s v] = svd(sta_col-mean(sta_t(:)));
             
-            svdfig=figure;
+            svdfig=figure
             
             for i = 1:3
                 subplot(2,3,i)
@@ -750,7 +750,7 @@ for cell_n = cell_range
         
         if pos_neg
             color_range = [0 1];
-            figure;
+            figure
             for t = 1:9
                 subplot(3, 3, t);
                 imagesc(sta_pos(:,:,t)' ,color_range);
@@ -766,7 +766,7 @@ for cell_n = cell_range
                 end
             end
             
-            figure;
+            figure
             color_range = [-1 0];
             for t = 1:9
                 subplot(3, 3, t);
@@ -836,7 +836,7 @@ for cell_n = cell_range
             [m ind] = max(abs(sta_t(:)-127));
             
             [x y t_lag] = ind2sub(size(sta_t),ind)
-            figure(wnfig);
+            figure(wnfig)
             subplot(2,2,4)
             imagesc(fftshift(abs(fft2(sta_t(:,:,t_lag)'-128))));
             title(titlestr);
@@ -893,11 +893,11 @@ for cell_n = cell_range
         if calculate_stc
             covmat =0;
             N=0;
-            figure;
+            figure
             imagesc(imresize(sta_t(xrange,yrange,t_lag)'-128,1,'bilinear'),[-32 32]);
             
             
-            figure;
+            figure
             imagesc(stvar(xrange,yrange,t_lag)'-mov_var/(128^2),[-.1 .1]);
             %%% calculate spike triggered covariance matrix
             tic
@@ -911,9 +911,9 @@ for cell_n = cell_range
             toc
             
             covmat = covmat/N;
-            figure;
+            figure
             imagesc(covmat);
-            figure;
+            figure
             imagesc(covmat-covmat_prior,[-.05 .05])
             colorbar
             
@@ -926,14 +926,14 @@ for cell_n = cell_range
                 var_diag(i)=covmat(i,i)-covmat_prior(i,i);
             end
             stvar = reshape(var_diag,dx,dy);
-            figure;
+            figure
             im = imresize(stvar,4,'bilinear');
             imagesc(im',[-.02 .04]);
             
             %%% sort and display eigenvalues
             clear lam V_sort
             for i=1:dx*dy; lam(i)=D(i,i); end
-            figure;
+            figure
             [lam_sort I] = sort(lam);
             V_sort(:,:) = V(:,I);
             plot((lam_sort),'o');
@@ -942,7 +942,7 @@ for cell_n = cell_range
             for i = dx*dy:-1:dx*dy-2
                 im = reshape(V_sort(:,i),dx,dy);
                 im = imresize(im,4,'bilinear');
-                figure;
+                figure
                 imagesc(im',[-0.2 0.2]);
                 axis image
                 if i==dx*dy
@@ -963,7 +963,7 @@ for cell_n = cell_range
             end
             toc
             
-            figure;
+            figure
             plot(h(t_lag+1:n_frames),n_spikes(t_lag+1:n_frames),'.');
             
             hist_int = .05;
@@ -978,7 +978,7 @@ for cell_n = cell_range
                 n_std(i-h_min+1) = std(n_sp(use));
                 n_samp(i-h_min+1) = size(use,1);
             end
-            figure;
+            figure
             errorbar(h_range*hist_int,n_mean,n_std./sqrt(n_samp));
             hold on;
             plot(h_range*hist_int,n_samp/500,'g');
@@ -990,16 +990,11 @@ for cell_n = cell_range
             saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
-            figure(wnfig);
+               figure(wnfig);
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
-            
-            figure(stafig);
-            
-            set(gcf, 'PaperPositionMode', 'auto');
-            print('-dpsc',psfilename,'-append');
-            
+            print('-dpsc',psfilename,'-append');          
             figure(svdfig);
             
             set(gcf, 'PaperPositionMode', 'auto');
@@ -1018,12 +1013,12 @@ for cell_n = cell_range
             saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
-            figure(timefig);
+            figure(timefig)
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
-            figure(tuningfig);
+            figure(tuningfig)
             
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
@@ -1039,18 +1034,26 @@ for cell_n = cell_range
             fl(cell_n).onset_bins=onset_bins;
             fl(cell_n).sta_pos=[x y];
             
+               OnOffFlash;
+     fl(cell_n).sustainBias=sustain;
+     fl(cell_n).onoffbias = onoffbias;
+     fl(cell_n).RFzcore = rfz;
+     fl(cell_n).rf = rf;
+     fl(cell_n).resps = resps; %%% timecourse averaged over sizes
+     fl(cell_n).flash_resp = flash_resp;  %%% mean response for on/off and size
+            
         elseif movietype==mv_noise
             
             saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(tuningfig,fullfile(noisepname,sprintf('move_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
-            figure(timefig);
+            figure(timefig)
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             
-            figure(tuningfig);
+            figure(tuningfig)
             
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
@@ -1069,13 +1072,13 @@ for cell_n = cell_range
         
         
     end
+
     
-    %         OnOffFlash
+%         OnOffFlash
 end  %%%cell
 
-
 % matlabpool close
-
+% 
 if movietype==cm_noise
     post = input('post doi? 0/1 : ');
     wn(cell_n,stim_eye).degperpix=degperpix;
@@ -1091,13 +1094,5 @@ elseif movietype==fl_noise
 elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
-    %
-    close all
-    
 end
-%save(afile,'wn','-append')
-%ps2pdf(fname);
-ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-delete(psfilename);
-
 %matlabpool close
