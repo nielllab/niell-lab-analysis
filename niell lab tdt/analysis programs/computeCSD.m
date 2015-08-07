@@ -14,11 +14,11 @@ Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
 Block_Name = pname(delims(length(delims))+1 :length(pname))
 
 nchan = input('number of channels : ');
-duration = 0.5;
+duration = 0.5; %used to be .5 changed to 1.5
 flags = struct('lfpTseries',1,'visStim',1,'lfpSpectra',1);
 data = getTDTdata(Tank_Name,Block_Name,1:nchan,flags);
 dt = median(diff(data.lfpT{1}))
-phi = zeros(nchan,duration/dt);
+phi = zeros(nchan,floor(duration/dt));
 
 for ch = 1:nchan
     ch

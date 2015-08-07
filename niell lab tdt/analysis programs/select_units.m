@@ -2,7 +2,7 @@ function select_units
 %%% after clustering is done, this program lets you go through and select
 %%% the clusters to use for analysis
 %%% written by Cris Niell, 2009-2010
-
+dbstop if error
 global goodcells;
 
 %%% read in the results of clustering
@@ -29,11 +29,11 @@ clear nspikes L_ratio trough_depth peak_height trough_width trough2peak1
 tet_data=1;
 clear wv
 
-% %%% merge two clusters
-% %%% this is a total hack! but can't think of a good gui to do this
-% ch = 1;
-% c1=2;
-% c2=5;
+%%% merge two clusters
+%%% this is a total hack! but can't think of a good gui to do this
+% ch = 7;   %%% ch is tetrode number, i.. 1-16
+% c1=4;
+% c2=9;
 % idx=idx_all{4*(ch-1)+1};
 % idx(idx==c2)=c1;
 % idx_all{4*(ch-1)+1}=idx;
@@ -62,6 +62,10 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
         set(gcf,'Position',[10 50 500 400]);
         open(sprintf('%ssnip%s_t%d.fig',oldpname,basename,tet))
         set(gcf,'Position',[10 550 500 400]);
+        for i = 1:4
+            subplot(2,2,i); ylim([-100 50])
+        end
+        
         open(sprintf('%sclust%s_t%d.fig',oldpname,basename,tet))
         set(gcf,'Position',[600 50 500 400]);
     end
@@ -114,11 +118,26 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
            wvclust = wvall(find(idx_all{tet_ch}==c),:,:);
             
           dt = diff(t1);
-          dt(dt>1000)=1;
+          breaks = find(dt>5*10^4);
+          breaks(end+1)=length(dt);
+          dt(dt>5*10^4)=1;
           tmerge = cumsum(dt);
-                  amps =squeeze(min(wvclust(:,5:10,:),[],2));
+                binwidth=60;
+                amps =squeeze(min(wvclust(:,5:10,:),[],2));
+                 clear ampmean
+                 for t =1:floor(max(tmerge)/binwidth);
+                      ampmean(t,:) = median(amps(tmerge>(t-1)*binwidth & tmerge<t*binwidth,:),1);
+                  end
+                  
         subplot(2,2,3:4)
-        plot([0 tmerge],amps,'.','MarkerSize',2 );
+        plot([0 tmerge],amps,'.','MarkerSize',2 ); hold on
+        plot((binwidth:binwidth:max(tmerge))-binwidth/2,ampmean,'LineWidth',2);
+        for b = 1:length(breaks)
+            plot([tmerge(breaks(b)) tmerge(breaks(b))],[-10^-4 2*10^-5])
+            bl = Block_Name{b}; bl(bl=='_')=' ';
+            text(tmerge(breaks(b))-120,2*10^-5,bl,'Rotation',90,'HorizontalAlignment','right')
+        end
+        
          end
          
           %%% call Erik's code to calculate cluster separation
@@ -162,7 +181,7 @@ for cell = 1:size(cells,1);
     wv(:,cell) = wv(:,cell)/abs(min(wv(:,cell)));
     spikeT{cell} = event_times_all{cells(cell,1)}(find(idx_all{cells(cell,1)} == c));
 end
-xlswrite('fullwvform',wv');
+
 figure
 plot(wv)
 cells

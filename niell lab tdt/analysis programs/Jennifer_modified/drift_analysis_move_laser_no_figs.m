@@ -56,10 +56,10 @@ end
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
 thresh_velocity = 1.0; %%or use 1.3, 1.5 or 2 to determine whether it changes speed distribution
-figure
-plot(tsamp,vsmooth);
-
-
+% figure
+% plot(tsamp,vsmooth);
+% 
+% 
 plot_duration=2.5; %in second
 
 hist_int = 0.05;
@@ -111,16 +111,16 @@ for cell_n = cell_range;
         clust_no = cells(cell_n,2)
         channel_times =spikeT{cell_n} - (block-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
-        hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
+       % hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
     else
-        hist_fig = figure('Name',sprintf('channel %d',cell_n))
+       % hist_fig = figure('Name',sprintf('channel %d',cell_n))
         channel_no = cell_n;
         clust_no = [];
     end
     
     for rep =1:2
 %         hist_fig = figure;
-         rast_fig = figure;
+%          rast_fig = figure;
         % fft_fig = figure;
         %         spont_full= figure;
 %         spont_full_rast=figure;
@@ -174,26 +174,26 @@ for cell_n = cell_range;
             title_text=['Orientation: ' num2str(cond*45)];
             
            % raster plot
-            if cond<n_rows*n_col;
-                figure(rast_fig);
-                subplot(n_rows,n_col,cond+1); hold on; set(gca, 'yDir','reverse');
-                
-              
-               plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
-                
-                axis([0 plot_duration 0 numtrials+1]);
-                set(gca,'XTickLabel',[])
-                set(gca,'YTickLabel',[])
-                if cond==0
-                    title_text = sprintf('%s',Tank_Name);
-                    text(0,3,title_text,'FontSize',8);
-                end
-                if cond==1
-                    title_text = sprintf('ch%d c%d',channel_no,clust_no);
-                    text(0,3,title_text,'FontSize',8);
-                end
-                
-            end
+%             if cond<n_rows*n_col;
+%                 figure(rast_fig);
+%                 subplot(n_rows,n_col,cond+1); hold on; set(gca, 'yDir','reverse');
+%                 
+%               
+%                plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
+%                 
+%                 axis([0 plot_duration 0 numtrials+1]);
+%                 set(gca,'XTickLabel',[])
+%                 set(gca,'YTickLabel',[])
+%                 if cond==0
+%                     title_text = sprintf('%s',Tank_Name);
+%                     text(0,3,title_text,'FontSize',8);
+%                 end
+%                 if cond==1
+%                     title_text = sprintf('ch%d c%d',channel_no,clust_no);
+%                     text(0,3,title_text,'FontSize',8);
+%                 end
+%                 
+%             end
       
             
           
@@ -328,9 +328,9 @@ for cell_n = cell_range;
             [max_resp pref_orient(cell_n)] = min(orient_tuning_all);
         end
         freq_tuning(cell_n,:) = orientfreq(pref_orient(cell_n),:);
-        figure
-        subplot(2,1,1);
-        plot(freq_tuning(cell_n,:));
+%         figure
+%         subplot(2,1,1);
+%         plot(freq_tuning(cell_n,:));
         if max(freq_tuning)>abs(min(freq_tuning))
             [max_resp pref_freq(cell_n)] = max(freq_tuning(cell_n,:));
         else
@@ -492,7 +492,7 @@ for cell_n = cell_range;
 %         xlabel('secs');
         
 %         saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+        % saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
 %         saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
        
         %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
@@ -501,17 +501,17 @@ for cell_n = cell_range;
 %         close(rast_fig);
 %         clear rast_fig;
     
-  for i = 1:length(cell_n)
-%     figure(hist_fig(i))
+%   for i = 1:length(cell_n)
+% %     figure(hist_fig(i))
+% %     set(gcf, 'PaperPositionMode', 'auto');
+% %     print('-dpsc',psfilename,'-append');
+%     
+%     figure(rast_fig(i))
 %     set(gcf, 'PaperPositionMode', 'auto');
 %     print('-dpsc',psfilename,'-append');
-    
-    figure(rast_fig(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-    
-  end
-  
+%     
+%   end
+%   
   
    
     end %%% rep
@@ -550,8 +550,8 @@ end
 %convert ps file to PDfs
 
 
-  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-  delete(psfilename);
+%   ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+%   delete(psfilename);
 
 if use_afile
     

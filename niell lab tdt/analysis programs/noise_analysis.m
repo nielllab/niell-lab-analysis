@@ -53,14 +53,17 @@ end
 Block_Name
 
 if ~useArgin
-    [fname pname] = uigetfile('*.mat','movie file');
+    [fname pname] = uigetfile('*.mat','movie file','C:\Users\lab\Desktop\movie files\cortex\step_binary_wn_5min.mat');
     movieFile = fullfile(pname,fname);
 end
 load(movieFile);
 
 %load wn012alpha1_5hz_contrast10sec5min021407   %%% the usual
 
-n_frames = length(moviedata)-1;
+%n_frames = length(moviedata)-1;
+n_frames = max(frameEpocs{blocknum}(1,:))
+moviedata=moviedata(:,:,1:n_frames);
+n_frames = n_frames-1; %%% last frame is sometimes bad
 
 if ~useArgin
     movietype = menu('Movie type','Contrast-modulated noise','Flashing sparse','Moving sparse');
@@ -207,7 +210,7 @@ if movietype==fl_noise | movietype==mv_noise
 end
 toc
 
-
+clear wn
 
 if SU
     cell_range = 1:size(cells,1)
@@ -272,12 +275,14 @@ for cell_n = cell_range
         if movietype == cm_noise
             wnfig=figure;
             subplot(2,2,1)
-            cspikes=condenseData(n_spikes,15);
+            cspikes=condenseData(n_spikes,framerate);
             bar(cspikes);
-            xlim([0 length(cspikes)])
+            xlim([0 length(cspikes)]) ;
+            xlabel('sec');ylabel('sp/sec')
         end
         
         cyc_frames = round(contrast_period/frame_duration);
+        
         if contrast_modulated
             %     for f= 1:n_frames;
             %         frm = moviedata(:,:,f);
@@ -286,13 +291,17 @@ for cell_n = cell_range
             f = 1:n_frames;
             c = double(0.5- 0.5*cos(2*pi*f/cyc_frames));  %%% define contrast
             
+            f_null=find(c==0);
+            spont = sum(n_spikes(f_null).*ntrials(f_null)')/sum(ntrials(f_null));
+            wn(cell_n,stim_eye).spont=spont;
+            
             nf = zeros(cyc_frames,1);
             contrastdata = zeros(cyc_frames,1);
             for i = 1:n_frames;
                 contrastdata(mod(i,cyc_frames)+1)=contrastdata(mod(i,cyc_frames)+1)+double(c(i));
                 nf(mod(i,cyc_frames)+1) = nf(mod(i,cyc_frames)+1)+1;
             end
-            contrastdata = contrastdata./(nf/cyc_frames);
+            contrastdata = contrastdata./nf;
             
             fftsignal = (fft(n_spikes));
             fftsignal = fftsignal(1:round(n_frames/2));
@@ -304,6 +313,8 @@ for cell_n = cell_range
             fft_chan = round(n_frames/cyc_frames)+1   %%%contrastfreq/df
             framerate = round(1/frame_duration);
             
+            
+            
             wn(cell_n,stim_eye).responsiveness = 2*abs(fftsignal(fft_chan))/(abs(fftsignal(1)));  %%double to normalize FFT relative to DC
             wn(cell_n,stim_eye).phase = angle(fftsignal(fft_chan));
             phaseangle = angle(fftsignal(fft_chan))
@@ -311,7 +322,7 @@ for cell_n = cell_range
             for i = 1:n_frames;
                 cycledata(mod(i,cyc_frames)+1)=cycledata(mod(i,cyc_frames)+1)+n_spikes(i);
             end
-            cycledata = cycledata./(nf/cyc_frames);
+            cycledata = cycledata./(nf);
             
             %cycledata = conv(cycledata,ones(1,30))/10;
             cycledata = condenseData(cycledata,framerate/2);
@@ -346,17 +357,18 @@ for cell_n = cell_range
             %     halfcontrast_wn(cell_n) = hf;
             %     plot(halfcontrast_wn(cell_n),0.5,'r*');
             %     halfslope_wn(cell_n) = polyval(polyder(p),halfcontrast_wn(cell_n));
-            
+            %figure
             subplot(2,2,3)
             hold on
             %%% plot average of up and down on contrast response
             meancontrast = 0.5*(contrastdata(1:10)+contrastdata(20:-1:11));
             meandata = 0.5*(cycledata(1:10)+cycledata(20:-1:11));
-            plot(meancontrast/max(meancontrast),meandata/max(meandata),'g');
+            plot(meancontrast/max(meancontrast),meandata,'g');
             title(sprintf('unit %d %d',channel_no, clust_no))
             xlabel('contrast');
-            ylabel('response');
-            plot(contrastdata/max(contrastdata),cycledata/max(meandata));
+            ylabel('sp / sec');
+            plot(contrastdata/max(contrastdata),cycledata);
+            
             %%% calculate adaptation index by difference between
             %%%  up leg and down leg
             adaptation_index(cell_n) = sum(cycledata(1:10)-cycledata(20:-1:11))/sum(cycledata(1:10)+cycledata(20:-1:11));
@@ -704,7 +716,7 @@ for cell_n = cell_range
             
         end
         
-  
+        
         
         nx = size(sta_t,1);
         ny = size(sta_t,2);
@@ -832,6 +844,9 @@ for cell_n = cell_range
             set(gca,'XTickLabel',[])
             set(gca,'YTickLabel',[])
             axis tight
+            
+            
+            
             %saveas(gcf,fullfile(noisepname,sprintf('fft_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
             %             h = zeros(size(n_spikes));
@@ -975,19 +990,19 @@ for cell_n = cell_range
             saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
-               figure(wnfig);
+            figure(wnfig);
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
-        set(gcf, 'PaperPositionMode', 'auto');
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
-    
-               figure(stafig);
-       
-        set(gcf, 'PaperPositionMode', 'auto');
+            
+            figure(stafig);
+            
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             figure(svdfig);
-           
-        set(gcf, 'PaperPositionMode', 'auto');
+            
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             wn(cell_n,stim_eye).crf=cycledata;
@@ -995,6 +1010,7 @@ for cell_n = cell_range
             wn(cell_n,stim_eye).svd_xy = svdt;
             wn(cell_n,stim_eye).svd_t = v;
             wn(cell_n,stim_eye).sta=sta_t;
+            %wn(cell_n,stim_eye).spont=spont;
             
             close all
         elseif movietype == fl_noise
@@ -1004,12 +1020,12 @@ for cell_n = cell_range
             
             figure(timefig);
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
-        set(gcf, 'PaperPositionMode', 'auto');
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             figure(tuningfig);
-           
-        set(gcf, 'PaperPositionMode', 'auto');
+            
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             fl(cell_n).N=N;
@@ -1030,13 +1046,13 @@ for cell_n = cell_range
             
             figure(timefig);
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
-        set(gcf, 'PaperPositionMode', 'auto');
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             
             figure(tuningfig);
-           
-        set(gcf, 'PaperPositionMode', 'auto');
+            
+            set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             
             mv(cell_n).N=N;
@@ -1051,31 +1067,37 @@ for cell_n = cell_range
             mv(cell_n).sta_pos=[x y];
         end
         
-       
+        
     end
     
-%         OnOffFlash
+    %         OnOffFlash
 end  %%%cell
 
 
 % matlabpool close
 
 if movietype==cm_noise
+    post = input('post doi? 0/1 : ');
     wn(cell_n,stim_eye).degperpix=degperpix;
-    save(afile,'wn','-append')
+    if post
+        wn_post=wn;
+        save(afile,'wn_post','-append')
+    else
+        save(afile,'wn','-append')
+    end
 elseif movietype==fl_noise
     fl(cell_n).degperpix=degperpix;
     save(afile,'fl','-append')
 elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
-%     
-close all
-
+    %
+    close all
+    
 end
- save(afile,'wn','-append')
-% ps2pdf(fname);
-% ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-% delete(psfilename);
+%save(afile,'wn','-append')
+%ps2pdf(fname);
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);
 
 %matlabpool close

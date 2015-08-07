@@ -1,7 +1,7 @@
 function s= semedian_ratio(data,data1)
 x=[data, data1];
 
-s = nanstd(bootstrp(1000,@(x) nanmedian(x(:,1))/nanmedian(x(:,2)),x)) ;
+s = nanstd(bootstrp(1000,@(x) nanmedianMW(x(:,1))/nanmedianMW(x(:,2)),x)) ;
 
 %s = nanstd(bootstrp(1000,@(x) nanmedian(x,1),data));
 % n=25;                   %number of neurons
