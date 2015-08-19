@@ -15,6 +15,8 @@ hist(PostnatalAge(PostnatalAge<60),14:25)
 agelist=sort(unique(PostnatalAge));
 agelist=agelist(agelist~=25);
 
+%%added by Jen
+all_img_STA={};STA_peak={};
 
 analysisPath ='E:\Wayne Matlab data\Wayne Matlab data_fromC\analysis files\development lgn\'
 afile = { 'analysis_05022013_P17_rec1.mat'...
@@ -210,6 +212,46 @@ for i = 1:length(afile);
     histoz(cell_range)=z;
     histSection(cell_range)=s;
     
+    %%added by Jen, comment out if your compile doesn't end up running
+    %%right
+    
+    if exist ('wn','var')
+        for w = 1:length(wn)
+            STA = wn(w).sta;
+            
+            %%%Dtermine time point with maximial response
+            [m ind] = max(abs(STA(:)-127));
+            [x y t_lag] = ind2sub(size(STA),ind);
+            
+            STA1{w} = STA(:,:,t_lag)-128;
+            
+            % figure
+            % imagesc(STA1{1,w}',[-64 64]); axis equal
+        end
+        
+        STA_peak(cell_range)=STA1
+        
+    else
+        STA_peak(cell_range)=NaN
+    end
+    
+end
+
+%%added by Jen comment out if your compile don't run, l is where you set
+%%conditions and then run the forloop I left in my run specific
+%%conditionals
+
+l=find(pinped & exc & N2A &resp )
+
+for j=1:length(STA_peak)
+
+    if ismember(j,l)
+figure
+if ~isempty(STA_peak{1,j})
+    colormap jet
+    imagesc(STA_peak{1,j}',[-64 64]);
+end
+    end
 end
 
 %%% align points on trace to reference

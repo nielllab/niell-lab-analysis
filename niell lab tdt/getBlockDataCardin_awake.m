@@ -13,13 +13,12 @@ for dataset =1:2
    
     if dataset ==1
 
-afile = {'1_13_15_analysis_pos_ctl_new.mat'...
-    'analysis_12_22_14_1st_clust_new.mat'...
-    };
+afile = {'analysis_2_19_15.mat'... 
+   'analysis_2_25_15_rec1.mat' };
     elseif dataset ==2
-        afile = {     'analysis_1_24_15_KO_new.mat'...
-    'analysis_1_26_15_NR2B_KO_NR5A1_new.mat'...
-    'analysis_2_2_15_NR2B_KO_new.mat'...
+afile = { 'analysis_2_2_15_NR2B_KO_new.mat'...
+                 'analysis_2_23_15.mat'...
+                 'analysis_2_24_15.mat' ...
     };
         
     end
@@ -67,7 +66,7 @@ for fnum = 1:length(afile)
         end
         clusterFile
         load(clusterFile);
-        blocknum=4; % just to load white noise blocks
+        blocknum=1; % just to load white noise blocks
        
         
 %         for blocknum = 1:length(Block_Name)
@@ -108,6 +107,7 @@ for fnum = 1:length(afile)
                 else
                     unitdata{cell_n+n}.spikes{blocknum} =spikeT{matchCell}(spikeT{matchCell}>(blocknum-1)*10^5 & spikeT{matchCell}<(blocknum-1 + 0.5)*10^5) - (blocknum-1)*10^5;
                     unitdata{cell_n+n}.expnum = fnum;
+                    unitdata{cell_n+n}.cond = dataset;
                     s= unitdata{cell_n+n}.spikes{blocknum};
                     tic
                   %  [unitdata{cell_n}.coherence{blocknum} t] = spikeLFPcoh(s,data.lfpT{useCells(cell_n,1)},data.lfpData{useCells(cell_n,1)},0.004,0.5);
@@ -148,4 +148,4 @@ end
 %  unitdata=unitdata_select;
 
 %
-save('Hoy_adult_awake_NR5A_NR2B_KO_and_control','exptdata','unitdata');
+save('Hoy_adult_awake_NR5A_NR2B_KO_and_control_bars','exptdata','unitdata');

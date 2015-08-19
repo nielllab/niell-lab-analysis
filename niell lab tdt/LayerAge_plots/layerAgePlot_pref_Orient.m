@@ -3,7 +3,7 @@ ageList=ageList';
 for age=1:4
     for group = 1:1
         if group ==1
-            uselist = (ageList==age & (layer<=6) & ~inh & used);
+            uselist = (ageList==age & (layer==4) & ~inh & used);
 %         elseif group ==2
 %             uselist = (ageList==age & (layer==4) & ~inh & used);
 %         elseif group==3
@@ -62,12 +62,12 @@ figure
 errorbar(1:4,frac_card(1,:),sem(1,:),'k');hold on
 %errorbar(1:4,frac_card(2,:),prct_err_lin(2,:),'k');hold on
 
-
-% barweb(meandata,errdata)
-% ylabel(label);
-% set(gca,'Xtick',1:6);
-% set(gca,'Xticklabel',{'2/3','4','5','6','inh','all'});
-% legend('EO1','adult');
+figure
+barweb(frac_card,sem)
+ylabel(label);
+set(gca,'Xtick',1:6);
+set(gca,'Xticklabel',{'4','4','5','6','inh','all'});
+legend('wt','KO1','KO2');
 % % 
 % figure
 % barweb(mediandata,errdataMed);

@@ -12,7 +12,7 @@ nchan = input('# chans : ');
 uselaser = 1
 % chans = 1:4:nchan;
 SU = input('multiunit (0) or single-unit (1) : ');
-%Pimp_session=input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
+Pimp_session=input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
 
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
@@ -64,10 +64,9 @@ end
 dt=0.001;
 histbins = -0.05:dt:0.05;
 longdt=2;
- longBins=-17:longdt:34;
+longBins=-17:longdt:34;
 psth=zeros(length(cell_range),length(hist(0,histbins)));
 longPsth = zeros(length(cell_range),length(hist(0,longBins)));
-tdiff_total=zeros(length(cell_range),length(edges));
 
 nfig=0;
 for cell_n = cell_range;
@@ -96,28 +95,19 @@ for cell_n = cell_range;
    title(sprintf('unit %d %d',channel_no,clust_no))
    %title(sprintf('ch %d ',cell_n))
   
-   
- % figure  
  subplot(3,2,2)
  hold on
     for t = 1:length(edges);
         tdiff = times-edges(t);
         tdiff = tdiff(abs(tdiff)<max(histbins));
-       % tdiff_total(cell_n,:)=tdiff(cell_n,:);
-        
-        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',3)
+        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',1)
         psth(cell_n,:) = psth(cell_n,:) + hist(tdiff,histbins);
     end
-    
-    hold on
-    plot([0 0],[0 1000],'g','linewidth',2);
-    subplot(3,2,4);
     psth(cell_n,:)=psth(cell_n,:)/(dt*length(edges));
-   
-    
-    plot(histbins*1000,psth(cell_n,:),'k','linewidth',2);
+    subplot(3,2,4);
+    plot(histbins*1000,psth(cell_n,:));
     hold on
-    plot([0 0],[0 max(psth(cell_n,:))],'g','linewidth',2);
+    plot([0 0],[0 max(psth(cell_n,:))],'g');
     
     xlabel('msec')
     ylabel('sp/sec')
@@ -161,8 +151,31 @@ xlabel('msec')
 ylabel('sp/sec')
 
 
-if SU 
-    save(fullfile(apname,afname),'psth','histbins','-append');
+if SU && Pimp_session==0;
+    psth_power1=psth;
+elseif SU && Pimp_session==1; 
+    psth_power2=psth;
+elseif SU && Pimp_session==2; 
+    psth_power3=psth;
+elseif SU && Pimp_session==3; 
+    psth_NBQX_power1=psth;
+else SU && Pimp_session==4; 
+    psth_NBQX_power2=psth;
+end
+   
+
+if SU && Pimp_session==0;
+    save(fullfile(apname,afname),'psth_power1','histbins','-append');
+elseif SU && Pimp_session==1; 
+       save(fullfile(apname,afname),'psth_power2','histbins','-append');
+elseif SU && Pimp_session==2; 
+       save(fullfile(apname,afname),'psth_power3','histbins','-append');
+elseif SU && Pimp_session==3; 
+       save(fullfile(apname,afname),'psth_NBQX_power1','histbins','-append');
+
+else SU && Pimp_session==4; 
+       save(fullfile(apname,afname),'psth_NBQX_power2','histbins','-append'); 
+    
 end
 
 

@@ -46,7 +46,7 @@ for ch = 1:nChan;
     
     H = fspecial('average',[4 6])
     lfpnorm = imfilter(lfpnorm,H);
-    
+%     lfpnorm=lfpnorm(:,1:314)
     figure
     imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]);
     axis xy
@@ -98,7 +98,7 @@ for ch = 1:nChan;
      set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 
-    close all
+  %  close all
 end %% tet
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);

@@ -9,34 +9,27 @@ if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous fil
 
 apath = 'D:\Jen_analysis\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
 N =0; cells=0;  all_img_STA={};PINPed=0; STA_peak={};stopCRF={}; moveCRF={};
+sessionNum=0;
 
+        
+        afiles = {'NR5A_Pinping\12_22_14_pos_ctl\analysis_12_22_14_1st_clust.mat',...
+           'NR5A_Pinping\2_25_15\analysis_2_25_15_rec1.mat',...
+           'NR5A_Pinping\3_7_15\analysis_3_7_15.mat',...
+           'NR5A_Pinping\3_11_15_wt\full\analysis_3_11_15_full.mat',...
+           'NR5A_Pinping\3_13_15\analysis_3_15_15.mat',...
+           'NR5A_Pinping\3_24_15\full\analysis_3_24_15.mat',...
+           'NR5A_Pinping\4_9_15\Full\analysis_full.mat',...
+           'NR5A_Pinping\4_10_15\analysis.mat',...
+           'NR5A_Pinping\4_13_15\analysis.mat'};
 
-for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR5A1-cre
-    
-    if dataset ==1
-        
-        
-        afiles = { 'NR5A_Pinping\1_13_15_pos_ctl\1_13_15_analysis_pos_ctl.mat',...
-            'NR5A_Pinping\12_22_14_pos_ctl\analysis_12_22_14_1st_clust.mat'};
-
-    elseif dataset==2
-%         
-        afiles = {'NR2A\KO\8_12_14_NR2A_KO\Rec2\analysis_8_12_14_rec2.mat',...
-            'NR2A\KO\9_19_14\rec2\analysis_9_19_14_NR2A_rec2.mat',...
-            'NR2A\KO\10_8_14\full clustering_rec1\analysis_10_8_14_NR2A_KO_rec1.mat'};
-%         
-    elseif dataset==3
-        afiles = {'NR2B\1_24_15_KO\analysis_1_24_15_KO.mat',...
-            'NR2B\12_8_14_homo\analysis_12_8_14_NR2BKO.mat',...
-            'NR2B\1_26_15_NR2B_KO_NR5A\analysis_1_26_15_NR2B_KO_NR5A1.mat',...
-            'NR2B\2_2_15\analysis_2_2_15_NR2B_KO.mat'};
-        
-    end
+  
+   
     
     
     
     for i = 1:length(afiles)
         
+        sessionNum=sessionNum+1;
         clear params
         clear wn 
         clear wn_movement
@@ -47,6 +40,11 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         clear locomotion
         clear drift
         clear layer
+        clear psth
+        clear psth_power1
+        clear psth_power2
+        clear psth_power3
+        
         
         load([apath afiles{i}]);
         
@@ -81,7 +79,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         cellrange = N+1:N+n_units;
         N=N+n_units;
        
-        
+        session(cellrange)=sessionNum;
         number(i) = n_units;
         
         alldata( cellrange,1:2) = cells;
@@ -97,46 +95,10 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         alldata(cellrange,26)=layer;
      
         
-        GT(cellrange)=4-dataset;
-%         for dontuse =1:1
-%             %     for c = 1:n_units;
-%             %         ch = alldata(c,1);
-%             %         cl = alldata(c,2);
-%             %         min_t = min(mean_wvform (:,ch : ch+3,cl),[],1);
-%             %         [trough_allc trig_chan] = min(min_t);
-%             %         trig_chan = ch+trig_chan-1;
-%             %         alldata(c,7) = mean_wvform(size(mean_wvform,1),trig_chan,cl)/peak_height(c);
-%             %
-%             %         t1= squeeze(event_times_all(ch,find(idx_all(ch,:) == cl)));
-%             %         dt = diff(t1);
-%             %         dt =dt(dt<.02);
-%             %         n=hist(dt,.001:0.002:.02);
-%             %         [y alldata(c,8)] = max(n);
-%             %         n=hist(dt,.0005:0.001:.02);
-%             %         alldata(c,9) = max(n(3:8))./mean(n(15:20))
-%             %     end;
-%             
-%             
-%                     %   A1(cellrange,:)=bars_A1;
-% %                     A2(cellrange,:)=bars_A2;
-% %                     w(cellrange,:)=bars_w;
-% %                     theta(cellrange,:)=bars_theta;
-% %                     bspont(cellrange,:)=barspont;
+       
 %                    
 %                     
-        % end
         
-        %size(rf_width)
-        
-%         if exist('rf_width');
-%             
-%         rfw(cellrange,:) = rf_width*30;
-%         
-%         else
-%             
-%         rfw(cellrange,:) = NaN;
-%         end
-      
       
         if  exist('drift', 'var'); 
         
@@ -161,7 +123,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
 
         cvDSI(cellrange,:) = field2array(drift,'cv_dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
         cvOSI(cellrange,:)=field2array(drift,'cv_osi');
-        %driftOri(cellrange,:) = field2array(drift,'orientfreq_all');
+       
         else
         driftA1(cellrange,:)= NaN;
         driftA2(cellrange,:)=NaN;
@@ -196,34 +158,34 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         
      clear meanwaves snr stdwaves
 %         
-%          for c=1:length(cells);
-%             %%% get SNR
-%             tet =ceil(cells(c,1)/4);
-%             
-%             if exist('wave_all','var')
-%                 wvall = wave_all{tet};
-%                 wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
-%                 
-%                 amps =squeeze(min(wvclust(:,5:10,:),[],2));
-%                 mn = abs(nanmean(amps));
-%                 stdev = nanstd(amps);
-%                 [y ind] = max(mn);
-%                 snr(c) = mn(ind)/stdev(ind);
-%                 
-%                 meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
-%                 stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
-%             else
-%                 meanwaves=NaN;
-%                 snr=NaN
-%                 stdwaves=NaN
-%             end
+         for c=1:length(cells);
+            %%% get SNR
+            tet =ceil(cells(c,1)/4);
+            
+            if exist('wave_all','var')
+                wvall = wave_all{tet};
+                wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
+                
+                amps =squeeze(min(wvclust(:,5:10,:),[],2));
+                mn = abs(nanmean(amps));
+                stdev = nanstd(amps);
+                [y ind] = max(mn);
+                snr(c) = mn(ind)/stdev(ind);
+                
+                meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
+                stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
+            else
+                meanwaves=NaN;
+                snr=NaN
+                stdwaves=NaN
+            end
 % %             
 % % %             
-%         end
+        end
 %         
-%         SNRall(cellrange)=snr;
-%         meanWavesAll(cellrange,:,:) = meanwaves;
-%         stdWavesAll(cellrange,:,:) = stdwaves;
+        SNRall(cellrange)=snr;
+        meanWavesAll(cellrange,:,:) = meanwaves;
+        stdWavesAll(cellrange,:,:) = stdwaves;
         
         if exist('params','var');
 
@@ -273,7 +235,7 @@ if exist ('wn','var')
 % imagesc(STA1{1,w}',[-64 64]); axis equal
     end
     
-    STA_peak(cellrange)=STA1
+    STA_peak(cellrange)=STA1;
    
 else
     STA_peak(cellrange)=NaN
@@ -283,9 +245,34 @@ end
         wvform(cellrange,:) = wv';
        
         %% get peristimulus histograms for PINPed units
+       if exist('psth_power1', 'var'); 
+        psth_pinp_1(cellrange,:)=psth_power1;
+       else
+           psth_pinp_1(cellrange,:)=NaN;
+           
+       end
+       
+       if exist('psth_power2', 'var'); 
+        psth_pinp_2(cellrange,:)=psth_power2;
+       else
+           psth_pinp_2(cellrange,:)=NaN; 
+       end
+       
+       if exist('psth_power3', 'var'); 
+        psth_pinp_3(cellrange,:)=psth_power3;
+       else
+           psth_pinp_3(cellrange,:)=NaN;
+           
+       end
+       
+       if exist('psth'); 
         psth_pinp(cellrange,:)=psth;
+       else
+        psth_pinp(cellrange,:)=NaN;
+       end
+       
         histbins=histbins
-     
+    
         %get firing rate at all measured orients and SF, put into an array:
         %12 rows(orientations) by 7 columns(SpatialFreqs) for each cell
         
@@ -297,7 +284,7 @@ end
         end
        
     end %%% loop over adult vs EO
-end
+
 
 %define excitatory cell types versus inhibotory types based on trough
 %to peak versus troughdepth/peak height
@@ -312,7 +299,7 @@ else
 end
 
 
-inh = alldata(:,6)>0 & alldata(:,6)<1.6  & alldata(:,5)<8.0;  %%% directly based on wvform; k-means includes another inh group?
+inh = alldata(:,6)>0 & alldata(:,6)<1.6  & alldata(:,5)<7.5  %%% directly based on wvform; k-means includes another inh group?
 midnarrow = alldata(:,6)>0 & alldata(:,6)<4 & alldata(:,5)<12 &  alldata(:,5)>8.5;  %%% could analyze these specifically at some point
 exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<4;
 
@@ -321,12 +308,6 @@ plot(alldata(find(inh),5),alldata(find(inh),6),'ro');
 hold on
 plot(alldata(find(exc),5),alldata(find(exc),6),'ko');
 hold on
-%plot(alldata(find(pinp),5),alldata(find(pinp),6),'go');
-
-figure
-plot(wvform(exc,:)','color','k');hold on
-plot(wvform(inh,:)','color','r');hold on
-
 
 for i = 1:size(driftA1,1)
     for j=1:size(driftA1,2)
@@ -339,67 +320,123 @@ for i = 1:size(driftA1,1)
         
     end
 end
+lyr = alldata(:,26)
+
+%%% define responsive
+resp = peak(:,1)>=2
+
+figure
+plot(psth_pinp(lyr==4 & exc,:)')
+set(gca,'xlim',[50 60])
+
+psth_pinp_1=psth_pinp
+psth_pinp_1(psth_pinp_1(:,:)>180)=0;
+
+figure
+plot(psth_pinp(lyr<=4 ,:)')
+
+
+
+figure
+plot(52:80,mean(psth_pinp(lyr==2&exc &resp ,52:80)),'m');
+hold on
+plot(52:80,mean(psth_pinp(lyr==3&exc & resp,52:80)),'b');
+plot(52:80,mean(psth_pinp(lyr==4&exc & resp,52:80)),'g');
+plot(52:80,mean(psth_pinp(lyr==5&exc & resp,52:80)),'k');
+plot(52:80,mean(psth_pinp(inh & resp,52:80)),'r');
+legend({'2','3','4','5','inh'})
 
 %%% calculate baseline, evoked, and artifact by choosing windows
-baseline = mean(psth_pinp(:,5:45),2);
-baseStd = std(psth_pinp(:,5:45),[],2);
-artifact = psth_pinp(:,50);
-ev = mean(psth_pinp(:,51:55),2);
-evoked = ev-baseline;
+baseline = mean(psth_pinp(:,1:45),2);
+baseStd = std(psth_pinp(:,1:45),[],2);
+artifact = psth_pinp(:,50:52);
+ev = mean(psth_pinp(:,53:54),2)
+evoked1 = ev-baseline;
 
-zscore =evoked./baseStd;
-zscore(zscore>10)=10;
-lyr=alldata(:,26);
+ 
+% ev = mean(psth_pinp(:,52:55),2) - mean(psth_pinp(:,[51 56 57]),2);
+% evoked1 = ev 
+
+% ev = max(psth_pinp(:,53:54),[],2)- min(psth_pinp(:,53:54),[],2);
+% evoked = ev;
+
+zscore1 =evoked1./baseStd;
+zscore1(zscore1>10)=10;
 
 %%% plot zscore vs evoked
 figure
-plot(zscore,evoked,'mo')
+plot(zscore1,evoked1,'mo')
 hold on
-plot(zscore(lyr==3),evoked(lyr==3),'bo')
-plot(zscore(lyr==4),evoked(lyr==4),'go')
-plot(zscore(lyr==5),evoked(lyr==5),'ro');
-plot(zscore(lyr==6),evoked(lyr==6),'yo');
-legend('lyr 2','lyr3','4','5','6')
+plot(zscore1(lyr==3),evoked1(lyr==3),'bo')
+plot(zscore1(lyr==4),evoked1(lyr==4),'go')
+plot(zscore1(inh),evoked1(inh),'ro');
 xlabel('zscore'); ylabel('evoked')
-
-% artscore = (artifact - baseline)./baseStd;
-% artscore(artscore>10)=10;
-% 
-% figure
-% hist(artscore',0:10)
+legend({'all','lyr 3','lyr4','inh'})
 
 %%% choose pinped
-pinped = (zscore>2& evoked>5); 
+pinped = (zscore1>8& evoked1>8 ); 
+
+figure
+plot(45:80,psth_pinp(pinped ,45:80),'k');hold on
+plot(45:80,psth_pinp(pinped & inh ,45:80),'r');hold on
+
+figure
+plot(wvform(exc & pinped & session'==5,:)','color','k');hold on
+plot(wvform(inh & pinped & session'==5,:)','color','r');hold on
+
+figure
+plot(psth_pinp( pinped & exc & session'==5,:)')
+xlim([50 60])
+
+
+figure
+bar([sum(exc & lyr==2 & pinped)/sum(exc & lyr==2) sum(exc & lyr==3 & pinped)/sum(exc & lyr==3) ...
+    sum(exc & lyr==4&pinped)/sum(exc & lyr==4) sum(exc & lyr==5&pinped)/sum(exc & lyr==5) sum(inh&pinped)/sum(inh)]);
+set(gca,'xticklabel',{'2','3','4','5','inh'},'ylim',[0 0.15])
+title(sprintf('%d pinped',sum(pinped)))
+ylabel('fraction pinped')
+
+figure
+plot(pinped(lyr==4),'*')
+hold on
+plot(GT(lyr==4)/3,'g')
+set(gca,'ylim',[0.2 1.25])
+xlabel('cell #')
+legend({'lyr 4 pinped','genotype'})
+
+figure
+plot(psth_pinp(pinped,:)')
+set(gca,'xlim',[50 60])
+
+figure
+plot(psth_pinp(~pinped & lyr==4,:)')
+set(gca,'xlim',[50 60])
 
 figure
 plot(baseline,ev,'ko')
-axis equal;hold on
-plot(baseline(pinped &lyr==4),ev(pinped&lyr==4),'go');hold on
-plot(baseline(pinped &lyr==3),ev(pinped&lyr==3),'bo');hold on
-plot(baseline(pinped &lyr<=2),ev(pinped&lyr<=2),'mo');hold on
-plot(baseline(pinped &lyr==5),ev(pinped&lyr==5),'ro');hold on
-plot(baseline(pinped&inh),ev(pinped&inh),'rs');
-
+hold on
+plot(baseline(pinped &lyr==4),ev(pinped&lyr==4),'go')
+plot(baseline(pinped &lyr==3),ev(pinped&lyr==3),'bo')
+plot(baseline(pinped&inh),ev(pinped&inh),'ro');
+%axes([0 50  0 200])
 legend('non','pinp lyr 4','pinp lyr3','pinp lyr2','pinp lyr5', 'pinp inh')
-plot([0 40],[0 40])
+plot([0 50],[0 200])
 xlabel('baseline'); ylabel('laser')
 sprintf('%d pinped neurons total',sum(pinped))
+
+
 
 
 figure
 plot(baseline,ev,'ko')
 axis equal; hold on
 plot(baseline(pinped &GT'==1),ev(pinped&GT'==1),'ro');hold on
-plot(baseline(pinped &GT'==2),ev(pinped&GT'==2),'go');hold on
-plot(baseline(pinped &GT'==3),ev(pinped&GT'==3),'bo');hold on
-legend('non','pinp 2B KO','pinp 2A KO','pinp wt')
+plot(baseline(pinped &GT'==2),ev(pinped&GT'==2),'bo');hold on
+plot(baseline(pinped &GT'==3),ev(pinped&GT'==3),'go');hold on
+legend('non','wt','N2A','N2B')
 plot([0 40],[0 40])
 xlabel('baseline'); ylabel('laser')
 
-
-
-%%% define responsive
-resp = driftpeak(:,2)>2 & driftpeak(:,1)>2;
 
 %%% # spikes evoked
 nbins=8;
@@ -427,9 +464,20 @@ N2B = GT'==1;
 %%% fraction responsive
 frac_resp(1) = sum(resp& lyr==4 & GT'==1 & pinped)/sum( lyr==4 & GT'==1 & pinped);
 frac_resp(2) = sum(resp& lyr==4 & GT'==3  & pinped)/sum( lyr==4 & GT'==3  & pinped);
+frac_resp(3) = sum(resp& lyr==4 & GT'==2 & pinped)/sum( lyr==4 & GT'==2  & pinped);
+
 figure
 bar(frac_resp); ylim([0 2]); ylabel('fraction resp >2'); title('lyr 4')
-set(gca,'xticklabel',{'2B pinp','wt pinp'})
+set(gca,'xticklabel',{'2B pinp','wt pinp','2A pinp'})
+
+%%% fraction responsive
+frac_resp(1) = sum(resp& lyr==4 & GT'==1 & ~pinped)/sum( lyr==4 & GT'==1 & ~pinped);
+frac_resp(2) = sum(resp& lyr==4 & GT'==3  & ~pinped)/sum( lyr==4 & GT'==3  & ~pinped);
+frac_resp(3) = sum(resp& lyr==4 & GT'==2 & ~pinped)/sum( lyr==4 & GT'==2  & ~pinped);
+
+figure
+bar(frac_resp); ylim([0 2]); ylabel('fraction resp >2'); title('lyr 4')
+set(gca,'xticklabel',{'2B non pinp','wt non pinp','2A pinp'})
 
 
 %%wt gain modulation of pinped neurons
@@ -437,10 +485,18 @@ peak_run_p=nanmedianMW(peak(wt & lyr<=4 & pinped & resp & exc,2))
 peak_stat_p=nanmedianMW(peak(wt & lyr<=4 & pinped & resp & exc,1))
 gain_ind_p=(peak_run_p-peak_stat_p)/(peak_run_p+peak_stat_p)
 
+sprintf('gain wt pinped %f',mean(gain_ind_p))
 
-peak_run=nanmedianMW(peak(wt & lyr <=4 & ~pinped & resp & exc,2))
-peak_stat=nanmedianMW(peak(wt &lyr<=4& ~pinped & resp & exc,1))
+peak_run=nanmedianMW(peak(wt & lyr ==4 & ~pinped & resp & exc,2))
+peak_stat=nanmedianMW(peak(wt &lyr==4& ~pinped & resp & exc,1))
 gain_ind=(peak_run-peak_stat)/(peak_run+peak_stat)
+sprintf('gain wt not pinped %f',mean(gain_ind))
+
+figure
+bar([peak_stat_p peak_run_p; peak_stat peak_run])
+title('peak resp wt')
+legend('stationary','run');
+set(gca,'xticklabel',{'pinped','non-pinped'})
 
 
 %%NR2B gain modualtion of pinped neurons
@@ -449,56 +505,87 @@ peak_run_p=nanmedianMW(peak(N2B & lyr<=4 & pinped & resp & exc,2))
 peak_stat_p=nanmedianMW(peak(N2B & lyr<=4 & pinped & resp & exc,1))
 gain_ind_p=(peak_run_p-peak_stat_p)/(peak_run_p+peak_stat_p)
 
+sprintf('gain n2b pinped %f',mean(gain_ind_p))
 
-peak_run=nanmedianMW(peak(N2B & lyr<=4 & ~pinped & resp & exc,2))
-peak_stat=nanmedianMW(peak(N2B & lyr<=4 & ~pinped & resp & exc,1))
+peak_run=nanmedianMW(peak(N2B & lyr==4 & ~pinped & resp & exc,2))
+peak_stat=nanmedianMW(peak(N2B & lyr==4 & ~pinped & resp & exc,1))
 gain_ind=(peak_run-peak_stat)/(peak_run+peak_stat)
+sprintf('gain n2b not pinped %f',mean(gain_ind))
+figure
+bar([peak_stat_p peak_run_p; peak_stat peak_run])
+title('peak resp NR2B KO')
+legend('stationary','run');
+set(gca,'xticklabel',{'pinped','non-pinped'})
 
-layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),GT,lyr,inh,resp,{'run','stat'},'run vs stat');
+
+%layerAgePlot_ratio_jlh(peak(:,1),peak(:,2),GT,lyr,inh,resp,{'run','stat'},'run vs stat');
 
 
 
 %%% plot grating respons data
 
-plotPinpData(driftspont,wt,1,pinped,inh,1)
+lyr34 = lyr==3 | lyr==4;
+
+plotPinpData(driftspont,wt,lyr==4,pinped,inh,1)
 plot([0 20],[0 20])
 title('spont')
 
-plotPinpData(peak,wt,1,pinped,inh,1)
+barPinp(driftspont,wt,N2B,N2A,lyr==4,pinped,inh,1)
+ylabel('spont')
+
+plotPinpData(peak,wt,lyr==4,pinped,inh,1)
 plot([0 20],[0 20])
 title('peak')
 
-plotPinpData(driftF1F0,wt,1,pinped,inh,resp)
+barPinp(peak(:,2),wt,N2B,N2A, lyr==4,pinped,inh,1)
+ylabel('peak')
+
+
+
+plotPinpData(driftF1F0,wt,lyr,pinped,inh,resp)
 plot([0 2],[0 2])
 title('F1F0')
 
-plotPinpData(cvOSI,N2B,1,pinped,inh,resp)
+barPinp(driftF1F0(:,1),wt,N2A,N2B,lyr==4,pinped,inh,resp)
+ylabel('F1F0')
+
+
+plotPinpData(cvOSI,wt,lyr==4,pinped,inh,resp)
 plot([0 1],[0 1])
 title('cvOSI')
 
-plotPinpData(OSI,N2B,1,pinped,inh,resp)
+barPinp(cvOSI(:,1),wt,N2B,N2A,lyr==4,pinped,inh,resp)
+ylabel('cvOSI')
+
+plotPinpData(OSI,wt,lyr,pinped,inh,resp)
 plot([0 1],[0 1])
 title('OSI')
 
+barPinp(OSI(:,1),wt,N2A,N2B,lyr==4,pinped,inh,resp)
+ylabel('OSI')
 
-
-plotPinpData(driftF1F0,N2B,1,pinped,inh,resp)
-plot([0 2],[0 2])
-title('F1F0 2B pinp')
-
-plotPinpData(DSI,N2B,1,pinped,inh,resp)
-plot([0 1],[0 1])
-title('DSI')
-
-
-plotPinpData(cvDSI,wt,lyr<=4,pinped,inh,resp)
+plotPinpData(cvDSI,wt,lyr==4,pinped,inh,resp)
 plot([0 1],[0 1])
 title('cv DSI')
 
-plotPinpData(driftpeak,GT'==1,lyr==4,pinped,inh,resp)
-hold on
-plot([0 50],[0 50])
-title('peak')
+barPinp(cvDSI(:,1),wt,N2B,N2A,lyr==4,pinped,inh,resp)
+ylabel('cvDSI')
+
+barPinp(DSI(:,1),wt,N2B,N2A,lyr==4,pinped,inh,resp)
+ylabel('cvDSI')
+
+
+driftwpref(driftwpref==0) = 0.005; %tranform SF pref = 0 to 0.005 in order to plot on log scale
+SF_pref_stat = resp & driftwpref(:,1) >=0.005 & driftwpref(:,1)<=0.40;
+
+barPinp(driftwpref(:,1),wt,N2B,N2A,lyr==4,pinped,inh,SF_pref_stat)
+ylabel('SFpref')
+
+drift_theta_1=size(drift_theta);
+drift_theta_1=(drift_theta*180)/pi;
+drift_theta_1(drift_theta_1>330)=0;
+%%preferred oprientation top 30prct
+layerAgePlot_pref_Orient(drift_theta_1(:,1),GT,lyr,inh,resp,{'pref Orient Cardinal' 'Prct total'},'Prefered Orientation Stationary');
 
 %%% show psth of all pinped cells
 %%% lots of figures but useful
@@ -527,8 +614,8 @@ plot(wvform(pinped,:)','g')
 title('pinped')
 
 I=find(inh)
-k=find(pinped & wt)
-l=find(~pinped&N2B)
+k=find(pinped &exc & N2A)
+l=find(~pinped& exc  & wt)
 n=find(pinped&inh)
 % for j=length(I)
 % figure
@@ -538,11 +625,13 @@ n=find(pinped&inh)
 h=ismember(k,I)
 
 %generate STA for pinped cells
+
 for j=1:length(STA_peak)
 
-    if ismember(j,l)
+    if ismember(j,k)
 figure
 if ~isempty(STA_peak{1,j})
+    colormap jet
     imagesc(STA_peak{1,j},[-64 64]);
 end
     end

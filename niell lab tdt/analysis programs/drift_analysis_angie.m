@@ -550,8 +550,8 @@ end
 %convert ps file to PDfs
 
 
-  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-  delete(psfilename);
+% ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+ % delete(psfilename);
 
 if use_afile
     
@@ -568,3 +568,25 @@ end
 
 % invoke(TTX, 'CloseTank');
 % invoke(TTX, 'ReleaseServer');
+
+% matlabpool close
+
+    post = input('post doi? 0/1 : ');
+    %drift(cell_n,stim_eye).degperpix=degperpix;
+    if post
+        drift_post=drift;
+        save(afile,'drift_post','-append')
+    else
+        save(afile,'drift','-append')
+    end
+
+    %
+    close all
+    
+
+%save(afile,'wn','-append')
+%ps2pdf(fname);
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);
+
+%matlabpool close
