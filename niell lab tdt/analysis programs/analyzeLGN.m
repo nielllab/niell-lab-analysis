@@ -19,6 +19,7 @@ end
 if ~exist('moviedata','var')
     load('C:\wn016alpha1_10hzLg60Hz.mat')
 end
+
 %%% main figsspi
 
 %%% supp by contrast
@@ -34,303 +35,670 @@ moviedata = double(moviedata);
 m= (moviedata-mean(moviedata(:)))/mean(moviedata(:));
 
 
-for c = 1:length(movement_all)
-    tic
-    c
+
+if ~exist('sta_all','var')
     
-    if ~isempty(movement_all(c).speed)
-        spikehist = histc(movement_all(c).spikes,movement_all(c).frameT)*60;
-        sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).frameT);
-        ph= spikehist.*exp(2*pi*sqrt(-1)*movement_all(c).frameNum/600);
-        ph = conv(ph,ones(2401,1),'same')./conv(spikehist,ones(2401,1),'same');
+    for c = 1:length(movement_all)
+        tic
+        c
         
-        %     figure
-        %     plot(abs(ph));
-        %     hold on
-        %     plot(sp/max(sp),'g')
-        %
-        %     figure
-        %     plot(mod(angle(ph),2*pi));
-        %     hold on
-        %     plot(sp/max(sp),'g')
+        if ~isempty(movement_all(c).speed)
+            spikehist = histc(movement_all(c).spikes,movement_all(c).frameT)*60;
+            sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).frameT);
+            ph= spikehist.*exp(2*pi*sqrt(-1)*movement_all(c).frameNum/600);
+            ph = conv(ph,ones(2401,1),'same')./conv(spikehist,ones(2401,1),'same');
+            
+            %     figure
+            %     plot(abs(ph));
+            %     hold on
+            %     plot(sp/max(sp),'g')
+            %
+            %     figure
+            %     plot(mod(angle(ph),2*pi));
+            %     hold on
+            %     plot(sp/max(sp),'g')
+            
+            cycframe = mod(movement_all(c).frameNum,600);
+            
+            for i = 1:20
+                fms = find(cycframe>(i-1)*30+1 & cycframe<i*30 & sp<1);
+                length(fms);
+                crf(1,i) =   mean(spikehist(fms));
+                crferr(1,i) = std(spikehist(fms))/sqrt(length(fms));
+                fms = find(cycframe>(i-1)*30+1 & cycframe<i*30 & sp>1);
+                crf(2,i) =   mean(spikehist(fms));
+                crferr(2,i) = std(spikehist(fms))/sqrt(length(fms));
+            end
+            figure
+            subplot(2,3,1)
+            hold on
+            errorbar(1:10,crf(1,1:10),crferr(1,1:10),'r','Linewidth',1.5); %plot(crf(1,20:-1:11),'r:','Linewidth',2);
+            errorbar(1:10,crf(2,1:10),crferr(2,1:10),'g','Linewidth',1.5);  %plot(crf(2,20:-1:11),'g:','Linewidth',2);
+            ylim([0 max(crf(:))])
+            xlim([0 10.5])
+            
+            crfAll(c,:,:) = crf;
+            spike_sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).spikes);
+            
+            pre_isi = diff(movement_all(c).spikes(1:end-1))*1000;
+            post_isi = diff(movement_all(c).spikes(2:end))*1000;
+            
+            %     subplot(2,2,2)
+            %     figure
+            %     use =find(spike_sp<1);
+            %     if length(use)>2000
+            %         use=use(2:2000);
+            %     else use=use(2:end-1);
+            %     end
+            %     plot(log10(pre_isi(use)),log10(post_isi(use)),'r.','Markersize',12)
+            %     hold on
+            %       use = find(spike_sp>1);
+            %     if length(use)>2000
+            %         use=use(2:2000);
+            %     else use=use(2:end-1);
+            %     end
+            %     plot(log10(pre_isi(use)),log10(post_isi(use)),'b.','Markersize',12)
+            
+            
+            
+            %%% calculate sta for all spikes, then get transfer function for
+            %%% moving vs stationary
+            
+            histbins{1} = 0:0.25:4;
+            histbins{2}=histbins{1};
+            
+            h=  hist3([log10(pre_isi(spike_sp(2:end-1)<1)) ;log10(post_isi(spike_sp(2:end-1)<1))]','edges',histbins);
+            
+            spikebins(1,:,:) = h/sum(h(:));
+            
+            
+            
+            h = hist3([log10(pre_isi(spike_sp(2:end-1)>1)) ;log10(post_isi(spike_sp(2:end-1)>1))]','edges',histbins);
+            
+            spikebins(2,:,:) = h/sum(h(:));
+            
+            subplot(2,3,2);
+            imagesc(squeeze(spikebins(1,:,:))); axis square
+            subplot(2,3,3)
+            imagesc(squeeze(spikebins(2,:,:))); axis square
+            
+            spikebinsAll(c,:,:,:) = spikebins;
+            
+            %     spikehist = hist(movement_all(c).spikes,0:0.01:max(movement_all(c).spikes));
+            %         figure
+            %         subplot(2,1,1)
+            %         spect = abs(fft(spikehist));
+            %         spect = spect(1:round(end/2));
+            %         loglog(spect);
+            %
+            %         lastT = max(movement_all(c).lfpT);
+            %         lfpAll = zeros(2,length(movement_all(c).spikes),501);
+            %         lfpAll(:) = NaN;
+            %
+            %         c
+            %         for i = 1:length(movement_all(c).spikes);
+            %
+            %           spk = movement_all(c).spikes(i);
+            %             if spk>1 & spk<lastT-1 & spike_sp(i)<1;
+            %              inds = find(movement_all(c).lfpT>spk);
+            %
+            %               lfpAll(1,i,:) = movement_all(c).lfpV(inds(1)-250:inds(1)+250);
+            %             elseif spk>1 & spk<lastT-1 & spike_sp(i)>1;
+            %               inds = find(movement_all(c).lfpT>spk);
+            %               lfpAll(2,i,:) = movement_all(c).lfpV(inds(1)-250:inds(1)+250);
+            %             end
+            %         end
+            %
+            %
+            %         subplot(2,1,2)
+            %         plot(-250:250,squeeze(nanmean(lfpAll,2))')
+            %         xlim([-250 250])
+            %
         
-        cycframe = mod(movement_all(c).frameNum,600);
-        
-        for i = 1:20
-            fms = find(cycframe>(i-1)*30+1 & cycframe<i*30 & sp<1);
-            length(fms);
-            crf(1,i) =   mean(spikehist(fms));
-            crferr(1,i) = std(spikehist(fms))/sqrt(length(fms));
-            fms = find(cycframe>(i-1)*30+1 & cycframe<i*30 & sp>1);
-            crf(2,i) =   mean(spikehist(fms));
-            crferr(2,i) = std(spikehist(fms))/sqrt(length(fms));
+            
+            % figure
+            % hold on
+            % plot(log10(pre_isi(1:500)),log10(post_isi(1:500)),'.','Markersize',8);
+            %
+            % for i = 1:100;
+            %
+            %    h= plot(log10(pre_isi(i+3)),log10(post_isi(i+3)),'g.','Markersize',24);
+            %
+            %     plot(log10(pre_isi(i:i+3)),log10(post_isi(i:i+3)));
+            %     axis([0 3.5 0 3.5])
+            %     mov(i)=getframe(gcf);
+            %     delete(h)
+            % end
+            % figure
+            % movie(mov)
+            
+            
+            sta_all= zeros(size(moviedata,1),size(moviedata,2),9);
+            %figure
+            fnum=movement_all(c).frameNum;
+            for lag = 1:9
+                for i = (lag+1):length(spikehist);
+                    sta_all(:,:,lag) =sta_all(:,:,lag)+spikehist(i)*moviedata(:,:,fnum(i-lag));
+                end
+                
+                
+                
+                %         subplot(3,3,lag);
+                %         imagesc(sta,[-0.1 0.1])
+                %         axis equal
+            end
+            
+            sta_all = sta_all/sum(spikehist);
+            sta_all = (sta_all-128)/128;
+            
+            obs = reshape(sta_all,size(sta_all,1)*size(sta_all,2),size(sta_all,3));
+            
+            
+            [u s v] = svd(obs');
+            
+            meanSTA= reshape(v(:,1),size(sta_all,1),size(sta_all,2));
+            tcourse = u(:,1);
+            if sum(tcourse(1:5))<0;
+                tcourse = -tcourse;
+                meanSTA=-meanSTA;
+            end
+            meanSTA = meanSTA*s(1,1)*max(tcourse);
+            tcourse = tcourse/max(tcourse);
+            
+            meanSTAall(c,:,:) = meanSTA;
+            
+            
+            subplot(2,3,4);
+            imagesc(meanSTA,[-0.1 0.1]); axis square; axis off
+            subplot(2,3,5);
+            plot(tcourse); hold on; plot([1 9],[0 0],':'); ylim([-1.05 1.05])
+            tcAll(c,:) = tcourse;
+            
+            
+            lag=4;
+            %     for i = (lag+1):length(spikehist);
+            %         sta =sta+spikehist(i)*moviedata(:,:,movement_all(c).frameNum(i-lag));
+            %     end
+            %
+            %     sta = sta/sum(spikehist);
+            %    sta = (sta-128)/128;
+            sta = meanSTA;
+            %cutoff = max(0.06,max(abs(sta(:)))*0.66);
+            cutoff = max(abs(sta(:)))*0.75;
+            sta(abs(sta)<cutoff)=0;
+            subplot(2,3,4);
+            %  imagesc(sta,[-0.1 0.1]); axis square; axis off
+            
+            staxc=zeros(size(spikehist));
+            for i = (lag+1):length(spikehist);
+                staxc(i) = sum(sum((m(:,:,movement_all(c).frameNum(i-lag))).*sta));
+            end
+            staxc = staxc/(sum(abs(sta(:))));
+            %         figure
+            %         plot(staxc,spikehist,'o');
+            
+            
+            clear xfer err xfer_mv err_mv xfer_stop err_stop
+            for i = 1:11;
+                matchsp = find(staxc>(i-6.5)*.2 & staxc<(i-5.5)*.2);
+                xfer(i)=mean(spikehist(matchsp));
+                err(i)=std(spikehist(matchsp))/sqrt(length(matchsp));
+                
+                matchsp = find(staxc>(i-6.5)*.2 & staxc<(i-5.5)*.2 & sp>1);
+                xfer_mv(i)=mean(spikehist(matchsp));
+                err_mv(i)=std(spikehist(matchsp))/sqrt(length(matchsp));
+                
+                matchsp = find(staxc>(i-6.5)*.2 & staxc<(i-5.5)*.2 & sp<1);
+                xfer_stop(i)=mean(spikehist(matchsp));
+                err_stop(i)=std(spikehist(matchsp))/sqrt(length(matchsp));
+            end
+            
+            subplot(2,3,6)
+            errorbar(-10:2:10,xfer,err);
+            xlim([-20 20])
+            hold on
+            plot([0 0],[0 max(xfer)],':')
+            errorbar(-10:2:10,xfer_stop,err_stop,'r');
+            errorbar(-10:2:10,xfer_mv,err_mv,'g');
+            xlim([-10 10])
+            if ~isnan(max(xfer_mv))
+                ylim([0 max(xfer_mv)+0.1]);
+            end
+            
+            xferAll(c,1,:) = xfer_stop;
+            xferAll(c,2,:) = xfer_mv;
+            xferSpont(c,1:2) = [xfer_stop(6) xfer_mv(6)];
+            xferGain(c,1) = mean([xfer_stop(7)-xfer_stop(6) 0.5*(xfer_stop(8)-xfer_stop(6)) 0.3333*(xfer_stop(9)-xfer_stop(6))]);
+            xferGain(c,2) = mean([xfer_mv(7)-xfer_mv(6) 0.5*(xfer_mv(8)-xfer_mv(6)) 0.3333*(xfer_mv(9)-xfer_mv(6))]);
+            
+            
+            R=zeros(8,7,2,3);
+            for tf =1:2
+                for f=1:3
+                    R(:,1,tf,f)=drift_all(c).flicker(tf,f);
+                end
+            end
+            R(:,2:7,:,:)=drift_all(c).R;
+            R(:,:,:,2:3) = abs(R(:,:,:,2:3));
+            osi = squeeze(mean(R(:,2:7,:,:),2)); %osi(:,:,1)=osi(:,:,1)-drift_all(c).spont(1);
+            
+            sf = squeeze(mean(R,1)); %sf(:,:,1) = sf(:,:,1)-drift_all(c).spont(1);
+            dr_spont(c) = drift_all(c).spont(1);
+            for tf=1:2
+                for f = 1:2
+                    osi_weight = osi(:,tf,f);
+                    osi_weight = osi_weight/max(osi_weight);
+                    osi_weight = 8/sum(osi_weight);
+                    sf_weight = sf(2:7,tf,f);
+                    sf_weight = sf_weight/max(sf_weight);
+                    sf_weight = 6/sum(sf_weight);
+                    osi(:,tf,f) = osi(:,tf,f)*sf_weight;
+                    sf(:,tf,f) = sf(:,tf,f)*osi_weight;
+                end
+            end
+            %
+            tf_tune = mean(mean(osi(:,:,1:2),3),1);
+            [mx tf_pref(c)] = max(tf_tune);
+            osi_all(c,:,:) = squeeze(osi(:,tf_pref(c),1:2));
+            sf_all(c,:,:) = squeeze(sf(:,tf_pref(c),1:2));
+            
+            figure  %%% tf,F1,os
+            for f = 1:2
+                subplot(2,2,f);
+                plot(squeeze(osi(:,1:2,f)));
+                hold on
+                plot([1 7],[drift_all(c).spont(1) drift_all(c).spont(1)],':')
+                lower =min(min(osi(:,:,f)));
+                upper = max(max(osi(:,:,f))); upper = max(upper, drift_all(c).spont(1));
+                ylim([0 1.1*max(upper,5)]);xlim([0.5 8.5])
+            end
+            
+            for f = 1:2
+                subplot(2,2,f+2);
+                plot(squeeze(sf(:,1:2,f))); hold on
+                plot([1 7],[drift_all(c).spont(1) drift_all(c).spont(1)],':')
+                lower =min(min(sf(:,:,f)));
+                upper = max(max(sf(:,:,f)));upper = max(upper, drift_all(c).spont(1));
+                ylim([0 1.1*max(upper,4)]); xlim([0.5 7.5])
+            end
+            
         end
-        figure
-        subplot(2,3,1)
-        hold on
-        errorbar(1:10,crf(1,1:10),crferr(1,1:10),'r','Linewidth',1.5); %plot(crf(1,20:-1:11),'r:','Linewidth',2);
-        errorbar(1:10,crf(2,1:10),crferr(2,1:10),'g','Linewidth',1.5);  %plot(crf(2,20:-1:11),'g:','Linewidth',2);
-        ylim([0 max(crf(:))])
-        xlim([0 10.5])
         
-        crfAll(c,:,:) = crf;
+        close all
+        toc
+    end
+end
+staUse = find(max(abs(reshape(meanSTAall,size(meanSTAall,1),size(meanSTAall,2)*size(meanSTAall,3))),[],2)>0.06);
+%%%staUse=staUse(staUse<143)
+
+clear moviedata m v
+clear autocorr
+for c = 1:length(movement_all)
+
+    c
+   if ~isempty(movement_all(c).mvlfp_tdata)
+       % figure
         spike_sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).spikes);
         
-        pre_isi = diff(movement_all(c).spikes(1:end-1))*1000;
-        post_isi = diff(movement_all(c).spikes(2:end))*1000;
-        
-        %     subplot(2,2,2)
-        %     figure
-        %     use =find(spike_sp<1);
-        %     if length(use)>2000
-        %         use=use(2:2000);
-        %     else use=use(2:end-1);
-        %     end
-        %     plot(log10(pre_isi(use)),log10(post_isi(use)),'r.','Markersize',12)
-        %     hold on
-        %       use = find(spike_sp>1);
-        %     if length(use)>2000
-        %         use=use(2:2000);
-        %     else use=use(2:end-1);
-        %     end
-        %     plot(log10(pre_isi(use)),log10(post_isi(use)),'b.','Markersize',12)
-        
-        
-        
-        %%% calculate sta for all spikes, then get transfer function for
-        %%% moving vs stationary
-        
-        histbins{1} = 0:0.25:4;
-        histbins{2}=histbins{1};
-        
-        h=  hist3([log10(pre_isi(spike_sp(2:end-1)<1)) ;log10(post_isi(spike_sp(2:end-1)<1))]','edges',histbins);
-        
-        spikebins(1,:,:) = h/sum(h(:));
-        
-        
-        
-        h = hist3([log10(pre_isi(spike_sp(2:end-1)>1)) ;log10(post_isi(spike_sp(2:end-1)>1))]','edges',histbins);
-        
-        spikebins(2,:,:) = h/sum(h(:));
-        
-        subplot(2,3,2);
-        imagesc(squeeze(spikebins(1,:,:))); axis square
-        subplot(2,3,3)
-        imagesc(squeeze(spikebins(2,:,:))); axis square
-        
-        spikebinsAll(c,:,:,:) = spikebins;
-        
-        %     spikehist = hist(movement_all(c).spikes,0:0.01:max(movement_all(c).spikes));
-        %         figure
-        %         subplot(2,1,1)
-        %         spect = abs(fft(spikehist));
-        %         spect = spect(1:round(end/2));
-        %         loglog(spect);
-        %
-        %         lastT = max(movement_all(c).lfpT);
-        %         lfpAll = zeros(2,length(movement_all(c).spikes),501);
-        %         lfpAll(:) = NaN;
-        %
-        %         c
-        %         for i = 1:length(movement_all(c).spikes);
-        %
-        %           spk = movement_all(c).spikes(i);
-        %             if spk>1 & spk<lastT-1 & spike_sp(i)<1;
-        %              inds = find(movement_all(c).lfpT>spk);
-        %
-        %               lfpAll(1,i,:) = movement_all(c).lfpV(inds(1)-250:inds(1)+250);
-        %             elseif spk>1 & spk<lastT-1 & spike_sp(i)>1;
-        %               inds = find(movement_all(c).lfpT>spk);
-        %               lfpAll(2,i,:) = movement_all(c).lfpV(inds(1)-250:inds(1)+250);
-        %             end
-        %         end
-        %
-        %
-        %         subplot(2,1,2)
-        %         plot(-250:250,squeeze(nanmean(lfpAll,2))')
-        %         xlim([-250 250])
-        %
-        
-        %
-        %     figure
-        %     plot(log10(pre_isi(1:200)),log10(post_isi(1:200)));
-        %     hold on
-        %     plot(log10(pre_isi(1:200)),log10(post_isi(1:200)),'.','Markersize',8);
-        %
-        
-        
-        % figure
-        % hold on
-        % plot(log10(pre_isi(1:500)),log10(post_isi(1:500)),'.','Markersize',8);
-        %
-        % for i = 1:100;
-        %
-        %    h= plot(log10(pre_isi(i+3)),log10(post_isi(i+3)),'g.','Markersize',24);
-        %
-        %     plot(log10(pre_isi(i:i+3)),log10(post_isi(i:i+3)));
-        %     axis([0 3.5 0 3.5])
-        %     mov(i)=getframe(gcf);
-        %     delete(h)
-        % end
-        % figure
-        % movie(mov)
-        
-        
-        sta_all= zeros(size(moviedata,1),size(moviedata,2),9);
-        %figure
-        fnum=movement_all(c).frameNum;
-        for lag = 1:9
-            for i = (lag+1):length(spikehist);
-                sta_all(:,:,lag) =sta_all(:,:,lag)+spikehist(i)*moviedata(:,:,fnum(i-lag));
+        for r = 1:2
+            if r==1
+                spikehist = hist(movement_all(c).spikes(spike_sp<1),0:0.005:max(movement_all(c).spikes));
+                spikehist = spikehist/sum(spike_sp<1);
+                
+            else
+                spikehist = hist(movement_all(c).spikes(spike_sp>1),0:0.005:max(movement_all(c).spikes));
+                spikehist = spikehist/sum(spike_sp>1);
             end
             
-            
-            
-            %         subplot(3,3,lag);
-            %         imagesc(sta,[-0.1 0.1])
-            %         axis equal
-        end
-        
-        sta_all = sta_all/sum(spikehist);
-        sta_all = (sta_all-128)/128;
-        
-        obs = reshape(sta_all,size(sta_all,1)*size(sta_all,2),size(sta_all,3));
-        
-        
-        [u s v] = svd(obs');
-        
-        meanSTA= reshape(v(:,1),size(sta_all,1),size(sta_all,2));
-        tcourse = u(:,1);
-        if sum(tcourse(1:5))<0;
-            tcourse = -tcourse;
-            meanSTA=-meanSTA;
-        end
-        meanSTA = meanSTA*s(1,1)*max(tcourse);
-        tcourse = tcourse/max(tcourse);
-        
-        meanSTAall(c,:,:) = meanSTA;
-        
-        
-        subplot(2,3,4);
-        imagesc(meanSTA,[-0.1 0.1]); axis square; axis off
-        subplot(2,3,5);
-        plot(tcourse); hold on; plot([1 9],[0 0],':'); ylim([-1.05 1.05])
-        tcAll(c,:) = tcourse;
-        
-        
-        lag=4;
-        %     for i = (lag+1):length(spikehist);
-        %         sta =sta+spikehist(i)*moviedata(:,:,movement_all(c).frameNum(i-lag));
-        %     end
-        %
-        %     sta = sta/sum(spikehist);
-        %    sta = (sta-128)/128;
-        sta = meanSTA;
-        %cutoff = max(0.06,max(abs(sta(:)))*0.66);
-        cutoff = max(abs(sta(:)))*0.75;
-        sta(abs(sta)<cutoff)=0;
-        subplot(2,3,4);
-        %  imagesc(sta,[-0.1 0.1]); axis square; axis off
-        
-        staxc=zeros(size(spikehist));
-        for i = (lag+1):length(spikehist);
-            staxc(i) = sum(sum((m(:,:,movement_all(c).frameNum(i-lag))).*sta));
-        end
-        staxc = staxc/(sum(abs(sta(:))));
-        %         figure
-        %         plot(staxc,spikehist,'o');
-        
-        
-        clear xfer err xfer_mv err_mv xfer_stop err_stop
-        for i = 1:11;
-            matchsp = find(staxc>(i-6.5)*.2 & staxc<(i-5.5)*.2);
-            xfer(i)=mean(spikehist(matchsp));
-            err(i)=std(spikehist(matchsp))/sqrt(length(matchsp));
-            
-            matchsp = find(staxc>(i-6.5)*.2 & staxc<(i-5.5)*.2 & sp>1);
-            xfer_mv(i)=mean(spikehist(matchsp));
-            err_mv(i)=std(spikehist(matchsp))/sqrt(length(matchsp));
-            
-            matchsp = find(staxc>(i-6.5)*.2 & staxc<(i-5.5)*.2 & sp<1);
-            xfer_stop(i)=mean(spikehist(matchsp));
-            err_stop(i)=std(spikehist(matchsp))/sqrt(length(matchsp));
-        end
-        
-        subplot(2,3,6)
-        errorbar(-10:2:10,xfer,err);
-        xlim([-20 20])
-        hold on
-        plot([0 0],[0 max(xfer)],':')
-        errorbar(-10:2:10,xfer_stop,err_stop,'r');
-        errorbar(-10:2:10,xfer_mv,err_mv,'g');
-        xlim([-10 10])
-        if ~isnan(max(xfer_mv))
-            ylim([0 max(xfer_mv)+0.1]);
-        end
-        
-        xferAll(c,1,:) = xfer_stop;
-        xferAll(c,2,:) = xfer_mv;
-        xferSpont(c,1:2) = [xfer_stop(6) xfer_mv(6)];
-        xferGain(c,1) = mean([xfer_stop(7)-xfer_stop(6) 0.5*(xfer_stop(8)-xfer_stop(6)) 0.3333*(xfer_stop(9)-xfer_stop(6))]);
-        xferGain(c,2) = mean([xfer_mv(7)-xfer_mv(6) 0.5*(xfer_mv(8)-xfer_mv(6)) 0.3333*(xfer_mv(9)-xfer_mv(6))]);
-        
-        
-        R=zeros(8,7,2,3);
-        for tf =1:2
-            for f=1:3
-                R(:,1,tf,f)=drift_all(c).flicker(tf,f);
+            autocorr(c,r,:) = xcorr(spikehist,spikehist,50,'coeff');
+
+            xcspect(c,r,:) = abs(fft(squeeze(autocorr(c,r,:))));
+            df = 1/(0.005*length(spikehist));
+            spect = abs(fft(spikehist));
+            spect = spect(1:round(end/2));
+            spect = conv(spect,ones(round(0.5/df),1),'valid');
+            spect = (spect-0*min(spect))/(max(spect)-0*min(spect));
+
+            for i = 1:150
+                f = 0.5*i -0.25; usef = round((f-0.25)/df+2):round((f+0.25)/df);
+                meanspect(c,r,i) = mean(spect(usef));
             end
-        end
-        R(:,2:7,:,:)=drift_all(c).R;
-        R(:,:,:,2:3) = abs(R(:,:,:,2:3));
-        osi = squeeze(mean(R(:,2:7,:,:),2)); %osi(:,:,1)=osi(:,:,1)-drift_all(c).spont(1);
-        
-        sf = squeeze(mean(R,1)); %sf(:,:,1) = sf(:,:,1)-drift_all(c).spont(1);
-        dr_spont(c) = drift_all(c).spont(1);
-        for tf=1:2
-            for f = 1:2
-                osi_weight = osi(:,tf,f);
-                osi_weight = osi_weight/max(osi_weight);
-                osi_weight = 8/sum(osi_weight);
-                sf_weight = sf(2:7,tf,f);
-                sf_weight = sf_weight/max(sf_weight);
-                sf_weight = 6/sum(sf_weight);
-                osi(:,tf,f) = osi(:,tf,f)*sf_weight;
-                sf(:,tf,f) = sf(:,tf,f)*osi_weight;
-            end
-        end
-        %
-        tf_tune = mean(mean(osi(:,:,1:2),3),1);
-        [mx tf_pref(c)] = max(tf_tune);
-        osi_all(c,:,:) = squeeze(osi(:,tf_pref(c),1:2));
-        sf_all(c,:,:) = squeeze(sf(:,tf_pref(c),1:2));
-        
-        figure  %%% tf,F1,os
-        for f = 1:2
-            subplot(2,2,f);
-            plot(squeeze(osi(:,1:2,f)));
-            hold on
-            plot([1 7],[drift_all(c).spont(1) drift_all(c).spont(1)],':')
-            lower =min(min(osi(:,:,f)));
-            upper = max(max(osi(:,:,f))); upper = max(upper, drift_all(c).spont(1));
-            ylim([0 1.1*max(upper,5)]);xlim([0.5 8.5])
+            meanspect(c,r,:)= meanspect(c,r,:)/max(meanspect(c,r,:),[],3);
+%                         subplot(3,2,r)
+%             plot((1:length(spect))*df+2,spect); xlim([0 75]); ylim([0.5 1])
+%             hold on
+%             plot(0.25:0.5:74.75,squeeze(meanspect(c,r,:)),'g')
         end
         
-        for f = 1:2
-            subplot(2,2,f+2);
-            plot(squeeze(sf(:,1:2,f))); hold on
-            plot([1 7],[drift_all(c).spont(1) drift_all(c).spont(1)],':')
-            lower =min(min(sf(:,:,f)));
-            upper = max(max(sf(:,:,f)));upper = max(upper, drift_all(c).spont(1));
-            ylim([0 1.1*max(upper,4)]); xlim([0.5 7.5])
-        end
-        
+        spikehist = histc(movement_all(c).spikes,movement_all(c).frameT)*60;
+        sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).frameT);
+        run_fraction(c) = sum(sp>1)/length(sp);
+        ph= spikehist.*exp(2*pi*sqrt(-1)*movement_all(c).frameNum/600);
+        ph = conv(ph,ones(2401,1),'same')./conv(spikehist,ones(2401,1),'same');
+       
+%         subplot(3,2,3:4)
+%         plot(abs(ph),'.');
+%         hold on
+%         plot(sp/max(sp),'g')
+%         
+%         subplot(3,2,5:6)
+%         plot(mod(angle(ph),2*pi),'.');
+%         hold on
+%         plot(sp/max(sp)*5,'g')
     end
-    
-    close all
-    toc
 end
 
+clear lfpTrig lfpTrigFFT lfpTrigFFTcontrol coh
+
+if false %%% lfp coherence analysis
+for c = 1:length(movement_all)
+ 
+      params.Fs = 1/(median(diff(movement_all(c).lfpT)));
+    params.tapers = [3 5];
+    params.err = 0;
+    params.pad =0;
+    params.fpass=[0 75];
+    
+    lfp = movement_all(c).lfpV;
+    spk = movement_all(c).spikes;
+    if ~isempty(lfp)
+        spike_sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).spikes);
+        figure; 
+        for r=1:2
+            if r==1
+                use_spk = spk(spike_sp<1); col = 'r';
+            else
+                use_spk = spk(spike_sp>1);col='g';
+            end
+            
+            [C phi S12 S1,S2,f,zerosp] = coherencysegcpt(lfp',use_spk',1,params,1);
+
+            plot(f,C,col); hold on; ylim([0 0.1])
+        end       
+    end
+end   
+for c=1:length(movement_all)
+   if ~isempty(movement_all(c).mvlfp_tdata)
+       lastT = max(movement_all(c).lfpT);
+    lfpAll = zeros(2,length(movement_all(c).spikes),1001);
+    lfpAll(:) = NaN; lfpAllFFT=lfpAll;
+     spike_sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).spikes);
+    c
+    for i = 1:length(movement_all(c).spikes)-1;
+        
+        spk = movement_all(c).spikes(i);
+        if spk>1 & spk<lastT-1 & spike_sp(i)<1;
+            inds = find(movement_all(c).lfpT>spk);
+            w = 500;
+            lfpAll(1,i,:) = (movement_all(c).lfpV(inds(1)-w:inds(1)+w));
+            lfpAllFFT(1,i,:) = fft(movement_all(c).lfpV(inds(1)-w:inds(1)+w));
+        elseif spk>1 & spk<lastT-1 & spike_sp(i)>1;
+            inds = find(movement_all(c).lfpT>spk);
+            lfpAll(2,i,:) = (movement_all(c).lfpV(inds(1)-w:inds(1)+w));
+            lfpAllFFT(2,i,:) = fft(movement_all(c).lfpV(inds(1)-w:inds(1)+w));
+        end
+    end
+
+    
+    lfpTrig(c,:,:) =squeeze(nanmean(lfpAll,2));
+    figure
+    subplot(2,2,1)
+    plot(squeeze(lfpTrig(c,:,:))')
+    
+    lfpTrigFFT(c,:,:) = abs(squeeze(nanmean(lfpAllFFT,2)));
+    lfpTrigFFTcontrol(c,:,:) = squeeze(nanmean(abs(lfpAllFFT),2));
+
+           dt = median(diff(movement_all(c).lfpT));
+    df=1/((2*w+1)*dt);
+    subplot(2,2,3)
+    plot((1:100)*df,squeeze(lfpTrigFFT(c,:,1:100))');
+    subplot(2,2,4)
+    plot((1:100)*df,squeeze(lfpTrigFFTcontrol(c,:,1:100))')
+    
+
+    coh(c,:,:) = lfpTrigFFT(c,:,:)./lfpTrigFFTcontrol(c,:,:);
+
+    subplot(2,2,2)
+    plot((1:100)*df,squeeze(coh(c,1,1:100)),'r')
+    hold on; plot((1:100)*df,squeeze(coh(c,2,1:100)),'g')
+   end
+
+end
+end
+
+
+for i = 1:length(drift_mv_all);
+    for rep = 1:2
+        orient_tune_all(:,:,:,rep,i) = drift_mv_all(i,rep).orient_tune;
+        sf_tune_all(:,:,:,rep,i) = drift_mv_all(i,rep).sf_tune;
+        for f = 1:2
+            sf_tune_all(:,f,1,rep,i) =  sf_tune_all(:,f,1,rep,i) - abs(drift_mv_all(i,rep).spont(f));
+            dr_spont_all(f,rep,i) = abs(drift_mv_all(i,rep).spont(f));
+        end
+    end
+    
+end
+
+%%% orient_tune_all(tf,f,ori,rep,cell)
+%%% sf_tune_all(tf,f,sf,rep,cell)
+
+orient_amp = squeeze(mean(mean(orient_tune_all,3),1));
+
+figure
+plot(squeeze(orient_amp(1,1,:)),squeeze(orient_amp(1,2,:)),'o')
+axis equal;hold on;plot([0 20],[0 20],'g')
+xlabel('stop F0'); ylabel('move F0');
+
+F0 = squeeze(orient_amp(1,:,:));
+
+driftSBC = find(F0(1,:)<-5 | F0(2,:)<-5);
+
+
+
+figure
+plot(squeeze(orient_amp(2,1,:)),squeeze(orient_amp(2,2,:)),'o')
+axis equal;hold on;plot([0 20],[0 20],'g')
+xlabel('stop F1'); ylabel('move F1');
+
+mn_orient_tune = squeeze(mean(orient_tune_all,1));
+for i = 1:length(mn_orient_tune);
+    for rep=1:2
+        for f=1:2
+            curve =squeeze( mn_orient_tune(f,:,rep,i));
+            if max(curve)>3
+                cvOSIall(f,rep,i)=abs(calcCVosi(curve));
+            else
+                cvOSIall(f,rep,i)=NaN;
+            end
+        end
+    end
+end
+
+figure
+plot(squeeze(cvOSIall(1,1,:)),squeeze(cvOSIall(1,2,:)),'o')
+
+figure
+hist(squeeze(cvOSIall(1,1,:)),0.05:0.1:1)
+xlabel('stop osi')
+
+figure
+hist(squeeze(cvOSIall(1,2,:)),0.05:0.1:1)
+
+xlabel('move osi')
+
+cvOSIavg = squeeze(nanmean(cvOSIall,2));
+figure
+h = hist(squeeze(cvOSIavg(1,:)),0.05:0.1:1);
+bar(0.05:0.1:1,h/sum(h))
+xlabel('OSI');
+ylabel('%')
+
+
+
+for i = 1:length(mn_orient_tune);
+    for f = 1:2
+        
+        [alignedOS(f,:,1,i) alignedOS(f,:,2,i)] =coAlignCurve(squeeze(mn_orient_tune(f,:,1,i)),squeeze(mn_orient_tune(f,:,2,i)));
+        
+    end
+end
+
+sbc = find(xferGain(:,2)<-1 | xferGain(:,1)<-1);
+OS = find(cvOSIall(1,1,:)>0.25 | cvOSIall(1,2,:)>0.25);
+cc= setdiff(staUse,OS);
+cc=setdiff(cc,sbc);
+sbc=setdiff(sbc,OS)
+driftsbc = find(orient_amp(1,1,:)<-5 | orient_amp(1,2,:)<-5);
+driftsbc=setdiff(driftsbc,cc);
+
+
+for i = 1:length(drift_mv_all)
+    
+    figure
+    for tf = 1:2
+        for f = 1:2
+            subplot(2,3,tf+(f-1)*3);
+            plot(squeeze(orient_tune_all(tf,f,:,1,i) + dr_spont_all(f,1,i)),'r');
+            hold on
+            plot(1:8, dr_spont_all(f,1,i)*ones(1,8),'r:');
+            plot(squeeze(orient_tune_all(tf,f,:,2,i) + dr_spont_all(f,2,i)),'g');
+            plot(1:8, dr_spont_all(f,2,i)*ones(1,8),'g:');
+            yl  = get(gca,'ylim');
+            ylim([0 max(20,yl(2))]); xlim([1 8])
+        end
+    end
+    subplot(2,3,1);
+    title(sprintf('spont %0.1f %0.1f',dr_spont_all(1,1,i),dr_spont_all(1,2,i)));
+    subplot(2,3,2);
+    title(sprintf('F0 %0.1f %0.1f',orient_amp(1,1,i),orient_amp(1,2,i)));
+    subplot(2,3,4);
+    title(sprintf('F1 %0.1f %0.1f',orient_amp(2,1,i),orient_amp(2,2,i)));
+    subplot(2,3,3);
+    plot(squeeze(xferAll(i,1,:)),'r'); xlim([1 11])
+    hold on
+    plot(squeeze(xferAll(i,2,:)),'g');
+    subplot(2,3,6);
+    imagesc(squeeze(meanSTAall(i,:,:)),[-0.1 0.1]); axis square; axis off
+    if ismember(i,cc);
+        title('cc')
+    elseif ismember(i,sbc);
+        title('sbc')
+    elseif ismember(i,OS)
+        title('OS')
+    end
+%     subplot(3,3,7);
+%     plot(0.25:0.5:74.75,squeeze(meanspect(i,1,:)),'r');
+%     hold on
+%     plot(0.25:0.5:74.75,squeeze(meanspect(i,2,:)),'g');
+%     axis([0 75 0 1])
+%     subplot(3,3,8);
+% %     plot(movement_all(i).freqs, squeeze(movement_all(i).mv_lfp));
+% %     xlim([0 58]);
+%      df=1/(101*0.005);
+%      plot((2:51)*df,squeeze(xcspect(i,1,2:51)),'r'); hold on
+%      plot((2:51)*df,squeeze(xcspect(i,2,2:51)),'g')
+%      xlim([ 1 50])
+%     title(sprintf('%0.2f',run_fraction(i)))
+%       %ylim([0 1.5*prctile(movement_all(i).mv_lfp(1,:),95)])
+%       subplot(3,3,9)
+%       plot((-50:50)*0.005,squeeze(autocorr(i,1,:)),'r'); hold on; plot((-50:50)*0.005,squeeze(autocorr(i,2,:)),'g');
+%       xlim([-0.25 0.25])
+%       ylim([0 0.2])
+end
+
+
+figure
+for r = 1:2
+    subplot(1,2,r);
+imagesc(squeeze(nanmean(spikebinsAll(OS,r,:,:),1)));
+axis equal
+end
+
+
+
+figure
+errorbar(1:8,squeeze(mean(alignedOS(1,:,1,OS),4)), squeeze(std(alignedOS(1,:,1,OS),[],4))/sqrt(length(OS)),'r','Linewidth',2  )
+hold on
+errorbar(1:8,squeeze(mean(alignedOS(1,:,2,OS),4)), squeeze(std(alignedOS(1,:,2,OS),[],4))/sqrt(length(OS)),'b','Linewidth',2  )
+ylim([-8 8]); xlim([1 8])
+set(gca,'Fontsize',16)
+plot([1 8],[0 0],'b:','Linewidth',2)
+set(gca,'Xtick',[1 3 5 7]);
+set(gca,'Xticklabel',{'-90','0','90','180'})
+xlabel('direction');
+ylabel('F0 sp/sec')
+
+
+figure
+errorbar(1:8,squeeze(mean(alignedOS(1,:,1,driftsbc),4)), squeeze(std(alignedOS(1,:,1,driftsbc),[],4))/sqrt(length(driftsbc)),'r','Linewidth',2  )
+hold on
+errorbar(1:8,squeeze(mean(alignedOS(1,:,2,driftsbc),4)), squeeze(std(alignedOS(1,:,2,driftsbc),[],4))/sqrt(length(driftsbc)),'b','Linewidth',2  )
+ylim([-8 8]); xlim([1 8])
+set(gca,'Fontsize',16)
+plot([1 8],[0 0],'b:','Linewidth',2)
+set(gca,'Xtick',[1 3 5 7]);
+set(gca,'Xticklabel',{'-90','0','90','180'})
+xlabel('direction');
+ylabel('F0 sp/sec')
+
+
+figure
+errorbar(1:8,squeeze(mean(alignedOS(1,:,1,cc),4)), squeeze(std(alignedOS(1,:,1,cc),[],4))/sqrt(length(cc)),'r','Linewidth',2  )
+hold on
+errorbar(1:8,squeeze(mean(alignedOS(1,:,2,cc),4)), squeeze(std(alignedOS(1,:,2,cc),[],4))/sqrt(length(cc)),'b','Linewidth',2  )
+ylim([-8 8]); xlim([1 8])
+set(gca,'Fontsize',16)
+plot([1 8],[0 0],'b:','Linewidth',2)
+set(gca,'Xtick',[1 3 5 7]);
+set(gca,'Xticklabel',{'-90','0','90','180'})
+xlabel('direction');
+ylabel('F0 sp/sec')
+
+
+data = [squeeze(mean(alignedOS(1,3,1,cc),4)) squeeze(mean(alignedOS(1,3,2,cc),4)); ...
+    squeeze(mean(alignedOS(1,3,1,driftsbc),4)) squeeze(mean(alignedOS(1,3,2,driftsbc),4)) ; ...
+    squeeze(mean(alignedOS(1,3,1,OS),4)) squeeze(mean(alignedOS(1,3,2,OS),4))]
+    
+err = [squeeze(std(alignedOS(1,3,1,cc),[],4)) squeeze(std(alignedOS(1,3,2,cc),[],4)); ...
+    squeeze(std(alignedOS(1,3,1,driftsbc),[],4)) squeeze(std(alignedOS(1,3,2,driftsbc),[],4)) ; ...
+    squeeze(std(alignedOS(1,3,1,OS),[],4)) squeeze(std(alignedOS(1,3,2,OS),[],4))]
+
+err(1,:)=err(1,:)/sqrt(length(cc));
+err(2,:)=err(2,:)/sqrt(length(driftsbc));
+err(3,:)=err(3,:)/sqrt(length(OS));
+err
+
+figure
+barweb(data,err)
+ylim([-8 8])
+set(gca,'Xticklabel',{'cc','sbc','OS'})
+ylabel('peak F0 sp/sec')
+legend('stationary','moving')
+set(gca,'Fontsize',16)
+
+
+OS = find(cvOSIall(1,1,:)>0.25 | cvOSIall(1,2,:)>0.25);
+
+figure
+plot(squeeze(orient_amp(1,1,:)),squeeze(orient_amp(1,2,:)),'ko')
+axis equal;hold on;
+xlabel('stop F0'); ylabel('move F0');
+plot(squeeze(orient_amp(1,1,staUse)),squeeze(orient_amp(1,2,staUse)),'bo')
+plot(squeeze(orient_amp(1,1,OS)),squeeze(orient_amp(1,2,OS)),'go')
+plot(squeeze(orient_amp(1,1,sbc)),squeeze(orient_amp(1,2,sbc)),'ro')
+legend({'all','sta_use','os','sbc'})
+plot([0 20],[0 20],'g')
+
+cc= setdiff(staUse,OS);
+cc=setdiff(cc,sbc);
+
+[median(orient_amp(1,1,cc)) median(orient_amp(1,2,cc))]
+[median(orient_amp(1,1,OS)) median(orient_amp(1,2,OS))]
+[median(orient_amp(1,1,sbc)) median(orient_amp(1,2,sbc))]
+
+[mean(orient_amp(1,1,cc)) mean(orient_amp(1,2,cc))]
+[mean(orient_amp(1,1,OS)) mean(orient_amp(1,2,OS))]
+[mean(orient_amp(1,1,sbc)) mean(orient_amp(1,2,sbc))]
 
 
 keyboard
@@ -338,8 +706,6 @@ keyboard
 figure
 plot(wvform')
 
-staUse = find(max(abs(reshape(meanSTAall,size(meanSTAall,1),size(meanSTAall,2)*size(meanSTAall,3))),[],2)>0.06);
-%%%staUse=staUse(staUse<143)
 
 
 figure
@@ -403,18 +769,18 @@ plot([0 0],[-5 20])
 
 sbc = find(sbcGain(:,2)<-2 | sbcGain(:,1)<-2);
 %sbc = find(xferGain(:,2)<-1 | xferGain(:,1)<-1);
-for i = 1:length(sbc)
-    figure
-    subplot(1,2,1); hold on
-    plot(squeeze(xferAll(sbc(i),1,:)),'r')
-    plot(squeeze(xferAll(sbc(i),2,:)),'g')
-    xlim([1 11])
-    
-    subplot(1,2,2);hold on
-    plot(squeeze(crfAll(sbc(i),1,1:10)),'r')
-    plot(squeeze(crfAll(sbc(i),2,1:10)),'g')
-    xlim([1 10])
-end
+% for i = 1:length(sbc)
+%     figure
+%     subplot(1,2,1); hold on
+%     plot(squeeze(xferAll(sbc(i),1,:)),'r')
+%     plot(squeeze(xferAll(sbc(i),2,:)),'g')
+%     xlim([1 11])
+%     
+%     subplot(1,2,2);hold on
+%     plot(squeeze(crfAll(sbc(i),1,1:10)),'r')
+%     plot(squeeze(crfAll(sbc(i),2,1:10)),'g')
+%     xlim([1 10])
+% end
 
 
 
@@ -470,16 +836,25 @@ plot([-1 1],[-1 1])
 
 F1F0 = mean(osi_all(:,:,2),2)./(mean(osi_all(:,:,1),2) );
 figure
-h=hist(F1F0,0:0.1:1); bar(0:0.1:1,h)
+h=hist(2*F1F0,0.1:0.2:2); bar(0.1:0.2:2,h/sum(h))
 hold on
-h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
-xlabel('F1/F0'); xlim([-0.1 1.1]);
+%h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
+xlabel('F1/F0'); xlim([0 2]);
 
 ev_osi = squeeze(osi_all(:,:,1)) - repmat(dr_spont',[1 8]);
 figure
 plot(ev_osi');
 
 
+figure
+data =[length(cc) length(sbc) length(OS) ]/length(ev_osi)
+err = [sqrt(length(cc)) sqrt(length(sbc)) sqrt(length(OS))]/length(ev_osi)
+
+bar(data); hold on
+errorbar(1:3,data,err,'k.','Linewidth',2)
+set(gca,'Xticklabel',{'cc','sbc','OS'})
+ylabel('fraction')
+set(gca,'Fontsize',16)
 
 evoked = mean(ev_osi,2);
 for i = 1:length(ev_osi)
@@ -504,39 +879,40 @@ h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
 h=hist(F1F0(F0OS),0:0.1:1); bar(0:0.1:1,h,'g');
 xlabel('F1/F0'); xlim([-0.1 1.1]);
 
-for i = 1:length(F0OS);
-    
-    figure
-    imagesc(squeeze(meanSTAall(F0OS(i),:,:)),[-0.1 0.1])
-    axis equal
-    
-end
+% for i = 1:length(F0OS);
+%
+%     figure
+%     imagesc(squeeze(meanSTAall(F0OS(i),:,:)),[-0.1 0.1])
+%     axis equal
+%
+% end
 
 
 
-for i = 1:length(F0OS)
-    figure
-    plot(squeeze(osi_all(F0OS(i),:,:)));
-    hold on
-    plot([1 8], [dr_spont(F0OS(i)) dr_spont(F0OS(i)) ])
-    title(sprintf('osi = %0.2f f1f0 = %0.2f sta = %d',cvosi(F0OS(i)),F1F0(F0OS(i)),ismember(F0OS(i),staUse)))
-end
+% for i = 1:length(F0OS)
+%     figure
+%     plot(squeeze(osi_all(F0OS(i),:,:)));
+%     hold on
+%     plot([1 8], [dr_spont(F0OS(i)) dr_spont(F0OS(i)) ])
+%     title(sprintf('osi = %0.2f f1f0 = %0.2f sta = %d',cvosi(F0OS(i)),F1F0(F0OS(i)),ismember(F0OS(i),staUse)))
+% end
 
 
 onoffOS = find(cvosi>0.2 & F1F0'<0.4);
-for i = 1:length(onoffOS);
-    figure
-    imagesc(squeeze(meanSTAall(onoffOS(i),:,:)),[-0.1 0.1])
-    axis equal
-end
+onoffOS = OS;
+% for i = 1:length(onoffOS);
+%     figure
+%     imagesc(squeeze(meanSTAall(onoffOS(i),:,:)),[-0.1 0.1])
+%     axis equal
+% end
 
-for i = 1:length(onoffOS)
-    figure
-    hold on
-    plot(squeeze(crfAll(onoffOS(i),1,1:10))','r')
-    plot(squeeze(crfAll(onoffOS(i),2,1:10))','g')
-end
-
+% for i = 1:length(onoffOS)
+%     figure
+%     hold on
+%     plot(squeeze(crfAll(onoffOS(i),1,1:10))','r')
+%     plot(squeeze(crfAll(onoffOS(i),2,1:10))','g')
+% end
+% 
 
 
 
@@ -555,13 +931,13 @@ for i = 1:4
     elseif i==3
         d= squeeze(nanmean(xferAll(sbc,:,:),1));
     elseif i==4
-        d= squeeze(nanmean(xferAll(onoffOS,:,:),1));
+        d= squeeze(nanmean(xferAll(OS,:,:),1));
     end
     d = d(:,6:10)
     d = (d-min(d(:)))/(max(d(:)-min(d(:))));
-    plot(0:0.2:0.8,d(1,:),'r')
+    plot(0:0.2:0.8,d(1,:),'r','Linewidth',2)
     hold on
-    plot(0:0.2:0.8,d(2,:),'b')
+    plot(0:0.2:0.8,d(2,:),'b','Linewidth',2)
     xlim([0 0.8]); ylim([0 1]);
     title(titleList{i},'FontSize',16)
     if i==1
@@ -578,7 +954,7 @@ plot(sbcGain(staUse(tcGroup==1),1),sbcGain(staUse(tcGroup==1),2),'go','LineWidth
 hold on
 plot(sbcGain(staUse(tcGroup==2),1),sbcGain(staUse(tcGroup==2),2),'bo','LineWidth',2);
 plot(sbcGain(sbc,1),sbcGain(sbc,2),'ro','LineWidth',2);
-plot(sbcGain(onoffOS,1),sbcGain(onoffOS,2),'ko','LineWidth',2);
+plot(sbcGain(OS,1),sbcGain(OS,2),'ko','LineWidth',2);
 axis square
 plot([-10 25],[-10 25])
 axis([-10 25 -10 25])
@@ -592,7 +968,7 @@ legend('sustained','transient','sbc','OS')
 data = [nanmedian(sbcGain(staUse(tcGroup==1),2)) nanmedian(sbcGain(staUse(tcGroup==1),1)); ...
     nanmedian(sbcGain(staUse(tcGroup==2),2)) nanmedian(sbcGain(staUse(tcGroup==2),1)); ...
     nanmedian(sbcGain(sbc,2)) nanmedian(sbcGain(sbc,1)) ; ...
-    nanmedian(sbcGain(onoffOS,2)),nanmedian(sbcGain(onoffOS,1))]
+    nanmedian(sbcGain(OS,2)),nanmedian(sbcGain(OS,1))]
 
 %
 % data = [nanmean(sbcGain(staUse(tcGroup==1),2)) nanmean(sbcGain(staUse(tcGroup==1),1)); ...
@@ -603,7 +979,7 @@ data = [nanmedian(sbcGain(staUse(tcGroup==1),2)) nanmedian(sbcGain(staUse(tcGrou
 err = [nanstd(sbcGain(staUse(tcGroup==1),2))/7 nanstd(sbcGain(staUse(tcGroup==1),1))/7; ...
     nanstd(sbcGain(staUse(tcGroup==2),2))/7 nanstd(sbcGain(staUse(tcGroup==2),1))/7; ...
     nanstd(sbcGain(sbc,2))/4 nanstd(sbcGain(sbc,1))/4 ; ...
-    nanstd(sbcGain(onoffOS,2))/4,nanstd(sbcGain(onoffOS,1))/4]
+    nanstd(sbcGain(OS,2))/4,nanstd(sbcGain(OS,1))/4]
 figure
 barweb(data(:,[2 1])*10,err(:,[2 1])*10)
 set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
@@ -652,17 +1028,17 @@ ylim([0 12])
 
 
 figure
-plot(burst_fraction(staUse(tcGroup==1),2),burst_fraction(staUse(tcGroup==1),1),'go','LineWidth',2);
+plot(burst_fraction(staUse(tcGroup==1),1),burst_fraction(staUse(tcGroup==1),2),'go','LineWidth',2);
 hold on
-plot(burst_fraction(staUse(tcGroup==2),2),burst_fraction(staUse(tcGroup==2),1),'bo','LineWidth',2);
-plot(burst_fraction(sbc,2),burst_fraction(sbc,1),'ro','LineWidth',2);
-plot(burst_fraction(onoffOS,2),burst_fraction(onoffOS,1),'ko','LineWidth',2);
+plot(burst_fraction(staUse(tcGroup==2),1),burst_fraction(staUse(tcGroup==2),2),'bo','LineWidth',2);
+plot(burst_fraction(sbc,1),burst_fraction(sbc,2),'ro','LineWidth',2);
+plot(burst_fraction(onoffOS,1),burst_fraction(onoffOS,2),'ko','LineWidth',2);
 axis square
 plot([0 0.3],[0 0.3])
-axis([0 0.15 0 0.3])
+axis([0 0.25 0 0.25])
 legend('sustained','transient','sbc','OS')
-xlabel('burst fraction moving');
-ylabel('burst fraction stationary')
+xlabel('burst fraction stationary');
+ylabel('burst fraction moving')
 
 data = [nanmedian(burst_fraction(staUse(tcGroup==1),2)) nanmedian(burst_fraction(staUse(tcGroup==1),1)); ...
     nanmedian(burst_fraction(staUse(tcGroup==2),2)) nanmedian(burst_fraction(staUse(tcGroup==2),1)); ...
@@ -682,10 +1058,10 @@ err = [nanstd(burst_fraction(staUse(tcGroup==1),2))/7 nanstd(burst_fraction(staU
 
 
 figure
-barweb(data,err)
+barweb(data(:,2:-1:1),err(:,2:-1:1))
 set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
 ylabel('median burst fraction')
-legend('moving','stationary')
+legend('stationary','moving')
 ylim([0 0.08])
 
 figure
