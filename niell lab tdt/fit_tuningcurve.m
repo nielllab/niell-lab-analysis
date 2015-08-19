@@ -13,6 +13,8 @@ i=sqrt(-1);
 mu = (sum(R.*exp(2*i*theta_ind)))/sum(abs(R));
 dsi = (sum(R.*exp(i*theta_ind)))/sum(abs(R));
 
+
+
 %osi = sum(R.*exp(sqrt(-1)*theta'))/sum(R)
 %osi = sum(R.*exp(sqrt(-1)*theta))/sum(R);
 
@@ -61,11 +63,11 @@ xfit(1,:)=theta_ind;
 xfit(2,:)=theta_pref;
 yfit = wrapped_gaussian(p,xfit);
 
-figure
-plot(x(1,1:31)*180/pi,y(1:31))
-hold on
-plot(x(1,1:2:31)*180/pi,y(1:2:31),'o');
-plot(x(1,:)*180/pi,wrapped_gaussian(p,x),'g');
+% figure
+% plot(x(1,1:31)*180/pi,y(1:31))
+% hold on
+% plot(x(1,1:2:31)*180/pi,y(1:2:31),'o');
+% plot(x(1,:)*180/pi,wrapped_gaussian(p,x),'g');
 
 
 A1=max(p(1),p(2));

@@ -39,7 +39,7 @@ if recluster~='y'
     max_time = 60*60; %%% total recording duration (secs)
     max_events=5*10^5;
     use_tets = 1:input('# of sites : ')/4;  %%% use all tetrodes
-    badsites = [];   %%% no bad sites to be removed
+     badsites = input('enter channel to zero out, e.g. [3 8 14] [](none) : ');
     plot_all=1;
 else    %% reclustering
     [fname pname] = uigetfile('','cluster file');
@@ -83,7 +83,11 @@ for tet=use_tets
                 Nblock(block) = length(T);
             end
             event_times_all{ch}(N+(1:Nblock(block))) = T +10^5 *(block-1);
-            X(N+(1:Nblock(block)),1:size(s,1),tet_ch)=s';
+            if ismember(ch,badsites)
+                 X(N+(1:Nblock(block)),1:size(s,1),tet_ch)=0;
+            else              
+                X(N+(1:Nblock(block)),1:size(s,1),tet_ch)=s';
+            end
             size(X)
             N=N+Nblock(block);
             N
@@ -181,7 +185,9 @@ for tet=use_tets
     else
         used = find(v0>0);
        end
-  
+  if isempty(used)
+      used = find(v0>0);
+  end
 
     figure
     hist(v0);
@@ -257,7 +263,7 @@ for tet=use_tets
         % layer a (semi-)transparent patch over the axes to trap clicks
         op = get(gca,'OuterPosition');
         axes('position',op); axis off;
-        a = patch([0 0 1 1],[0 1 1 0],'w');
+        a = patch([0 0 1 1],[0 1 1 0],'w','PickableParts','All');
         set(a,'FaceAlpha',0)
         set(a,'EdgeAlpha',0)
         set(a,'ButtonDownFcn',@togglegoodcell);
@@ -513,21 +519,26 @@ Tank_Name
 clear  Xshift Xica Xold Xraw used nonc_score s c_score clear group
 
 %%% save everything
-[bname output_path] = uiputfile('','data folder');
+[bname output_path] = uiputfile('.mat','data folder');
 bname
 output_path
 
 if bname~=0
-    fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname))
-    save(fname,'-v7.3');
+    
+%     fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname));
+
     for t=use_tets
-        fname = fullfile(output_path,sprintf('hist%s_%s_t%d',Tank_Name,bname,t));
-        saveas(histfig(t),fname,'fig');
-        fname = fullfile(output_path,sprintf('snip%s_%s_t%d',Tank_Name,bname,t));
-        saveas(snipfig(t),fname,'fig');
-        fname = fullfile(output_path,sprintf('clust%s_%s_t%d',Tank_Name,bname,t));
-        saveas(clustfig(t),fname,'fig');
+        fname = fullfile(output_path,sprintf('hist%s_%s_t%d.fig',Tank_Name,bname(1:(end-4)),t));
+        savefig(histfig(t),fname);
+        fname = fullfile(output_path,sprintf('snip%s_%s_t%d.fig',Tank_Name,bname(1:(end-4)),t));
+        savefig(snipfig(t),fname);
+        fname = fullfile(output_path,sprintf('clust%s_%s_t%d.fig',Tank_Name,bname(1:(end-4)),t));
+        savefig(clustfig(t),fname);
     end
+    
+    close all
+    fname = fullfile(output_path,sprintf('cluster_data_%s_%s',Tank_Name,bname));
+    save(fname, '-v7.3');
 end
 
 

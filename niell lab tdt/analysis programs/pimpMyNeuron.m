@@ -10,8 +10,9 @@ Block_Name = pname(delims(length(delims))+1 :length(pname))
 
 nchan = input('# chans : ');
 uselaser = 1
-chans = 1:4:nchan;
+% chans = 1:4:nchan;
 SU = input('multiunit (0) or single-unit (1) : ');
+%Pimp_session=input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
 
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
@@ -27,6 +28,12 @@ if SU
     load(afile);
     use_afile=1;
     cells
+end
+
+if SU
+ chans=1:nchan;
+else
+ chans = 1:4:max(nchan,1);
 end
 
 if SU
@@ -47,7 +54,6 @@ edgeDiff(1)=100;
 trainEdges=edges(edgeDiff>1);
 
 
-
 if SU
     cell_range = 1:size(cells,1)
 else
@@ -61,12 +67,14 @@ longdt=2;
  longBins=-17:longdt:34;
 psth=zeros(length(cell_range),length(hist(0,histbins)));
 longPsth = zeros(length(cell_range),length(hist(0,longBins)));
+tdiff_total=zeros(length(cell_range),length(edges));
 
 nfig=0;
-for c = 1:length(cell_range)
+for cell_n = cell_range;
 % for c=2:2
-     cell_n=cell_range(c);
-    ch= cell_n;
+  cell_n
+%      cell_n=cell_range(cell_n);
+%     ch= cell_n;
     if SU
         channel_no = cells(cell_n,1)
         clust_no = cells(cell_n,2)
@@ -78,60 +86,82 @@ for c = 1:length(cell_range)
         times=tdtData.MUspikeT{cell_n};
     end
     
-    histfig(c)=figure;
-    set(gcf,'position',[200 200 600 700]);
+   histfig(cell_n)=figure;
+   set(gcf,'position',[200 200 600 700]);
    subplot(3,2,1);
    plot(laserT,tdtData.laserTTL,'g');
    hold on
    plot(0:1:max(times),hist(times,0:1:max(times)));
    
-   title(sprintf('ch %d ',cell_n))
+   title(sprintf('unit %d %d',channel_no,clust_no))
+   %title(sprintf('ch %d ',cell_n))
   
+   
+ % figure  
  subplot(3,2,2)
  hold on
     for t = 1:length(edges);
         tdiff = times-edges(t);
         tdiff = tdiff(abs(tdiff)<max(histbins));
-        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',1)
-        psth(c,:) = psth(c,:) + hist(tdiff,histbins);
+       % tdiff_total(cell_n,:)=tdiff(cell_n,:);
+        
+        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',3)
+        psth(cell_n,:) = psth(cell_n,:) + hist(tdiff,histbins);
     end
-    psth(c,:)=psth(c,:)/(dt*length(edges));
-    subplot(3,2,3);
-    plot(histbins*1000,psth(c,:));
+    
     hold on
-    plot([0 0],[0 max(psth(c,:))],'g');
+    plot([0 0],[0 1000],'g','linewidth',2);
+    subplot(3,2,4);
+    psth(cell_n,:)=psth(cell_n,:)/(dt*length(edges));
+   
+    
+    plot(histbins*1000,psth(cell_n,:),'k','linewidth',2);
+    hold on
+    plot([0 0],[0 max(psth(cell_n,:))],'g','linewidth',2);
+    
     xlabel('msec')
     ylabel('sp/sec')
     
-   subplot(3,2,4)
+
+
+%  %    base(c)=nanmean(psth(c,1:48)) %%between -50 and 0 ms
+
+%     Sdev(c)=nanstd(psth(c,1:48))%%between -50 and 0 ms
+%     PinpFR(c)=max(psth(c,52:64))%peak between laser onest (0) and 12ms
+%     PINPed(c)= PinpFR(c)>= base(c)+(3*Sdev(c)) & base(c)>=0.5;
+%     PINP_sup(c)=nanmean(psth(c,52:60))< (base(c)-(2*Sdev(c)));
+  
+    subplot(3,2,3)
    hold on
-       for t = 1:length(trainEdges);
-        tdiff = times-trainEdges(t);
-        tdiff = tdiff(tdiff<max(longBins) & tdiff>min(longBins));
-        plot([tdiff;tdiff],[t*ones(size(tdiff));t*ones(size(tdiff))-1],'k')
-        longPsth(c,:) = longPsth(c,:) + hist(tdiff,longBins);
-    end
-    longPsth(c,:)=longPsth(c,:)/(longdt*length(trainEdges));
+   for t = 1:length(trainEdges);
+       tdiff = times-trainEdges(t);
+       tdiff = tdiff(tdiff<max(longBins) & tdiff>min(longBins));
+       plot([tdiff;tdiff],[t*ones(size(tdiff));t*ones(size(tdiff))-1],'k')
+       longPsth(cell_n,:) = longPsth(cell_n,:) + hist(tdiff,longBins);
+   end
+    longPsth(cell_n,:)=longPsth(cell_n,:)/(longdt*length(trainEdges));
     xlim([min(longBins) max(longBins)])
     subplot(3,2,5);
-    plot(longBins,longPsth(c,:));
+    plot(longBins,longPsth(cell_n,:));
     hold on
-    plot([0 0],[0 max(longPsth(c,:))],'g');
+    plot([0 0],[0 max(longPsth(cell_n,:))],'g');
     xlabel('sec')
     ylabel('sp/sec')
     xlim([min(longBins) max(longBins)])
    % ylim([0 7]); plot([0 17],[6 6],'g','Linewidth',4);
 end
 
-
+%save(afile, 'base','Sdev','PinpFR','PINPed','PINP_sup','-append')
+histbins=histbins*1000
 
 mainfig=figure;
-plot(histbins*1000,psth);
-plot([0 0],[0 max(psth(:))],'g');
+plot(histbins,psth(:,:));hold on
+plot([0 0],[0 (max(psth(:)))],'g');
 xlabel('msec')
-    ylabel('sp/sec')
+ylabel('sp/sec')
 
-if SU
+
+if SU 
     save(fullfile(apname,afname),'psth','histbins','-append');
 end
 
@@ -151,6 +181,8 @@ for i = 1:length(histfig)
 end
 if SU
     ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
+   
 else
-   ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']); 
+    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']);
+   
 end

@@ -71,21 +71,21 @@ for ch = 1:nChan;
     theta = mean(lfpnorm(:,ceil(7/df):ceil(10/df)),2);
     gamma = mean(lfpnorm(:,ceil(55/df):ceil(65/df)),2);
     
-    v_interp = interp1(tsamp,vsmooth,tdtData.spectT{ch});
-
-    %     figure
-    %     plot(v_interp,gamma(t),'o');
-    %     figure
-    %     plot(v_interp,theta(t),'o');
-    Smean = mean(lfpnorm,2)';
-    stationary = find(v_interp<2 & Smean<(5*median(Smean)));
-    moving = find(v_interp>2.05  & Smean<(5*median(Smean)));
-
-    figure
-    plot(mean(lfpnorm(stationary,:),1));
-    hold on
-    plot(mean(lfpnorm(moving,:),1),'g');
-    axis([0 70/df 0 1.2*max(mean(lfpnorm(moving,:)))]);
+%     v_interp = interp1(tsamp,vsmooth,tdtData.spectT{ch});
+% 
+%     %     figure
+%     %     plot(v_interp,gamma(t),'o');
+%     %     figure
+%     %     plot(v_interp,theta(t),'o');
+%     Smean = mean(lfpnorm,2)';
+%     stationary = find(v_interp<1 & Smean<(5*median(Smean)));
+%     moving = find(v_interp>=1  & Smean<(5*median(Smean)));
+% 
+%     figure
+%     plot(mean(lfpnorm(stationary,:),1));
+%     hold on
+%     plot(mean(lfpnorm(moving,:),1),'g');
+%     axis([0 70/df 0 1.2*max(mean(lfpnorm(moving,:)))]);
     set(gca,'XTick',(10:10:70)/df);
     set(gca,'XTickLabel',{'10','20','30','40','50','60','70','70'})
     

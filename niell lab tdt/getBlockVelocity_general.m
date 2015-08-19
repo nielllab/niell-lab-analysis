@@ -40,7 +40,7 @@ else %%% new 30hz cumulative position
     [dTS, dData] = TankGetUDP_SyncEvents(tank,block);
 
     fprintf('Processing...\n');
-    dData
+    size(dData)
     
     Mouse1_Idx = find(dData(1,:)==2); % all events on channel 2
     dXY = dData(2,Mouse1_Idx);
@@ -67,6 +67,8 @@ plot(M2_T)
 dt = 0.1;
 Tmax = max(max(M1_T),max(M2_T))
 Tmin =max(min(M1_T),min(M2_T))
+
+
 
 tsamp = Tmin:dt:Tmax;
 M1_Xsamp = interp1(M1_T,M1_X,tsamp);

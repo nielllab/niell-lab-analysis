@@ -1,2 +1,0 @@
-KlustaKwik_prescott: KlustaKwik.C
-	g++ -mtune=prescott -march=prescott -pipe -O2 -o KlustaKwik_prescott KlustaKwik.C  param.c -lm

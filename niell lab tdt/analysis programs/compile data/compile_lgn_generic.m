@@ -371,6 +371,14 @@ params.Fs = 0.25*1/median(diff(movement_all(cell_n).lfpT(1:1000)));
     end   
 end
 
+
+keyboard
+
+
+  plot(stop_crf(cell_n,:),'r');
+        hold on
+        plot(move_crf(cell_n,:),'b');
+        
 figure
 hist(burst_fraction);
 xlabel('burst fraction')

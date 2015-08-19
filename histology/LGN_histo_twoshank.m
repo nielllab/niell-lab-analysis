@@ -30,9 +30,6 @@ for i = 1:length(file);
                 rgbImage=imread(file{i,shank});
                 
                 
-                if i==6
-                    keyboard
-                end
                 for c = 1:3
                     rgbImage(:,:,c) = fliplr(rgbImage(:,:,c));
                 end

@@ -15,7 +15,7 @@ if exist(psfilename,'file')==2;delete(psfilename);end
 
 tic
 
-matlabpool
+parpool
 parfor w = 1:length(wn)
 %close all
 
@@ -147,7 +147,7 @@ params(w).exp_var=exp_var_final(w);
 end
 
 toc
-matlabpool close
+delete(gcp('nocreate'))
 
 save(afile, 'params','all_img','all_fit','all_test_img','-append');
 

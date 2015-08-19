@@ -7,7 +7,7 @@ dAdd = hex2dec('8000');      % 32768
 Vsign = 1 - 2*double(uiSignBit);
 idxNeg = find(Vsign<0);
 
-uiVal(idxNeg) = bitcmp(uiVal(idxNeg), 15); % bit-complement neg values
+uiVal(idxNeg) = bitcmp(uiVal(idxNeg),'uint32'); % bit-complement neg values
 dMod = double(uiVal) .*Vsign;              % restore sign
 dDiff = diff(dMod);
 

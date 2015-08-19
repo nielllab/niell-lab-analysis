@@ -160,7 +160,22 @@ h = hist([co ; shuffle_co]', -0.4:0.2:0.8)
 bar( -0.4:0.2:0.8, h)
 legend({'raw','shuffled'})
 
-wvfig = figure
+% wvfig = figure
+% hold on
+% for i = 1:length(co);
+%     
+% if rankCorr(i)>0.3;
+%     plot(wv(:,i),'g');
+% elseif rankCorr(i)<-0.1
+%     plot(wv(:,i),'r');
+%     else
+%          plot(wv(:,i),'b');
+% end
+% end
+
+
+if SU
+    wvfig = figure
 hold on
 for i = 1:length(co);
     
@@ -172,10 +187,8 @@ elseif rankCorr(i)<-0.1
          plot(wv(:,i),'b');
 end
 end
-
-
-if SU
     save(fullfile(apname,afname),'co','shuffle_co' ,'p','d','Rall','mouseVall','-append');
+    
 end
 
 
