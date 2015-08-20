@@ -7,7 +7,7 @@ dbstop if error
 psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
-apath = 'E:\Angie_analysis\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
+apath = 'D:\Jen_analysis\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
 N =0; cells=0;  all_img_STA={};PINPed=0; STA_peak={};stopCRF={}; moveCRF={};
 
 
@@ -16,8 +16,8 @@ for dataset = 1:1  %%% control ("wt") Scnn1a-cre/CHR2 animals vs. NR2A deleted N
     if dataset ==1
         
         
-        afiles = { '1_20_15\analysis_1_20_15_rec1.mat',...
-           };
+        afiles = { 'Scnn1a\analysis_2_27_15.mat',...
+           'Scnn1a\2_28_15\analysis_2_28_15.mat'};
 
 %     elseif dataset==2
 %         
@@ -208,14 +208,14 @@ for dataset = 1:1  %%% control ("wt") Scnn1a-cre/CHR2 animals vs. NR2A deleted N
 
         end
         
-        if exist ('wn_movement','var')
-           
-            stopCRF(cellrange)=field2array_false(wn_movement,'stopCRF');
-            moveCRF(cellrange)=field2array_false(wn_movement,'moveCRF');
-        else
-            stopCRF(cellrange)=NaN;
-            moveCRF(cellrange)=NaN;
-        end
+%         if exist ('wn_movement','var')
+%            
+%             stopCRF(cellrange)=field2array_false(wn_movement,'stopCRF');
+%             moveCRF(cellrange)=field2array_false(wn_movement,'moveCRF');
+%         else
+%             stopCRF(cellrange)=NaN;
+%             moveCRF(cellrange)=NaN;
+%         end
 
 clear m ind x y t_lag STA1
 
@@ -229,8 +229,8 @@ if exist ('wn','var')
     
     STA1{w} = STA(:,:,t_lag)-128;
 
-figure
-imagesc(STA1{1,w}'); axis equal
+% figure
+% imagesc(STA1{1,w}'); axis equal
     end
     
     STA_peak(cellrange)=STA1
@@ -301,12 +301,16 @@ end
 baseline = mean(psth_pinp(:,5:45),2);
 baseStd = std(psth_pinp(:,5:45),[],2);
 artifact = psth_pinp(:,50);
-ev = mean(psth_pinp(:,51:55),2);
+ev = mean(psth_pinp(:,51:54),2);
 evoked = ev-baseline;
+
+ev = mean(psth_pinp(:,53:55),2) - mean(psth_pinp(:,[52 56 57]),2);
+evoked = ev;
 
 zscore =evoked./baseStd;
 zscore(zscore>10)=10;
 
+lyr=alldata(:,26);
 %%% plot zscore vs evoked
 figure
 plot(zscore,evoked,'o')
@@ -324,7 +328,7 @@ xlabel('zscore'); ylabel('evoked')
 % hist(artscore',0:10)
 
 %%% choose pinped
-pinped = (zscore>3& evoked>6); 
+pinped = (zscore>1& evoked>4); 
 
 figure
 plot(baseline,ev,'o')
@@ -340,7 +344,7 @@ xlabel('baseline'); ylabel('laser')
 sprintf('%d pinped neurons total',sum(pinped))
 
 %%% define responsive
-resp = driftpeak(:,2)>1 & driftpeak(:,1)>1;
+resp = driftpeak(:,2)>2 & driftpeak(:,1)>2;
 
 %%% # spikes evoked
 nbins=8;
@@ -398,9 +402,9 @@ plotPinpData(cvOSI,N2B,1,pinped,inh,resp)
 plot([0 1],[0 1])
 title('cvOSI')
 
-plotPinpData(OSI,N2B,1,pinped,inh,resp)
-plot([0 1],[0 1])
-title('OSI')
+plotPinpData(driftwpref,wt,1,pinped,inh,resp)
+plot([0 .32],[0 .32])
+title('SF')
 
 plotPinpData(DSI,N2B,1,pinped,inh,resp)
 plot([0 1],[0 1])

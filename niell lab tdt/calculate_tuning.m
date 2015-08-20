@@ -27,7 +27,7 @@ if OSI>0.3333
     theta = 0:.01:(pi/2);
     curve = A1*exp(-0.5*(theta/w).^2) + A2*exp(-0.5*((theta-pi)/w).^2);
     curve = curve/max(curve);
-    width = interp1(curve,theta,0.5);
+    width = interp1(curve(end:-1:1),theta(end:-1:1),0.5);
 else
     width = 0;
 end

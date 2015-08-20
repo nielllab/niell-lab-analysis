@@ -361,6 +361,15 @@ end
 
 fl_thresh=1;
 
+
+%%% set age bins
+ageBins = [14 20; 21 34; 45 50]';
+[sp sperr] = sortbyage(wn_spont',age,ageBins,1);
+figure
+errorbar(mean(ageBins,1),sp,sperr);
+ylabel('wn spont rate (sp/sec)')
+
+
 [supp supperr] = sortbyage(fl_supp',age,agelist,fl_amp>fl_thresh );
 figure
 errorbar(agelist,supp, supperr);
@@ -380,6 +389,14 @@ ylabel('flash spot latency (frames)')
 figure
 errorbar(agelist,resp, resperr);
 ylabel('wx white noise)')
+
+%%wayne
+[resp resperr] = sortbyage(wx,age,ageBins,1)
+figure
+hold on
+errorbar(mean(ageBins,1),resp, resperr);
+bar(mean(ageBins,1),resp);
+ylabel('wx from wn (sp/sec)')
 
 [resp resperr] = sortbyage(fl_amp',age,agelist,1)
 figure

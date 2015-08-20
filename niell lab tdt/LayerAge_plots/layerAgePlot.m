@@ -5,7 +5,7 @@ hold on
 
 colorlist='bgrm';
 
-for age=1:4
+for age=1:3
     for group = 1:6
         if group ==1
             uselist = (ageList==age & (layer<=3) & ~inh  & used);
@@ -35,20 +35,10 @@ for age=1:4
              s = semedian(data(uselist));
              errdata_med(group,age)=s;
              errdata(group,age)=nanstd(data(uselist))/sqrt(N(group,age));             
-             alldata{group,age}= data(uselist);
-             
-       
-            plot(data(uselist),(rand(size(data(uselist)))*0.15 - 0.075)+ones(size(data(uselist)))*(group + (age-1)*0.4 - 0.2),'o','Color',colorlist(age)); hold on
-            m  = nanmedian(data(uselist));
-            s = semedian(data(uselist));
-            %plot([m m], group + (age-1)*0.4 -0.2 + [ -0.2 0.2],'Color','k','LineWidth',4);
-            %plot ([(m-s) (m-s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color','k','LineWidth',2);
-            %plot ([(m+s) (m+s)],group + (age-1)*0.4 -0.2 + [-0.2 0.2],'Color','k','LineWidth',2);
-        end
-             
+            
+        end      
     
     end
-
 
 end
 axis ij

@@ -93,8 +93,8 @@ end
 
 if isfield(flags,'mouseOn') && flags.mouseOn
    % version = input('old (0) or new (1) mouse format: ');
-display('warning - using old mouse format!!!')
-version=0;
+display('using new mouse format!!!')
+version=1;
    
   try
       [tdtData.mouseT tdtData.mouseV ] =getBlockVelocity_general(Tank_Name,Block_Name,0);

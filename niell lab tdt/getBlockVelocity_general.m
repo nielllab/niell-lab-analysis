@@ -68,6 +68,8 @@ dt = 0.1;
 Tmax = max(max(M1_T),max(M2_T))
 Tmin =max(min(M1_T),min(M2_T))
 
+
+
 tsamp = Tmin:dt:Tmax;
 M1_Xsamp = interp1(M1_T,M1_X,tsamp);
 M2_Xsamp = interp1(M2_T,M2_X,tsamp);

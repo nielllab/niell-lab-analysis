@@ -119,11 +119,11 @@ for cell_n = cell_range;
     end
     
     for rep =1:2
-        hist_fig = figure;
-        rast_fig = figure;
+%         hist_fig = figure;
+         rast_fig = figure;
         % fft_fig = figure;
         %         spont_full= figure;
-        spont_full_rast=figure;
+%         spont_full_rast=figure;
         for cond =0:n_cond-1
                   if SU
                 [Spike_Timing index numtrials Epocs_TS] = getTrialsSU(stimEpocs{block},times, cond+1, stim_duration);
@@ -173,13 +173,13 @@ for cell_n = cell_range;
             
             title_text=['Orientation: ' num2str(cond*45)];
             
-            %raster plot
+           % raster plot
             if cond<n_rows*n_col;
                 figure(rast_fig);
                 subplot(n_rows,n_col,cond+1); hold on; set(gca, 'yDir','reverse');
                 
-                %  plot (Spike_Timing, index, '.k', 'MarkerSize',4);
-                plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
+              
+               plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
                 
                 axis([0 plot_duration 0 numtrials+1]);
                 set(gca,'XTickLabel',[])
@@ -199,46 +199,46 @@ for cell_n = cell_range;
           
             %% histograms
             rate_hist = hist(Spike_Timing, hist_range)/(hist_int*numtrials);
-            if cond<n_rows*n_col
-                figure(hist_fig);
-                subplot(n_rows,n_col,cond+1);
-                bar(hist_range, rate_hist);  hold on;
-                axis(axis_range);
-                set(gca,'XTickLabel',[])
-                set(gca,'YTickLabel',[])
-                
-                
-                if cond==0
-                    title_text = sprintf('%s',Tank_Name);
-                    text(0,20,title_text,'FontSize',8);
-                end
-                if cond==1
-                    title_text = sprintf('ch%d c%d',channel_no,clust_no);
-                    text(0,20,title_text,'FontSize',8);
-                end
-                
-            end
+%             if cond<n_rows*n_col
+%                 figure(hist_fig);
+%                 subplot(n_rows,n_col,cond+1);
+%                 bar(hist_range, rate_hist);  hold on;
+%                 axis(axis_range);
+%                 set(gca,'XTickLabel',[])
+%                 set(gca,'YTickLabel',[])
+%                 
+%                 
+%                 if cond==0
+%                     title_text = sprintf('%s',Tank_Name);
+%                     text(0,20,title_text,'FontSize',8);
+%                 end
+%                 if cond==1
+%                     title_text = sprintf('ch%d c%d',channel_no,clust_no);
+%                     text(0,20,title_text,'FontSize',8);
+%                 end
+%                 
+%             end
                 
             
-            if cond>=n_rows*n_col & full_field%%% blank frame or full-field, but only plot if full-field is on
-                %                 figure(spont_full)
-                %                 subplot(2,1,cond-n_rows*n_col +1);
-                %                 bar(hist_range, rate_hist);  hold on;
-                %                 axis(axis_range);
-                %                 set(gca,'XTickLabel',[])
-                %                 set(gca,'YTickLabel',[])
-                %                 title(title_text);
-                %
-                figure(spont_full_rast);
-                
-                subplot(2,1,cond-n_rows*n_col +1);
-                hold on; set(gca, 'yDir','reverse');
-                plot (Spike_Timing, index, '.k', 'MarkerSize',8);
-                axis([0 plot_duration 0 numtrials+1]);
-                set(gca,'XTickLabel',[])
-                set(gca,'YTickLabel',[])
-                title(title_text);
-            end
+%             if cond>=n_rows*n_col & full_field%%% blank frame or full-field, but only plot if full-field is on
+%                 %                 figure(spont_full)
+%                 %                 subplot(2,1,cond-n_rows*n_col +1);
+%                 %                 bar(hist_range, rate_hist);  hold on;
+%                 %                 axis(axis_range);
+%                 %                 set(gca,'XTickLabel',[])
+%                 %                 set(gca,'YTickLabel',[])
+%                 %                 title(title_text);
+%                 %
+%                 figure(spont_full_rast);
+%                 
+%                 subplot(2,1,cond-n_rows*n_col +1);
+%                 hold on; set(gca, 'yDir','reverse');
+%                 plot (Spike_Timing, index, '.k', 'MarkerSize',8);
+%                 axis([0 plot_duration 0 numtrials+1]);
+%                 set(gca,'XTickLabel',[])
+%                 set(gca,'YTickLabel',[])
+%                 title(title_text);
+%             end
             
             
             %%fourier analysis
@@ -285,7 +285,7 @@ for cell_n = cell_range;
 %             spikeR
         end  %% cond
         
-        title_text = sprintf('channel %d cluster %d',channel_no, clust_no);
+%         title_text = sprintf('channel %d cluster %d',channel_no, clust_no);
         
         if blank_stim
             spont_avg = R(cell_n,n_rows*n_col+1);
@@ -299,20 +299,20 @@ for cell_n = cell_range;
         
         
         
-        plotcolor = 'bgrcmykbgr';
+%         plotcolor = 'bgrcmykbgr';
         
-        tuning_fig = figure;
+%         tuning_fig = figure;
         
         
         %for f= 1:n_col;
-        for f = 1:n_col
-            plot(R(cell_n,f:n_col:f+n_col*(n_rows-1))-spont_avg,plotcolor(f));
-            hold on;
-        end
-        title(title_text);
-        legend('.01 cpd','.02cpd','.04cpd','.08cpd','.16cpd','.32cpd')
+%         for f = 1:n_col
+%             plot(R(cell_n,f:n_col:f+n_col*(n_rows-1))-spont_avg,plotcolor(f));
+%             hold on;
+%         end
+%         title(title_text);
+%         legend('.01 cpd','.02cpd','.04cpd','.08cpd','.16cpd','.32cpd')
        
-        %set(gca,'XTickLabel',['0' '45' '90' '135' '180' '225' '270' '315']);
+       
              
         
         %% calculate tuning parameters
@@ -485,14 +485,14 @@ for cell_n = cell_range;
                 
         title_text = sprintf('%s ch%d cl%d',Tank_Name, channel_no,clust_no);
         
-        if printfig
-            print(hist_fig);
-        end
+%         if printfig
+%             print(hist_fig);
+%         end
 
-        xlabel('secs');
+%         xlabel('secs');
         
 %         saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-%         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
 %         saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
        
         %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
@@ -502,9 +502,9 @@ for cell_n = cell_range;
 %         clear rast_fig;
     
   for i = 1:length(cell_n)
-    figure(hist_fig(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
+%     figure(hist_fig(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
     
     figure(rast_fig(i))
     set(gcf, 'PaperPositionMode', 'auto');
@@ -516,33 +516,33 @@ for cell_n = cell_range;
    
     end %%% rep
     
-    both_theta=figure
-    plot(theta_ind*180/pi,drift(cell_n,1).thetatuning+drift(cell_n,1).spont)
-    hold on
-    plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,1).spont,':')
-    plot(theta_ind*180/pi,drift(cell_n,2).thetatuning+drift(cell_n,2).spont,'g')
-    plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,2).spont,'g:')
-%     saveas(both_theta,fullfile(apname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
-    
-    both_sf=figure
-    plot(interp_sfs,drift(cell_n,1).sftuning+drift(cell_n,1).spont);
-    hold on
-    plot(interp_sfs,ones(25,1)*drift(cell_n,1).spont,':')
-    plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
-    plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
-%     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+%     both_theta=figure
+%     plot(theta_ind*180/pi,drift(cell_n,1).thetatuning+drift(cell_n,1).spont)
+%     hold on
+%     plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,1).spont,':')
+%     plot(theta_ind*180/pi,drift(cell_n,2).thetatuning+drift(cell_n,2).spont,'g')
+%     plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,2).spont,'g:')
+% %     saveas(both_theta,fullfile(apname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+%     
+%     both_sf=figure
+%     plot(interp_sfs,drift(cell_n,1).sftuning+drift(cell_n,1).spont);
+%     hold on
+%     plot(interp_sfs,ones(25,1)*drift(cell_n,1).spont,':')
+%     plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
+%     plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
+% %    saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
   
-    
-for i = 1:length(cell_n)
-    figure(both_theta(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-    
-    figure(both_sf(i))
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-    
-end
+%     
+% for i = 1:length(cell_n)
+%     figure(both_theta(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+%     
+%     figure(both_sf(i))
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+%     
+% end
 
  close all
 end
@@ -550,8 +550,8 @@ end
 %convert ps file to PDfs
 
 
-%   ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-%   delete(psfilename);
+  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+  delete(psfilename);
 
 if use_afile
     
@@ -563,7 +563,8 @@ if use_afile
     save(afile, 'drift','-append');
 end
 
-ps2pdf(fname);
+%  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+%   delete(psfilename);
 
 % invoke(TTX, 'CloseTank');
 % invoke(TTX, 'ReleaseServer');

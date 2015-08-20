@@ -24,11 +24,12 @@ if null<0 %%% had to add this to keep things good
 end
 
 OSI = (peak-null)/(peak+null);
-if OSI>0.3333
+if OSI>0.34 & peak>0
     theta = 0:.01:(pi/2);
     curve = B+A1*exp(-0.5*(theta/w).^2) + A2*exp(-0.5*((theta-pi)/w).^2);
     curve = curve/max(curve);
-    width = interp1(curve,theta,0.5);
+    thresh = find(curve<0.5);
+    width = interp1(curve(1:thresh(1)),theta(1:thresh(1)),0.5);
 else
     width = 0;
 end
