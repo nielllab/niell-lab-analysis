@@ -1,20 +1,8 @@
-%%% get OSI
 
-%%% get transience
-
-%%% get on/off
-
-%%% get burst/ firing pattern
-
-%%% get crf
-
-%%% compare crf, bursting with running
-
-
-%%% get grating response with speed
 
 if ~exist('drift_mv_all','var')
-    load ('adultData061715.mat')
+    %load ('adultData061715.mat')
+    load ('adultData090815.mat')
 end
 if ~exist('moviedata','var')
     load('C:\wn016alpha1_10hzLg60Hz.mat')
@@ -176,8 +164,11 @@ if ~exist('sta_all','var')
             sta_all= zeros(size(moviedata,1),size(moviedata,2),9);
             %figure
             fnum=movement_all(c).frameNum;
+            lagframes= find(spikehist>0);
+            lagframes=lagframes(lagframes>10);
             for lag = 1:9
-                for i = (lag+1):length(spikehist);
+               % for i = (lag+1):length(spikehist);
+               for i = lagframes
                     sta_all(:,:,lag) =sta_all(:,:,lag)+spikehist(i)*moviedata(:,:,fnum(i-lag));
                 end
                 
@@ -328,6 +319,9 @@ if ~exist('sta_all','var')
         toc
     end
 end
+
+keyboard
+
 staUse = find(max(abs(reshape(meanSTAall,size(meanSTAall,1),size(meanSTAall,2)*size(meanSTAall,3))),[],2)>0.06);
 %%%staUse=staUse(staUse<143)
 
@@ -391,7 +385,7 @@ end
 clear lfpTrig lfpTrigFFT lfpTrigFFTcontrol coh
 
 if false %%% lfp coherence analysis
-for c = 1:length(movement_all)
+for c = 1:length(drift_all)
  
       params.Fs = 1/(median(diff(movement_all(c).lfpT)));
     params.tapers = [3 5];
@@ -417,7 +411,7 @@ for c = 1:length(movement_all)
         end       
     end
 end   
-for c=1:length(movement_all)
+for c=1:length(drift_all)
    if ~isempty(movement_all(c).mvlfp_tdata)
        lastT = max(movement_all(c).lfpT);
     lfpAll = zeros(2,length(movement_all(c).spikes),1001);
@@ -515,7 +509,8 @@ for i = 1:length(mn_orient_tune);
 end
 
 figure
-plot(squeeze(cvOSIall(1,1,:)),squeeze(cvOSIall(1,2,:)),'o')
+plot(squeeze(cvOSIall(1,1,:)),squeeze(cvOSIall(1,2,:)),'o'); axis equal
+hold on; plot([0 0.8],[0 0.8])
 
 figure
 hist(squeeze(cvOSIall(1,1,:)),0.05:0.1:1)
@@ -523,7 +518,6 @@ xlabel('stop osi')
 
 figure
 hist(squeeze(cvOSIall(1,2,:)),0.05:0.1:1)
-
 xlabel('move osi')
 
 cvOSIavg = squeeze(nanmean(cvOSIall,2));
