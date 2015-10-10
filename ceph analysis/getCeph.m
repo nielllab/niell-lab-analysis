@@ -76,7 +76,7 @@ imagesc(thresh_im(:,:,1))
 
 %%% go through binarized images and grab the biggest one
 display('getting regions')
-labelmov = zeros(size(thresh_im,1),size(thresh_im,2),3,size(thresh_im,3));
+%labelmov = zeros(size(thresh_im,1),size(thresh_im,2),3,size(thresh_im,3));
 clear obj
 for fr = 1:size(thresh_im,3)
     label(:,:,fr) = bwlabel(thresh_im(:,:,fr),8);
@@ -87,10 +87,11 @@ for fr = 1:size(thresh_im,3)
     orient(fr) = props(ind).Orientation;
     centroid(fr,:) = props(ind).Centroid;
     label(:,:,fr) = label(:,:,fr)==ind;
-    labelmov(:,:,1,fr) = label(:,:,fr); labelmov(:,:,2,fr) = label(:,:,fr); labelmov(:,:,3,fr) = label(:,:,fr);
+   % labelmov(:,:,1,fr) = label(:,:,fr); labelmov(:,:,2,fr) = label(:,:,fr); labelmov(:,:,3,fr) = label(:,:,fr);
 end
 figure
 imagesc(label(:,:,1))
+clear labelmov
 
 figure
 plot(centroid(:,1),centroid(:,2));
@@ -240,12 +241,13 @@ end
 display('might want to check warped movie to determine frames')
 keyboard
 
-im_warp = im_warp(:,:,10:59);
+im_warp = im_warp(:,:,1:end);
 
 %%% select chromatophores
 mn = mean(im_warp,3);
 mask = zeros(size(im_warp));
 clear sz
+maskfig=figure
 mnfig= figure;
 imagesc(mean(im_warp,3)); axis equal; colormap gray;
 for spot = 1:10
@@ -263,6 +265,8 @@ for spot = 1:10
         mask(:,:,fr) =   mask(:,:,fr)+spot*outline;      
         sz(fr,spot) = sqrt(sum(sum(obj)));
     end
+    close(mnfig)
+    
     figure
     imagesc(mean(mask,3)); axis equal
 end
@@ -270,11 +274,13 @@ end
 %%% plot sizes
 figure
 plot(sz);
-sz (sz==0)= NaN; sz(sz>20)=NaN;
+sz (sz==0)= NaN; sz(sz>15)=NaN;
 legend; ylabel('size'); xlabel('frame')
+figure
+plot(sz);
 
 %%% plot correlations
-cc= corrcoef(sz(1:38,:),'rows','pairwise');
+cc= corrcoef(sz,'rows','pairwise');
 figure
 imagesc(cc,[-1 1]); colormap jet
 title('size correlations')
@@ -296,7 +302,7 @@ axis([60 240 50 500]); axis off
 set(gca,'LooseInset',get(gca,'TightInset'))
 
 %%% normalize sizes and subtract min size
-sz =sz(1:48,:)
+
 clear normsz
 for sp = 1:size(sz,2);
     normsz(:,sp) = (sz(:,sp)-min(sz(:,sp)))/nanstd(sz(:,sp));
