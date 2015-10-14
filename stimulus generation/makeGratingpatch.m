@@ -7,8 +7,8 @@ isi = 3.5;
 sfrange = [ 0.1 0.2];
 tfrange =[ 0 ];
 %phaserange = [0 0 0 0 0];
-phaserange = linspace(0, 2*pi,9);
-phaserange=phaserange(1:8);
+phaserange = linspace(0, 2*pi,9)
+phaserange=phaserange(1:8)
 
 ntheta = 1;
 nx = 2; ny =1;

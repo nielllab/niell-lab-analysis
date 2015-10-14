@@ -17,9 +17,9 @@ else %%% .avi file
    display('reading avi')
    vr= VideoReader(fullfile(p,f));
     fr=0;
-    im = zeros(vr.Height,vr.Width,vr.Framerate*vr.duration,'uint8');
-   % im = zeros(vr.Height,vr.Width,500,'uint8');
-    while (hasFrame(vr)) 
+    %im = zeros(vr.Height,vr.Width,vr.Framerate*vr.duration,'uint8');
+    im = zeros(vr.Height,vr.Width,500,'uint8');
+    while (hasFrame(vr)) & fr<500
         fr=fr+1;
         frame = readFrame(vr,'native');
         im(:,:,fr) = frame(:,:,1);
@@ -52,6 +52,7 @@ display('normalizing')
 for fr = 1:size(im,3);
     im(:,:,fr) = im(:,:,fr)/brightness(fr);
 end
+clear im
 
 figure
 imagesc(im(:,:,1))
@@ -65,7 +66,7 @@ imagesc(std_img);
 figure
 imagesc(std_img>0.05);
 
-for fr = 1:size(im,3);
+for fr = 1:size(norm_im,3);
    im(:,:,fr) = im(:,:,fr).*(std_img>0.05);
 end
 im(im==0)=NaN;
@@ -101,8 +102,7 @@ for fr = 1:size(thresh_im,3)
     obj(fr) = props(ind);
     orient(fr) = props(ind).Orientation;
     centroid(fr,:) = props(ind).Centroid;
-    label = label==ind;
-    im(:,:,fr)=label.*im(:,:,fr);
+  %  label(:,:,fr) = label(:,:,fr)==ind;
    % labelmov(:,:,1,fr) = label(:,:,fr); labelmov(:,:,2,fr) = label(:,:,fr); labelmov(:,:,3,fr) = label(:,:,fr);
 end
 figure
@@ -110,28 +110,28 @@ imagesc(label)
 
 
 figure
-plot(centroid(:,1),centroid(:,2));axis ([1 size(im,2) 1 size(im,1)])
+plot(centroid(:,1),centroid(:,2));
 title('centroid position')
 
+im_masked = label.*norm_im;
 figure
-imagesc(im(:,:,1));
-clear label thresh_im
+imagesc(im_masked(:,:,1));
+clear label norm_im
 
 
 %%% check bounds of centroid
 w = 250;
 centroid = max(centroid,w+1);
-centroid(:,1) = min(centroid(:,1),size(im,2)-w);
-centroid(:,2) = min(centroid(:,2),size(im,1)-w);
+centroid(:,1) = min(centroid(:,1),size(im_masked,2)-w);
+centroid(:,2) = min(centroid(:,2),size(im_masked,1)-w);
 centroid = round(centroid);
 
 %%% choose block around centroid and rotate it to match
 display('getting blocks')
 range = -w:w;
-imblock_rot = zeros(length(range),length(range),size(im,3));
-for fr = 1:size(im,3);
-    imblock = im(centroid(fr,2)+range,centroid(fr,1)+range,fr);
-    imblock_rot(:,:,fr) = imrotate(imblock,90-orient(fr),'crop');
+for fr = 1:size(im_masked,3);
+    imblock(:,:,fr) = im_masked(centroid(fr,2)+range,centroid(fr,1)+range,fr);
+    imblock_rot(:,:,fr) = imrotate(imblock(:,:,fr),90-orient(fr),'crop');
     if fr>1;
       %%% orientation is ambiguous (up/down) so use correlation to first
       %%% image as match
@@ -141,6 +141,8 @@ for fr = 1:size(im,3);
     end
     
 end
+
+clear im_block
 
 figure
 imagesc(imblock_rot(:,:,1))
@@ -160,7 +162,6 @@ for fr = 1:size(imblock_rot,3)
     end
 end
 
-clear im
 
 %%% calculate correlation of image over time, to find stable periods
 %%% (just for trouble-shooting, doesn't get used
@@ -169,10 +170,12 @@ imsparse = imblock_rot(dx:dx:end,dx:dx:end,:);
 imsparse = reshape(imsparse,size(imsparse,1)*size(imsparse,2),size(imsparse,3));
 imsparse = imsparse>0;
 tic
-cc = corrcoef(imsparse);
+cc = corrcoef(imsparse)
 toc
 figure
 imagesc(cc)
+figure
+plot(cc(1,:))
 
 %%% get correlation of each frame with mean image, to find good matches
 meanimg = (mean(imblock_rot>0,3)>0.5); axis equal
