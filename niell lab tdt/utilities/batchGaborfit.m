@@ -5,11 +5,10 @@
 
 
 
-afiles = {'NR2A\KO\7_29_15\analysis_2.mat',...
-    'NR5A_Pinping\6_25_15\analysis_2.mat',...
-    'NR2A\KO\7_17_15\7_17_15\analysis.mat'}
+afiles = {'NR2A\KO\9_14_15\analysis_9_14_15.mat',...
+    'NR2A\KO\9_16_15\analysis_2.mat'}
 
-apath = 'D:\Jen_analysis\';
+apath = 'E:\jennifer\Jennifer_analysis\';
        % for i = 1:length(afiles)
         for i = 1:length(afiles)
             afiles{i}
