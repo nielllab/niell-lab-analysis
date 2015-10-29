@@ -7,6 +7,7 @@ function noise_analysis(clustfile,afile,pdfFile,movieFile,Block_Name,blocknum,mo
 
 %%% read in cluster data, then connect to the tank and read the block
 close all
+dbstop if error
 
 if ~exist('Block_Name','var');
     SU = menu('recording type','multi-unit','single unit')-1;
@@ -53,7 +54,7 @@ end
 Block_Name
 
 if ~useArgin
-    [fname pname] = uigetfile('*.mat','movie file','C:\Users\lab\Desktop\movie files\cortex\step_binary_wn_5min.mat');
+    [fname pname] = uigetfile('*.mat','movie file','C:\Users\lab\Desktop\movie files\cortex\');
     movieFile = fullfile(pname,fname);
 end
 load(movieFile);
@@ -170,7 +171,7 @@ end
 % figure
 % imagesc(movavg-127,[-64 64])
 
-matlabpool
+parpool
 tic
 
 if movietype==mv_noise
@@ -637,7 +638,6 @@ for cell_n = cell_range
             
             %%%%% histrograms relative to onset/offset
             timefig = figure;
-            clear onset_hist
             sizes = [1 2 4 8 16 255];
             for rep = 1:2
                 for sz = 1:length(sizes);
@@ -692,15 +692,21 @@ for cell_n = cell_range
                         plot(t,ones(length(t),1)*i,[c '*'])
                         if ~isempty(t)
                             h =h+ histc(t, histbins);
+                      
                         end
                     end
                     
                     if length(h)>1
+                        clear onset_hist
+                        
                         subplot(2,1,2)
                         hold on
                         plot(histbins(1:end-1)+dt/2,h(1:end-1)/(n*dt),c)
                         onset_hist(rep,sz,:) = h(1:end-1)/(n*dt);
                         onset_bins=histbins;
+                    else
+                        onset_hist=NaN
+                        onset_bins=histbins
                     end
                 end
             end
@@ -1012,6 +1018,7 @@ for cell_n = cell_range
             
             saveas(timefig,fullfile(noisepname,sprintf('flash_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+            %saveas(tuningfig,fullfile(noisepname,sprintf('flash_tuning_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
             figure(timefig)
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
@@ -1034,6 +1041,8 @@ for cell_n = cell_range
             fl(cell_n).onset_bins=onset_bins;
             fl(cell_n).sta_pos=[x y];
             
+   if ~isnan(onset_hist);
+       
                OnOffFlash;
      fl(cell_n).sustainBias=sustain;
      fl(cell_n).onoffbias = onoffbias;
@@ -1041,7 +1050,15 @@ for cell_n = cell_range
      fl(cell_n).rf = rf;
      fl(cell_n).resps = resps; %%% timecourse averaged over sizes
      fl(cell_n).flash_resp = flash_resp;  %%% mean response for on/off and size
-            
+   else
+     fl(cell_n).sustainBias=NaN;
+     fl(cell_n).onoffbias = NaN;
+     fl(cell_n).RFzcore = NaN;
+     fl(cell_n).rf = NaN;
+     fl(cell_n).resps = NaN; %%% timecourse averaged over sizes
+     fl(cell_n).flash_resp = NaN;
+     
+   end
         elseif movietype==mv_noise
             
             saveas(timefig,fullfile(noisepname,sprintf('move_time_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
@@ -1073,11 +1090,11 @@ for cell_n = cell_range
         
     end
 
-    
+close all
 %         OnOffFlash
 end  %%%cell
 
-% matlabpool close
+% parpool close
 % 
 if movietype==cm_noise
     post = input('post doi? 0/1 : ');
@@ -1095,4 +1112,4 @@ elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
 end
-%matlabpool close
+delete(gcp('nocreate'))
