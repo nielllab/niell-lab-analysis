@@ -205,29 +205,30 @@ plot(match)
 
 %%% save out aligned tif movie for stable periods
 imblock_rot_sm = imresize(imblock_rot(:,:,matchfilt>0.95),1);
-for fr = 1:size(imblock_rot_sm,3)
-    fr
-    if fr==1
-        imwrite(imblock_rot_sm(:,:,fr),fullfile(p,[f(1:end-4) '_stable.tif']),'tiff');
-    else
-        imwrite(imblock_rot_sm(:,:,fr),fullfile(p,[f(1:end-4) '_stable.tif']),'tiff','Writemode','append');
-    end
-end
-
+% for fr = 1:size(imblock_rot_sm,3)
+%     fr
+%     if fr==1
+%         imwrite(imblock_rot_sm(:,:,fr),fullfile(p,[f(1:end-4) '_stable.tif']),'tiff');
+%     else
+%         imwrite(imblock_rot_sm(:,:,fr),fullfile(p,[f(1:end-4) '_stable.tif']),'tiff','Writemode','append');
+%     end
+% end
+% 
 %%% "warp" moving along x-axis, aligning to mean. Intended to compensate
 %%% for side to side movement/twisting
-mn = mean(imblock_rot_sm>0,3)
-for fr = 1:size(imblock_rot_sm,3)
-    fr
-    for i = 1:size(imblock_rot_sm,1);
-        [xc lag] = xcorr(double(mn(i,:)),double(squeeze(imblock_rot_sm(i,:,fr)>0)));
-        [m ind] = max(xc);
-        shift = lag(ind);
-        im_warp(i,:,fr) = circshift(squeeze(imblock_rot_sm(i,:,fr))',[shift 0]);
-    end
-end
+% mn = mean(imblock_rot_sm>0,3);
+% display('warping')
+% for fr = 1:size(imblock_rot_sm,3)
+%     for i = 1:size(imblock_rot_sm,1);
+%         [xc lag] = xcorr(double(mn(i,:)),double(squeeze(imblock_rot_sm(i,:,fr)>0)));
+%         [m ind] = max(xc);
+%         shift = lag(ind);
+%         im_warp(i,:,fr) = circshift(squeeze(imblock_rot_sm(i,:,fr))',[shift 0]);
+%     end
+% end
 
 %%% save out "warped" movie
+im_warp = imblock_rot_sm;
 for fr = 1:size(imblock_rot_sm,3)
     fr
     if fr==1
