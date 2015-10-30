@@ -36,4 +36,11 @@ sprintf('mean time to capture')
 sprintf('light = %f sec',mean(latency(lighting==1))/60)
 sprintf('dark = %f sec',mean(latency(lighting==0))/60)
 
+d = [mean(latency(lighting==1)) mean(latency(lighting==0))]/60;
+err = [std(latency(lighting==1))/sqrt(sum(lighting==1)) std(latency(lighting==0))/sqrt(sum(lighting==0))]/60;
+figure
+barweb(d,err)
+ylabel('secs to caputure')
+legend('light','dark')
+
 
