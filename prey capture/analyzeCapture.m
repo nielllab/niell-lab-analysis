@@ -41,8 +41,8 @@ axis([ 0 2000 0 1200])
 %%% distance between head and target
 r = sqrt((head(:,1) - targ(:,1)).^2 + (head(:,2) - targ(:,2)).^2);
 subplot(2,3,2)
-plot(r); ylabel('distance to target')
-xlim([1 length(r)]); ylim([0 2000])
+plot((1:length(r))/60,r); ylabel('distance to target')
+xlim([1 length(r)]/60); ylim([0 2000])
 
 %%%% mouse speed
 vbody = diff(body); vbody = sqrt(vbody(:,1).^2 + vbody(:,2).^2);
@@ -59,7 +59,7 @@ targtheta = getSmoothAngle(targvec);
 
 neckvec = head-body;
 necktheta = getSmoothAngle(neckvec);
-
+headtheta = necktheta;
 
 % plot((necktheta-headtheta)*180/pi)
 % ylabel('head angle wrt body'); ylim([-45 45])
@@ -67,9 +67,9 @@ necktheta = getSmoothAngle(neckvec);
 
 %%% head angle and target position
 subplot(2,3,3)
-plot(mod(headtheta*180/pi,360)); hold on; plot(mod(targtheta*180/pi,360),'g');
+plot((1:length(headtheta))/60,mod(headtheta*180/pi,360)); hold on; plot((1:length(headtheta))/60,mod(targtheta*180/pi,360),'g');
 legend('head','targ'); ylabel('theta'); xlabel('time');
-xlim([1 length(headtheta)])
+xlim([1 length(headtheta)]/60)
 
 % %%% angle between head and target
 % figure
@@ -77,36 +77,38 @@ xlim([1 length(headtheta)])
 %  plot([1 length(targtheta)],[0 0 ],'r');
 % ylabel('head wrt target')
 
-%%% calculate correlation between head angle and target location
-opt = 'unbiased';
-[xc lags] = xcorr(headtheta,targtheta,opt); t0= find(lags==0);
-cc = corrcoef(headtheta,targtheta);
-subplot(2,3,4)
-hold on; 
-[headxc] = xcorr(headtheta,headtheta,opt);
-hold on; plot(lags,headxc/headxc(t0),'Linewidth',2);
-[targxc] = xcorr(targtheta,targtheta,opt);
-plot(lags,targxc/targxc(t0),'g','Linewidth',2)
-plot(lags,xc*cc(1,2)/xc(t0),'k','Linewidth',2); 
-plot([0 0], [0 1.2],'r');
-legend('head','targ','head vs targ')
-xlabel('lag');
-ylabel('correlation')
-headxc = headxc(lags>=-100 & lags<=100);
-targxc = targxc(lags>=-100 & lags<=100);
-xc = xc(lags>=-100 & lags<=100);
+% %%% calculate correlation between head angle and target location
+% opt = 'unbiased';
+% [xc lags] = xcorr(headtheta(r>200),targtheta(r>200),opt); t0= find(lags==0);
+% cc = corrcoef(headtheta(r>200),targtheta(r>200));
+% subplot(2,3,4)
+% hold on; 
+% [headxc] = xcorr(headtheta(r>200),headtheta(r>200),opt);
+% hold on; plot(lags,headxc/headxc(t0),'Linewidth',2);
+% [targxc] = xcorr(targtheta(r>200),targtheta(r>200),opt);
+% plot(lags,targxc/targxc(t0),'g','Linewidth',2)
+% plot(lags,xc*cc(1,2)/xc(t0),'k','Linewidth',2); 
+% plot([0 0], [0 1.2],'r');
+% legend('head','targ','head vs targ')
+% xlabel('lag');
+% ylabel('correlation')
+% headxc = headxc(lags>=-100 & lags<=100);
+% targxc = targxc(lags>=-100 & lags<=100);
+% xc = xc(lags>=-100 & lags<=100);
 
+lags = -300:300;
 subplot(2,3,4); hold off
-xc=lagCircRMS(headtheta,targtheta,-300:300);
-plot(-300:300,xc,'k');
+xc=lagCircRMS(headtheta,targtheta,lags);
+plot(lags/60,xc,'k');
 hold on
-plot(-300:300,lagCircRMS(headtheta,headtheta,-300:300),'b')
-plot(-300:300,lagCircRMS(targtheta,targtheta,-300:300),'g')
-axis([-300 300 -1 1])
+plot(lags/60,lagCircRMS(headtheta,headtheta,lags),'b')
+plot(lags/60,lagCircRMS(targtheta,targtheta,lags),'g')
+axis([lags(1)/60 lags(end)/60 -1 1]); plot([0 0], [-1 1],'r:');
+ylabel('angle corr')
 
 
 %%% correlation between target movement and head movement
-dt = 10;
+dt = 6;
 
 vhead = headtheta((1+dt):end)- headtheta(1:end-dt);
 vtarg = targtheta((1+dt):end)- targtheta(1:end-dt);
@@ -118,14 +120,14 @@ vtarg = targtheta((1+dt):end)- targtheta(1:end-dt);
 
 %plot(vhead); hold on; plot(vtarg,'g')
 [vxc lags] = xcorr(vhead,vtarg,'coeff');
-vxc = conv(vxc,ones(1,100),'same')/100;
-vxc = vxc(lags>=-300 & lags<=300);
-lags = lags(lags>=-300 & lags<=300);
+%vxc = conv(vxc,ones(1,100),'same')/100;
+vxc = vxc(lags>=-120 & lags<=120);
+lags = lags(lags>=-120 & lags<=120);
 subplot(2,3,5)
 plot(lags/60,vxc,'Linewidth',2);
 xlabel('secs')
-ylabel('xcorr'); legend('head vs targ angular vel')
-axis([ -5 5 -0.1 0.2 ])
+ylabel('speed corr'); %legend('head vs targ angular vel')
+axis([ -2 2 -0.25 0.5 ]); hold on; plot([0 0],[-0.25 0.5],'r:')
 
 %%% how far off? head angle and distance
 % figure

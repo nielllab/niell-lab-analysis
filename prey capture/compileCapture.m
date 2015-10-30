@@ -1,4 +1,4 @@
-close all
+%close all
 clear all
 
 captureBatch
@@ -22,14 +22,14 @@ title('light')
 
 subplot(2,2,2);
 plot((-300:300)/60,mean(xc(:,lighting==0),2)); axis([-5 5 -1 1])
-hold on; plot([0 0],[-1 1],'r')
+hold on; plot([0 0],[-1 1],'r:')
 plot((-300:300)/60,mean(xc(:,lighting==1),2),'g');axis([-5 5 -1 1])
 title('angle corr'); xlabel('secs')
 
 subplot(2,2,4);
-plot((-300:300)/60,mean(vxc(:,lighting==0),2)); axis([-5 5 -0.1 0.2])
-hold on; plot([0 0],[-1 1],'r')
-plot((-300:300)/60,mean(vxc(:,lighting==1),2),'g');axis([-5 5 -0.1 0.2])
+plot((-120:120)/60,mean(vxc(:,lighting==0),2)); axis([-2 2 -0.25 0.5])
+hold on; plot([0 0],[-1 1],'r:')
+plot((-120:120)/60,mean(vxc(:,lighting==1),2),'g');axis([-2 2 -0.25 0.5])
 title('speed corr'); xlabel('secs')
 
 sprintf('mean time to capture')
