@@ -1,4 +1,4 @@
-%%% load cluster file
+function [spikes mouseT mouseV framenums frametimes] = getMovieData %%% load cluster file
 [fname, pname] = uigetfile('*.mat','cluster data');
 clustfile=fullfile(pname,fname);
 load(clustfile);
@@ -14,9 +14,14 @@ Block_Name = Block_Name{blocknum}
 %%% get mouse data and stim timing
 flags = struct('mouseOn',1,'visStim',1);
 tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
-tsampDark = tdtData.mouseT;  %%% time points for speed measurements
-vsmoothDark = tdtData.mouseV;  %%% speed
-framenums = tdtData.frameEpocs;  %%% stim timing (frame # and time)
+
+mouseT = tdtData.mouseT;  %%% time points for speed measurements
+mouseV = tdtData.mouseV;  %%% speed
+
+framenums = tdtData.frameEpocs(1,:); %%% frame numbers
+frametimes = tdtData.frameEpocs(2,:);  %%% onset of each frame
+
+clear tdtData;
 
 %%% get spikes for this cell and block
 for c = 1:length(spikeT)   
