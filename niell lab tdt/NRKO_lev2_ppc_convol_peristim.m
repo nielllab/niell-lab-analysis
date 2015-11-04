@@ -8,7 +8,8 @@ output  = 'lev2_ppc_convol_peristim';
 
 % loop over the various files
 nDirs = length(info);
-for iDir = 1:nDirs
+
+for iDir =1:nDirs
   load(fullfile(outputDir, input, info(iDir).dataname, input));
   
   % different ppc versions, angle, rayleigh test
@@ -34,5 +35,7 @@ for iDir = 1:nDirs
   % save the STS
   filename = fullfile(outputDir, output, info(iDir).dataname, output);
   mkdir(fullfile(outputDir, output, info(iDir).dataname));
+  if exist ('stat', 'var')
   save(filename, 'stat')
+  end
 end

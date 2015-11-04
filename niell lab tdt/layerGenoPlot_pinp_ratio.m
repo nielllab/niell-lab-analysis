@@ -1,4 +1,4 @@
-function [mediandata errdata ratio]  =layerGenoPlot_pinp_ratio(data1,data2,pinp,geno,layer,inh,exc,used,label)
+function [mediandata errdata ratio]  =layerGenoPlot_pinp_ratio(data1,data2,pinp,geno,layer,used,label)
 %plot ratio of data1 vs data2 with CIs by layer
 pinp=pinp;
 geno=geno';
@@ -7,15 +7,15 @@ for GT = 1:3
     
 for P=1:2
     
-    for group = 1:4
+    for group = 1:2
         if group ==1
-            uselist = (geno==GT & pinp==P & layer<=3 & exc & used);
+            uselist = (geno==GT & pinp==P & layer<=4 & used);
         elseif group==2
-            uselist = (geno==GT & pinp==P & layer==4 & exc & used);
-        elseif group==3
-            uselist = (geno==GT & pinp==P & layer==5 & exc & used);
-        elseif group==4  
-             uselist = (geno==GT & pinp==P & inh & used);
+            uselist = (geno==GT & pinp==P  & used);
+%         elseif group==3
+%             uselist = (geno==GT & pinp==P & layer==5 & exc & used);
+%         elseif group==4  
+%              uselist = (geno==GT & pinp==P & inh & used);
         end
    
         if sum(uselist)>1

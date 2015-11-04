@@ -9,6 +9,9 @@ outputDir = 'D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_files
 inputDir  = 'D:/Jen_analysis/NR5A_Pinping/Jen_NR5A_analysis_files/analysis_files/Martin_analysis/Data/Hoy';
 
 info      = [];
+
+%%1==wt, 0==N2BKO, 2==N2AKO
+
 % info(end+1).dataname = '2_2_15_analysis_2'; 
 % info(end).datafile   = fullfile(inputDir, '2_2_15_analysis_2');
 % info(end).stimDur    = 3.0535;
@@ -126,101 +129,133 @@ info(end).genotype   = 0;
 
 info(end+1).dataname = '6_23_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '6_23_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 info(end+1).dataname = '6_25_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '6_25_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 1;
 
 info(end+1).dataname = '6_26_15_analysis_2A'; 
 info(end).datafile   = fullfile(inputDir, '6_26_15_analysis_2A');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 info(end+1).dataname = '6_28_15_analysis_2A'; 
 info(end).datafile   = fullfile(inputDir, '6_28_15_analysis_2A');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 2;
 
 info(end+1).dataname = '6_29_15_analysis_2A'; 
 info(end).datafile   = fullfile(inputDir, '6_29_15_analysis_2A');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 1;
 
 info(end+1).dataname = '6_30_15_analysis_2B'; 
 info(end).datafile   = fullfile(inputDir, '6_30_15_analysis_2B');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 2;
 
 info(end+1).dataname = '7_1_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '7_1_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 info(end+1).dataname = '7_29_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '7_29_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 2;
+
+info(end+1).dataname = '8_7_15_analysis_2A'; 
+info(end).datafile   = fullfile(inputDir, '8_7_15_analysis_2A');
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
+info(end).genotype   = 2;
+
+info(end+1).dataname = '8_10_15_analysis_2A'; 
+info(end).datafile   = fullfile(inputDir, '8_10_15_analysis_2A');
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
+info(end).genotype   = 1;
 
 info(end+1).dataname = '8_11_15_analysis_2A'; 
 info(end).datafile   = fullfile(inputDir, '8_11_15_analysis_2A');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
+info(end).genotype   = 0;
+
+info(end+1).dataname = '8_11_15_rec2_analysis_2'; 
+info(end).datafile   = fullfile(inputDir, '8_11_15_rec2_analysis_2');
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 info(end+1).dataname = '8_13_15_analysis_2A'; 
 info(end).datafile   = fullfile(inputDir, '8_13_15_analysis_2A');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 info(end+1).dataname = '8_14_15_analysis'; 
 info(end).datafile   = fullfile(inputDir, '8_14_15_analysis');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 info(end+1).dataname = '8_17_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '8_17_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 1;
 
 info(end+1).dataname = '8_18_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '8_18_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 2;
 
 info(end+1).dataname = '8_18_15_rec2_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '8_18_15_rec2_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 2;
 
 info(end+1).dataname = '8_19_15_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '8_19_15_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
 
 info(end+1).dataname = '8_19_15_rec2_analysis_2'; 
 info(end).datafile   = fullfile(inputDir, '8_19_15_rec2_analysis_2');
-info(end).stimDur    = 3.0535;
-info(end).stimType   = 'bars';
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
 info(end).genotype   = 0;
 
+info(end+1).dataname = '9_12_15_analysis'; 
+info(end).datafile   = fullfile(inputDir, '9_12_15_analysis');
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
+info(end).genotype   = 2;
 
+info(end+1).dataname = '9_16_15_analysis_2'; 
+info(end).datafile   = fullfile(inputDir, '9_16_15_analysis_2');
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
+info(end).genotype   = 2;
 
-
+info(end+1).dataname = 'analysis_9_14_15'; 
+info(end).datafile   = fullfile(inputDir, 'analysis_9_14_15');
+info(end).stimDur    = 1.5;
+info(end).stimType   = 'drift';
+info(end).genotype   = 2;

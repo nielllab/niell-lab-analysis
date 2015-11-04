@@ -29,7 +29,7 @@ end
 
 % get the means according to random effects analysis
 gCnt = 0; mnGG = []; smGG = [];
-for iG = 0:1
+for iG = 0:2
   gCnt = gCnt + 1;
   sl = genotypeAnimal==iG;
   w  = 1./varAnimal(sl,:);
@@ -44,9 +44,11 @@ for iG = 0:1
   smGG(gCnt,:) = sqrt(1./sum(w));
 end
   
-figure, errorbar(1:3,mnGG(1,:),smGG(1,:),smGG(1,:)), hold on, errorbar(1:3,mnGG(2,:),smGG(2,:),smGG(2,:),'r')
+figure, errorbar(1:3,mnGG(1,:),smGG(1,:),smGG(1,:)), hold on, errorbar(1:3,mnGG(2,:),smGG(2,:),smGG(2,:),'r'),hold on, errorbar(1:3,mnGG(3,:),smGG(3,:),smGG(3,:),'g')
+hold on
+legend ('N2B','ctl','N2A');hold on
+    title 'method1_PPC0'
 
-
-
+%N2B =0, ctl=1 and N2A=2 are the genotype labels
 
 

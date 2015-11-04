@@ -117,7 +117,7 @@ if max(conds>100)   %%% two tfs
 end
 s(1,:)=conds;
 stimEpocs{block}=s;
-keyboard
+%keyboard
 
 for cell_n = cell_range;
    close all
@@ -236,8 +236,8 @@ for cell_n = cell_range;
                 
             end
               figure(hist_fig)
-              set(gcf, 'PaperPositionMode', 'auto');
-              print('-dpsc',psfilename,'-append');      
+            %  set(gcf, 'PaperPositionMode', 'auto');
+            %  print('-dpsc',psfilename,'-append');      
             
             if cond>=n_rows*n_col & full_field%%% blank frame or full-field, but only plot if full-field is on
                 %                 figure(spont_full)
@@ -335,25 +335,28 @@ for cell_n = cell_range;
         
         orientfreq = reshape(R(cell_n,1:n_col*n_rows),n_col,n_rows)'-spont_avg;
         orient_tuning_all = mean(orientfreq,2);
-        %  figure
-        %  plot(orient_tuning_all);
-        if max(orient_tuning_all)>abs(min(orient_tuning_all))
+         
+        figure
+         plot(orient_tuning_all);
+       
+         if max(orient_tuning_all)>abs(min(orient_tuning_all))
             [max_resp pref_orient(cell_n)] = max(orient_tuning_all);
         else
             [max_resp pref_orient(cell_n)] = min(orient_tuning_all);
         end
         freq_tuning(cell_n,:) = orientfreq(pref_orient(cell_n),:);
-%         figure
-%         subplot(2,1,1);
-%         plot(freq_tuning(cell_n,:));
+%       
+figure
+      subplot(2,1,1);
+      plot(freq_tuning(cell_n,:));
         if max(freq_tuning)>abs(min(freq_tuning))
             [max_resp pref_freq(cell_n)] = max(freq_tuning(cell_n,:));
         else
             [max_resp pref_freq(cell_n)] = min(freq_tuning(cell_n,:));
         end
         orient_tuning(cell_n,:) = orientfreq(:,pref_freq(cell_n))';
-%         subplot(2,1,2);
-%         plot(orient_tuning(cell_n,:));
+        subplot(2,1,2);
+        plot(orient_tuning(cell_n,:));
 %         
 %        
         
@@ -489,15 +492,15 @@ for cell_n = cell_range;
 
         xlabel('secs');
         
-%         saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-%         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-%         saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+        saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+        saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+        saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
        
         %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
         
         cell_n
-        close(rast_fig);
-        clear rast_fig;
+       % close(rast_fig);
+        %clear rast_fig;
         
      
     end %%% rep
@@ -516,28 +519,29 @@ for cell_n = cell_range;
     plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
     plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
 %     saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
-% for i = 1:length(hist_fig)
-%     figure(hist_fig(i))
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
-%     
-%     figure(rast_fig(i))
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
-%     
-%     figure(tuning_fig(i))
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
+
+for i = 1:length(hist_fig)
+    figure(hist_fig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+    figure(rast_fig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
+    figure(tuning_fig(i))
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
     
  
-%end
-
-%convert ps file to PDfs
-  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-  delete(psfilename);
 end
 
 
+end
+
+%convert ps file to PDfs
+%  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+  %delete(psfilename);
 
 if use_afile
     
@@ -548,3 +552,21 @@ if use_afile
     
     save(afile, 'drift','-append');
 end
+
+    post = input('post doi? 0/1 : ');
+    %drift(cell_n,stim_eye).degperpix=degperpix;
+    if post
+        drift_post=drift;
+        save(afile,'drift_post','-append')
+    else
+        save(afile,'drift','-append')
+    end
+
+    %
+    close all
+    
+
+%save(afile,'wn','-append')
+%ps2pdf(fname);
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);

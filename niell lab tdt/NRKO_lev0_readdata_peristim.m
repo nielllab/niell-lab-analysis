@@ -18,6 +18,8 @@ for iDir = 1:nDirs
     
   % create a new structure DAT that fits with Fieldtrip
   dat = [];
+  
+
   dat.time{1}   = data.lfpT{1}{1}(:)'; % if this is 1,1 needs to be checked
   nChannels     = length(data.lfpT{1});
   for iChannel  = 1:nChannels
@@ -31,6 +33,7 @@ for iDir = 1:nDirs
   trl = data.stimEpocs{1}(2,:); % this variable will contain the trial on and offsets in samples
   nTrials  = length(trl);
   samples  = [];
+  
   for iTrial = 1:nTrials
     samples(iTrial,1) = nearest(dat.time{1}, trl(iTrial));
   end
@@ -52,9 +55,9 @@ for iDir = 1:nDirs
   for iCell = 1:nCells
     spike.timestamp{iCell} = unitdataSession{iCell}.spikes{1};
     spike.label{iCell} = ['spk_' num2str(iCell)];
-    cnds(iCell) = unitdataSession{iCell}.cond;
+    cnds(iCell) = unitdataSession{iCell}.GT;
   end
-  
+ 
   % make trials in the spike structure
   cfg = [];
   trl = data.stimEpocs{1}(2,:);

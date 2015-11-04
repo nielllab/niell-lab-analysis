@@ -6,13 +6,13 @@ geno=geno';
 for GT=1:3
     for P=1:2
         
-        for group = 1:3
+        for group = 1:1
             if group ==1
-                uselist = (geno==GT & pinp==P &(layer<=3) & exc & used);
-            elseif group ==2
-                uselist = (geno==GT & pinp==P & (layer==4) & exc & used);
-            elseif group==3
-                uselist = (geno==GT & pinp==P & (layer==5) & exc & used);
+                uselist = (geno==GT & pinp==P & layer & used);
+%             elseif group ==2
+%                 uselist = (geno==GT & pinp==P & (layer==4) & exc & used);
+%             elseif group==3
+%                 uselist = (geno==GT & pinp==P & (layer==5) & exc & used);
             end
             
             lin = histc(data(uselist),0.8:1:2);

@@ -32,7 +32,7 @@ for iDir = 1:nDirs
 end
 
 
-% gather the results
+% gather the results, genotypes:N2B=0, control=1 and N2A=2
 group.genotype = genotype;
 group.animalid = animalid;
 group.ppc      = ppcAllCat;

@@ -170,7 +170,7 @@ end
 % figure
 % imagesc(movavg-127,[-64 64])
 
-matlabpool
+parpool
 tic
 
 if movietype==mv_noise
@@ -994,7 +994,7 @@ for cell_n = cell_range
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
-            print('-dpsc',psfilename,'-append');          
+           % print('-dpsc',psfilename,'-append');          
             figure(svdfig);
             
             set(gcf, 'PaperPositionMode', 'auto');
@@ -1077,8 +1077,11 @@ for cell_n = cell_range
 %         OnOffFlash
 end  %%%cell
 
-% matlabpool close
-% 
+delete(gcp('nocreate'))
+
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);
+
 if movietype==cm_noise
     post = input('post doi? 0/1 : ');
     wn(cell_n,stim_eye).degperpix=degperpix;
@@ -1095,4 +1098,4 @@ elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
 end
-%matlabpool close
+

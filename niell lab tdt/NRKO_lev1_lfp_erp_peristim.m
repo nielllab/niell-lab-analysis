@@ -20,7 +20,7 @@ for iDir = 1:nDirs
   % save the STS
   filename = fullfile(outputDir, output, info(iDir).dataname, output);
   mkdir(fullfile(outputDir, output, info(iDir).dataname));
-  save(filename, 'sts')
+  save(filename, 'erp')
    
 end
 
