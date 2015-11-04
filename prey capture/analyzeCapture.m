@@ -146,4 +146,18 @@ h= h/sum(h(:));
 % hold on
 % plot(floor(length(bins)/2) ,floor(length(bins)/2) + 1,'ro','Linewidth',2)
 
+figure
+hist(r,25:50:1000);
+
+% lost = r'>200;
+% contact = find(diff(chase)>0);
+% interval = [0 diff(contact)];
+% contact = contact(interval>60);
+% figure
+% plot(r); hold on; plot(contact,zeros(size(contact)),'g*');
+% 
+% ylost = y; xlost=x; xlost(~lost)=NaN; ylost(~lost)=NaN;
+% figure
+% plot(ylost,xlost); hold on; plot(0,0,'r*'); axis([-1600 1600 -1600 1600])
+
 
