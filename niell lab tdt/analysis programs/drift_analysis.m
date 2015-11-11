@@ -297,7 +297,7 @@ for cell_n = cell_range;
     hold on
     cols = 'bgrcmyk';
     for sf = 1:size(alltune,2);
-        plot(0:45:315,alltune(:,sf),cols(sf));
+        plot(1:size(alltune,1),alltune(:,sf),cols(sf));
     end
     xlabel('orientation'); ylabel('sp/sec');
     legend('0.01cpd','0.02cpd','0.04cpd','0.08cpd','0.16cpd','0.32cpd');

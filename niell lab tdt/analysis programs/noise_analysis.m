@@ -1113,3 +1113,6 @@ elseif movietype==mv_noise
     save(afile,'mv','-append')
 end
 delete(gcp('nocreate'))
+
+ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
+delete(psfilename);
