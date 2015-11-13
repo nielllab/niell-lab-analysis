@@ -5,3 +5,5 @@
 %use getMovieData to pull spike times, mouse velocity/time, frame info
 [spikes mouseT mouseV framenums frametimes] = getMovieData;
 
+%load movie legend
+load GeomStim
