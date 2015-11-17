@@ -10,7 +10,7 @@ for n = 1:size(ordstimlib,4)
     cnt = cnt + 90;
 end
 
-dir = 'C:\Users\lab\Documents\MATLAB';
+dir = 'C:\Users\nlab\Documents\MATLAB';
 nam = 'GeomStim';
 save(fullfile(dir,nam),'moviedata','ordleg');
 
