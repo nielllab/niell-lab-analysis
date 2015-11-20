@@ -1,6 +1,8 @@
 %PRLP 10/29/2015 Niell Lab
 %This code is used to generate simple unidirectional stimuli based on
 %images made in Adobe Illustrator
+%%%legend info: column 1 = number, 2 = shape/size, 3 = color, 4 =
+%%%position/direction
 
 nstim = 1; %choose number of repeats per stimulus
 MovieMag=15;                 %% magnification that movie will be played at

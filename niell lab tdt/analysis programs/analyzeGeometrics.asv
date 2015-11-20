@@ -2,7 +2,7 @@
 %%%use to get spiking relative to geometric stimulus movie
 %%% P.R.L. Parker, Cris Niell Lab, 11/12/2015
 
-%%%ordered legend info: column 1 = number, 2 = shape/size, 3 = color, 4 =
+%%%legend info: column 1 = number, 2 = shape/size, 3 = color, 4 =
 %%%position/direction
 
 %use getMovieData to pull spike times, mouse velocity/time, frame info
@@ -11,6 +11,19 @@
 %load movie legend
 load GeomStim
 fpsec = 60;
+
+% % %generate table of stimulus order
+% % cnt = 1;
+% % for stimShape = 1:max(ordleg(:,2))
+% %     for stimColor = 1:max(ordleg(:,3))
+% %         for stimPosition = 1:max(ordleg(:,4))
+% %             stimInd(cnt,:) = find(ordleg(:,2)==stimShape &...
+% %                 ordleg(:,3)==stimColor &...
+% %                 ordleg(:,4)==stimPosition);
+% %             cnt = cnt + 1;
+% %         end
+% %     end
+% % end
 
 %stimulus parameters: black, white, shape/size, location/direction
 blStim = find(ordleg(:,3)==1);
@@ -83,8 +96,7 @@ end
 [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
 if exist(psfilename,'file')==2;delete(psfilename);end
 
-%make plots for every cell, each subplot is different stimulus, see key
-%file to make life easier
+%make plots for every cell, each subplot is different stimulus
 xrange = [-0.5 1];
 for n = 1:size(spikes,2)
     figure('Name',sprintf('unit %d',n))
@@ -156,4 +168,4 @@ end
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);
 
-save(fullfile(pname,fname(1:end-3)),'fpsec','sortedSpikes');
+save(fullfile(pname,fname(1:end-3)),'fpsec','sortedSpikes',
