@@ -42,16 +42,16 @@ firstFrameind = find(framenums==firstFrame); firstFrameind = firstFrameind(1); %
 
 %bin spikes by desired binSize
 spikebins = frametimes(firstFrameind)-0.5:binSize:frametimes(firstFrameind)+1080-binSize; %create binning edges w/half second baseline before first stimulus
-spikeHist = zeros(size(spikes,2),size(spikebins,2));
+spikehist = zeros(size(spikes,2),size(spikebins,2));
 for n = 1:size(spikes,2)
-    spikeHist(n,:) = histc(spikes{n},spikebins);
+    spikehist(n,:) = histc(spikes{n},spikebins);
 end
 
 %bin spikes by pre, stim, post (0.5 sec each)
 epochbins = frametimes(firstFrameind)-0.5:0.5:frametimes(firstFrameind)+1080-0.5; %create binning edges w/half second baseline before first stimulus
-epochHist = zeros(size(spikes,2),size(epochbins,2));
+epochhist = zeros(size(spikes,2),size(epochbins,2));
 for n = 1:size(spikes,2)
-    epochHist(n,:) = histc(spikes{n},epochbins);
+    epochhist(n,:) = histc(spikes{n},epochbins);
 end
 
 %rearrange spikes to baseline + stim + post for each full stimulus (5
@@ -61,12 +61,24 @@ sortedSpikes = zeros(size(ordleg,1),1500/(binSize*1000),size(spikes,2));
 for unit = 1:size(spikes,2)
     count = 1;
     for stimNum = 1:size(ordleg,1)
-        sortedSpikes(stimNum,:,unit) = spikeHist(unit,count:count+(1500/(binSize*1000))-1);
+        sortedSpikes(stimNum,:,unit) = spikehist(unit,count:count+(1500/(binSize*1000))-1);
         count = count + (1500/(binSize*1000));
     end
 end
 sortedSpikes = sortedSpikes/binSize; %get rate
 
+%same rearranging except for firing rate per entire stimulus period (pre stim post)
+sortedEpochs = zeros(size(ordleg,1),1500/(0.5*1000),size(spikes,2));
+for unit = 1:size(spikes,2)
+    count = 1;
+    for stimNum = 1:size(ordleg,1)
+        sortedEpochs(stimNum,:,unit) = spikehist(unit,count:count+(1500/(0.5*1000))-1);
+        count = count + (1500/(0.5*1000));
+    end
+end
+sortedEpochs = sortedEpochs/0.5; %get rate
+
+%%
 %generate averaged histograms for each type of stimulus
 for n = 1:size(spikes,2)
     bl(n,:) = mean(sortedSpikes(blStim,:,n));
@@ -113,17 +125,6 @@ for n = 1:size(spikes,2)
 end
 
 %%
-%same rearranging except for firing rate per entire stimulus period (pre stim post)
-sortedEpochs = zeros(size(ordleg,1),1500/(0.5*1000),size(spikes,2));
-for unit = 1:size(spikes,2)
-    count = 1;
-    for stimNum = 1:size(ordleg,1)
-        sortedEpochs(stimNum,:,unit) = epochHist(unit,count:count+(1500/(0.5*1000))-1);
-        count = count + (1500/(0.5*1000));
-    end
-end
-sortedEpochs = sortedEpochs/0.5; %get rate
-
 % get change in firing rate stim/baseline
 for n = 1:size(spikes,2)
     blFRmean(n,:) = mean(sortedEpochs(blStim,:,n));
@@ -192,7 +193,7 @@ if exist(psfilename,'file')==2;delete(psfilename);end
 
 xvals = [-0.5:binSize:1-binSize];
 xrange = [-0.5 1];
-yrange = [0 40];
+% yrange = [0 40];
 
 for n = 1:size(spikes,2)
     figure('Name',sprintf('unit %d',n))
@@ -256,8 +257,6 @@ for n = 1:size(spikes,2)
     subplot(4,5,20)
     plot(xvals,allstim(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
     
     figure('Name',sprintf('unit %d',n))
     subplot(3,3,1)
@@ -290,6 +289,7 @@ for n = 1:size(spikes,2)
     xlim([0 3])
 %     axis([0 3 0 1])
     set(gca,'Xtick',1:2,'XTickLabel',{'moving', 'static'})
+    
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
@@ -297,4 +297,4 @@ end
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);
 
-save(fullfile(pname,fname(1:end-3)),'fpsec','sortedSpikes','sortedEpochs','colorPref','shapePref','sizePref','posPref','movPref','movstatPref');
+save(fullfile(pname,fname(1:end-3)),'fpsec','sortedSpikes');
