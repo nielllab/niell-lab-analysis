@@ -42,16 +42,9 @@ firstFrameind = find(framenums==firstFrame); firstFrameind = firstFrameind(1); %
 
 %bin spikes by desired binSize
 spikebins = frametimes(firstFrameind)-0.5:binSize:frametimes(firstFrameind)+1080-binSize; %create binning edges w/half second baseline before first stimulus
-spikehist = zeros(size(spikes,2),size(spikebins,2));
+spikeHist = zeros(size(spikes,2),size(spikebins,2));
 for n = 1:size(spikes,2)
-    spikehist(n,:) = histc(spikes{n},spikebins);
-end
-
-%bin spikes by pre, stim, post (0.5 sec each)
-epochbins = frametimes(firstFrameind)-0.5:0.5:frametimes(firstFrameind)+1080-0.5; %create binning edges w/half second baseline before first stimulus
-epochhist = zeros(size(spikes,2),size(epochbins,2));
-for n = 1:size(spikes,2)
-    epochhist(n,:) = histc(spikes{n},epochbins);
+    spikeHist(n,:) = histc(spikes{n},spikebins);
 end
 
 %rearrange spikes to baseline + stim + post for each full stimulus (5
@@ -61,129 +54,158 @@ sortedSpikes = zeros(size(ordleg,1),1500/(binSize*1000),size(spikes,2));
 for unit = 1:size(spikes,2)
     count = 1;
     for stimNum = 1:size(ordleg,1)
-        sortedSpikes(stimNum,:,unit) = spikehist(unit,count:count+(1500/(binSize*1000))-1);
+        sortedSpikes(stimNum,:,unit) = spikeHist(unit,count:count+(1500/(binSize*1000))-1);
         count = count + (1500/(binSize*1000));
     end
 end
 sortedSpikes = sortedSpikes/binSize; %get rate
 
-%same rearranging except for firing rate per entire stimulus period (pre stim post)
-sortedEpochs = zeros(size(ordleg,1),1500/(0.5*1000),size(spikes,2));
-for unit = 1:size(spikes,2)
-    count = 1;
-    for stimNum = 1:size(ordleg,1)
-        sortedEpochs(stimNum,:,unit) = spikehist(unit,count:count+(1500/(0.5*1000))-1);
-        count = count + (1500/(0.5*1000));
-    end
-end
-sortedEpochs = sortedEpochs/0.5; %get rate
-
-%%
-%generate averaged histograms for each type of stimulus
+%get relevant measures for each stimulus: histograms and FR changes, mean
+%and SEM for each
+ep1 = 1:0.5/binSize; %indices for baseline period
+ep2 = ep1(end)+1:1/binSize; %stimulus period
+ep3 = ep2(end)+1:1.5/binSize; %post-stimulus period
 for n = 1:size(spikes,2)
-    bl(n,:) = mean(sortedSpikes(blStim,:,n));
-    maxFR(1) = max(bl(n,:));
-    wh(n,:) = mean(sortedSpikes(whStim,:,n));
-    maxFR(2) = max(wh(n,:));
-    triBig(n,:) = mean(sortedSpikes(triBigStim,:,n));
-    maxFR(3) = max(triBig(n,:));
-    triSml(n,:) = mean(sortedSpikes(triSmlStim,:,n));
-    maxFR(4) = max(triSml(n,:));
-    sqrBig(n,:) = mean(sortedSpikes(sqrBigStim,:,n));
-    maxFR(5) = max(sqrBig(n,:));
-    sqrSml(n,:) = mean(sortedSpikes(sqrSmlStim,:,n));
-    maxFR(6) = max(sqrSml(n,:));
-    crcBig(n,:) = mean(sortedSpikes(crcBigStim,:,n));
-    maxFR(7) = max(crcBig(n,:));
-    crcSml(n,:) = mean(sortedSpikes(crcSmlStim,:,n));
-    maxFR(8) = max(crcSml(n,:));
-    starBig(n,:) = mean(sortedSpikes(starBigStim,:,n));
-    maxFR(9) = max(starBig(n,:));
-    starSml(n,:) = mean(sortedSpikes(starSmlStim,:,n));
-    maxFR(10) = max(starSml(n,:));
-    centStat(n,:) = mean(sortedSpikes(centStatStim,:,n));
-    maxFR(11) = max(centStat(n,:));
-    topStat(n,:) = mean(sortedSpikes(topStatStim,:,n));
-    maxFR(12) = max(topStat(n,:));
-    rightStat(n,:) = mean(sortedSpikes(rightStatStim,:,n));
-    maxFR(13) = max(rightStat(n,:));
-    botStat(n,:) = mean(sortedSpikes(botStatStim,:,n));
-    maxFR(14) = max(botStat(n,:));
-    leftStat(n,:) = mean(sortedSpikes(leftStatStim,:,n));
-    maxFR(15) = max(leftStat(n,:));
-    bot2topMov(n,:) = mean(sortedSpikes(bot2topMovStim,:,n));
-    maxFR(16) = max(bot2topMov(n,:));
-    left2rightMov(n,:) = mean(sortedSpikes(left2rightMovStim,:,n));
-    maxFR(17) = max(left2rightMov(n,:));
-    top2botMov(n,:) = mean(sortedSpikes(top2botMovStim,:,n));
-    maxFR(18) = max(top2botMov(n,:));
-    right2leftMov(n,:) = mean(sortedSpikes(right2leftMovStim,:,n));
-    maxFR(19) = max(right2leftMov(n,:));
-    allstim(n,:) = mean(sortedSpikes(:,:,n));
-    maxFR(20) = max(allstim(n,:));
-    ymax(n) = max(maxFR);
+    bl(:,:,n) = sortedSpikes(blStim,:,n); %hist w/all trials for this stim
+    blHistMean(n,:) = mean(bl(:,:,n)); %mean hist for this stim
+    blHistSem = nansem(bl(:,:,n)); %SEM hist for this stim
+    blMeanDF(n,:) = mean(mean(bl(:,ep2,n),2)-mean(bl(:,ep1,n),2)); %mean firing rate change
+    blSemDF(n,:) = nansem(mean(bl(:,ep2,n),2)-mean(bl(:,ep1,n),2)); %SEM firing rate change
+    maxFR(1) = max(blHistMean(n,:)); %using to calc max stim-evoked firing for plotting
+    wh(:,:,n) = sortedSpikes(whStim,:,n);
+    whHistMean(n,:) = mean(wh(:,:,n));
+    whHistSem = nansem(wh(:,:,n));
+    whMeanDF(n,:) = mean(mean(wh(:,ep2,n),2)-mean(wh(:,ep1,n),2));
+    whSemDF(n,:) = nansem(mean(wh(:,ep2,n),2)-mean(wh(:,ep1,n),2));
+    maxFR(2) = max(whHistMean(n,:));
+    triBig(:,:,n) = sortedSpikes(triBigStim,:,n);
+    triBigHistMean(n,:) = mean(triBig(:,:,n));
+    triBigHistSem = nansem(triBig(:,:,n));
+    triBigMeanDF(n,:) = mean(mean(triBig(:,ep2,n),2)-mean(triBig(:,ep1,n),2));
+    triBigSemDF(n,:) = nansem(mean(triBig(:,ep2,n),2)-mean(triBig(:,ep1,n),2));
+    maxFR(3) = max(triBigHistMean(n,:));
+    triSml(:,:,n) = sortedSpikes(triSmlStim,:,n);
+    triSmlHistMean(n,:) = mean(triSml(:,:,n));
+    triSmlHistSem = nansem(triSml(:,:,n));
+    triSmlMeanDF(n,:) = mean(mean(triSml(:,ep2,n),2)-mean(triSml(:,ep1,n),2));
+    triSmlSemDF(n,:) = nansem(mean(triSml(:,ep2,n),2)-mean(triSml(:,ep1,n),2));
+    maxFR(4) = max(triSmlHistMean(n,:));
+    sqrBig(:,:,n) = sortedSpikes(sqrBigStim,:,n);
+    sqrBigHistMean(n,:) = mean(sqrBig(:,:,n));
+    sqrBigHistSem = nansem(sqrBig(:,:,n));
+    sqrBigMeanDF(n,:) = mean(mean(sqrBig(:,ep2,n),2)-mean(sqrBig(:,ep1,n),2));
+    sqrBigSemDF(n,:) = nansem(mean(sqrBig(:,ep2,n),2)-mean(sqrBig(:,ep1,n),2));
+    maxFR(5) = max(sqrBigHistMean(n,:));
+    sqrSml(:,:,n) = sortedSpikes(sqrSmlStim,:,n);
+    sqrSmlHistMean(n,:) = mean(sqrSml(:,:,n));
+    sqrSmlHistSem = nansem(sqrSml(:,:,n));
+    sqrSmlMeanDF(n,:) = mean(mean(sqrSml(:,ep2,n),2)-mean(sqrSml(:,ep1,n),2));
+    sqrSmlSemDF(n,:) = nansem(mean(sqrSml(:,ep2,n),2)-mean(sqrSml(:,ep1,n),2));
+    maxFR(6) = max(sqrSmlHistMean(n,:));
+    crcBig(:,:,n) = sortedSpikes(crcBigStim,:,n);
+    crcBigHistMean(n,:) = mean(crcBig(:,:,n));
+    crcBigHistSem = nansem(crcBig(:,:,n));
+    crcBigMeanDF(n,:) = mean(mean(crcBig(:,ep2,n),2)-mean(crcBig(:,ep1,n),2));
+    crcBigSemDF(n,:) = nansem(mean(crcBig(:,ep2,n),2)-mean(crcBig(:,ep1,n),2));
+    maxFR(7) = max(crcBigHistMean(n,:));
+    crcSml(:,:,n) = sortedSpikes(crcSmlStim,:,n);
+    crcSmlHistMean(n,:) = mean(crcSml(:,:,n));
+    crcSmlHistSem = nansem(crcSml(:,:,n));
+    crcSmlMeanDF(n,:) = mean(mean(crcSml(:,ep2,n),2)-mean(crcSml(:,ep1,n),2));
+    crcSmlSemDF(n,:) = nansem(mean(crcSml(:,ep2,n),2)-mean(crcSml(:,ep1,n),2));
+    maxFR(8) = max(crcSmlHistMean(n,:));
+    starBig(:,:,n) = sortedSpikes(starBigStim,:,n);
+    starBigHistMean(n,:) = mean(starBig(:,:,n));
+    starBigHistSem = nansem(starBig(:,:,n));
+    starBigMeanDF(n,:) = mean(mean(starBig(:,ep2,n),2)-mean(starBig(:,ep1,n),2));
+    starBigSemDF(n,:) = nansem(mean(starBig(:,ep2,n),2)-mean(starBig(:,ep1,n),2));
+    maxFR(9) = max(starBigHistMean(n,:));
+    starSml(:,:,n) = sortedSpikes(starSmlStim,:,n);
+    starSmlHistMean(n,:) = mean(starSml(:,:,n));
+    starSmlHistSem = nansem(starSml(:,:,n));
+    starSmlMeanDF(n,:) = mean(mean(starSml(:,ep2,n),2)-mean(starSml(:,ep1,n),2));
+    starSmlSemDF(n,:) = nansem(mean(starSml(:,ep2,n),2)-mean(starSml(:,ep1,n),2));
+    maxFR(10) = max(starSmlHistMean(n,:));
+    centStat(:,:,n) = sortedSpikes(centStatStim,:,n);
+    centStatHistMean(n,:) = mean(centStat(:,:,n));
+    centStatHistSem = nansem(centStat(:,:,n));
+    centStatMeanDF(n,:) = mean(mean(centStat(:,ep2,n),2)-mean(centStat(:,ep1,n),2));
+    centStatSemDF(n,:) = nansem(mean(centStat(:,ep2,n),2)-mean(centStat(:,ep1,n),2));
+    maxFR(11) = max(centStatHistMean(n,:));
+    topStat(:,:,n) = sortedSpikes(topStatStim,:,n);
+    topStatHistMean(n,:) = mean(topStat(:,:,n));
+    topStatHistSem = nansem(topStat(:,:,n));
+    topStatMeanDF(n,:) = mean(mean(topStat(:,ep2,n),2)-mean(topStat(:,ep1,n),2));
+    topStatSemDF(n,:) = nansem(mean(topStat(:,ep2,n),2)-mean(topStat(:,ep1,n),2));
+    maxFR(12) = max(topStatHistMean(n,:));
+    rightStat(:,:,n) = sortedSpikes(rightStatStim,:,n);
+    rightStatHistMean(n,:) = mean(rightStat(:,:,n));
+    rightStatHistSem = nansem(rightStat(:,:,n));
+    rightStatMeanDF(n,:) = mean(mean(rightStat(:,ep2,n),2)-mean(rightStat(:,ep1,n),2));
+    rightStatSemDF(n,:) = nansem(mean(rightStat(:,ep2,n),2)-mean(rightStat(:,ep1,n),2));
+    maxFR(13) = max(rightStatHistMean(n,:));
+    botStat(:,:,n) = sortedSpikes(botStatStim,:,n);
+    botStatHistMean(n,:) = mean(botStat(:,:,n));
+    botStatHistSem = nansem(botStat(:,:,n));
+    botStatMeanDF(n,:) = mean(mean(botStat(:,ep2,n),2)-mean(botStat(:,ep1,n),2));
+    botStatSemDF(n,:) = nansem(mean(botStat(:,ep2,n),2)-mean(botStat(:,ep1,n),2));
+    maxFR(14) = max(botStatHistMean(n,:));
+    leftStat(:,:,n) = sortedSpikes(leftStatStim,:,n);
+    leftStatHistMean(n,:) = mean(leftStat(:,:,n));
+    leftStatHistSem = nansem(leftStat(:,:,n));
+    leftStatMeanDF(n,:) = mean(mean(leftStat(:,ep2,n),2)-mean(leftStat(:,ep1,n),2));
+    leftStatSemDF(n,:) = nansem(mean(leftStat(:,ep2,n),2)-mean(leftStat(:,ep1,n),2));
+    maxFR(15) = max(leftStatHistMean(n,:));
+    bot2topMov(:,:,n) = sortedSpikes(bot2topMovStim,:,n);
+    bot2topMovHistMean(n,:) = mean(bot2topMov(:,:,n));
+    bot2topMovHistSem = nansem(bot2topMov(:,:,n));
+    bot2topMovMeanDF(n,:) = mean(mean(bot2topMov(:,ep2,n),2)-mean(bot2topMov(:,ep1,n),2));
+    bot2topMovSemDF(n,:) = nansem(mean(bot2topMov(:,ep2,n),2)-mean(bot2topMov(:,ep1,n),2));
+    maxFR(16) = max(bot2topMovHistMean(n,:));
+    left2rightMov(:,:,n) = sortedSpikes(left2rightMovStim,:,n);
+    left2rightMovHistMean(n,:) = mean(left2rightMov(:,:,n));
+    left2rightMovHistSem = nansem(left2rightMov(:,:,n));
+    left2rightMovMeanDF(n,:) = mean(mean(left2rightMov(:,ep2,n),2)-mean(left2rightMov(:,ep1,n),2));
+    left2rightMovSemDF(n,:) = nansem(mean(left2rightMov(:,ep2,n),2)-mean(left2rightMov(:,ep1,n),2));
+    maxFR(17) = max(left2rightMovHistMean(n,:));
+    top2botMov(:,:,n) = sortedSpikes(top2botMovStim,:,n);
+    top2botMovHistMean(n,:) = mean(top2botMov(:,:,n));
+    top2botMovHistSem = nansem(top2botMov(:,:,n));
+    top2botMovMeanDF(n,:) = mean(mean(top2botMov(:,ep2,n),2)-mean(top2botMov(:,ep1,n),2));
+    top2botMovSemDF(n,:) = nansem(mean(top2botMov(:,ep2,n),2)-mean(top2botMov(:,ep1,n),2));
+    maxFR(18) = max(top2botMovHistMean(n,:));
+    right2leftMov(:,:,n) = sortedSpikes(right2leftMovStim,:,n);
+    right2leftMovHistMean(n,:) = mean(right2leftMov(:,:,n));
+    right2leftMovHistSem = nansem(right2leftMov(:,:,n));
+    right2leftMovMeanDF(n,:) = mean(mean(right2leftMov(:,ep2,n),2)-mean(right2leftMov(:,ep1,n),2));
+    right2leftMovSemDF(n,:) = nansem(mean(right2leftMov(:,ep2,n),2)-mean(right2leftMov(:,ep1,n),2));
+    maxFR(19) = max(right2leftMovHistMean(n,:));
+    allTrials(:,:,n) = sortedSpikes(:,:,n);
+    allTrialsHistMean(n,:) = mean(allTrials(:,:,n));
+    allTrialsHistSem = nansem(allTrials(:,:,n));
+    allTrialsMeanDF(n,:) = mean(mean(allTrials(:,ep2,n),2)-mean(allTrials(:,ep1,n),2));
+    allTrialsSemDF(n,:) = nansem(mean(allTrials(:,ep2,n),2)-mean(allTrials(:,ep1,n),2));
+    maxFR(20) = max(allTrialsHistMean(n,:));
+    
+    ymax(n) = max(maxFR); %each cell's max FR for plotting
 end
 
-%%
-% get change in firing rate stim/baseline
-for n = 1:size(spikes,2)
-    blFRmean(n,:) = mean(sortedEpochs(blStim,:,n));
-    blFRse(n,:) = std(sortedEpochs(blStim,:,n))/sqrt(size(blStim,1));
-    whFRmean(n,:) = mean(sortedEpochs(whStim,:,n));
-    whFRse(n,:) = std(sortedEpochs(whStim,:,n))/sqrt(size(whStim,1));
-    triBigFRmean(n,:) = mean(sortedEpochs(triBigStim,:,n));
-    triBigFRstd(n,:) = std(sortedEpochs(triBigStim,:,n))/sqrt(size(triBigStim,1));
-    triSmlFRmean(n,:) = mean(sortedEpochs(triSmlStim,:,n));
-    triSmlFRstd(n,:) = std(sortedEpochs(triSmlStim,:,n))/sqrt(size(triSmlStim,1));
-    sqrBigFRmean(n,:) = mean(sortedEpochs(sqrBigStim,:,n));
-    sqrBigFRstd(n,:) = std(sortedEpochs(sqrBigStim,:,n))/sqrt(size(sqrBigStim,1));
-    sqrSmlFRmean(n,:) = mean(sortedEpochs(sqrSmlStim,:,n));
-    sqrSmlFRstd(n,:) = std(sortedEpochs(sqrSmlStim,:,n))/sqrt(size(sqrSmlStim,1));
-    crcBigFRmean(n,:) = mean(sortedEpochs(crcBigStim,:,n));
-    crcBigFRstd(n,:) = std(sortedEpochs(crcBigStim,:,n))/sqrt(size(crcBigStim,1));
-    crcSmlFRmean(n,:) = mean(sortedEpochs(crcSmlStim,:,n));
-    crcBigFRstd(n,:) = std(sortedEpochs(crcSmlStim,:,n))/sqrt(size(crcSmlStim,1));
-    starBigFRmean(n,:) = mean(sortedEpochs(starBigStim,:,n));
-    starBigFRstd(n,:) = std(sortedEpochs(starBigStim,:,n))/sqrt(size(starBigStim,1));
-    starSmlFRmean(n,:) = mean(sortedEpochs(starSmlStim,:,n));
-    starSmlFRstd(n,:) = std(sortedEpochs(starSmlStim,:,n))/sqrt(size(starSmlStim,1));
-    centStatFRmean(n,:) = mean(sortedEpochs(centStatStim,:,n));
-    centStatFRstd(n,:) = std(sortedEpochs(centStatStim,:,n))/sqrt(size(centStatStim,1));
-    topStatFRmean(n,:) = mean(sortedEpochs(topStatStim,:,n));
-    topStatFRstd(n,:) = std(sortedEpochs(topStatStim,:,n))/sqrt(size(topStatStim,1));
-    rightStatFRmean(n,:) = mean(sortedEpochs(rightStatStim,:,n));
-    rightStatFRstd(n,:) = std(sortedEpochs(rightStatStim,:,n))/sqrt(size(rightStatStim,1));
-    botStatFRmean(n,:) = mean(sortedEpochs(botStatStim,:,n));
-    botStatFRstd(n,:) = std(sortedEpochs(botStatStim,:,n))/sqrt(size(botStatStim,1));
-    leftStatFRmean(n,:) = mean(sortedEpochs(leftStatStim,:,n));
-    leftStatFRstd(n,:) = std(sortedEpochs(leftStatStim,:,n))/sqrt(size(leftStatStim,1));
-    bot2topMovFRmean(n,:) = mean(sortedEpochs(bot2topMovStim,:,n));
-    bot2topMovFRstd(n,:) = std(sortedEpochs(bot2topMovStim,:,n))/sqrt(size(bot2topMovStim,1));
-    left2rightMovFRmean(n,:) = mean(sortedEpochs(left2rightMovStim,:,n));
-    left2rightMovFRstd(n,:) = std(sortedEpochs(left2rightMovStim,:,n))/sqrt(size(left2rightMovStim,1));
-    top2botMovFRmean(n,:) = mean(sortedEpochs(top2botMovStim,:,n));
-    top2botMovFRstd(n,:) = std(sortedEpochs(top2botMovStim,:,n))/sqrt(size(top2botMovStim,1));
-    right2leftMovFRmean(n,:) = mean(sortedEpochs(right2leftMovStim,:,n));
-    right2leftMovFRstd(n,:) = std(sortedEpochs(right2leftMovStim,:,n))/sqrt(size(right2leftMovStim,1));
-    allFRmean(n,:) = mean(sortedEpochs(:,:,n));
-    allFRse(n,:) = std(sortedEpochs(:,:,n))/sqrt(size(ordleg,1));
-end
-
-%create ratio measures for stimulus-specific preferences, normalized to max
-for n = 1:size(spikes,2)
-    colorPref(n,:) = [blFRmean(n,2)-blFRmean(n,1) whFRmean(n,2)-whFRmean(n,1)];
-%     colorPref(n,:) = colorPref(n,:)/max(colorPref(n,:));
-    shapePref(n,:) = [triBigFRmean(n,2)-triBigFRmean(n,1) triSmlFRmean(n,2)-triSmlFRmean(n,1) sqrBigFRmean(n,2)-sqrBigFRmean(n,1) sqrSmlFRmean(n,2)-sqrSmlFRmean(n,1) crcBigFRmean(n,2)-crcBigFRmean(n,1) crcSmlFRmean(n,2)-crcSmlFRmean(n,1) starBigFRmean(n,2)-starBigFRmean(n,1) starSmlFRmean(n,2)-starSmlFRmean(n,1)];
-%     shapePref(n,:) = shapePref(n,:)/max(shapePref(n,:));
-    sizePref(n,:) = [mean([triBigFRmean(n,2)-triBigFRmean(n,1) sqrBigFRmean(n,2)-sqrBigFRmean(n,1) crcBigFRmean(n,2)-crcBigFRmean(n,1) starBigFRmean(n,2)-starBigFRmean(n,1)]) mean([triSmlFRmean(n,2)-triSmlFRmean(n,1) sqrSmlFRmean(n,2)-sqrSmlFRmean(n,1) crcSmlFRmean(n,2)-crcSmlFRmean(n,1) starSmlFRmean(n,2)-starSmlFRmean(n,1)])];
-%     sizePref(n,:) = sizePref(n,:)/max(sizePref(n,:));
-    posPref(n,:) = [centStatFRmean(n,2)-centStatFRmean(n,1) topStatFRmean(n,2)-topStatFRmean(n,1) rightStatFRmean(n,2)-rightStatFRmean(n,1) botStatFRmean(n,2)-botStatFRmean(n,1) leftStatFRmean(n,2)-leftStatFRmean(n,1)];
-%     posPref(n,:) = posPref(n,:)/max(posPref(n,:));
-    movPref(n,:) = [bot2topMovFRmean(n,2)-bot2topMovFRmean(n,1) left2rightMovFRmean(n,2)-left2rightMovFRmean(n,1) top2botMovFRmean(n,2)-top2botMovFRmean(n,1) right2leftMovFRmean(n,2)-right2leftMovFRmean(n,1)];
-%     movPref(n,:) = movPref(n,:)/max(movPref(n,:));
-    movstatPref(n,:) = [mean([bot2topMovFRmean(n,2)-bot2topMovFRmean(n,1) left2rightMovFRmean(n,2)-left2rightMovFRmean(n,1) top2botMovFRmean(n,2)-top2botMovFRmean(n,1) right2leftMovFRmean(n,2)-right2leftMovFRmean(n,1)]) mean([centStatFRmean(n,2)-centStatFRmean(n,1) topStatFRmean(n,2)-topStatFRmean(n,1) rightStatFRmean(n,2)-rightStatFRmean(n,1) botStatFRmean(n,2)-botStatFRmean(n,1) leftStatFRmean(n,2)-leftStatFRmean(n,1)])];
-%     movstatPref(n,:) = movstatPref(n,:)/max(movstatPref(n,:));
-end
+% %%
+% %create ratio measures for stimulus-specific preferences, normalized to max
+% for n = 1:size(spikes,2)
+%     colorPrefmean(n,:) = [blMeanDF whMean(n,2)-whMean(n,1)];
+% %     colorPref(n,:) = colorPref(n,:)/max(colorPref(n,:));
+%     shapePref(n,:) = [triBigFRmean(n,2)-triBigFRmean(n,1) triSmlFRmean(n,2)-triSmlFRmean(n,1) sqrBigFRmean(n,2)-sqrBigFRmean(n,1) sqrSmlFRmean(n,2)-sqrSmlFRmean(n,1) crcBigFRmean(n,2)-crcBigFRmean(n,1) crcSmlFRmean(n,2)-crcSmlFRmean(n,1) starBigFRmean(n,2)-starBigFRmean(n,1) starSmlFRmean(n,2)-starSmlFRmean(n,1)];
+% %     shapePref(n,:) = shapePref(n,:)/max(shapePref(n,:));
+%     sizePref(n,:) = [mean([triBigFRmean(n,2)-triBigFRmean(n,1) sqrBigFRmean(n,2)-sqrBigFRmean(n,1) crcBigFRmean(n,2)-crcBigFRmean(n,1) starBigFRmean(n,2)-starBigFRmean(n,1)]) mean([triSmlFRmean(n,2)-triSmlFRmean(n,1) sqrSmlFRmean(n,2)-sqrSmlFRmean(n,1) crcSmlFRmean(n,2)-crcSmlFRmean(n,1) starSmlFRmean(n,2)-starSmlFRmean(n,1)])];
+% %     sizePref(n,:) = sizePref(n,:)/max(sizePref(n,:));
+%     posPref(n,:) = [centStatFRmean(n,2)-centStatFRmean(n,1) topStatFRmean(n,2)-topStatFRmean(n,1) rightStatFRmean(n,2)-rightStatFRmean(n,1) botStatFRmean(n,2)-botStatFRmean(n,1) leftStatFRmean(n,2)-leftStatFRmean(n,1)];
+% %     posPref(n,:) = posPref(n,:)/max(posPref(n,:));
+%     movPref(n,:) = [bot2topMovFRmean(n,2)-bot2topMovFRmean(n,1) left2rightMovFRmean(n,2)-left2rightMovFRmean(n,1) top2botMovFRmean(n,2)-top2botMovFRmean(n,1) right2leftMovFRmean(n,2)-right2leftMovFRmean(n,1)];
+% %     movPref(n,:) = movPref(n,:)/max(movPref(n,:));
+%     movstatPref(n,:) = [mean([bot2topMovFRmean(n,2)-bot2topMovFRmean(n,1) left2rightMovFRmean(n,2)-left2rightMovFRmean(n,1) top2botMovFRmean(n,2)-top2botMovFRmean(n,1) right2leftMovFRmean(n,2)-right2leftMovFRmean(n,1)]) mean([centStatFRmean(n,2)-centStatFRmean(n,1) topStatFRmean(n,2)-topStatFRmean(n,1) rightStatFRmean(n,2)-rightStatFRmean(n,1) botStatFRmean(n,2)-botStatFRmean(n,1) leftStatFRmean(n,2)-leftStatFRmean(n,1)])];
+% %     movstatPref(n,:) = movstatPref(n,:)/max(movstatPref(n,:));
+% end
 
 [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
 if exist(psfilename,'file')==2;delete(psfilename);end
@@ -193,103 +215,104 @@ if exist(psfilename,'file')==2;delete(psfilename);end
 
 xvals = [-0.5:binSize:1-binSize];
 xrange = [-0.5 1];
-% yrange = [0 40];
+yrange = [0 40];
 
 for n = 1:size(spikes,2)
     figure('Name',sprintf('unit %d',n))
     subplot(4,5,1)
-    plot(xvals,bl(n,:))
+    shadedErrorBar(xvals,blHistMean(n,:),blHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,2)
-    plot(xvals,wh(n,:))
+    shadedErrorBar(xvals,whHistMean(n,:),whHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,3)
-    plot(xvals,triBig(n,:))
+    shadedErrorBar(xvals,triBigHistMean(n,:),triBigHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,4)
-    plot(xvals,triSml(n,:))
+    shadedErrorBar(xvals,triSmlHistMean(n,:),triSmlHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,5)
-    plot(xvals,sqrBig(n,:))
+    shadedErrorBar(xvals,sqrBigHistMean(n,:),sqrBigHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,6)
-    plot(xvals,sqrSml(n,:))
+    shadedErrorBar(xvals,sqrSmlHistMean(n,:),sqrSmlHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,7)
-    plot(xvals,crcBig(n,:))
+    shadedErrorBar(xvals,crcBigHistMean(n,:),crcBigHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,8)
-    plot(xvals,crcSml(n,:))
+    shadedErrorBar(xvals,crcSmlHistMean(n,:),crcBigHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,9)
-    plot(xvals,starBig(n,:))
+    shadedErrorBar(xvals,starBigHistMean(n,:),starBigHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,10)
-    plot(xvals,starSml(n,:))
+    shadedErrorBar(xvals,starSmlHistMean(n,:),starSmlHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,11)
-    plot(xvals,centStat(n,:))
+    shadedErrorBar(xvals,centStatHistMean(n,:),centStatHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,12)
-    plot(xvals,topStat(n,:))
+    shadedErrorBar(xvals,topStatHistMean(n,:),topStatHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,13)
-    plot(xvals,rightStat(n,:))
+    shadedErrorBar(xvals,rightStatHistMean(n,:),rightStatHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,14)
-    plot(xvals,botStat(n,:))
+    shadedErrorBar(xvals,botStatHistMean(n,:),botStatHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,15)
-    plot(xvals,leftStat(n,:))
+    shadedErrorBar(xvals,leftStatHistMean(n,:),leftStatHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,16)
-    plot(xvals,bot2topMov(n,:))
+    shadedErrorBar(xvals,bot2topMovHistMean(n,:),bot2topMovHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,17)
-    plot(xvals,left2rightMov(n,:))
+    shadedErrorBar(xvals,left2rightMovHistMean(n,:),left2rightMovHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,18)
-    plot(xvals,top2botMov(n,:))
+    shadedErrorBar(xvals,top2botMovHistMean(n,:),top2botMovHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,19)
-    plot(xvals,right2leftMov(n,:))
+    shadedErrorBar(xvals,right2leftMovHistMean(n,:),right2leftMovHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
     subplot(4,5,20)
-    plot(xvals,allstim(n,:))
+    shadedErrorBar(xvals,allTrialsHistMean(n,:),allTrialsHistSem(n,:))
     axis([xrange(1) xrange(2) yrange(1) ymax(n)]);
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
     
     figure('Name',sprintf('unit %d',n))
     subplot(3,3,1)
-    bar(1:2,colorPref(n,:))
-    xlim([0 3])
-%     axis([0 3 0 1])
+    errorbar(1:2,[blMeanDF(n) whMeanDF(n)],[blSemDF(n) whSemDF(n)])
+    axis([0 3 -10 10])
     set(gca,'Xtick',1:2,'XTickLabel',{'black', 'white'})
     subplot(3,3,2)
-    bar(1:8,shapePref(n,:))
-    xlim([0 9])
-%     axis([0 9 0 1])
-    set(gca,'Xtick',1:8,'XTickLabel',{'triBig', 'triSml', 'sqrBig', 'sqrSml', 'crcBig', 'crcSml', 'starBig', 'starSml'})
+    errorbar(1:8,[triBigMeanDF(n) triSmlMeanDF(n) sqrBigMeanDF(n) sqrSmlMeanDF(n) crcBigMeanDF(n) crcSmlMeanDF(n) starBigMeanDF(n) starSmlMeanDF],...
+        [triBigSemDF triSmlSemDF sqrBigSemDF sqrSmlSemDF crcBigSemDF crcSmlSemDF starBigSemDF starSmlSemDF])
+    axis([0 9 -10 10])
+    set(gca,'Xtick',1:8,'XTickLabel',{'TRI', 'tri', 'SQR', 'sqr', 'CRC', 'crc', 'Star', 'star'})
     subplot(3,3,3)
-    bar(1:2,sizePref(n,:))
-    xlim([0 3])
-%     axis([0 3 0 1])
+    errorbar(1:2,[mean([triBigMeanDF sqrBigMeanDF crcBigMeanDF starBigMeanDF]) mean([triSmlMeanDF sqrSmlMeanDF crcSmlMeanDF starSmlMeanDF])],...
+        [nansem([triBigMeanDF sqrBigMeanDF crcBigMeanDF starBigMeanDF]) nansem([triSmlMeanDF sqrSmlMeanDF crcSmlMeanDF starSmlMeanDF])])
+    axis([0 3 -10 10])
     set(gca,'Xtick',1:2,'XTickLabel',{'big', 'small'})
     subplot(3,3,4)
-    bar(1:5,posPref(n,:))
-    xlim([0 6])
-%     axis([0 6 0 1])
-    set(gca,'Xtick',1:5,'XTickLabel',{'centStat', 'topStat', 'rightStat', 'botStat', 'leftStat'})    
+    errorbar(1:5,[centStatMeanDF topStatMeanDF rightStatMeanDF botStatMeanDF leftStatMeanDF],...
+        [centStatSemDF topStatSemDF rightStatSemDF botStatSemDF leftStatSemDF])
+    axis([0 6 -10 10])
+    set(gca,'Xtick',1:5,'XTickLabel',{'cent', 'top', 'rght', 'bot', 'lft'})    
     subplot(3,3,5)
-    bar(1:4,movPref(n,:))
-    xlim([0 5])
-%     axis([0 5 0 1])
-    set(gca,'Xtick',1:4,'XTickLabel',{'bot2topMov', 'left2rightMov', 'top2botMov', 'right2leftMov'})
+    errorbar(1:4,[bot2topMovMeanDF left2rightMovMeanDF top2botMovMeanDF right2leftMovMeanDF],...
+        [bot2topMovSemDF left2rightMovSemDF top2botMovSemDF right2leftMovSemDF])
+    axis([0 5 -10 10])
+    set(gca,'Xtick',1:4,'XTickLabel',{'B2T', 'L2R', 'T2B', 'R2L'})
     subplot(3,3,6)
-    bar(1:2,movstatPref(n,:))
+    bar(1:2,[mean([bot2topMovMeanDF left2rightMovMeanDF top2botMovMeanDF right2leftMovMeanDF]) mean([centStatMeanDF topStatMeanDF rightStatMeanDF botStatMeanDF leftStatMeanDF])],...
+        [nansem([bot2topMovMeanDF left2rightMovMeanDF top2botMovMeanDF right2leftMovMeanDF]) mean([centStatMeanDF topStatMeanDF rightStatMeanDF botStatMeanDF leftStatMeanDF])])
     xlim([0 3])
-%     axis([0 3 0 1])
-    set(gca,'Xtick',1:2,'XTickLabel',{'moving', 'static'})
-    
+    axis([0 3 -10 10])
+    set(gca,'Xtick',1:2,'XTickLabel',{'mov', 'stat'})
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
@@ -297,4 +320,4 @@ end
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);
 
-save(fullfile(pname,fname(1:end-3)),'fpsec','sortedSpikes');
+save(fullfile(pname,fname(1:end-3)),'fpsec','binSize','sortedSpikes');
