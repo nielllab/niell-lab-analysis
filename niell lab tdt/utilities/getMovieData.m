@@ -12,7 +12,8 @@ load(afile);
 Block_Name = Block_Name{blocknum}
 
 %%% get mouse data and stim timing
-flags = struct('mouseOn',1,'visStim',1);
+% flags = struct('mouseOn',1,'visStim',1);
+flags = struct('visStim',1); 
 tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
 
 mouseT = tdtData.mouseT;  %%% time points for speed measurements
