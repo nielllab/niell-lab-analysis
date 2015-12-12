@@ -7,7 +7,8 @@ dbstop if error
 % psfilename = 'c:/test.ps';   %%% default location
 % if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
-apath = 'D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_files\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
+apath = 'D:\Jen_analysis\'
+%apath = 'D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_files\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
 N =0; cells=0;  all_img_STA={};PINPed=0; Inh=0; STA_peak={};stopCRF={}; moveCRF={};
 sessionNum=0;
 
@@ -16,8 +17,8 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
     if dataset ==1
         
         
-        afiles = { 'NR5A_Pinping\1_13_15_pos_ctl\1_13_15_analysis_pos_ctl.mat',...
-            'NR5A_Pinping\12_22_14_pos_ctl\analysis_12_22_14_1st_clust.mat',...
+        afiles = { 'NR5A_Pinping\1_13_15_pos_ctl\analysis_2.mat',...
+            'NR5A_Pinping\12_22_14_pos_ctl\analysis_2.mat',...
            'NR5A_Pinping\2_25_15\analysis_2.mat',...
            'NR5A_Pinping\3_11_15_wt\full\analysis_2.mat',...
           'NR5A_Pinping\4_9_15\Full\analysis_2.mat',...
@@ -236,34 +237,34 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         
      clear meanwaves snr stdwaves
 %         
-         for c=1:length(cells);
-            %%% get SNR
-            tet =ceil(cells(c,1)/4);
-            
-            if exist('wave_all','var')
-                wvall = wave_all{tet};
-                wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
-                
-                amps =squeeze(min(wvclust(:,5:10,:),[],2));
-                mn = abs(nanmean(amps));
-                stdev = nanstd(amps);
-                [y ind] = max(mn);
-                snr(c) = mn(ind)/stdev(ind);
-                
-                meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
-                stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
-            else
-                meanwaves=NaN;
-                snr=NaN
-                stdwaves=NaN
-            end
-% %             
+%          for c=1:length(cells);
+%             %%% get SNR
+%             tet =ceil(cells(c,1)/4);
+%             
+%             if exist('wave_all','var')
+%                 wvall = wave_all{tet};
+%                 wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
+%                 
+%                 amps =squeeze(min(wvclust(:,5:10,:),[],2));
+%                 mn = abs(nanmean(amps));
+%                 stdev = nanstd(amps);
+%                 [y ind] = max(mn);
+%                 snr(c) = mn(ind)/stdev(ind);
+%                 
+%                 meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
+%                 stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
+%             else
+%                 meanwaves=NaN;
+%                 snr=NaN
+%                 stdwaves=NaN
+%             end
 % % %             
-        end
+% % % %             
+%         end
 %         
-        SNRall(cellrange)=snr;
-        meanWavesAll(cellrange,:,:) = meanwaves;
-        stdWavesAll(cellrange,:,:) = stdwaves;
+%         SNRall(cellrange)=snr;
+%         meanWavesAll(cellrange,:,:) = meanwaves;
+%         stdWavesAll(cellrange,:,:) = stdwaves;
         
         if exist('params','var');
 

@@ -1,10 +1,10 @@
 
 badwv=wv(14,:); %enter value where waveform value discriminates bad events from good
-bad=cells(badwv<.25,:)
-find(badwv <.25)
+bad=cells(badwv<.42,:)
+b=find(badwv <.42)
 
-%list of  11 5
-u=5;
+%list of  2 5 8 10 16 18 
+u=4;
 
 %row org
 cells(u,:) = [];

@@ -40,18 +40,18 @@ end
 %%% show all traces
 sfactor=8;
 rf_fig = figure;
-for x = 1:nx/sfactor
-    for y = 1:ny/sfactor
-        xi= x*sfactor; yi = y*sfactor;
-        subplot(nx/sfactor,ny/sfactor,(x-1)*ny/sfactor + y)
-        plot(squeeze(mean(onset_hist(xi,yi,1,1:4,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)));
-        hold on
-        plot(squeeze(mean(onset_hist(xi,yi,2,1:4,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)),'r');
-        ylim([min(resps(:)) max(resps(:))])
-        axis off
-        set(gca,'LooseInset',get(gca,'TightInset'));
-    end
-end
+% for x = 1:nx/sfactor
+%     for y = 1:ny/sfactor
+%         xi= x*sfactor; yi = y*sfactor;
+%         subplot(nx/sfactor,ny/sfactor,(x-1)*ny/sfactor + y)
+%         plot(squeeze(mean(onset_hist(xi,yi,1,1:4,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)));
+%         hold on
+%         plot(squeeze(mean(onset_hist(xi,yi,2,1:4,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)),'r');
+%         ylim([min(resps(:)) max(resps(:))])
+%         axis off
+%         set(gca,'LooseInset',get(gca,'TightInset'));
+%     end
+% end
 
 datafig=figure;
 
@@ -132,8 +132,8 @@ title('on off')
 sustain = mean(resps(:,:,:,2:end),4)./max(resps(:,:,:,2:end),[],4);
 sustain(:,:,1)=medfilt2(sustain(:,:,1)); sustain(:,:,2)=medfilt2(sustain(:,:,2)); 
 sustain = (rfpos(:,:,1).*sustain(:,:,1) + rfpos(:,:,2).*sustain(:,:,2) )./(rfpos(:,:,1) + rfpos(:,:,2));
-sustainIm = mat2im(sustain,cmap,[0 1]);
-
-subplot(1,2,2)
-imshow(imresize(sustainIm.*amp,10));
-title('sustain')
+% sustainIm = mat2im(sustain,cmap,[0 1]);
+% 
+% subplot(1,2,2)
+% imshow(imresize(sustainIm.*amp,10));
+% title('sustain')
