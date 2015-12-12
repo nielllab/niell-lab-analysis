@@ -7,9 +7,9 @@ function tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
 tdtData=struct('streamV',[],'streamT',[],'MUspikeT',[], 'snips',[], 'spikeT',[],  'lfpT' ,[],...
     'lfpData',[], 'spectT',[], 'spectF',[], 'spectData' ,[], ...
     'frameEpocs' ,[],'stimEpocs' ,[], ...
-    'mouseT',[], 'mouseV' ,[],'laserT',[], 'laserTTL',[],'analogV',[],'analogT',[]);
+    'mouseT',[], 'mouseV' ,[],'laserT',[], 'laserTTL',[],'analogV',[],'analogT',[],'cameraT',[]);
 
-TTX = openTTX(Tank_Name,Block_Name);
+TTX = openTTX(Tank_Name,Block_Name)
 
 if isfield(flags,'stream') && flags.stream
     event_code = 'pAll';
@@ -90,6 +90,13 @@ if isfield(flags,'laserOn') && flags.laserOn
     display('laser')
     [tdtData.laserT tdtData.laserTTL] = read_laser(TTX);
 end
+
+if isfield(flags,'cameraOn') && flags.cameraOn
+    display('camera')
+    [tdtData.cameraT] = read_camTTL(TTX);
+    length(tdtData.cameraT)
+end
+
 
 if isfield(flags,'mouseOn') && flags.mouseOn
    % version = input('old (0) or new (1) mouse format: ');
