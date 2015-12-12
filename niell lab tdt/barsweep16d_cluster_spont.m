@@ -9,6 +9,7 @@ function barsweep16d_cluster_spont
 %%% read in cluster data, then connect to the tank and read the block
 clear all
 cells =1;
+block=0;
 [fname, pname] = uigetfile('*.mat','cluster data');
 load(fullfile(pname,fname));
 for i =1:length(Block_Name);

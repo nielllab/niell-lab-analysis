@@ -1,9 +1,11 @@
 %PRLP 10/29/2015 Niell Lab
 %This code is used to generate simple unidirectional stimuli based on
 %images made in Adobe Illustrator
+%%%legend info: column 1 = number, 2 = shape/size, 3 = color, 4 =
+%%%position/direction
 
-nstim = 5; %choose number of repeats per stimulus
-MovieMag=3;                 %% magnification that movie will be played at
+nstim = 1; %choose number of repeats per stimulus
+MovieMag=15;                 %% magnification that movie will be played at
 screenWidthPix = 1280;        %% Screen width in Pixels
 screenWidthCm = 50;         %% Width in cm
 screenDistanceCm = 25;      %% Distance in cm
@@ -32,7 +34,7 @@ shapes(:,:,6) = crcSml;
 shapes(:,:,7) = starBig;
 shapes(:,:,8) = starSml;
 
-scaleDownBy = 4;
+scaleDownBy = 2;
 shapes = shapes(1:scaleDownBy:256,1:scaleDownBy:256,:);
 stimframes = 30;
 

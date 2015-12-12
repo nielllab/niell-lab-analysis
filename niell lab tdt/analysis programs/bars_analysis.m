@@ -136,6 +136,7 @@ for cell_n = cell_range;
         hold on; set(gca, 'yDir','reverse');
         axis([0 plot_duration 0 numtrials+1]);
         plot ([Spike_Timing; Spike_Timing], [index-0.25;index+0.25], 'k', 'MarkerSize',4);
+        title('spontaneous')
         set(gca,'XTickLabel',[]);     set(gca,'YTickLabel',[])
         print('-dpsc',psfilename,'-append');
         
@@ -180,7 +181,7 @@ for cell_n = cell_range;
             
             %% histograms
             figure(hist_fig);
-            subplot(nrows,ncols,c);
+            subplot(4,4,c);
             hold on
             if rep ==1
                 color = 'b';
@@ -209,7 +210,10 @@ for cell_n = cell_range;
             obs =obs_interp - bars(cell_n,1).spont;
             [min(obs) max(obs) fit_range(find(max(obs))) stim_duration/5];
             peak_guess = median(fit_range(find(obs> 0.75*max(obs))));
-            fit_coeff = nlinfit(fit_range,obs,@rf_fit_nobaseline,[ max(obs) peak_guess stim_duration/10]);
+           if isnan(peak_guess)
+               peak_guess = fit_range(round(end/2));
+           end
+           fit_coeff = nlinfit(fit_range,obs,@rf_fit_nobaseline,[ max(obs) peak_guess stim_duration/10]);
             
             fit_coeff(3)=abs(fit_coeff(3));
             if isnan(fit_coeff(1))
@@ -240,7 +244,7 @@ for cell_n = cell_range;
 
 
             hold on
-            plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1);
+          %  plot(fit_range, rf_fit_nobaseline(fit_coeff,fit_range)+bars(cell_n,1).spont,'g','LineWidth',1);
 
         
             
@@ -272,13 +276,15 @@ for cell_n = cell_range;
 
     plot(orient_list,bars(cell_n,2).amp,'r');
    % plot(orient_list,bars(cell_n,2).Rmax-bars(cell_n,1).spont,'r--');
-
+    ylabel('sp/sec')
+    legend('off','on')
+    
     set(gca,'XTick',orient_list)
     xlabel('orientation -deg');
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
   
-    close all
+   % close all
  
 end
 

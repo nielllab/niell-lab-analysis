@@ -12,7 +12,7 @@ nblock=0;
 
 recluster= input('reclustering? (y/n) ','s');
 
-choose_pca= input('choose pca? (y/n) ','s');;
+% choose_pca= input('choose pca? (y/n) ','s');;
 
 if recluster~='y'
 
@@ -268,7 +268,9 @@ for tet=use_tets
     ica_fig=figure
     score = zeros(size(X,1),8);
 
-    if choose_pca~='y'
+    choose_pca = 1;
+    
+    if choose_pca%~='y'
         n_pca=8;
     else
         n_pca =8;
@@ -306,7 +308,7 @@ for tet=use_tets
 
     goodcells = zeros(1,n_pca);
 
-    if choose_pca~='y'
+    if choose_pca%~='y'
         %     ginput(1)
         %     n_pca=input('how many ica to use?  ');
         %     for i = 1:n_pca;
