@@ -81,11 +81,21 @@ for dataset = 2:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
         n_units = length(cells);
        
         %%% determine waveform ID
-        
+%         F1 = trough2peak;
+%         F2 = -trough_depth./peak_height;
+%         EI=[F1;F2]'
+%        
+%         opts = statset('display','final');
+%         [idx,ctrs] = kmeans(EI,2,'distance','city','Replicates',5,'options',opts);
+%         if sum(idx==1)<sum(idx==2)
+%             inh = (idx==1);
+%         else
+%             inh = (idx==2);
+%         end
+
+       
         trough2peak;
         TH_ratio = -trough_depth./peak_height;
-       
-        
         inh = TH_ratio>0 & TH_ratio <1.6  & trough2peak<7.5  %%% directly based on wvform; k-means includes another inh group?
         midnarrow = TH_ratio>0 & TH_ratio<4 & trough2peak<10 &  trough2peak(:,5)>7.5;  %%% could analyze these specifically at some point
         exc= trough2peak>10 & TH_ratio>0 & TH_ratio<4;
@@ -108,12 +118,11 @@ for dataset = 2:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
         peak=NaN;
        
         end
-            
+          
+        resp = peak(:,1)>=1;
         %load in peri-light stim firing rates
         psth_pinp=psth;
          %histbins = -50ms to + 50 in steps of 1 (msec) if you need to plot
-        
-        resp = peak(:,1)>=1;
         baseline = mean(psth_pinp(:,5:45),2);
         baseStd = std(psth_pinp(:,5:45),[],2);
 

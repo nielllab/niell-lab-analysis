@@ -370,38 +370,30 @@ else
     inh = (idx==2);
 end
 
-wave=alldata(:,7:25);
 
-inh = alldata(:,6)>0 & alldata(:,6)<1.6  & alldata(:,5)<7.5  %%% directly based on wvform; k-means includes another inh group?
-midnarrow = alldata(:,6)>0 & alldata(:,6)<4 & alldata(:,5)<10 &  alldata(:,5)>7.5;  %%% could analyze these specifically at some point
-exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<4;
+
+alldata( cellrange,5) = trough2peak;
+alldata( cellrange,6) = -trough_depth./peak_height;
+
+wave=alldata(:,7:25);
+% inh = alldata(:,6)>0 & alldata(:,6)<1.6  & alldata(:,5)<7.5  %%% directly based on wvform; k-means includes another inh group?
+% midnarrow = alldata(:,6)>0 & alldata(:,6)<4 & alldata(:,5)<10 &  alldata(:,5)>7.5;  %%% could analyze these specifically at some point
+% exc= alldata(:,5)>10 & alldata(:,6)>0 & alldata(:,6)<4;
 
 lyr = alldata(:,26)
 
 figure
-plot(alldata(find(inh),5),alldata(find(inh),6),'ro');
+plot(alldata(find(~inh),5),alldata(find(~inh),6),'go');
 hold on
-plot(alldata(find(exc),5),alldata(find(exc),6),'ko');
-hold on
-plot(alldata(find(midnarrow),5),alldata(find(midnarrow),6),'bo');
-
+plot(alldata(find(inh),5),alldata(find(inh),6),'ko');
 
 %plot(alldata(find(pinp),5),alldata(find(pinp),6),'go');
 
-%junk = (psth_pinp(:,52)>50);
 junk= psth_pinp(:,52)>50;
 
 figure
 plot(psth_pinp(lyr<=4 & junk,:)')
 set(gca,'xlim',[50 60])
-
-figure
-%plot(wvform(junk,:)','color','k');hold on
-plot(wvform(inh &~junk ,:)','color','r');hold on
-plot(wvform(midnarrow&~junk ,:)','color','b');hold on
-plot(wvform(exc & ~junk ,:)','color','g');hold on
-plot(wvform(junk,:)','color','k');hold on
-
 
 for i = 1:size(driftA1,1)
     for j=1:size(driftA1,2)
@@ -414,7 +406,6 @@ for i = 1:size(driftA1,1)
         
     end
 end
-lyr = alldata(:,26);
 
 %%% define responsive
 resp = peak(:,1)>=2 %peak firing rate during gratings
@@ -427,6 +418,15 @@ for i=1:length(CRF)
         wn_resp(i)=0;
     end
 end
+
+figure
+%plot(wvform(junk,:)','color','k');hold on
+plot(wvform(inh &~junk & resp,:)','color','r');hold on
+plot(wvform(~inh &~junk & resp ,:)','color','g');hold on
+
+I=idx(inh&~junk);
+E=idx(~inh&~junk);
+pctinh=length(I)/(length(I)+length(E))
 
 plotrange = 50:80;
 figure

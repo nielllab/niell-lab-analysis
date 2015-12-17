@@ -22,7 +22,7 @@ end
 for iDir = dirsel
   
   iDir 
-  
+  clear dat
   % check if directory has been processed already
   filename1 = fullfile(outputDir, output1, info(iDir).dataname, output1);
   mkdir(fullfile(outputDir, output1, info(iDir).dataname));
@@ -57,6 +57,16 @@ for iDir = dirsel
   cfg.bsinstabilityfix = 'reduce';
   dat = ft_preprocessing(cfg, dat);
       
+%   cfg = [];
+%   cfg.length = 100;
+%   cfg.overlap = 0.5;
+%   data_long = ft_redefinetrial(cfg, dat);
+%   
+%   cfg = [];
+%   cfg.method = 'mtmfft';
+%   cfg.taper  = 'hanning';
+%   cfg.output = 'pow'
+%   ft = ft_freqanalysis(cfg, dataTrials);
   % detect the state point transitions on the data based on 1 cm threshold
   % and check for each trial in which state transition the trial fell
   threshold = 1.4;
@@ -147,12 +157,13 @@ for iDir = dirsel
 
   % read in the unit data, create a spike structure
   nCells = length(unitdataSession);
+  clear spike
   for iCell = 1:nCells
     spike.timestamp{iCell} = unitdataSession{iCell}.spikes{1};
     spike.label{iCell} = ['chan_' num2str(unitdataSession{iCell}.ch) '_cluster_' num2str(unitdataSession{iCell}.clust) ];
     cnds(iCell) = unitdataSession{iCell}.GT;
   end
- 
+  
   % make trials in the spike structure
   cfg = [];
   trl = data.stimEpocs{indxChan}(2,:);
@@ -169,8 +180,27 @@ for iDir = dirsel
  
   cfg.timestampspersecond = 1;
   cfg.trl(trialsToDel,:) = [];
-  spikeTrials = ft_spike_maketrials(cfg, spike);  
+  spikeTrials = ft_spike_maketrials(cfg, spike); 
+  if length(spikeTrials.label)~=length(unitdataSession)
+      error('number of cells dont match')
+  end
   trialinfo = {'move1sit0', 'time_since_change', 'time_to_change', 'velocity'};
+%   cfg = [];
+%   cfg.spikechannel = [1:5];
+%   cfg.binsize = 0.025;
+%   psth = ft_spike_psth(cfg, spikeTrials);
+%    cfg = [];
+%   cfg.spikechannel = [1:5];
+%  
+%   figure
+%   cfg.topplotfunc = 'line';
+%   ft_spike_plot_raster(cfg,spikeTrials,psth)
+%   cfg = [];
+%   jpsth = ft_spike_jpsth(cfg, psth);
+%   figure
+%   cfg = [];
+%   cfg.channelcmb = {psth.label{1}, psth.label{2}};
+%   ft_spike_plot_jpsth(cfg, jpsth)
   
   save(filename1, 'dataTrials', 'trialinfo')
   
@@ -178,4 +208,4 @@ for iDir = dirsel
   mkdir(fullfile(outputDir, output2, info(iDir).dataname));  
   save(filename2, 'spikeTrials', 'spike', 'trialinfo')    
 end
-
+exit
