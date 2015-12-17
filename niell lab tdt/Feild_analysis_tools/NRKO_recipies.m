@@ -1,8 +1,15 @@
+%%appending Indices or variables that you want to analyze at the end i.e inh waveforms versus exc, may be a cleaner
+%%way to do this
+append_analysis_file
+
+%% extracting the data from analysis and cluster files
+getBlockData_specific_block_sessions
+
 %% resave the data, I want one session per directory to keep things organized
 NRKO_resavedata
 
 %% this is required by all functions
-NRKO_global % always run at the start of analyses
+NRKO_global % always run at the start of analyses will be specific to project
 NRKO_lev0_readdata_peristim
 
 %% spike triggered spectrum 
