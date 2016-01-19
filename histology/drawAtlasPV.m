@@ -22,6 +22,7 @@ Yall = [];
 Zall = [];
 for paxnum=1:totalnum;
     pathname='C:\data\matlab data\Wayne Matlab data\histology\PV traces';
+    pathname='histology\PV traces';
      filename = sprintf('%d.tif',paxnum);%sprintf returns as string. lgn paxinos figures 44-55.
 img=imread(fullfile(pathname,filename));
 

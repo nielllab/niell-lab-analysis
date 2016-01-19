@@ -10,4 +10,5 @@ end
     N(i) = sum(age_used);
     sortedVals(i,:) = nanmean(vals(age_used,:),1);
     sortedError(i,:) = nanstd(vals(age_used,:),[],1)/sqrt(N(i));
+    
 end
