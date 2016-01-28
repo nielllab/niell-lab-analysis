@@ -1,18 +1,18 @@
 
 badwv=wv(14,:); %enter value where waveform value discriminates bad events from good
-bad=cells(badwv<.42,:)
-b=find(badwv <.42)
+bad=cells(badwv<.29,:)
+b=find(badwv <.29)
 
-%list of  2 5 8 10 16 18 
-u=4;
+%list of  5 4 3 2 1 
+u=1;
 
 %row org
 cells(u,:) = [];
-wn(u,:)=[];
+%wn(u,:)=[];
 
-psth(u,:)=[];
+%psth(u,:)=[];
 %layer(u,:)=[];
-drift(u,:)=[];
+%drift(u,:)=[];
 
 %column org
 

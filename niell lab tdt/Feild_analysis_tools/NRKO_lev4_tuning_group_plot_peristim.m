@@ -7,24 +7,24 @@ filename = fullfile(outputDir,output,output);
 mkdir(fullfile(outputDir,output))
 load(filename);
 %
-rate_stat.unitinfo(rate_stat.unitinfo(:,4)==2,4) = 3;
+rate_stat.unitinfo(rate_stat.unitinfo(:,4)==2,4) = 3; %collapse layer 2 and layer 3 units
 
 %% plot the different layer 4 cells
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-gt = {'N2BKO','wt','N2AKO'};
+gt = {'wt','N2B','N2AKO'};
 
 figure
 cnt = 0;
 for iStim = 1:2
     for k = 0:1
         for iLayer = 3:5
-            cors = {'r', 'k', 'g'};            
+            cors = {'k', 'r', 'g'};            
             df = [];
             cnt=cnt+1;
             subplot(4,3,cnt)
             mn = []; sm = [];
-            for iType = [1 0 2]
+            for iType = [1 0 2] % 1=wt, 0= N2B & 2=N2A
                 hold on
                 if k==0
                     sl =  rate_stat.unitinfo(:,4)==iLayer & rate_stat.unitinfo(:,5)==k & rate_stat.unitinfo(:,1)==iType & rate_stat.unitinfo(:,6)==iStim;
@@ -46,25 +46,27 @@ for iStim = 1:2
                                 n(iType+1) = stt.nIndividuals;
 
             end
-            yax = get(gca, 'YLim');
-            yax(1) = 0;
-            set(gca,'YLim', yax);
+%             yax = get(gca, 'YLim');
+%             yax(1) = 0;
+%             set(gca,'YLim', yax);
+            ylim([0 0.4])
             xlim([-0.5 2.5])
             nt = {'pyr', 'int'};
             stims = {'drift', 'bar'};
             layers = {'nan', 'nan','superficial', 'granular', 'deep'};
             H = title(sprintf('%s, %s, %s, %d(%d) %d(%d) %d(%d)',  layers{iLayer}, stims{iStim}, nt{k+1},df(1),n(1), df(2),n(2), df(3), n(3)));
             set(H,'FontSize',6)
+            
         end
     end
 end
 %%
-figure
+figure %plot comparisons relative to pinp no pinp
 cnt = 0;
 for iStim = 1:2
     for k = 0:1
         for iLayer = 3:5
-            cors = {'r', 'k', 'g'};            
+            cors = {'k', 'r', 'g'};            
             df = [];
             cnt=cnt+1;
             subplot(4,3,cnt)
@@ -106,14 +108,14 @@ for iStim = 1:2
 end
 %%
 
-gt = {'N2BKO','wt','N2AKO'};
+gt = {'wt','N2B','N2AKO'};
 
 figure
 cnt = 0;
 for iStim = 1:2
     for k = 0:1
         for iLayer = 3:5
-            cors = {'r', 'k', 'g'};            
+            cors = {'k', 'r', 'g'};            
             df = [];
             cnt=cnt+1;
             subplot(4,3,cnt)
@@ -154,12 +156,13 @@ for iStim = 1:2
     end
 end
 %%
+gt = {'wt','N2BKO','N2AKO'};
 figure
 cnt = 0;
 for iStim = 1:2
     for k = 0:1
         for iLayer = 3:5
-            cors = {'r', 'k', 'g'};            
+            cors = {'k', 'r', 'g'};            
             df = [];
             cnt=cnt+1;
             subplot(4,3,cnt)
@@ -202,14 +205,14 @@ for iStim = 1:2
 end
 %%
 
-gt = {'N2BKO','wt','N2AKO'};
+gt = {'wt','N2BKO','N2AKO'};
 
 figure
 cnt = 0;
 for iStim = 1:2
     for k = 0:1
         for iLayer = 3:5
-            cors = {'r', 'k', 'g'};            
+            cors = {'k', 'r', 'g'};            
             df = [];
             cnt=cnt+1;
             subplot(4,3,cnt)
@@ -255,7 +258,7 @@ cnt = 0;
 for iStim = 1:2
     for k = 0:1
         for iLayer = 3:5
-            cors = {'r', 'k', 'g'};            
+            cors = {'k', 'r', 'g'};            
             df = [];
             cnt=cnt+1;
             subplot(4,3,cnt)
@@ -297,7 +300,7 @@ for iStim = 1:2
     end
 end
 %%
-gt = {'N2BKO','wt','N2AKO'};
+gt = {'wt','N2BKO','N2AKO'};
 
 figure
 for iLatency = 1:2
@@ -306,7 +309,7 @@ for iLatency = 1:2
     for iStim = 1:2
         for k = 0:1
             for iLayer = 3:5
-                cors = {'r', 'k', 'g'};            
+                cors = {'k', 'r', 'g'};            
                 df = [];
                 cnt=cnt+1;
                 subplot(4,3,cnt)
@@ -355,7 +358,7 @@ for iLatency = 1:2
         for k = 0:1
             for iLayer = 3:5
                 try
-                    cors = {'r', 'k', 'g'};            
+                    cors = {'k', 'r', 'g'};            
                     df = [];
                     cnt=cnt+1;
                     subplot(4,3,cnt)

@@ -32,11 +32,11 @@ clear nspikes L_ratio trough_depth peak_height trough_width trough2peak1
 tet_data=1;
 clear wv
 
-%%% merge two clusters
-%%% this is a total hack! but can't think of a good gui to do this
+% %%% merge two clusters
+% %%% this is a total hack! but can't think of a good gui to do this
 % ch = 7;   %%% ch is tetrode number, i.. 1-16
 % c1=4;
-% c2=9;
+% c2=12;
 % idx=idx_all{4*(ch-1)+1};
 % idx(idx==c2)=c1;
 % idx_all{4*(ch-1)+1}=idx;
@@ -48,8 +48,25 @@ clear wv
 % peak_trough(ch,c1) = 0.5*(peak_trough(ch,c1)+peak_trough(ch,c2));
 % mean_wvform(:,4*(ch-1)+1:4*(ch-1)+4,c1) = 0.5*(mean_wvform(:,4*(ch-1)+1:4*(ch-1)+4,c1) + ...
 %     mean_wvform(:,4*(ch-1)+1:4*(ch-1)+4,c2)); 
-% %%% done merge
-
+% % %%% done merge
+% 
+% %%% merge two clusters
+% %%% this is a total hack! but can't think of a good gui to do this
+% ch = 8;   %%% ch is tetrode number, i.. 1-16
+% c1=3;
+% c2=5;
+% idx=idx_all{4*(ch-1)+1};
+% idx(idx==c2)=c1;
+% idx_all{4*(ch-1)+1}=idx;
+% csize(ch,c1) = csize(ch,c1)+csize(ch,c2);
+% Lratio(ch,c1) = 0.5*(Lratio(ch,c1)+Lratio(ch,c2));
+% trough(ch,c1) = 0.5*(trough(ch,c1)+trough(ch,c2));
+% peak(ch,c1) = 0.5*(peak(ch,c1)+peak(ch,c2));
+% half_width(ch,c1) = 0.5*(half_width(ch,c1)+half_width(ch,c2));
+% peak_trough(ch,c1) = 0.5*(peak_trough(ch,c1)+peak_trough(ch,c2));
+% mean_wvform(:,4*(ch-1)+1:4*(ch-1)+4,c1) = 0.5*(mean_wvform(:,4*(ch-1)+1:4*(ch-1)+4,c1) + ...
+%     mean_wvform(:,4*(ch-1)+1:4*(ch-1)+4,c2)); 
+% % %%% done merge
 
 linecolor = [0 0 1; 0 1 0 ; 1 0 0; 0 1 1; 1 0 1; 1 1 0; 0 0 0; .25 0 0.5; 0 0.5 0 ; 0.5 .25 0; 0.5 0 1; 0 0.5 0.5];
 ncells = 0;

@@ -25,9 +25,9 @@ for iDir = 1:length(info)
     end
     
 end
-%% PRE STIM VS PRESTIM; WILD TYPES
+%% STIM VS preSTIM; WILD TYPES
 % first figure: relative to different layers, with running and with sitting
-iType = 1;
+iType = 0;
 iMethod = 1; % phsae locking
 iTaper = 1;
  figure
@@ -52,18 +52,20 @@ for iStim = 1:2
                     freq = 4:4:160;
                     errorbar(log10(freq), mn,sm,cors{iLatency})
                     hold on
-                    latencies = {'prestim', 'stim'};
+                    latencies = {'stim', 'prestim'};
                     stims = {'drift', 'bar'};
                     layers = {'superficial', 'granular', 'deep'};
                     nt = {'pyr', 'int'};
                     xlim(log10([4 160]))
                     H = title(sprintf('%s %s %s',  layers{iLayer}, G_stat.state{iState}, stims{iStim}, sum(sl)));
                     set(H,'FontSize', 6);
+                  
                 end         
             end
         end
     end
 end
+
 %%
 iType = 1;
 iMethod = 1; % phsae locking
@@ -94,7 +96,7 @@ for iStim = 1:2
                     sm = squeeze(nanstd(dat,1))./sqrt(sum(sl));
                     errorbar(log10(freq), mn,sm,cors{iLatency})
                     hold on
-                    latencies = {'prestim', 'stim'};
+                    latencies = {'stim', 'prestim'};
                     stims = {'drift', 'bar'};
                     layers = {'superficial', 'granular', 'deep'};
                     nt = {'pyr', 'int'};
@@ -136,7 +138,7 @@ for iStim = 1:2
                     sm = squeeze(nanstd(dat,1))./sqrt(sum(sl));
                     errorbar(log10(freq), mn,sm,cors{iState})
                     hold on
-                    latencies = {'prestim', 'stim'};
+                    latencies = {'stim', 'prestim'};
                     stims = {'drift', 'bar'};
                     layers = {'superficial', 'granular', 'deep'};
                     nt = {'pyr', 'int'};
@@ -151,8 +153,7 @@ end
 %% GT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% PRE STIM VS PRESTIM; WILD TYPES
-% first figure: relative to different layers, with running and with sitting
+%% STIM VS PRESTIM; genotypes
 gt = {'N2B', 'WT', 'N2A'}
 for iType = 0:2
     iMethod = 1; % phsae locking
@@ -241,17 +242,51 @@ for iType = 0:2
     end
 end
 
+%%
 
+gt = {'N2B', 'WT', 'N2A'}
+iLayer = 2;
+iMethod = 1; % phsae locking
+iTaper = 1;
+ figure
+cnt = 0;
+for iStim = 1:2         
+    for iLatency = 1:2
+         for iType = 0:2
 
-
-
-
-
-
-
-
-
-
+            cors = {'g', 'r'};
+            cnt=cnt+1;
+            subplot(4,3,cnt)
+            for iState= [2:-1:1]
+                hold on
+                try                                            
+                    sl =  unitinfo==iStim & G_stat.dirinfo==iType;
+                    dat = G_stat.powAllCat(iState,iLatency,iLayer).powAll(sl,:,:);
+                    dat(dat==0) = NaN;
+                    dat(~isfinite(dat)) = NaN;
+                    freq = 4:4:160;                                        
+                    if iState==2
+                        norm = repmat(nanmean(dat,2),[1 length(freq)]);
+                    end
+                    dat = log10(dat./norm);
+                    
+                    mn = squeeze(nanmean(dat,1));
+                    sm = squeeze(nanstd(dat,1))./sqrt(sum(sl));
+                    errorbar(log10(freq), mn,sm,cors{iState})
+                    hold on
+                    latencies = {'stim', 'prestim'};
+                    stims = {'drift', 'bar'};
+                    layers = {'superficial', 'granular', 'deep'};
+                    nt = {'pyr', 'int'};
+                    Genotype={'N2B','wt','N2A'};
+                    xlim(log10([4 160]))
+                    H = title(sprintf('%s %s %s',  Genotype{iType+1}, latencies{iLatency}, stims{iStim}, sum(sl)));
+                    set(H,'FontSize', 6);
+                end         
+            end
+        end
+    end
+end 
 
 
 

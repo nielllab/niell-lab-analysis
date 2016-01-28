@@ -31,7 +31,7 @@ for c = 1:length(spikeT)
     sp = sp(sp>0 & sp<10^5);
     histbins = 5:10:max(tsampDark);
     darkR(1:length(histbins),c) = hist(sp,histbins)/10;
-   % [ corr_Fvel lags] = xcorr(darkR{c}-mean(darkR{c}),vsmoothDark-mean(vsmoothDark),60/dt,'coeff')
+  % [corr_Fvel lags] = xcorr(darkR{c}-mean(darkR{c}),vsmoothDark-mean(vsmoothDark),60/dt,'coeff')
     figure
     subplot(2,1,1)
     plot(histbins,darkR(1:length(histbins),c));

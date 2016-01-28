@@ -39,7 +39,7 @@ xlabel('frame #'); ylabel('secs');
 ylim([ 0 0.2])
 
 thresh = 0.8; %pupil threshold for binarization
-puprange = [10 35]; %set
+puprange = [10 55]; %set
 
 %user input to select center and right points
 sprintf('Please select pupil center and top, eyeball top and right points, darkest part of eyeball')
@@ -195,28 +195,28 @@ end
 % plot(rad, 
 
 % video with tracking
-h4 = figure
-for i = 1:size(data,3)
- 
-    subplot(1,2,1)
-    imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off
-    
-    subplot(1,2,2)
-    imshow(bindata(:,:,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off 
-%     mov(i) = getframe(gcf)
-%     vid = VideoWriter('predoi_tracking.avi')
-%     open(vid); writeVideo(vid,mov); close(vid)
-end
+% h4 = figure
+% for i = 1:size(data,3)
+%  
+%     subplot(1,2,1)
+%     imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off
+%     
+%     subplot(1,2,2)
+%     imshow(bindata(:,:,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off 
+% %     mov(i) = getframe(gcf)
+% %     vid = VideoWriter('predoi_tracking.avi')
+% %     open(vid); writeVideo(vid,mov); close(vid)
+% end
 
 
 save(afile,'tsampBar','vsmoothBar','R','centroid','rad','-append');
