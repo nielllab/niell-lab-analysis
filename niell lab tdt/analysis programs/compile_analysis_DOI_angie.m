@@ -19,7 +19,7 @@ for dataset = 1:1  %%% pre and post DOI
     if dataset==1
         %%DOI
 %         
-         afiles = {'Angie_analysis\DOI_experiments\12_02_15\analysis_120215.mat'} %,...
+         afiles = {'Angie_analysis\DOI_experiments\12_09_15\analysis_120915.mat'} %,...
 % %             'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat'}
 % %         %    'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat'
 
@@ -140,7 +140,7 @@ for dataset = 1:1  %%% pre and post DOI
         alldata( cellrange,4) = trough_width;
         alldata( cellrange,5) = trough2peak;
         alldata( cellrange,6) = -trough_depth./peak_height;
-        alldata( cellrange,7:25)= wv';
+     %   alldata( cellrange,7:25)= wv';
         alldata(cellrange,26)=layer;
         
         

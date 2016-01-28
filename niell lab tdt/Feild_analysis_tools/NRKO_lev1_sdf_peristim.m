@@ -1,6 +1,6 @@
-function [] = NRKO_lev1_sts_convol_peristim(dirsel, overwrite)
+function [] = NRKO_lev1_sdf_peristim(dirsel, overwrite)
 
-% NRKO_LEV1_STS_PERISTIM produces spike triggered spectra of the LFP
+% NRKO_LEV1_sdf_PERISTIM produces peristimulus spike times
 
 % take the globals from the info script that has been ran at the start
 global info

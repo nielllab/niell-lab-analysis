@@ -156,7 +156,7 @@ for iStim = 1:2
                                 latencies = {'prestim', 'stim'};
                                 stims = {'drift', 'bar'};
                                 layers = {'nan', 'nan','superficial', 'granular', 'deep'};
-                                nt = {'stimmodulated', 'non-stimmodulated'};
+                                nt = {'stimmodulated', 'suppressed by stim'};
                                 H = title(sprintf('unit: %s LFP: %s %s %s %s df=%d',  layers{iLayer}, G_stat.layers{jLayer}, G_stat.state{iState}, stims{iStim}, nt{k+1},sum(sl)));
                                 set(H,'FontSize', 6);
                             end                        
@@ -167,7 +167,7 @@ for iStim = 1:2
     end
 end
 %%
-iType = 1;
+iType =1;
 iMethod = 1; % phsae locking
 iTaper = 1;
 for iStim = 1:2
@@ -185,9 +185,9 @@ for iStim = 1:2
                             hold on
                             try    
                                 if k==0
-                                    sl =  rate_stat.osi(:)>0.5 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                    sl =  rate_stat.osi(:)>0.3 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 elseif k==1
-                                    sl =  rate_stat.osi(:)<0.2 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                    sl =  rate_stat.osi(:)<0.1 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 end
                                 dat = G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper,jLayer).ppcAll(sl,:,:);
                                 dat(dat==0) = NaN;
@@ -232,9 +232,9 @@ for iStim = 1:2
                             hold on
                             try    
                                 if k==0
-                                    sl =  (rate_stat.loco_mod(:,2))>0.3 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                    sl =  (rate_stat.loco_mod(:,2))>0.35 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 elseif k==1
-                                    sl =  (rate_stat.loco_mod(:,2))<0.1 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                    sl =  (rate_stat.loco_mod(:,2))<0.2 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 end
                                 dat = G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper,jLayer).ppcAll(sl,:,:);
                                 dat(dat==0) = NaN;
@@ -494,9 +494,9 @@ for iType = [0:2]
                                 hold on
                                 try               
                                     if iPing==1
-                                        sl =  G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,2)==iPing & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                        sl = rate_stat.osi(:)>0.45 & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,2)==iPing & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                     elseif iPing==0
-                                        sl =  G_stat.unitinfo(:,4)==4 & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,2)==iPing & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                        sl =  rate_stat.osi(:)>0.55 & G_stat.unitinfo(:,4)==4 & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,2)==iPing & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                     end                                        
                                     dat = G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper,jLayer).ppcAll(sl,:,:);
                                     dat(dat==0) = NaN;
@@ -542,7 +542,7 @@ for iStim = 1:2
                         for iType = [1 0 2]
                             hold on
                             try                                            
-                                sl =  G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==k & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                sl =  G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,2)==k & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 dat = G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper,jLayer).ppcAll(sl,:,:);
                                 dat(dat==0) = NaN;
                                 dat(~isfinite(dat)) = NaN;
@@ -584,7 +584,7 @@ for iStim = 1:2
 end
 %%
 
-%% STIM VS PRE STIM 
+%% STIM VS PRE STIM all genotypes all cells that are orientation selective
 iType = 1;
 iMethod = 1; % phsae locking
 iTaper = 1;
@@ -602,7 +602,7 @@ for iStim = 1:2
                         for iLatency= 1:2
                             hold on
                             try                                            
-                                sl =  G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                sl =  rate_stat.osi(:)>0.55  & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 dat = G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper,jLayer).ppcAll(sl,:,:);
                                 dat(dat==0) = NaN;
                                 dat(~isfinite(dat)) = NaN;
@@ -617,7 +617,7 @@ for iStim = 1:2
                                 stims = {'drift', 'bar'};
                                 layers = {'nan', 'nan','superficial', 'granular', 'deep'};
                                 nt = {'pyr', 'int'};
-                                H = title(sprintf('unit: %s LFP: %s %s %s %s df=%d',  layers{iLayer}, G_stat.layers{jLayer}, G_stat.state{iState}, stims{iStim}, gt{iType+1},sum(sl)));
+                                H = title(sprintf('unit: %s LFP: %s %s %s %s df=%d', layers{iLayer},  G_stat.layers{jLayer}, G_stat.state{iState}, stims{iStim}, gt{iType+1},sum(sl)));
                                 set(H,'FontSize', 6);
                             end                        
                         end
