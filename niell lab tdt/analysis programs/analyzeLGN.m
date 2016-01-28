@@ -1,9 +1,15 @@
+close all
 
+load('adultdata012716.mat')
+% if ~exist('drift_mv_all','var')
+%     %load ('adultData061715.mat')
+%    % load ('adultData090815.mat')
+%    load('rundata091215.mat')
+% end
+% if ~exist('movement_all','var')
+%     load ('adultData090815.mat')
+% end
 
-if ~exist('drift_mv_all','var')
-    %load ('adultData061715.mat')
-    load ('adultData090815.mat')
-end
 if ~exist('moviedata','var')
     load('C:\wn016alpha1_10hzLg60Hz.mat')
 end
@@ -22,7 +28,7 @@ close all
 moviedata = double(moviedata);
 m= (moviedata-mean(moviedata(:)))/mean(moviedata(:));
 
-
+clear sta_all
 
 if ~exist('sta_all','var')
     
@@ -31,7 +37,9 @@ if ~exist('sta_all','var')
         c
         
         if ~isempty(movement_all(c).speed)
-            spikehist = histc(movement_all(c).spikes,movement_all(c).frameT)*60;
+            spikehist = histc(movement_all(c).spikes,movement_all(c).frameT);
+            framedur= [diff(movement_all(c).frameT) 1/60];
+            spikehist = spikehist./framedur;
             sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).frameT);
             ph= spikehist.*exp(2*pi*sqrt(-1)*movement_all(c).frameNum/600);
             ph = conv(ph,ones(2401,1),'same')./conv(spikehist,ones(2401,1),'same');
@@ -112,55 +120,7 @@ if ~exist('sta_all','var')
             
             spikebinsAll(c,:,:,:) = spikebins;
             
-            %     spikehist = hist(movement_all(c).spikes,0:0.01:max(movement_all(c).spikes));
-            %         figure
-            %         subplot(2,1,1)
-            %         spect = abs(fft(spikehist));
-            %         spect = spect(1:round(end/2));
-            %         loglog(spect);
-            %
-            %         lastT = max(movement_all(c).lfpT);
-            %         lfpAll = zeros(2,length(movement_all(c).spikes),501);
-            %         lfpAll(:) = NaN;
-            %
-            %         c
-            %         for i = 1:length(movement_all(c).spikes);
-            %
-            %           spk = movement_all(c).spikes(i);
-            %             if spk>1 & spk<lastT-1 & spike_sp(i)<1;
-            %              inds = find(movement_all(c).lfpT>spk);
-            %
-            %               lfpAll(1,i,:) = movement_all(c).lfpV(inds(1)-250:inds(1)+250);
-            %             elseif spk>1 & spk<lastT-1 & spike_sp(i)>1;
-            %               inds = find(movement_all(c).lfpT>spk);
-            %               lfpAll(2,i,:) = movement_all(c).lfpV(inds(1)-250:inds(1)+250);
-            %             end
-            %         end
-            %
-            %
-            %         subplot(2,1,2)
-            %         plot(-250:250,squeeze(nanmean(lfpAll,2))')
-            %         xlim([-250 250])
-            %
-        
-            
-            % figure
-            % hold on
-            % plot(log10(pre_isi(1:500)),log10(post_isi(1:500)),'.','Markersize',8);
-            %
-            % for i = 1:100;
-            %
-            %    h= plot(log10(pre_isi(i+3)),log10(post_isi(i+3)),'g.','Markersize',24);
-            %
-            %     plot(log10(pre_isi(i:i+3)),log10(post_isi(i:i+3)));
-            %     axis([0 3.5 0 3.5])
-            %     mov(i)=getframe(gcf);
-            %     delete(h)
-            % end
-            % figure
-            % movie(mov)
-            
-            
+ 
             sta_all= zeros(size(moviedata,1),size(moviedata,2),9);
             %figure
             fnum=movement_all(c).frameNum;
@@ -320,6 +280,65 @@ if ~exist('sta_all','var')
     end
 end
 
+
+dt=1;
+close all
+for sess = 1:max(site)
+    units = find(site == sess);
+    clear sp_hist
+    if ~isempty(movement_all(units(1)).spikes)
+        for i=1:length(units)
+            sp = movement_all(units(i)).spikes;
+            sp_hist(i,:) = hist(sp,dt/2:dt:max(movement_all(units(i)).lfpT));
+            sp_hist(i,:) = sp_hist(i,:)/std(sp_hist(i,:));
+        end
+        clear ticklabel
+        for j = 1:length(units)
+            ticklabel{j} = num2str(units(j));
+        end
+        
+        figure
+        imagesc(sp_hist(:,301:450));
+        title(sprintf('%d',sess))
+        set(gca,'Ytick',1:size(sp_hist,1));
+        set(gca,'YTickLabel',ticklabel);
+        
+        figure
+        imagesc(sp_hist);
+        title(sprintf('%d',sess))
+              set(gca,'Ytick',1:size(sp_hist,1));
+        set(gca,'YTickLabel',ticklabel);
+        
+        figure
+        imagesc(cov(sp_hist'),[-1 1]); colormap jet
+              set(gca,'Ytick',1:size(sp_hist,1));
+        set(gca,'YTickLabel',ticklabel);
+        
+        [coeff score latent] = pca(sp_hist');
+        figure
+        plot(latent/sum(latent));
+        
+        figure
+        plot(score(:,1),score(:,2));
+        
+        npca = min(size(score,2),5);
+        figure
+        for j=1:npca
+            subplot(npca+1,1,j)
+            plot(score(:,j)); xlim([0 1200])
+        end
+        subplot(npca+1,1,npca+1);
+        plot(movement_all(units(i)).speed); xlim([0 1200]); ylim([0 20])
+        
+        figure
+        range = max(abs(coeff(:)));
+        imagesc(coeff,[-range range]); colorbar
+              set(gca,'Ytick',1:size(sp_hist,1));
+        set(gca,'YTickLabel',ticklabel);
+    end
+end
+
+
 keyboard
 
 staUse = find(max(abs(reshape(meanSTAall,size(meanSTAall,1),size(meanSTAall,2)*size(meanSTAall,3))),[],2)>0.06);
@@ -327,6 +346,47 @@ staUse = find(max(abs(reshape(meanSTAall,size(meanSTAall,1),size(meanSTAall,2)*s
 
 clear moviedata m v
 clear autocorr
+
+clear h
+for c = 1:length(movement_all)
+        if ~isempty(movement_all(c).mvlfp_tdata)
+            sp = interp1(movement_all(c).mvlfp_tdata, movement_all(c).speed,movement_all(c).frameT);
+        duration(c) = max(movement_all(c).frameT);
+        lastspike(c) = max(movement_all(c).spikes);
+        run_fraction(c) = sum(sp>1)/length(sp);
+        run_total(c) = sum(sp>1)/60;
+        isi = diff(movement_all(c).spikes);
+     
+        h(c,:) = hist(isi(isi<0.02),0.0005:0.001:0.02)/length(isi);
+        end
+end
+
+figure
+plot(run_total/60);
+xlabel('unit')
+ylabel('total running time (min)')
+
+refract = h(:,2)./mean(h(:,6:10),2);
+
+figure
+plot(run_total,refract,'o')
+xlabel('total running time');
+ylabel('isi contamination');
+
+
+
+figure
+plot(refract);
+xlabel('unit')
+ylabel('isi contaimination')
+
+
+goodunit = run_total>300 & refract'<0.25;
+
+
+
+
+if false
 for c = 1:length(movement_all)
 
     c
@@ -380,6 +440,7 @@ for c = 1:length(movement_all)
 %         hold on
 %         plot(sp/max(sp)*5,'g')
     end
+end
 end
 
 clear lfpTrig lfpTrigFFT lfpTrigFFTcontrol coh
@@ -480,6 +541,8 @@ orient_amp = squeeze(mean(mean(orient_tune_all,3),1));
 
 figure
 plot(squeeze(orient_amp(1,1,:)),squeeze(orient_amp(1,2,:)),'o')
+hold on
+plot(squeeze(orient_amp(1,1,goodunit)),squeeze(orient_amp(1,2,goodunit)),'go')
 axis equal;hold on;plot([0 20],[0 20],'g')
 xlabel('stop F0'); ylabel('move F0');
 
@@ -490,7 +553,8 @@ driftSBC = find(F0(1,:)<-5 | F0(2,:)<-5);
 
 
 figure
-plot(squeeze(orient_amp(2,1,:)),squeeze(orient_amp(2,2,:)),'o')
+plot(squeeze(orient_amp(2,1,:)),squeeze(orient_amp(2,2,:)),'o'); hold on
+plot(squeeze(orient_amp(2,1,goodunit)),squeeze(orient_amp(2,2,goodunit)),'go')
 axis equal;hold on;plot([0 20],[0 20],'g')
 xlabel('stop F1'); ylabel('move F1');
 
@@ -509,18 +573,20 @@ for i = 1:length(mn_orient_tune);
 end
 
 figure
-plot(squeeze(cvOSIall(1,1,:)),squeeze(cvOSIall(1,2,:)),'o'); axis equal
+plot(squeeze(cvOSIall(1,1,:)),squeeze(cvOSIall(1,2,:)),'o'); axis equal; hold on
+plot(squeeze(cvOSIall(1,1,goodunit)),squeeze(cvOSIall(1,2,goodunit)),'go'); axis equal
 hold on; plot([0 0.8],[0 0.8])
 
+
 figure
-hist(squeeze(cvOSIall(1,1,:)),0.05:0.1:1)
+hist(squeeze(cvOSIall(1,1,goodunit)),0.05:0.1:1)
 xlabel('stop osi')
 
 figure
-hist(squeeze(cvOSIall(1,2,:)),0.05:0.1:1)
+hist(squeeze(cvOSIall(1,2,goodunit)),0.05:0.1:1)
 xlabel('move osi')
 
-cvOSIavg = squeeze(nanmean(cvOSIall,2));
+cvOSIavg = squeeze(nanmean(cvOSIall(:,:,goodunit),2));
 figure
 h = hist(squeeze(cvOSIavg(1,:)),0.05:0.1:1);
 bar(0.05:0.1:1,h/sum(h))
@@ -542,21 +608,40 @@ OS = find(cvOSIall(1,1,:)>0.25 | cvOSIall(1,2,:)>0.25);
 cc= setdiff(staUse,OS);
 cc=setdiff(cc,sbc);
 sbc=setdiff(sbc,OS)
-driftsbc = find(orient_amp(1,1,:)<-5 | orient_amp(1,2,:)<-5);
+driftsbc = find(orient_amp(1,1,:)<-5  & orient_amp(1,2,:)<0 | orient_amp(1,2,:)<-5  &  orient_amp(1,1,:)<0 );
 driftsbc=setdiff(driftsbc,cc);
+OS = setdiff(OS,driftsbc);
 
+driftsbc = intersect(driftsbc,find(goodunit));
+OS = intersect(OS,find(goodunit));
+cc = intersect(cc,find(goodunit));
+
+
+
+figure
+plot(squeeze(dr_spont_all(1,1,:)),squeeze(dr_spont_all(1,2,:)),'o');
+hold on
+plot(squeeze(dr_spont_all(1,1,goodunit)),squeeze(dr_spont_all(1,2,goodunit)),'go');
+xlabel('drift spont stop'); ylabel('spont move')
+axis equal
+plot([0 20],[0 20],'r')
+
+figure
+hist(squeeze(dr_spont_all(1,1,goodunit)),1:1:30);
+figure
+hist(squeeze(dr_spont_all(1,2,goodunit)),1:1:30);
 
 for i = 1:length(drift_mv_all)
-    
+if ismember(i,OS) 
     figure
     for tf = 1:2
         for f = 1:2
             subplot(2,3,tf+(f-1)*3);
             plot(squeeze(orient_tune_all(tf,f,:,1,i) + dr_spont_all(f,1,i)),'r');
             hold on
-            plot(1:8, dr_spont_all(f,1,i)*ones(1,8),'r:');
+            plot(1:8, dr_spont_all(f,1,i).*ones(1,8),'r:');
             plot(squeeze(orient_tune_all(tf,f,:,2,i) + dr_spont_all(f,2,i)),'g');
-            plot(1:8, dr_spont_all(f,2,i)*ones(1,8),'g:');
+            plot(1:8, dr_spont_all(f,2,i).*ones(1,8),'g:');
             yl  = get(gca,'ylim');
             ylim([0 max(20,yl(2))]); xlim([1 8])
         end
@@ -567,10 +652,20 @@ for i = 1:length(drift_mv_all)
     title(sprintf('F0 %0.1f %0.1f',orient_amp(1,1,i),orient_amp(1,2,i)));
     subplot(2,3,4);
     title(sprintf('F1 %0.1f %0.1f',orient_amp(2,1,i),orient_amp(2,2,i)));
+   
+    subplot(2,3,5);
+    if goodunit(i)
+        title('good')
+    else
+        title('bad')
+    end
+    
     subplot(2,3,3);
+   
     plot(squeeze(xferAll(i,1,:)),'r'); xlim([1 11])
     hold on
     plot(squeeze(xferAll(i,2,:)),'g');
+     title(sprintf('run=%0.1f isi=%0.2f',run_total(i)/60,refract(i)));
     subplot(2,3,6);
     imagesc(squeeze(meanSTAall(i,:,:)),[-0.1 0.1]); axis square; axis off
     if ismember(i,cc);
@@ -580,6 +675,8 @@ for i = 1:length(drift_mv_all)
     elseif ismember(i,OS)
         title('OS')
     end
+end
+
 %     subplot(3,3,7);
 %     plot(0.25:0.5:74.75,squeeze(meanspect(i,1,:)),'r');
 %     hold on
@@ -600,6 +697,12 @@ for i = 1:length(drift_mv_all)
 %       ylim([0 0.2])
 end
 
+figure
+plot(squeeze(orient_amp(1,1,driftsbc)),squeeze(orient_amp(1,2,driftsbc)),'o')
+axis equal;hold on
+plot([-20 0],[-20 0],'r');
+
+mean(orient_amp(1,2,driftsbc),3)
 
 figure
 for r = 1:2
@@ -661,6 +764,20 @@ err(1,:)=err(1,:)/sqrt(length(cc));
 err(2,:)=err(2,:)/sqrt(length(driftsbc));
 err(3,:)=err(3,:)/sqrt(length(OS));
 err
+
+figure
+plot(squeeze(alignedOS(1,3,1,cc)),squeeze(alignedOS(1,3,2,cc)),'o'); hold on
+plot(squeeze(alignedOS(1,3,1,intersect(cc,find(goodunit)))),squeeze(alignedOS(1,3,2,intersect(cc,find(goodunit)))),'go');
+axis equal; 
+plot([ 0 20],[0 20]);
+
+figure
+plot(squeeze(alignedOS(1,3,1,OS)),squeeze(alignedOS(1,3,2,OS)),'o'); hold on
+plot(squeeze(alignedOS(1,3,1,intersect(OS,find(goodunit)))),squeeze(alignedOS(1,3,2,intersect(OS,find(goodunit)))),'go');
+axis equal; 
+plot([ 0 20],[0 20]);
+
+
 
 figure
 barweb(data,err)
@@ -919,13 +1036,13 @@ figure
 for i = 1:4
     subplot(2,2,i)
     if i ==1
-        d= squeeze(nanmean(xferAll(staUse(tcGroup==1),:,:),1));
+        d= squeeze(nanmean(xferAll(staUse(tcGroup==1 ),:,:),1));
     elseif i==2
-        d= squeeze(nanmean(xferAll(staUse(tcGroup==2),:,:),1));
+        d= squeeze(nanmean(xferAll(staUse(tcGroup==2 ),:,:),1));
     elseif i==3
-        d= squeeze(nanmean(xferAll(sbc,:,:),1));
+        d= squeeze(nanmean(xferAll(sbc&goodunit,:,:),1));
     elseif i==4
-        d= squeeze(nanmean(xferAll(OS,:,:),1));
+        d= squeeze(nanmean(xferAll(OS & goodunit,:,:),1));
     end
     d = d(:,6:10)
     d = (d-min(d(:)))/(max(d(:)-min(d(:))));

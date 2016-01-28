@@ -4,6 +4,7 @@ n=0;
 n=n+1;
 files(n).expt = '120215';
 files(n).dir = '12_02_15';
+files(n).tank = '';
 files(n).clusterfile = '';
 files(n).analysisfile = '';
 files(n).predark = 'pre_dark';
@@ -18,10 +19,12 @@ files(n).injection = 'injection period';
 files(n).treatment = 'DOI';
 files(n).layers = [5 6];
 files(n).notes = 'good data';
+files(n).misc = '';
 
 n=n+1;
 files(n).expt = '091815';
 files(n).dir = '09_18_15';
+files(n).tank = '';
 files(n).clusterfile = '';
 files(n).analysisfile = '';
 files(n).predark = 'pre_dark';
@@ -36,10 +39,12 @@ files(n).injection = 'injection period';
 files(n).treatment = 'saline';
 files(n).layers = [5 6];
 files(n).notes = 'good data';
+files(n).misc = '';
 
 n=n+1;
 files(n).expt = '093015';
 files(n).dir = '09_30_15';
+files(n).tank = '';
 files(n).clusterfile = '';
 files(n).analysisfile = '';
 files(n).predark = 'pre_dark';
@@ -54,5 +59,5 @@ files(n).injection = 'injection period';
 files(n).treatment = 'DOI';
 files(n).layers = [2 3];
 files(n).notes = 'good data';
-
+files(n).misc = '';
 
