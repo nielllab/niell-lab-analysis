@@ -16,10 +16,10 @@ for i = 1:length(use)
     clustfile = files(use(i)).clusterfile;
     
     block = files(use(i)).prewn;   %%% run for pre
-    analyzeDarkness;
+    darknessAnalysis
     %%% save out any important data
     
     block = files(use(i)).postwn;  %%% run for post
-    analyzeDarkness;
+    darknessAnalysis
     %%% save out any important data
 end
