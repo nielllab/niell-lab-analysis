@@ -1,6 +1,4 @@
-close all
-clear all
-
+if ~exist('clustfile','var')  %%%stand alone run
 [fname, pname] = uigetfile('*.mat','cluster data');
 clustfile=fullfile(pname,fname);
 load(clustfile);
@@ -10,6 +8,13 @@ afile = fullfile(apname,afname);
   load(afile);
     [pname fname] = fileparts(afile);
     Block_Name = Block_Name{blocknum}
+else   %%% if using batch
+    load(clustfile)
+    load(afile)
+    blocknum = find(strcmp(Block_Name,block));
+    Block_Name = block;
+end
+
     
 flags = struct('mouseOn',1);
 tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
