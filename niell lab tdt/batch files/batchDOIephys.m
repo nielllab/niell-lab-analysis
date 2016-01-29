@@ -1,6 +1,7 @@
 pathname = '\\niell-v2-w7\Angie_analysis\DOI_experiments';
 n=0;
 
+
 n=n+1;
 files(n).expt = '120215';
 files(n).dir = '12_02_15';
@@ -61,3 +62,42 @@ files(n).layers = [2 3];
 files(n).notes = 'good data';
 files(n).misc = '';
 
+n=n+1;
+files(n).expt = '7_25_15';
+files(n).dir = '7_25_15';
+files(n).tank = '';
+files(n).clusterfile = '';
+files(n).analysisfile = '';
+files(n).predark = 'dark_pre_doi_rec1';
+files(n).postdark = 'dark_predoi_rec1';
+files(n).prewn = 'wn_pre_doi_rec1';
+files(n).postwn = 'wn_post_doi_rec1';
+files(n).predrift = 'drift_pre_doi_rec1';
+files(n).postdrift = 'drift_post_doi_rec1';
+files(n).prebars = 'bars_pre_doi_rec1';
+files(n).postbars = 'bars_post_doi_rec1';
+files(n).injection = '';
+files(n).treatment = 'DOI';
+files(n).layers = [5 6];
+files(n).notes = 'good data';
+files(n).misc = '';
+
+n=n+1;
+files(n).expt = '7_23_15';
+files(n).dir = '7_23_15';
+files(n).tank = '';
+files(n).clusterfile = '';
+files(n).analysisfile = '';
+files(n).predark = 'dark_predoi_rec1';
+files(n).postdark = 'dark_predoi_rec1';
+files(n).prewn = 'wnmovie_predoi_rec1';
+files(n).postwn = 'wnmovie_postdoi_rec1';
+files(n).predrift = 'drift_predoi_rec1';
+files(n).postdrift = 'drift_postdoi_rec1';
+files(n).prebars = 'bars_predoi_rec1';
+files(n).postbars = 'bars_postdoi_rec1';
+files(n).injection = '';
+files(n).treatment = 'DOI';
+files(n).layers = [5 6];
+files(n).notes = 'good data';
+files(n).misc = '';
