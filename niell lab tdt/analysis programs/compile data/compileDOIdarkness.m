@@ -18,13 +18,13 @@ for i = 1:length(use)
     afile = files(use(i)).analysisfile;
     clustfile = files(use(i)).clusterfile;
     
-    block = files(use(i)).prewn;   %%% run for pre
+    block = files(use(i)).predark;   %%% run for pre
     darknessAnalysis
     %%% save out any important data
     prespikes{end+1:end+length(blockSpike)} = blockSpike;
     
     
-    block = files(use(i)).postwn;  %%% run for post
+    block = files(use(i)).postdark;  %%% run for post
     darknessAnalysis
     %%% save out any important data
     postspikes{end+1:end+length(blockSpike)} = blockSpike;
