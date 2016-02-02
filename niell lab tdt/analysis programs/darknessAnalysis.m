@@ -11,15 +11,16 @@ afile = fullfile(apname,afname);
 else   %%% if using batch
     load(clustfile)
     load(afile)
-    blocknum = find(strcmp(Block_Name,block));
-    Block_Name = block;
+    blocknum = find(strcmp(Block_Name,blocknm));
+    Block_Name = blocknm;
 end
 
-    
 flags = struct('mouseOn',1);
 tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
 tsampDark = tdtData.mouseT;
 vsmoothDark = tdtData.mouseV;
+
+dt=0.5
 
 figure
 plot(tsampDark,vsmoothDark)
@@ -30,47 +31,66 @@ if exist(psfilename,'file')==2;delete(psfilename);end %%%
 
 clear R
 close all
+% for c = 1:length(spikeT)
+%     sp = spikeT{c};
+%     sp = sp-(blocknum-1)*10^5;
+%     sp = sp(sp>0 & sp<10^5);
+%     histbins = 5:10:max(tsampDark);
+%     darkR(1:length(histbins),c) = hist(sp,histbins)/10;
+%   % [corr_Fvel lags] = xcorr(darkR{c}-mean(darkR{c}),vsmoothDark-mean(vsmoothDark),60/dt,'coeff')
+%     figure
+%     subplot(2,1,1)
+
+%     plot(histbins,darkR(1:length(histbins),c));
+%     hold on
+%     plot(tsampDark,vsmoothDark,'g');
+%     ylim([0 15]);
+%     legend('sp/sec','cm/sec')
+%     %sp = spikeT{c};
+%     subplot(2,1,2)
+%     hist(spikeT{c},0:10^5:max(spikeT{c}))
+%     %subplot(2,2,3)
+%     %plot(lags,corr_Fvel)
+%     %title('FR and velocity')
+%     
+% %     set(gcf, 'PaperPositionMode', 'auto');
+% %     print('-dpsc',psfilename,'-append');
+%     blockSpike{c} = sp;
+%
+% end
+
 for c = 1:length(spikeT)
     sp = spikeT{c};
     sp = sp-(blocknum-1)*10^5;
     sp = sp(sp>0 & sp<10^5);
     histbins = 5:10:max(tsampDark);
-    darkR(1:length(histbins),c) = hist(sp,histbins)/10;
-  % [corr_Fvel lags] = xcorr(darkR{c}-mean(darkR{c}),vsmoothDark-mean(vsmoothDark),60/dt,'coeff')
+    rate=hist(sp,histbins)/dt
+    rate = rate(2:end);
+    
+    darkR(1:length(histbins),c) = hist(sp,histbins)/dt;
+    % darkR(:,c) = hist(sp,histbins)/10;
     figure
-    subplot(2,1,1)
-    plot(histbins,darkR(1:length(histbins),c));
+    subplot(1,2,1)
+    % plot(rate/max(rate)); hold on; plot(vInterp/max(vInterp),'g'); plot(rInterp/max(rInterp),'r');
+    
+    plot(histbins,darkR(1:length(histbins),c))    
     hold on
     plot(tsampDark,vsmoothDark,'g');
-    ylim([0 15]);
+    ylim([0 20]);
     legend('sp/sec','cm/sec')
-    %sp = spikeT{c};
-    subplot(2,1,2)
-    hist(spikeT{c},0:10^5:max(spikeT{c}))
-    %subplot(2,2,3)
-    %plot(lags,corr_Fvel)
-    %title('FR and velocity')
+    hold off
+    subplot(1,2,2)
     
-%     set(gcf, 'PaperPositionMode', 'auto');
-%     print('-dpsc',psfilename,'-append');
+    [corr_Fvel lags] = xcorr(rate-mean(rate),vsmoothDark-mean(vsmoothDark),60/dt);
+    plot(lags,corr_Fvel)
+    title('FR and velocity')
+    % title_text = sprintf('ch%d c%d',channel_no,clust_no);
+    
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+    
     blockSpike{c} = sp;
-  
 end
-
-% %plot spike times for each unit
-% for c = 1:length(spikeT)
-%     sp = spikeT{c};
-%     figure
-%     hist(spikeT{c})
-% end
-% 
-% figure
-% plot(histbins,mean(darkR(1:length(histbins),2)));
-% hold on
-% plot(tsampDark,vsmoothDark,'g');
-% ylim([0 15]);
-% legend('sp/sec','cm/sec'); title('average')
-
 
 
 save(afile,'tsampDark','vsmoothDark','darkR','-append');
@@ -83,4 +103,4 @@ ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
 delete(psfilename);
 
 [f p] = uiputfile('*.mat','save block data?')
-save(fullfile(p,f),'blockSpike','tsampDark','vsmoothDark');
+save(fullfile(p,f),'blockSpike','tsampDark','vsmoothDark', 'darkR','corr_Fvel');

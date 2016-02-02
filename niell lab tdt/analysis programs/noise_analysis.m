@@ -996,13 +996,16 @@ for cell_n = cell_range
             saveas(stafig,fullfile(noisepname,sprintf('wn_sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             saveas(svdfig,fullfile(noisepname,sprintf('wn_svd_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
             
-               figure(wnfig);
+            figure(wnfig);
             title(sprintf('ch=%d cl=%d',channel_no,clust_no));
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
-           % print('-dpsc',psfilename,'-append');          
-            figure(svdfig);
             
+            figure(stafig);
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            figure(svdfig);
             set(gcf, 'PaperPositionMode', 'auto');
             print('-dpsc',psfilename,'-append');
             

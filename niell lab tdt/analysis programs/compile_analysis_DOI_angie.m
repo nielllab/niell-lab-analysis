@@ -19,12 +19,12 @@ for dataset = 1:1  %%% pre and post DOI
     if dataset==1
         %%DOI
 %         
-         afiles = {'Angie_analysis\DOI_experiments\08_31_15\analysis_083115.mat'} %,...
-% %             'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat'}
-% %         %    'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat'
+afiles = {'Angie_analysis\DOI_experiments\01_29_16\analysis_012916.mat'}%,...
+%     'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat',...
+%     'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat'}
 
     
-% %         
+%         
 %         afiles = {'Angie_analysis\DOI_experiments\7_29_15\analysis_072915.mat',...
 %             'Angie_analysis\DOI_experiments\08_02_15\analysis_080215.mat',...
 %             'Angie_analysis\DOI_experiments\08_03_15\analysis_080315.mat',...
@@ -40,7 +40,12 @@ for dataset = 1:1  %%% pre and post DOI
 %             'Angie_analysis\DOI_experiments\10_19_15\analysis_101915.mat',...
 %             'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat',...
 %             'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat',...
-%             'Angie_analysis\DOI_experiments\11_19_15\analysis_111915.mat'}
+%             'Angie_analysis\DOI_experiments\11_19_15\analysis_111915.mat',...
+%            'Angie_analysis\DOI_experiments\12_02_15\analysis_120215.mat',...
+%             'Angie_analysis\DOI_experiments\12_09_15\analysis_120915.mat',...
+%             'Angie_analysis\DOI_experiments\12_14_15\analysis_121415.mat',...
+%             'Angie_analysis\DOI_experiments\01_04_16\analysis_010416.mat',...
+%             'Angie_analysis\DOI_experiments\01_08_16\analysis_010816.mat'}
 %      
         
         
@@ -52,13 +57,15 @@ for dataset = 1:1  %%% pre and post DOI
         % %                     'Angie_analysis\DOI_experiments\08_31_15\analysis_083115.mat'}
         %
         % saline
-%         
-%         afiles = {'Angie_analysis\DOI_experiments\08_12_15\analysis_081215.mat',...
-%             'Angie_analysis\DOI_experiments\08_21_15\analysis_082115.mat',...
-%             'Angie_analysis\DOI_experiments\09_14_15\analysis_091415.mat',...
-%             'Angie_analysis\DOI_experiments\09_18_15\analysis_091815.mat',...
-%             'Angie_analysis\DOI_experiments\09_21_15\analysis_092115.mat'}
-%    
+% %         
+% afiles = {'Angie_analysis\DOI_experiments\08_12_15\analysis_081215.mat',...
+%     'Angie_analysis\DOI_experiments\08_21_15\analysis_082115.mat',...
+%     'Angie_analysis\DOI_experiments\09_14_15\analysis_091415.mat',...
+%     'Angie_analysis\DOI_experiments\09_18_15\09_18_15a\analysis_091815a.mat',...
+%     'Angie_analysis\DOI_experiments\09_21_15\analysis_092115.mat',...
+%     'Angie_analysis\DOI_experiments\10_02_15\analysis_100215.mat',...
+%     'Angie_analysis\DOI_experiments\10_09_15\analysis_100915.mat'}
+% %    
     elseif dataset==2
         %         %%lisuride
         %afiles = {'Angie_analysis\DOI_experiments\08_13_15\08_13_15a\analysis_081315a.mat',...
@@ -448,9 +455,10 @@ EtOH = GT'==1;
 
 use = find(DOI)
 clear crf
+%divide CRFs by layer
 figure
 for i = 1:length(use)
-    subplot(26,25,i); hold on
+    subplot(30,30,i); hold on
     set(gcf,'Position',[300 300 800 400])
     
     
@@ -622,6 +630,30 @@ for selectlyr=3:6
     axis equal
     title(sprintf('lyr %d',selectlyr))
 end
+% 
+% %%% dark pre/post scatter plots
+% figure
+% subplot(2,3,1)
+% hold on
+% plot(driftspont(exc,1),driftspont(exc,2),'b.');
+% plot([0 10],[0 10]); axis equal
+% title('all exc; drift spont')
+% 
+% subplot(2,3,2)
+% plot(driftspont(inh,1),driftspont(inh,2),'r.');
+% hold on
+% plot([0 10],[0 10]); axis equal
+% title('all inh')
+% 
+% for selectlyr=3:6
+%     subplot(2,3,selectlyr)
+%     plot( driftspont(exc&lyr==selectlyr,1), driftspont(exc&lyr==selectlyr,2),'b.')
+%     hold on
+%     plot([0 5],[0 5])
+%     axis equal
+%     title(sprintf('lyr %d',selectlyr))
+% end
+
 
 
 %%%Jen's version of plots below need to make compatible with Cris above
