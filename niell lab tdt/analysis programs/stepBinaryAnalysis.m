@@ -1,3 +1,5 @@
+close all; clear all
+
 if ~exist('clustfile','var')  %%%stand alone run
 [fname, pname] = uigetfile('*.mat','cluster data');
 clustfile=fullfile(pname,fname);
@@ -14,8 +16,6 @@ else   %%% if using batch
     blocknum = find(strcmp(Block_Name,blocknm));
     Block_Name = blocknm;
 end
-
-
     
 flags = struct('mouseOn',1);
 tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
@@ -35,6 +35,7 @@ frameRate = median(diff(frameT));
 
 clear R
 close all
+binFrames=20;
 for c = 1:length(spikeT)
     sp = spikeT{c};
     sp = sp-(blocknum-1)*10^5;
@@ -42,52 +43,34 @@ for c = 1:length(spikeT)
    % histbins = 5:10:max(tsampDark);
     frameR = histc(sp,frameT)/frameRate;
     
-    for i = 1:600;
-        cycAvg(i) = mean(frameR(mod(frameNum,600)+1 ==i));
+    for i = 1:(600/binFrames);
+        cycAvg(i,c) = mean(frameR(mod(floor(frameNum/binFrames),600/binFrames)+1 ==i));
     end
-
     figure
-    plot(cycAvg);
-
-
-% cellspikes = frameR(i,:,:);
-% normR(c,:,:) = cellspikes/max(cellspikes(:));
+    plot(cycAvg(:,c));
+    
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
 end
 
-%allR = [squeeze(normR(:,:,1)) squeeze(normR(:,:,2))];
+
 figure
-imagesc(cycAvg(i));
+subplot(2,1,1)
+imagesc(cycAvg',[0 22]); colormap jet; colorbar; axis xy; ylabel 'cell #'; xlabel 'time (s)'
 
-dur=600
-figure 
-imagesc(cycAvg);
-% axis xy;
-% hold on
-% plot(tsampsb/dt,5*vsmoothsb/max(vsmoothsb)-5 ,'g'); ylim([-5 size(frameR,1)+0.5]);
-% %plot spike times for each unit
-% for c = 1:length(spikeT)
-%     sp = spikeT{c};
-%     figure
-%     hist(spikeT{c})
-% end
-% 
-% figure
-% plot(histbins,mean(darkR(1:length(histbins),2)));
-% hold on
-% plot(tsampDark,vsmoothDark,'g');
-% ylim([0 15]);
-% legend('sp/sec','cm/sec'); title('average')
-
-
-
-save(afile,'tsampDark','vsmoothDark','darkR','-append');
-
+subplot(2,1,2)
+plot(cycAvg); ylim ([0 65]);ylabel 'cell #'; xlabel 'time (s)'
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
-    
+
+%append to analysisfile
+save(afile,'cycAvg','tsampsb','vsmoothsb','frameR','-append');
+
+%save pdf   
 [f p] = uiputfile('*.pdf','pdf name');
 ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
 delete(psfilename);
 
+%save block data
 [f p] = uiputfile('*.mat','save block data?')
-save(fullfile(p,f),'blockSpike','tsampDark','vsmoothDark');
+save(fullfile(p,f),'frameR','cycAvg','tsampsb','vsmoothsb');

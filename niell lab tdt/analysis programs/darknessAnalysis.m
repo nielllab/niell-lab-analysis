@@ -11,7 +11,7 @@ afile = fullfile(apname,afname);
 else   %%% if using batch
     load(clustfile)
     load(afile)
-    blocknum = find(strcmp(Block_Name,blocknm));
+    blocknm = find(strcmp(Block_Name,blocknm));
     Block_Name = blocknm;
 end
 
