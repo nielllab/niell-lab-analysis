@@ -51,9 +51,9 @@ figure
     plot(squeeze(R(c,:,:))); xlabel 'time(s)'; ylabel 'sp/sec'
     legend({'pre','post'})
     subplot(2,2,2)
-   barcv2 = [cv21 cv22]
-bar(barcv2)
-   %barcv2 = [meanRpre meanRpost]
+    barcv2 = [cv21 cv22]
+    bar(barcv2)
+    %barcv2 = [meanRpre meanRpost]
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end

@@ -2,6 +2,26 @@ pathname = '\\niell-v2-w7\Angie_analysis\DOI_experiments';
 n=0;
 
 n=n+1;
+files(n).expt = '020516';
+files(n).dir = '02_05_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_02_05_16_cluster_020516.mat';
+files(n).analysisfile = 'analysis_020516.mat';
+files(n).predark = 'dark_presal1';
+files(n).postdark = 'dark_postsal1';
+files(n).prewn = 'wn_presal1';
+files(n).postwn = 'wn_postsal2';
+files(n).predrift = 'drift_presal1';
+files(n).postdrift = 'drift_postsal1';
+files(n).prebars = 'bars_presal1';
+files(n).postbars = 'bars_postsal2';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline';
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = '';
+
+n=n+1;
 files(n).expt = '012916';
 files(n).dir = '01_29_16';
 files(n).tank = '';
