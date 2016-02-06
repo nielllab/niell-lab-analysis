@@ -88,7 +88,6 @@ for c = 1:length(spikeT)
     
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
-    
     blockSpike{c} = sp;
 end
 

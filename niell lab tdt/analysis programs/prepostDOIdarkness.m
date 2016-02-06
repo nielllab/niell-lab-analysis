@@ -18,8 +18,7 @@ postRunV = vsmoothDark;
 
 dur = 600;
 dt = 1;
-
-binSpikes=10;
+binSpikes=1.5;
 for c = 1:length(preSpikes);
 figure
     for cond =1:2;
@@ -27,10 +26,10 @@ figure
             sp = preSpikes{c};
             preISI  = diff(sp(1:end-1));
             postISI = diff(sp(2:end))
-            cv21(c) = mean(2*abs(preISI-postISI)./(preISI-postISI));
+            % cv2a(c) = mean(2*abs(preISI-postISI)./(preISI-postISI));
             %subplot(2,2,2)
             %bar(cv2(c),'b'); legend({'pre','post'}); axis square
-           % hold on
+            % hold on
             subplot(2,2,4)
             loglog(preISI,postISI,'b.'); xlabel 'pre ISI'; ylabel 'postISI'; axis square
             hold on 
@@ -38,25 +37,39 @@ figure
             sp = postSpikes{c};
             preISI  = diff(sp(1:end-1));
             postISI = diff(sp(2:end))
-            cv22(c) = mean(2*abs(preISI-postISI)./(preISI-postISI));
+            %             cv2b(c) = mean(2*abs(preISI-postISI)./(preISI-postISI));
             %subplot(2,2,2)
             %bar(cv2(c),'r');%legend({'post'})
             subplot(2,2,4)
             loglog(preISI,postISI,'r.');
         end
         R(c,:,cond) = hist(sp(sp<dur),dt/2:dt:dur);
-        %cv2(c) = mean(2*abs(preISI-postISI)./(preISI-postISI));
+        cv2(c,:,cond) = mean(2*abs(preISI-postISI)./(preISI-postISI));
+        
     end
     subplot(2,2,1)
-    plot(squeeze(R(c,:,:))); xlabel 'time(s)'; ylabel 'sp/sec'
-    legend({'pre','post'})
+    plot(squeeze(R(c,:,:))); xlabel 'time(s)'; ylabel 'sp/sec';
+    
     subplot(2,2,2)
-   barcv2 = [cv21 cv22]
-bar(barcv2)
-   %barcv2 = [meanRpre meanRpost]
+    bar(squeeze(cv2(c,:,:))); ylim([-1 1])
+    ax = gca;
+    ax.XTick = [1 2];
+    ax.XTickLabels = {'pre','post'}; %use pre post isi to calc error
+    %barcv2 = [meanRpre meanRpost]
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
+% high CV = more variation in spiking pattern...less bursty
+%cv pre vs cv post
+figure
+subplot(1,2,1)
+scatterhist(cv2(:,:,1),cv2(:,:,2), 'Color',[.3,.5,1]); xlabel 'CV2 pre'; ylabel 'CV2 post'; lsline
+axis square;
+
+%cvpre& post vs  fr
+
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',psfilename,'-append');
 
 
 for c= 1:length(preSpikes);
@@ -126,7 +139,7 @@ subplot(2,1,1)
 barweb(meanR(:,1),meanR(:,2))
 
 subplot(2,1,2)
-bar(barx)
+bar(barx); title 'mean FR'; ylabel 'sp/sec'
 set(gca,'Xticklabel',{'pre','post'});
 
 set(gcf, 'PaperPositionMode', 'auto');
@@ -196,7 +209,7 @@ set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
     
 [f p] = uiputfile('*.pdf','pdf name');
-save(fullfile(p,f),'allR', 'preSpikes', 'postSpikes');
+save(fullfile(p,f),'allR', 'preSpikes', 'postSpikes', 'cv2');
 
 ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
 delete(psfilename);
