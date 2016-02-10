@@ -2,6 +2,7 @@ function [theta_pref cvOSI cvDSI A1 A2 w B orth_rate yfit ] = fit_tuningcurve(R,
 
 % temp_baseline =min(R); 
 % R=R-temp_baseline;  %%%need to keep things positive for fourier analysis
+
 theta_ind
 if abs(min(R))>max(R)  %%% check for units that are inhibited more than excited
     R = -R;
@@ -9,6 +10,12 @@ if abs(min(R))>max(R)  %%% check for units that are inhibited more than excited
 else
     inverted=0;
 end
+
+if min(R)<0
+    R = R-min(R);
+end
+
+
 i=sqrt(-1);
 mu = (sum(R.*exp(2*i*theta_ind)))/sum(abs(R));
 dsi = (sum(R.*exp(i*theta_ind)))/sum(abs(R));
