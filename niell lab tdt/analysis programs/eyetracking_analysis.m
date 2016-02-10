@@ -173,10 +173,7 @@ for c = 1:length(spikeT)
 end
 
 
-    % not going to work! need a way
-%     to make length of firing rate and rad equal (find times when spiking
-%     occured, and only look at rad then?) Is this because of histbins are
-%     reducing the length of R? try R(1:length(histbins))
+   
 %velocity and FR
 % %    scatter(vsmoothBar,R(1:length(histbins),c))        
 % 
