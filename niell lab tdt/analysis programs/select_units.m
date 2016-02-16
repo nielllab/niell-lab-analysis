@@ -162,8 +162,8 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
          
           %%% call Erik's code to calculate cluster separation
           %%%showClusterSeparation(wave_all{tet},idx_all{tet_ch},i);
-          set(gcf, 'PaperPositionMode', 'auto');
-          print('-dpsc',psfilename,'-append');
+%           set(gcf, 'PaperPositionMode', 'auto');
+%           print('-dpsc',psfilename,'-append');
     end
 
     %%% give the user a chance to revise their choices
@@ -211,12 +211,12 @@ peakchan
 
 save(fullaname, 'clusterfilename', 'Tank_Name',  'cells', 'nspikes', 'L_ratio', 'trough_depth', 'peak_height', 'trough_width', 'trough2peak','idx_all', 'pname','wv','spikeT','peakchan');
 
-[f p] = uiputfile('*.pdf','save pdf');
-if f~=0
-    try
-   ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
-catch
-    display('couldnt generate pdf');
-    end
-end
+% [f p] = uiputfile('*.pdf','save pdf');
+% if f~=0
+%     try
+%    ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
+% catch
+%     display('couldnt generate pdf');
+%     end
+% end
 delete(psfilename);

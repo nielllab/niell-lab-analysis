@@ -5,9 +5,9 @@ batchDOIephys; %%% load batch file
 
 %%% select the sessions you want based on filters
 %%% example
-use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark})  & strcmp({files.expt},'120215') )
+use =  find(strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark})  & strcmp({files.expt},'111915') )
 
-% use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
+%use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 sprintf('%d selected sessions',length(use))
 
@@ -34,3 +34,7 @@ for i = 1:length(use)
 end
 
 
+% for layer =2:6
+% subplot(2,3,layer)
+% bar(darkR)
+% end

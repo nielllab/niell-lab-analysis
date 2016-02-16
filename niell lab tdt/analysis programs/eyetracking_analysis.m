@@ -39,7 +39,7 @@ xlabel('frame #'); ylabel('secs');
 ylim([ 0 0.2])
 
 thresh = 0.8; %pupil threshold for binarization
-puprange = [10 55]; %set
+puprange = [8 45]; %set
 
 %user input to select center and right points
 sprintf('Please select pupil center and top, eyeball top and right points, darkest part of eyeball')
