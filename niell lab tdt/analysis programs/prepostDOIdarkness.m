@@ -27,7 +27,7 @@ dt = 1;
 %histbins = dt/2:dt:dur
 
 for c = 1:length(preSpikes);
-figure
+    figure
     for cond = 1:2;
         if cond==1
             col = 'b';
@@ -45,23 +45,18 @@ figure
             subplot(2,2,4)
             loglog(preISI,postISI,'r.');
         end
-        R(c,:,cond) = (hist(sp(sp<dur) ,dt/2:dt:dur));
+        R(c,:,cond) = (hist(sp(sp<dur),dt/2:dt:dur));
         cv2(c,:,cond) = mean(2*abs(preISI-postISI)./(preISI+postISI));
     end
-% length(R(c,:,1))
-        subplot(2,2,1)
-        plot(squeeze(R(c,:,:))); xlabel 'time(s)'; ylabel 'sp/sec';
-        subplot(2,2,3)
-       hist(R(c,:,:)); ylim ([0 610]);
-%subplot(2,2,3)
-    %hist(sp
+    
+    subplot(2,2,1)
+    plot(squeeze(R(c,:,:))); xlabel 'time(s)'; ylabel 'sp/sec';
+    
     subplot(2,2,2)
     bar(squeeze(cv2(c,:,:))); ylim([0 1.5])
     ax = gca;
     ax.XTick = [1 2];
-    ax.XTickLabels = {'pre','post'}; %use pre post isi to calc error
-    %barcv2 = [meanRpre meanRpost]
- title_text = sprintf('c%d c%d',cells([c,1]),cells([c,2]));
+    ax.XTickLabels = {'pre','post'}; 
     text(0,-10,title_text,'FontSize',8);
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
@@ -81,19 +76,24 @@ for m = 1:2
              layercellsFR(o,n,m) = cellrates(o);  
       end
 subplot(2,3,1)
-barweb(mean(layerFR(:,:)),(mean(darkerr(:,:)))); title 'all layers'; hold on
+%barweb(mean(layerFR(:,:)),mean(darkerr(:,:)));
+bar(mean(layerFR(:,:))); title 'all layers'; hold on
+ax = gca;
+%ax.XTick = [1 2];
+%ax.XTickLabels = {'pre','post'}
+title ('all layers')
 subplot(2,3,n+1)
-barweb(layerFR(n,:), darkerr(n,:))
+bar(layerFR(n,:))%, darkerr(n,:))
 %errorbar(layerFR(n,:),darkerr(n))
 title(sprintf('layer %d',n+1))
 ax = gca;
-ax.XTick = [1 2];
-ax.XTickLabels = {'pre','post'}
+%ax.XTick = [1 2];
+%ax.XTickLabels = {'pre','post'}
     end
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
-
+legend({'pre','post'})
 
 %note:layerFR(1 = layer 2)
 
@@ -103,7 +103,7 @@ end
 figure
 subplot(1,2,1)
 scatterhist(cv2(:,:,1),cv2(:,:,2),'Color',[0,.3,1]); xlabel 'CV2 Pre DOI'; ylabel 'CV2 Post DOI'; lsline
-axis equal;
+ylim([0.6 1.6]); axis square;
 
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
