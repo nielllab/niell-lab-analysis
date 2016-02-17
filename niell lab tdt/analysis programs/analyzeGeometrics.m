@@ -216,6 +216,7 @@ if exist(psfilename,'file')==2;delete(psfilename);end
 xvals = [-0.5:binSize:1-binSize];
 xrange = [-0.5 1];
 yrange = [0 40];
+ymax = ymax+1;
 
 for n = 1:size(spikes,2)
     figure('Name',sprintf('unit %d',n))
