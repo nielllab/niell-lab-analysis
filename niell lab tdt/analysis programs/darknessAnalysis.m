@@ -3,7 +3,7 @@ clear all; close all
 if ~exist('clustfile','var')  %%%stand alone run
 [fname, pname] = uigetfile('*.mat','cluster data');
 clustfile=fullfile(pname,fname);
-load(clustfile);
+load(clustfile,'Block_Name');
 blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');
 [afname, apname] = uigetfile('*.mat','analysis data');
 afile = fullfile(apname,afname);
@@ -11,7 +11,7 @@ afile = fullfile(apname,afname);
     [pname fname] = fileparts(afile);
     Block_Name = Block_Name{blocknum}
 else   %%% if using batch
-    load(clustfile)
+    load(clustfile,'Block_Name')
     load(afile)
     blocknm = find(strcmp(Block_Name,blocknm));
     Block_Name = blocknm;

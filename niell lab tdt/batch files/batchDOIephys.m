@@ -843,6 +843,12 @@ files(n).notes = 'good data';
 
 
 
+for f = 1:length(files);
+    files(f).blockWn = {files(f).prewn files(f).postwn};
+    files(f).blockDark = {files(f).predark files(f).postdark};
+    files(f).blockBar = {files(f).prebars files(f).postbars};
+    files(f).blockDrift = {files(f).predrift files(f).postdrift};
+end
 
 
 
