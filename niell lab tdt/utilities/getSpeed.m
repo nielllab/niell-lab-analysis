@@ -3,6 +3,7 @@ function speed = getSpeed(clustfile,afile, block)
 %%% checks to see if data already exists
 %%% otherwise reads it in and saves to analysis file, with entry for each block
 %%% returns data for specified block
+%%% speed.t = timestamps, speed.v = speed
 
 
 load(clustfile,'Block_Name','Tank_Name');
