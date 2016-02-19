@@ -1,4 +1,4 @@
-function speed = getSpeed(clustfile,afile, block)
+function speed = getSpeed(clustfile,afile, block,redo )
 %%% read in optical mouse speed data for a given block
 %%% checks to see if data already exists
 %%% otherwise reads it in and saves to analysis file, with entry for each block
@@ -12,17 +12,17 @@ Block_Name = Block_Name{blocknum}
 
 load(afile,'speed');
 
-if ~exist('speed','var') | isempty(speed(blocknum))
+if ~exist('speed','var') | length(speed)<blocknum  | isempty(speed(blocknum).t) | redo
     try
         flags = struct('mouseOn',1);
         tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
         speed(blocknum).t= tdtData.mouseT;
         speed(blocknum).v = tdtData.mouseV;
     catch
-        speed(blocknum).t=NaN;
-        speed(blocknum).v=NaN;
+        speed(blocknum).t=[];
+        speed(blocknum).v=[];
     end
-    save(afiles,'speed','-append')
+    save(afile,'speed','-append')
 end
 
 speed = speed(blocknum);

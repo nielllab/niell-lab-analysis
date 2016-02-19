@@ -1,31 +1,29 @@
-clear all; close all
-[f p] = uigetfile('*.mat','pre data');
-load(fullfile(p,f));
+blocknm = files(use(i)).blockWn{1};
+spikes = getSpikes(clustfile,afile, blocknm,0);
+spd = getSpeed(clustfile,afile,blocknm,0);
+preSpikes = spikes.sp;
+preRunT = spd.t;
+preRunV = spd.v;
 
-[afname, apname] = uigetfile('*.mat','analysis data');
-darkpname = apname;
-afile = fullfile(apname,afname);
-load(afile);
+blocknm = files(use(i)).blockWn{2};
+spikes = getSpikes(clustfile,afile, blocknm,0);
+spd = getSpeed(clustfile,afile,blocknm,0);
+postSpikes = spikes.sp;
+postRunT = spd.t;
+postRunV = spd.v;
 
-preSpikes = blockSpike;
-preRunT = tsampDark;
-preRunV = vsmoothDark;
+load(afile,'layer','cells');
 
-[f p] = uigetfile('*.mat','post data');
-load(fullfile(p,f));
+if savePDF
+    psfilename = 'C:\analysisPS.ps';
+    if exist(psfilename,'file')==2;delete(psfilename);end %%%
+end
 
-psfilename = 'D:\Angie_analysis\analysisPS.ps';
-if exist(psfilename,'file')==2;delete(psfilename);end %%% 
-
-postSpikes = blockSpike;
-postRunT = tsampDark;
-postRunV = vsmoothDark;
-
-
-dur = 600;
+dur = min(max(preRunT),max(postRunT));
 dt = 1;
 %histbins = dt/2:dt:dur
 
+clear R cv2
 for c = 1:length(preSpikes);
     figure
     for cond = 1:2;
@@ -35,7 +33,7 @@ for c = 1:length(preSpikes);
             preISI  = diff(sp(1:end-1));
             postISI = diff(sp(2:end))
             subplot(2,2,4)
-            loglog(preISI,postISI,'b.'); xlabel 'pre ISI'; ylabel 'postISI'; axis square
+            loglog(preISI*10^3,postISI*10^3,'b.'); xlabel 'pre ISI'; ylabel 'postISI'; axis square
             hold on
         else
             col = 'r';
@@ -43,7 +41,7 @@ for c = 1:length(preSpikes);
             preISI  = diff(sp(1:end-1));
             postISI = diff(sp(2:end))
             subplot(2,2,4)
-            loglog(preISI,postISI,'r.');
+            loglog(preISI*10^3,postISI*10^3,'r.'); axis([1 10^4 1 10^4])
         end
         R(c,:,cond) = (hist(sp(sp<dur),dt/2:dt:dur));
         cv2(c,:,cond) = mean(2*abs(preISI-postISI)./(preISI+postISI));
@@ -56,11 +54,25 @@ for c = 1:length(preSpikes);
     bar(squeeze(cv2(c,:,:))); ylim([0 1.5])
     ax = gca;
     ax.XTick = [1 2];
-    ax.XTickLabels = {'pre','post'}; 
+    ax.XTickLabels = {'pre','post'};
+    title_text = sprintf('ch %d cl %d',cells(c,1),cells(c,2));
     text(0,-10,title_text,'FontSize',8);
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
+    ylabel('cv2')
+    
+    subplot(2,2,3)
+    bar(squeeze(mean(R(c,:,:),2))); ylim([0 10]);
+    ax = gca;
+    ax.XTick = [1 2];
+    ax.XTickLabels = {'pre','post'};
+    ylabel('mean sp/sec')
+    
+    if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+    
 end
+
 
 layernums = unique(layer);
 layerFR = zeros(length(layernums),2); %layerFR(layer,pre/post DOI) = mean FR per layer
@@ -70,28 +82,32 @@ for m = 1:2
     for n=1:length(layernums)
         layerFR(n,m) = mean(mean(R(find(layer==layernums(n)),:,m),2));
         cellrates = mean(R(find(layer==layernums(n)),:,m),2);
-         darkerr (n,m) = nanstd(layerFR(:,m)/sqrt(sum(layerFR(n,m))));
-      for o = 1:length(find(layer==layernums(n)));
-             %darkerr (n,m) = nanstd(layerFR(:,m)/sqrt(sum(layerFR(n,m))));
-             layercellsFR(o,n,m) = cellrates(o);  
-      end
-subplot(2,3,1)
-%barweb(mean(layerFR(:,:)),mean(darkerr(:,:)));
-bar(mean(layerFR(:,:))); title 'all layers'; hold on
-ax = gca;
-%ax.XTick = [1 2];
-%ax.XTickLabels = {'pre','post'}
-title ('all layers')
-subplot(2,3,n+1)
-bar(layerFR(n,:))%, darkerr(n,:))
-%errorbar(layerFR(n,:),darkerr(n))
-title(sprintf('layer %d',n+1))
-ax = gca;
-%ax.XTick = [1 2];
-%ax.XTickLabels = {'pre','post'}
+        darkerr (n,m) = nanstd(layerFR(:,m)/sqrt(sum(layerFR(n,m))));
+        for o = 1:length(find(layer==layernums(n)));
+            %darkerr (n,m) = nanstd(layerFR(:,m)/sqrt(sum(layerFR(n,m))));
+            layercellsFR(o,n,m) = cellrates(o);
+        end
+        subplot(2,3,1)
+        %barweb(mean(layerFR(:,:)),mean(darkerr(:,:)));
+        bar(mean(layerFR(:,:))); title 'all layers'; hold on
+        ax = gca;
+        %ax.XTick = [1 2];
+        %ax.XTickLabels = {'pre','post'}
+        title ('all layers')
+        subplot(2,3,n+1)
+        bar(layerFR(n,:))%, darkerr(n,:))
+        %errorbar(layerFR(n,:),darkerr(n))
+        title(sprintf('layer %d',n+1))
+        ax = gca;
+        %ax.XTick = [1 2];
+        %ax.XTickLabels = {'pre','post'}
     end
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
+    
+    if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+    
 end
 legend({'pre','post'})
 
@@ -105,10 +121,12 @@ subplot(1,2,1)
 scatterhist(cv2(:,:,1),cv2(:,:,2),'Color',[0,.3,1]); xlabel 'CV2 Pre DOI'; ylabel 'CV2 Post DOI'; lsline
 ylim([0.6 1.6]); axis square;
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
-
+clear normR
 for c= 1:length(preSpikes);
     cellspikes = R(c,:,:);
     normR(c,:,:) = cellspikes/max(cellspikes(:));
@@ -122,8 +140,10 @@ imagesc(R(:,:,1),[0 rmax]); title('pre'); xlabel('secs'); ylabel('cell #')
 subplot(2,1,2)
 imagesc(R(:,:,2),[0 rmax]); title('post'); xlabel('secs'); ylabel('cell #')
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 rmax = 10;
 figure
@@ -132,8 +152,10 @@ imagesc(normR(:,:,1),[0 rmax]); title('pre'); xlabel('secs'); ylabel('cell #')
 subplot(2,1,2)
 imagesc(normR(:,:,2),[0 rmax]); title('post'); xlabel('secs'); ylabel('cell #')
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 preCorr = corrcoef(squeeze(normR(:,:,1))');
 postCorr = corrcoef(squeeze(normR(:,:,2))');
@@ -141,12 +163,45 @@ postCorr = corrcoef(squeeze(normR(:,:,2))');
 figure
 subplot(1,2,1);
 imagesc(preCorr,[-1 1]); colormap jet; title('Pre DOI'); xlabel('cell #'); ylabel('cell #'); axis square;
-subplot(1,2,2); 
-imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell #'); ylabel('cell #'); 
+subplot(1,2,2);
+imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell #'); ylabel('cell #');
 axis square;
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+
+figure
+plot(preCorr(:),postCorr(:),'.')
+axis equal; hold on
+plot([-0.5 0.5],[ -0.5 0.5],'r')
+axis([-0.5 1 -0.5 1])
+xlabel('pre correlation'); ylabel('post correlation')
+
+figure
+bar([nanmean(abs(preCorr(preCorr~=1))) nanmean(abs(postCorr(postCorr~=1)))]);
+ylabel('mean abs correlation');
+set(gca,'XtickLabel',{'pre','post'});
+
+figure
+cbins = -1:0.1:1;
+plot(cbins,hist(preCorr(:),cbins));
+hold on
+plot(cbins,hist(postCorr(:),cbins),'g');
+
+preCorrClean = preCorr; preCorrClean(isnan(preCorrClean))=0;
+postCorrClean = postCorr; postCorrClean(isnan(postCorrClean))=0;
+
+clear eigs
+eigs(:,1) = sort(eig(preCorrClean),'descend');
+eigs(:,2) = sort(eig(postCorrClean),'descend');
+figure
+plot(eigs); hold on; plot([1 length(eigs)],[1 1],'k:')
+legend({'pre','post'}); ylabel('eigenvalues');
+
+
+
 
 preRunV = preRunV(preRunT<dur); preRunT= preRunT(preRunT<dur);
 postRunV = postRunV(postRunT<dur);postRunT= postRunT(postRunT<dur);
@@ -157,16 +212,20 @@ plot(preRunT,preRunV); xlim([0 dur]); xlabel('secs'); ylabel('pre speed')
 subplot(2,1,2);
 plot(postRunT,postRunV);xlim([0 dur]); xlabel('secs'); ylabel('post speed')
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 meanR = squeeze(mean(R,2));
 figure
-plot(meanR(:,2),meanR(:,1),'o');hold on; plot([0 20],[0 20]);axis equal
-xlabel('post rate'); ylabel('pre rate');
+plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);axis equal
+xlabel('pre rate'); ylabel('post rate');
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 meanRpre = mean(meanR(:,1))
 meanRpost = mean(meanR(:,2))
@@ -180,29 +239,35 @@ subplot(2,1,2)
 bar(barx); title 'mean FR'; ylabel 'sp/sec'
 set(gca,'Xticklabel',{'pre','post'});
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 allR = [squeeze(normR(:,:,1)) squeeze(normR(:,:,2))];
 allV = [preRunV postRunV];
 allT = [preRunT postRunT+dur];
 
-figure 
+figure
 imagesc(allR,[0 1]);
 axis xy;
 hold on
 plot(allT/dt,5*allV/max(allV)-5 ,'g'); ylim([-5 size(allR,1)+0.5]);
 plot([dur dur],[-5 size(allR,1)],'r'); colorbar;
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 [coeff score latent] = pca(allR');
 figure
-plot(latent(1:10)/sum(latent))
+plot(latent/sum(latent))
 
+if savePDF
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
+end
 
 figure
 subplot(2,1,1)
@@ -211,20 +276,24 @@ subplot(2,1,2)
 
 %hist of PCA loadings
 hist(coeff); axis square
+if savePDF
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
+end
 
 
 figure
 hold on
 plot(score(:,1),score(:,2))
 for i=1:length(score);
-plot(score(i,1),score(i,2),'.','Markersize',12,'Color',cmapVar(i,1,length(score),jet))
-xlabel 'PC1'; ylabel 'PC2';
+    plot(score(i,1),score(i,2),'.','Markersize',12,'Color',cmapVar(i,1,length(score),jet))
+    xlabel 'PC1'; ylabel 'PC2';
 end
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 figure
 for i = 1:3
@@ -234,27 +303,33 @@ end
 subplot(4,1,4)
 plot(allT,allV); ylabel('speed')
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 %timeponts
 figure
 imagesc(corrcoef(allR)); axis square; xlabel('secs'); ylabel('secs'); colorbar; title('correlation')
 colormap jet;
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
 %corr units
 figure
 imagesc(corrcoef(allR'),[-1 1]); axis square; xlabel('cell #'); ylabel('cell #'); colorbar; title('correlation')
 colormap jet;
 
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-    
-[f p] = uiputfile('*.pdf','pdf name');
-save(fullfile(p,f),'allR', 'preSpikes', 'postSpikes', 'cv2');
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
 
-ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
-delete(psfilename);
+if savePDF
+    [f p] = uiputfile('*.pdf','pdf name');
+    ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
+    delete(psfilename);
+end
