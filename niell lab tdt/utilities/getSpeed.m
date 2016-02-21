@@ -26,3 +26,4 @@ if ~exist('speed','var') | length(speed)<blocknum  | isempty(speed(blocknum).t) 
 end
 
 speed = speed(blocknum);
+

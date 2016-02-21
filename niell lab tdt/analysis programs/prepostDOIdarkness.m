@@ -1,11 +1,12 @@
-blocknm = files(use(i)).blockWn{1};
+function [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile, blocks, dt, savePDF);
+blocknm = blocks{1};
 spikes = getSpikes(clustfile,afile, blocknm,0);
 spd = getSpeed(clustfile,afile,blocknm,0);
 preSpikes = spikes.sp;
 preRunT = spd.t;
 preRunV = spd.v;
 
-blocknm = files(use(i)).blockWn{2};
+blocknm = blocks{2};
 spikes = getSpikes(clustfile,afile, blocknm,0);
 spd = getSpeed(clustfile,afile,blocknm,0);
 postSpikes = spikes.sp;
@@ -20,7 +21,7 @@ if savePDF
 end
 
 dur = min(max(preRunT),max(postRunT));
-dt = 1;
+%dt = 1;
 %histbins = dt/2:dt:dur
 
 clear R cv2
@@ -43,7 +44,7 @@ for c = 1:length(preSpikes);
             subplot(2,2,4)
             loglog(preISI*10^3,postISI*10^3,'r.'); axis([1 10^4 1 10^4])
         end
-        R(c,:,cond) = (hist(sp(sp<dur),dt/2:dt:dur));
+        R(c,:,cond) = (hist(sp(sp<dur),dt/2:dt:dur))/dt;
         cv2(c,:,cond) = mean(2*abs(preISI-postISI)./(preISI+postISI));
     end
     
@@ -181,14 +182,26 @@ xlabel('pre correlation'); ylabel('post correlation')
 
 figure
 bar([nanmean(abs(preCorr(preCorr~=1))) nanmean(abs(postCorr(postCorr~=1)))]);
+hold on
+errorbar([1 2],[nanmean(abs(preCorr(preCorr~=1))) nanmean(abs(postCorr(postCorr~=1)))], [nanstd(abs(preCorr(preCorr~=1))) nanstd(abs(postCorr(postCorr~=1)))]/sqrt(0.5*length(preCorr(:))),'o')
 ylabel('mean abs correlation');
 set(gca,'XtickLabel',{'pre','post'});
 
 figure
-cbins = -1:0.1:1;
+bar([nanmean((preCorr(preCorr~=1))) nanmean((postCorr(postCorr~=1)))]);
+hold on
+errorbar([1 2],[nanmean((preCorr(preCorr~=1))) nanmean((postCorr(postCorr~=1)))], [nanstd((preCorr(preCorr~=1))) nanstd((postCorr(postCorr~=1)))]/sqrt(0.5 *length(preCorr(:))),'o')
+ylabel('mean correlation');
+set(gca,'XtickLabel',{'pre','post'});
+
+
+figure
+cbins = -1:0.05:1;
 plot(cbins,hist(preCorr(:),cbins));
 hold on
 plot(cbins,hist(postCorr(:),cbins),'g');
+xlabel('correlation');
+xlim([-0.75 0.75])
 
 preCorrClean = preCorr; preCorrClean(isnan(preCorrClean))=0;
 postCorrClean = postCorr; postCorrClean(isnan(postCorrClean))=0;
@@ -200,6 +213,15 @@ figure
 plot(eigs); hold on; plot([1 length(eigs)],[1 1],'k:')
 legend({'pre','post'}); ylabel('eigenvalues');
 
+[coeff score prelatent] = pca(squeeze(normR(:,:,1))');
+[coeff score postlatent] = pca(squeeze(normR(:,:,2))');
+
+latents(:,1)=prelatent/sum(prelatent);
+latents(:,2)=postlatent/sum(postlatent);
+
+figure
+plot(latents);
+ylabel('latents'); legend('pre','post');
 
 
 
@@ -287,8 +309,9 @@ hold on
 plot(score(:,1),score(:,2))
 for i=1:length(score);
     plot(score(i,1),score(i,2),'.','Markersize',12,'Color',cmapVar(i,1,length(score),jet))
-    xlabel 'PC1'; ylabel 'PC2';
 end
+    xlabel 'PC1'; ylabel 'PC2';
+    
 
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
