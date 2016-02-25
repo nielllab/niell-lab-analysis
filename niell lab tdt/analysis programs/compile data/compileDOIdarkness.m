@@ -32,7 +32,9 @@ for i = 1:3
     %%% get layer info
     load(afile,'layer');
     layerAll(cellrange) = layer;
-    %%% getLayers (needs histo information, but will give layers for all sites
+    %%% getLayers (needs histo information, but will give layers for all sites)
+    
+    %%% getEyes  (needs camera files)
     
     %%% session info
     sessionNum(cellrange)=i;
@@ -41,38 +43,41 @@ for i = 1:3
     if strcmp(files(use(i)).treatment,'DOI'), treatment(cellrange)=doi, end;
     if strcmp(files(use(i)).treatment,'Lisuride'), treatment(cellrange)=lisuride, end;
     sessionTreatment(i) = treatment(cellrange(1));
-
-for prepost = 1:2
-spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},0);
-speedHistWn(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
-end
-
-
+    
+    %%% get pre/post running speed
+    for prepost = 1:2
+        spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},0);
+        speedHistWn(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
+        speedTrace{i,prepost}=spd.v;
+    end
+    
+    
     %%% get grating responses
     for prepost = 1:2
-        drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+        drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
         drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
         drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
         drift_spont(cellrange,:,prepost) = drift.interSpont;
+        drift_osi(cellrange,:,prepost) = drift.cv_osi;
     end
     
-%%% get wn response
-    for prepost = 1:2      
+    %%% get wn response
+    for prepost = 1:2
         wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
     end
     
-    %%% lfp power 
+    %%% lfp power
     %%%(right now averages over all sites, should use layer info)
     for prepost=1:2
-    lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
-    LFPall(i,:,:,prepost) =squeeze(median(lfpMove.meanSpect, 1))/median(lfpMove.meanSpect(:));
+        lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
+        LFPall(i,:,:,prepost) =squeeze(median(lfpMove.meanSpect, 1))/median(lfpMove.meanSpect(:));
     end
     
     %%% darkness / correlation analysis
-
+    
     %%% need to keep track of n^2 values for correlations
     corrRange=ncorr+1:ncorr+nc^2;
     corrTreatment(corrRange)=treatment(cellrange(1));
@@ -90,105 +95,91 @@ end
     
     cv2Dark(cellrange,:) = cv2;
     meanRdark(cellrange,:) = mean(R,2);
-
+    
     %%% keep track of cell type for correlations
     corrType1 = zeros(size(preCorr)); corrType2 = corrType1;
     for j= 1:length(inh);
         corrType1(j,:)=inh(j); corrType2(:,j)=inh(j);
     end
     corrType1all(corrRange) = corrType1(:) ; corrType2all(corrRange)= corrType2(:);
-
-  n= n+nc;
-  ncorr= ncorr+nc^2;
+    
+    n= n+nc;
+    ncorr= ncorr+nc^2;
 end
 
+%%% plot correlation for white noise
 titles = {'saline','doi'};
 figure
 for i = 1:2
-subplot(1,2,i);
-plot(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),'.'); hold on; axis equal
-plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
-xlabel('pre wn corr'); ylabel('post')
+    subplot(1,2,i);
+    plot(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),'.'); hold on; axis equal
+    plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
+    xlabel('pre wn corr'); ylabel('post')
 end
 
+%%% plot correlation for darkness
 titles = {'saline','doi'};
 figure
 for i = 1:2
-subplot(1,2,i);
-plot(darkCorr(corrTreatment==i,1),darkCorr(corrTreatment==i,2),'.'); hold on; axis equal
-plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
-xlabel('pre dark corr'); ylabel('post')
+    subplot(1,2,i);
+    plot(darkCorr(corrTreatment==i,1),darkCorr(corrTreatment==i,2),'.'); hold on; axis equal
+    plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
+    xlabel('pre dark corr'); ylabel('post')
 end
 
+%%% compare spontaneous rates measured with gratings and wn
 figure
 plot(drift_spont(:),wn_spont(:),'.'); hold on; plot([0 10], [0 10]); axis equal
 xlabel('drift spont'),ylabel('wn spont');
 
-
-figure
-for i = 1:6
-    subplot(2,3,i)
-    plot(drift_spont(treatment==saline & layerAll ==i,1,1),drift_spont(treatment==saline& layerAll ==i,1,2),'k.');
-    hold on
-    plot(drift_spont(treatment==doi& layerAll ==i,1,1),drift_spont(treatment==doi& layerAll ==i,1,2),'r.');
-    plot([0 10],[0 10]); axis equal
-    title(sprintf('layer %d',i)); xlabel('stop drift spont'); ylabel('post');
+%%% scatter plot of drift spont
+for mv = 1:2
+    figure
+    for i = 1:6
+        subplot(2,3,i)
+        plot(drift_spont(treatment==saline & layerAll ==i,mv,1),drift_spont(treatment==saline& layerAll ==i,mv,2),'k.');
+        hold on
+        plot(drift_spont(treatment==doi& layerAll ==i,mv,1),drift_spont(treatment==doi& layerAll ==i,mv,2),'r.');
+        plot([0 10],[0 10]); axis equal
+        title(sprintf('layer %d',i)); ylabel('post');
+        if mv ==1 , xlabel('stop drift spont'); else  xlabel('move drift spont'); end
+        
+    end
 end
 
-figure
-for i = 1:6
-    subplot(2,3,i)
-    plot(drift_spont(treatment==saline & layerAll ==i,2,1),drift_spont(treatment==saline& layerAll ==i,2,2),'k.');
-    hold on
-    plot(drift_spont(treatment==doi& layerAll ==i,2,1),drift_spont(treatment==doi& layerAll ==i,2,2),'r.');
-    plot([0 10],[0 10]); axis equal
-    title(sprintf('layer %d',i)); xlabel('move drift spont'); ylabel('post');
-end
-
-
-figure
-for i = 1:6
-    subplot(2,3,i)
-    plot(wn_spont(treatment==saline & layerAll ==i,1,1),wn_spont(treatment==saline& layerAll ==i,1,2),'k.');
-    hold on
-    plot(wn_spont(treatment==doi& layerAll ==i,1,1),wn_spont(treatment==doi& layerAll ==i,1,2),'r.');
-    plot([0 10],[0 10]); axis equal
-    title(sprintf('layer %d',i)); xlabel('stop wn spont'); ylabel('post');
-end
-
-figure
-for i = 1:6
-    subplot(2,3,i)
-    plot(wn_spont(treatment==saline & layerAll ==i,2,1),wn_spont(treatment==saline& layerAll ==i,2,2),'k.');
-    hold on
-    plot(wn_spont(treatment==doi& layerAll ==i,2,1),wn_spont(treatment==doi& layerAll ==i,2,2),'r.');
-    plot([0 10],[0 10]); axis equal
-    title(sprintf('layer %d',i)); xlabel('move wn spont'); ylabel('post');
+%%% scatter plot of wn spont
+for mv = 1:2
+    figure
+    for i = 1:6
+        subplot(2,3,i)
+        plot(wn_spont(treatment==saline & layerAll ==i,mv,1),wn_spont(treatment==saline& layerAll ==i,mv,2),'k.');
+        hold on
+        plot(wn_spont(treatment==doi& layerAll ==i,mv,1),wn_spont(treatment==doi& layerAll ==i,mv,2),'r.');
+        plot([0 10],[0 10]); axis equal
+        title(sprintf('layer %d',i));  ylabel('post');
+        if mv ==1 , xlabel('stop wn spont'); else  xlabel('move wn spont'); end
+    end
 end
 
 
-figure
-for i = 1:6
-    subplot(2,3,i)
-    plot(wn_evoked(treatment==saline & layerAll ==i,1,1),wn_evoked(treatment==saline& layerAll ==i,1,2),'k.');
-    hold on
-    plot(wn_evoked(treatment==doi& layerAll ==i,1,1),wn_evoked(treatment==doi& layerAll ==i,1,2),'r.');
-    plot([0 10],[0 10]); xl = get(gca,'Xlim'); yl = get(gca,'Ylim'); axis square; axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
-    title(sprintf('layer %d',i)); xlabel('stop wn evoked'); ylabel('post');
+%%% scatter plot wn evoked
+for mv = 1:2
+    figure
+    for i = 1:6
+        subplot(2,3,i)
+        plot(wn_evoked(treatment==saline & layerAll ==i,mv,1),wn_evoked(treatment==saline& layerAll ==i,mv,2),'k.');
+        hold on
+        plot(wn_evoked(treatment==doi& layerAll ==i,mv,1),wn_evoked(treatment==doi& layerAll ==i,mv,2),'r.');
+        plot([0 10],[0 10]); xl = get(gca,'Xlim'); yl = get(gca,'Ylim'); axis square; axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
+        title(sprintf('layer %d',i));  ylabel('post');
+        if mv ==1 , xlabel('stop wn evoked'); else  xlabel('move wn evoked'); end
+    end
 end
 
-figure
-for i = 1:6
-    subplot(2,3,i)
-    plot(wn_evoked(treatment==saline & layerAll ==i,2,1),wn_evoked(treatment==saline& layerAll ==i,2,2),'k.');
-    hold on
-    plot(wn_evoked(treatment==doi& layerAll ==i,2,1),wn_evoked(treatment==doi& layerAll ==i,2,2),'r.');
-    plot([0 10],[0 10]); xl = get(gca,'Xlim'); yl = get(gca,'Ylim'); axis square; axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
-    title(sprintf('layer %d',i)); xlabel('move wn evoked'); ylabel('post');
-end
-
+%%% plot white noise response functions for all units
 for t = 1:2
-figure
+    figure
+    if t==1, set(gcf,'Name','saline wn CRF'), else set(gcf,'Name','doi wn CRF'),end
     useN = find(treatment==t)
     for i = 1:length(useN)
         np = ceil(sqrt(length(useN)));
@@ -200,9 +191,10 @@ figure
     end
 end
 
-
+%%% plot orientation tuning curves for all units
 for t = 1:2
-figure
+    figure
+    if t==1, set(gcf,'Name','saline drift orientation'), else set(gcf,'Name','doi drift orientation'),end
     useN = find(treatment==t)
     for i = 1:length(useN)
         np = ceil(sqrt(length(useN)));
@@ -210,15 +202,17 @@ figure
         hold on
         plot(drift_orient(useN(i),:,1,1),'Color',[0.5 0 0]);  plot(drift_orient(useN(i),:,2,1),'Color',[0 0.5 0]);
         plot(drift_orient(useN(i),:,1,2),'Color',[1 0 0]);  plot(drift_orient(useN(i),:,2,2),'Color',[0 1 0]);
-             plot([1 12], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
+        plot([1 12], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
         plot([1 12], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
-yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
+        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
     end
 end
 
+%%% plot speed histogram
 figure
 hold on
-subplot(1,2,1)
-plot(mean(speedHistWn(sessionTreatment==saline,:,:),1)'); title('saline'); xlabel('speed')
-subplot(1,2,2)
-plot(mean(speedHistWn(sessionTreatment==doi,:,:),1)'); title('doi'); xlabel('speed')
+subplot(2,1,1)
+plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==saline,1:25,:),1))); title('saline'); xlabel('speed')
+subplot(2,1,2)
+plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==doi,1:25,:),1))); title('doi'); xlabel('speed')
+legend('pre','post')

@@ -20,6 +20,8 @@ files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '';
+files(n).tip1 = 500; files(n).tip2 = 450; files(n).angle = 35;  %%% example
+files(n).wn_camera = {'eyefile1.mat','eyefile2.mat'};  %%% example
 
 n=n+1;
 files(n).expt = '012916';
