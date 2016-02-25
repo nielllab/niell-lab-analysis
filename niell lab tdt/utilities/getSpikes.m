@@ -3,7 +3,6 @@ function spikes = getSpikes(clustfile,afile, block,redo)
 %%% this is mostly just a matter of sorting the spikes from one block 
 %%% but nice to do it just in one line!
 
-
 load(clustfile,'Block_Name','Tank_Name');
 blocknum = find(strcmp(block,Block_Name));
 Block_Name = Block_Name{blocknum}

@@ -14,7 +14,8 @@ Block_Name = Block_Name{blocknum}
 load(afile,'lfpMove');
 
 if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknum).freq) | redo
-    try
+  
+   try
    lfp = getLFP(clustfile,afile,block,redo);
    spd = getSpeed(clustfile,afile,block,redo);
    s = lfp.normspect;

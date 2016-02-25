@@ -71,7 +71,7 @@ for c = 1:length(preSpikes);
         set(gcf, 'PaperPositionMode', 'auto');
         print('-dpsc',psfilename,'-append');
     end
-    
+   close(gcf)
 end
 
 
