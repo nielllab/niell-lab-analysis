@@ -611,7 +611,7 @@ end
 % plot([0 10],[0 10]); axis equal
 % title('all inh')
 
-%%all units pre/post spont and evoked -- scatter
+%%all units pre/post spont and ev
 figure
 subplot(1,2,1)
 plot(crf(exc,10,1)-crf(exc,1,1),crf(exc,10,2)-crf(exc,1,2),'b.');
@@ -638,6 +638,10 @@ plot([0 50],[0 50]);
 % hold on
 % plot([0 10],[0 10]); axis equal
 % title('all inh')
+
+
+
+
 
 %%% drift spont scatter plots
 figure

@@ -2,17 +2,16 @@ clear all; close all
 [f p] = uigetfile('*.mat','pre data');
 load(fullfile(p,f));
 
+preSpikes = blockSpike;
+preRunT = tsampDark;
+preRunV = vsmoothDark;
+[f p] = uigetfile('*.mat','post data');
+load(fullfile(p,f));
+
 [afname, apname] = uigetfile('*.mat','analysis data');
 darkpname = apname;
 afile = fullfile(apname,afname);
 load(afile);
-
-preSpikes = blockSpike;
-preRunT = tsampDark;
-preRunV = vsmoothDark;
-
-[f p] = uigetfile('*.mat','post data');
-load(fullfile(p,f));
 
 psfilename = 'D:\Angie_analysis\analysisPS.ps';
 if exist(psfilename,'file')==2;delete(psfilename);end %%% 
@@ -24,7 +23,6 @@ postRunV = vsmoothDark;
 
 dur = 600;
 dt = 1;
-%histbins = dt/2:dt:dur
 
 for c = 1:length(preSpikes);
     figure
@@ -103,7 +101,7 @@ legend({'pre','post'})
 figure
 subplot(1,2,1)
 scatterhist(cv2(:,:,1),cv2(:,:,2),'Color',[0,.3,1]); xlabel 'CV2 Pre DOI'; ylabel 'CV2 Post DOI'; lsline
-ylim([0.6 1.6]); axis square;
+ylim([0.6 1.4]); xlim([0.6 1.4]); axis square;
 
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
@@ -135,14 +133,17 @@ imagesc(normR(:,:,2),[0 rmax]); title('post'); xlabel('secs'); ylabel('cell #')
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
 
-preCorr = corrcoef(squeeze(normR(:,:,1))');
-postCorr = corrcoef(squeeze(normR(:,:,2))');
+preCorr = corrcoef(squeeze(normR(13:end,:,1))');
+postCorr = corrcoef(squeeze(normR(13:end,:,2))');
 
-figure
+
+figure 
 subplot(1,2,1);
-imagesc(preCorr,[-1 1]); colormap jet; title('Pre DOI'); xlabel('cell #'); ylabel('cell #'); axis square;
-subplot(1,2,2); 
-imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell #'); ylabel('cell #'); 
+imagesc(preCorr,[-1 1]); colormap jet; title('Pre DOI'); xlabel('cell number'); ylabel('cell number'); axis square;
+set(gca,'fontsize',17)
+subplot(1,2,2);
+imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell number'); ylabel('cell number');
+set(gca,'fontsize',17);
 axis square;
 
 set(gcf, 'PaperPositionMode', 'auto');
@@ -162,9 +163,10 @@ print('-dpsc',psfilename,'-append');
 
 meanR = squeeze(mean(R,2));
 figure
-plot(meanR(:,2),meanR(:,1),'o');hold on; plot([0 20],[0 20]);axis equal
-xlabel('post rate'); ylabel('pre rate');
-
+plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);
+%axis equal
+xlabel('Pre DOI Firing Rate (sp/sec)'); ylabel('Post DOI Firing Rate (sp/sec)');
+xlim ([-2 23]); ylim([0 20]);set(gca,'FontSize', 20)
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
 
