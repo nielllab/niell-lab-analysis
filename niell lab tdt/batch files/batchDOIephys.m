@@ -5,8 +5,8 @@ n=n+1;
 files(n).expt = '020516';
 files(n).dir = '02_05_16';
 files(n).tank = '';
-files(n).clusterfile = 'D:\Angie_analysis\DOI_experiments\02_05_16\cluster_data_02_05_16_cluster_020516';
-files(n).analysisfile = 'D:\Angie_analysis\DOI_experiments\02_05_16\analysis_020516';
+files(n).clusterfile = 'cluster_data_02_05_16_cluster_020516';
+files(n).analysisfile = 'analysis_020516';
 files(n).predark = 'dark_presal1';
 files(n).postdark = 'dark_postsal1';
 files(n).prewn = 'wn_presal1';
@@ -20,12 +20,14 @@ files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '';
+files(n).tip1 = 500; files(n).tip2 = 450; files(n).angle = 35;  %%% example
+files(n).wn_camera = {'eyefile1.mat','eyefile2.mat'};  %%% example
 
 n=n+1;
 files(n).expt = '012916';
 files(n).dir = '01_29_16';
 files(n).tank = '';
-files(n).clusterfile = 'cluster_012916';
+files(n).clusterfile = 'cluster_data_01_29_16_cluster_012916';
 files(n).analysisfile = 'analysis_012916';
 files(n).predark = 'dark_pre';
 files(n).postdark = 'dark_postdoi1';
@@ -45,7 +47,7 @@ n=n+1;
 files(n).expt = '010816';
 files(n).dir = '01_08_16';
 files(n).tank = '';
-files(n).clusterfile = 'cluster_010816';
+files(n).clusterfile = 'cluster_data_01_08_16htr2a_doi_cluster_010816';
 files(n).analysisfile = 'analysis_010816';
 files(n).predark = 'dark_predoi1';
 files(n).postdark = 'dark_postdoi1';
@@ -843,6 +845,12 @@ files(n).notes = 'good data';
 
 
 
+for f = 1:length(files);
+    files(f).blockWn = {files(f).prewn files(f).postwn};
+    files(f).blockDark = {files(f).predark files(f).postdark};
+    files(f).blockBar = {files(f).prebars files(f).postbars};
+    files(f).blockDrift = {files(f).predrift files(f).postdrift};
+end
 
 
 

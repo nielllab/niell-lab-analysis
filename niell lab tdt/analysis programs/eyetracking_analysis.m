@@ -39,8 +39,8 @@ xlabel('frame #'); ylabel('secs');
 ylim([ 0 0.2])
 
 thresh = 0.85; %pupil threshold for binarization
-puprange = [4 11]; %set
-imshow(data(:,:,10))
+puprange = [20 55]; %set
+imshow(data(:,:,10)) % for an example frame
 
 %user input to select center and right points
 sprintf('Please select pupil center and top, eyeball top and right points, darkest part of eyeball')
@@ -86,13 +86,15 @@ for n = 2:size(data,3)
     end
 end
 toc
+%histogram of recorded radii
 figure
-hist(rad, 1:.5:40,'Color',[0,.5,1]); xlim ([0 20]); ylim([0 3000]); 
-xlabel 'pixels'; ylabel 'number of frames';set(gca,'FontSize', 18)
+hist(rad, 1:.5:55,'Color',[0,.5,1]); xlim ([0 20]); ylim([0 3000]); 
+xlabel 'pixels'; ylabel 'number of frames';
 
 
 clear R
 close all
+%for each unit, plot firing rate, running velocity, and radius
 for c = 1:length(spikeT)
     sp = spikeT{c};
     sp = sp-(blocknum-1)*10^5;
@@ -104,8 +106,10 @@ for c = 1:length(spikeT)
     hold on
     plot(tsampBar,vsmoothBar,'-g');
     plot(0.1:0.1:size(data,3)/10,rad,'-b')
-   % plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m')
-    %plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c')
+   % plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m') % x-postion of
+   % center
+    %plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c')y-postion of
+   % center
     ylim([0 20]); xlim ([0 600]);
     legend('sp/sec','cm/sec','radius','x pos','ypos')
     set(gcf, 'PaperPositionMode', 'auto');
@@ -115,7 +119,7 @@ end
 % figure
 % plot(tsampBar,vsmoothBar,'-g');
 % hold on
-% plot(0.1:0.1:size(data,3)/10,rad,'-b'); set(gca,'FontSize', 18)
+% plot(0.1:0.1:size(data,3)/10,rad,'-b'); 
 % xlim([0 600]); ylim ([0 15]); xlabel 'pixels'; ylabel 'number of frames';
 
 startT = max(tsampBar(1),cameraTTL(1))
@@ -140,13 +144,13 @@ plot([0 0],[0 1],'g-')
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append')
 
-
+%scatter plot of rad & velocity 
 figure
 scatter(vInterp, rInterp, '.b')
 xlabel('cm/sec');ylabel('radius')
 lsline;
- set(gcf, 'PaperPositionMode', 'auto');
- print('-dpsc',psfilename,'-append')
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',psfilename,'-append')
 
 % %for FR and rad
 %scatter(vsmoothBar,R(1:length(histbins),c))
@@ -160,8 +164,7 @@ for c = 1:length(spikeT)
     rate=hist(sp,histbins)/dt;
     rate = rate(2:end);
     R(1:length(histbins),c) = hist(sp,histbins)/dt;
-    [ corr_Frad lags] = xcorr(rate-mean(rate),rInterp-mean(rInterp),60/dt,'coeff');
-    [ corr_Fvel lags] = xcorr(rate-mean(rate),vInterp-mean(vInterp),60/dt,'coeff');
+    [corr_Frad lags] = xcorr(rate-mean(rate),rInterp-mean(rInterp),60/dt,'coeff');
     
     figure
     subplot(2,2,1)
@@ -178,11 +181,8 @@ for c = 1:length(spikeT)
     plot(preISI,postISI,'.')
     xlabel('preISI'); ylabel('postISI')
   
-   
-   %xcorr(rate-mean(rate),rate-mean(rate))
-    %
-        set(gcf, 'PaperPositionMode', 'auto');
-         print('-dpsc',psfilename,'-append');
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
 end
 
 
@@ -191,9 +191,10 @@ end
 %    scatter(vsmoothBar,R(1:length(histbins),c))        
 
 % h2 = figure
-% hold on
+
 % plot(0.1:0.1:size(data,3)/10,rad,'b-')
-% plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m')
+% hold on
+% plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m') 
 % plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c')
 % hold off
 % legend('radius','x pos','ypos')
@@ -206,27 +207,24 @@ end
 
 % video with tracking
 % h4 = figure
-for i = 1:size(data,3)
-%  
-    subplot(1,2,1)
-    imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off
-    
-    subplot(1,2,2)
-    imshow(bindata(:,:,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off 
-%     mov(i) = getframe(gcf)
-%     vid = VideoWriter('predoi_tracking.avi')
-%     open(vid); writeVideo(vid,mov); close(vid)
-end
+% for i = 1:size(data,3)
+% %  
+%     subplot(1,2,1)
+%     imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off
+%     
+%     subplot(1,2,2)
+%     imshow(bindata(:,:,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off 
+% end
 
 
 save(afile,'tsampBar','vsmoothBar','R','centroid','rad', 'corr_Frad','corr_vrad','-append');
