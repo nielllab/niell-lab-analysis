@@ -7,9 +7,9 @@ batchDOIephys; %%% load batch file
 
 %%% select the sessions you want based on filters
 %%% example
-use =  find(strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark})   )
+%use =  find(strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark})   )
 
-%use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
+use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 sprintf('%d selected sessions',length(use))
 
