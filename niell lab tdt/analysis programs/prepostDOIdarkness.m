@@ -1,30 +1,3 @@
-clear all; close all
-[f p] = uigetfile('*.mat','pre data');
-load(fullfile(p,f));
-
-preSpikes = blockSpike;
-preRunT = tsampDark;
-preRunV = vsmoothDark;
-
-[f p] = uigetfile('*.mat','post data');
-load(fullfile(p,f));
-
-[afname, apname] = uigetfile('*.mat','analysis data');
-darkpname = apname;
-afile = fullfile(apname,afname);
-load(afile);
-
-psfilename = 'D:\Angie_analysis\analysisPS.ps';
-if exist(psfilename,'file')==2;delete(psfilename);end %%% 
-
-postSpikes = blockSpike;
-postRunT = tsampDark;
-postRunV = vsmoothDark;
-
-
-dur = 600;
-dt = 1;
-
 function [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile, blocks, dt, savePDF);
 blocknm = blocks{1};
 spikes = getSpikes(clustfile,afile, blocknm,0);
@@ -130,8 +103,7 @@ for m = 1:2
         %ax.XTick = [1 2];
         %ax.XTickLabels = {'pre','post'}
     end
-
-
+    
     if savePDF
         set(gcf, 'PaperPositionMode', 'auto');
         print('-dpsc',psfilename,'-append');
@@ -148,7 +120,7 @@ legend({'pre','post'})
 figure
 subplot(1,2,1)
 scatterhist(cv2(:,:,1),cv2(:,:,2),'Color',[0,.3,1]); xlabel 'CV2 Pre DOI'; ylabel 'CV2 Post DOI'; lsline
-ylim([0.6 1.4]); xlim([0.6 1.4]); axis square;
+ylim([0.6 1.6]); axis square;
 
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
@@ -186,22 +158,14 @@ if savePDF
     print('-dpsc',psfilename,'-append');
 end
 
-preCorr = corrcoef(squeeze(normR(13:end,:,1))');
-postCorr = corrcoef(squeeze(normR(13:end,:,2))');
+preCorr = corrcoef(squeeze(normR(:,:,1))');
+postCorr = corrcoef(squeeze(normR(:,:,2))');
 
-
-figure 
+figure
 subplot(1,2,1);
-imagesc(preCorr,[-1 1]); colormap jet; title('Pre DOI'); xlabel('cell number'); ylabel('cell number'); axis square;
-set(gca,'fontsize',17)
-subplot(1,2,2);
-imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell number'); ylabel('cell number');
-set(gca,'fontsize',17);
-
 imagesc(preCorr,[-1 1]); colormap jet; title('Pre DOI'); xlabel('cell #'); ylabel('cell #'); axis square;
 subplot(1,2,2);
 imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell #'); ylabel('cell #');
-
 axis square;
 
 if savePDF
@@ -277,12 +241,6 @@ end
 
 meanR = squeeze(mean(R,2));
 figure
-plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);
-%axis equal
-xlabel('Pre DOI Firing Rate (sp/sec)'); ylabel('Post DOI Firing Rate (sp/sec)');
-xlim ([-2 23]); ylim([0 20]);set(gca,'FontSize', 20)
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
 plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);axis equal
 xlabel('pre rate'); ylabel('post rate');
 
