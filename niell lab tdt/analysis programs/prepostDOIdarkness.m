@@ -51,10 +51,15 @@ figure
     plot(squeeze(R(c,:,:))); xlabel 'time(s)'; ylabel 'sp/sec';
     
     subplot(2,2,2)
+<<<<<<< HEAD
     bar(squeeze(cv2(c,:,:))); ylim([-1 1])
     ax = gca;
     ax.XTick = [1 2];
     ax.XTickLabels = {'pre','post'}; %use pre post isi to calc error
+=======
+    barcv2 = [cv21 cv22]
+    bar(barcv2)
+>>>>>>> b907503e35707d9d3b9a60629265d106f44f0d79
     %barcv2 = [meanRpre meanRpost]
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');

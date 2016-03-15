@@ -1,3 +1,5 @@
+clear all; close all
+
 if ~exist('clustfile','var')  %%%stand alone run
 [fname, pname] = uigetfile('*.mat','cluster data');
 clustfile=fullfile(pname,fname);
