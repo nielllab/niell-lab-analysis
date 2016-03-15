@@ -158,8 +158,10 @@ if savePDF
     print('-dpsc',psfilename,'-append');
 end
 
+
 preCorr = corrcoef(squeeze(normR(:,:,1))');
 postCorr = corrcoef(squeeze(normR(:,:,2))');
+
 
 figure
 subplot(1,2,1);

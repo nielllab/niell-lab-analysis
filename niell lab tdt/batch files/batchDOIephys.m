@@ -1,28 +1,28 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
-% n=n+1;
-% files(n).expt = '030916';
-% files(n).dir = '03_09_16';
-% files(n).tank = '';
-% files(n).clusterfile = 'cluster_data_03_09_16_cluster_030916';
-% files(n).analysisfile = 'analysis_030916';
-% files(n).predark = 'dark_pre1';
-% files(n).postdark = 'dark_post1';
-% files(n).prewn = 'wn_pre1';
-% files(n).postwn = 'wn_post1';  
-% files(n).predrift = 'drift_pre1';
-% files(n).postdrift = 'drift_post1';
-% files(n).prebars = 'bars_pre1';
-% files(n).postbars = 'bars_post2';
-% files(n).injection = 'injection';
-% files(n).treatment = 'DOI';
-% files(n).layers = [];
-% files(n).notes = 'good data';
-% files(n).misc = 'atropine';
-% %files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  %%% example
-% %files(n).wn_camera = {'eyefile1.mat','eyefile2.mat'};  %%% example
-% 
+n=n+1;
+files(n).expt = '030916';
+files(n).dir = '03_09_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_09_16_cluster_030916';
+files(n).analysisfile = 'analysis_030916';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = 'bars_pre1';
+files(n).postbars = 'bars_post2';
+files(n).injection = 'injection';
+files(n).treatment = 'DOI';
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = 'atropine';
+%files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  %%% example
+%files(n).wn_camera = {'eyefile1.mat','eyefile2.mat'};  %%% example
+
 n=n+1;
 files(n).expt = '020516';
 files(n).dir = '02_05_16';
