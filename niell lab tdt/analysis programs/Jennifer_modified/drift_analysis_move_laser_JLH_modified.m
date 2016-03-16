@@ -9,7 +9,6 @@
 
 
 
-
 SU = 1;
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
