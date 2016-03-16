@@ -26,6 +26,12 @@ if ~exist('lfp','var') | length(lfp)<blocknum  | isempty(lfp(blocknum).t) | redo
             normalizer = repmat(normalizer,size(lfpchan,1),1);
             lfp(blocknum).normspect(ch,:,:) = lfpchan.*normalizer;
         end
+        %%% downsample lfp
+        for f = 1:nChan/4;
+            ns(f,:,:) = median(lfp(blocknum).normspect((f-1)*4 + 1:4,:,4:4:end),1);
+        end
+        lfp(blocknum).normspect = ns;
+        lfp(blocknum).freq = lfp(blocknum).freq(4:4:end);
     catch
         lfp(blocknum).t=[];
         lfp(blocknum).freq=[];
