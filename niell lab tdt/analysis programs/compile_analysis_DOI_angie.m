@@ -19,33 +19,50 @@ for dataset = 1:1  %%% pre and post DOI
     if dataset==1
         %%DOI
 %         
-afiles = {'Angie_analysis\DOI_experiments\01_29_16\analysis_012916.mat'}%,...
-%     'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat',...
-%     'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat'}
+afiles = {'Angie_analysis\DOI_experiments\03_09_16\analysis_030916.mat'}
 
-    
-%         
-%         afiles = {'Angie_analysis\DOI_experiments\7_29_15\analysis_072915.mat',...
-%             'Angie_analysis\DOI_experiments\08_02_15\analysis_080215.mat',...
-%             'Angie_analysis\DOI_experiments\08_03_15\analysis_080315.mat',...
-%             'Angie_analysis\DOI_experiments\08_05_15\analysis_080515.mat',...
-%             'Angie_analysis\DOI_experiments\08_07_15\analysis_080715.mat',...
-%             'Angie_analysis\DOI_experiments\09_02_15\analysis_090215.mat',...
-%             'Angie_analysis\DOI_experiments\09_04_15\analysis_090415.mat',...
-%             'Angie_analysis\DOI_experiments\09_07_15\analysis_090715.mat',...
-%             'Angie_analysis\DOI_experiments\09_08_15\analysis_090815.mat',...
-%             'Angie_analysis\DOI_experiments\09_23_15\analysis_092315.mat',...
-%             'Angie_analysis\DOI_experiments\09_29_15\analysis_092915.mat',...
-%             'Angie_analysis\DOI_experiments\09_30_15\analysis_093015.mat',...
-%             'Angie_analysis\DOI_experiments\10_19_15\analysis_101915.mat',...
-%             'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat',...
-%             'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat',...
-%             'Angie_analysis\DOI_experiments\11_19_15\analysis_111915.mat',...
-%            'Angie_analysis\DOI_experiments\12_02_15\analysis_120215.mat',...
-%             'Angie_analysis\DOI_experiments\12_09_15\analysis_120915.mat',...
-%             'Angie_analysis\DOI_experiments\12_14_15\analysis_121415.mat',...
-%             'Angie_analysis\DOI_experiments\01_04_16\analysis_010416.mat',...
-%             'Angie_analysis\DOI_experiments\01_08_16\analysis_010816.mat'}
+
+
+% afiles = {'Angie_analysis\DOI_experiments\09_07_15\analysis_090715.mat',...
+%     'Angie_analysis\DOI_experiments\09_08_15\analysis_090815.mat',...
+%     'Angie_analysis\DOI_experiments\09_23_15\analysis_092315.mat',...
+%     'Angie_analysis\DOI_experiments\09_29_15\analysis_092915.mat',...
+%     'Angie_analysis\DOI_experiments\09_30_15\analysis_093015.mat',...
+%     'Angie_analysis\DOI_experiments\10_19_15\analysis_101915.mat',...
+%     'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat',...
+%     'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat',...
+%     'Angie_analysis\DOI_experiments\11_19_15\analysis_111915.mat',...
+%     'Angie_analysis\DOI_experiments\12_02_15\analysis_120215.mat',...
+%     'Angie_analysis\DOI_experiments\12_09_15\analysis_120915.mat',...
+%     'Angie_analysis\DOI_experiments\12_14_15\analysis_121415.mat',...
+%     'Angie_analysis\DOI_experiments\01_08_16\analysis_010816.mat',...
+%     'Angie_analysis\DOI_experiments\01_29_16\analysis_012916.mat'}
+
+
+% afiles = {'Angie_analysis\DOI_experiments\7_29_15\analysis_072915.mat',...
+%     'Angie_analysis\DOI_experiments\08_02_15\analysis_080215.mat',...
+%     'Angie_analysis\DOI_experiments\08_03_15\analysis_080315.mat',...
+%     'Angie_analysis\DOI_experiments\08_05_15\analysis_080515.mat',...
+%     'Angie_analysis\DOI_experiments\08_07_15\analysis_080715.mat',...
+%     'Angie_analysis\DOI_experiments\09_02_15\analysis_090215.mat',...
+%     'Angie_analysis\DOI_experiments\09_04_15\analysis_090415.mat',...
+%     'Angie_analysis\DOI_experiments\09_07_15\analysis_090715.mat',...
+%     'Angie_analysis\DOI_experiments\09_08_15\analysis_090815.mat',...
+%     'Angie_analysis\DOI_experiments\09_23_15\analysis_092315.mat',...
+%     'Angie_analysis\DOI_experiments\09_29_15\analysis_092915.mat',...
+%     'Angie_analysis\DOI_experiments\09_30_15\analysis_093015.mat',...
+%     'Angie_analysis\DOI_experiments\10_19_15\analysis_101915.mat',...
+%     'Angie_analysis\DOI_experiments\10_28_15\analysis_102815.mat',...
+%     'Angie_analysis\DOI_experiments\11_04_15\analysis_110415.mat',...
+%     'Angie_analysis\DOI_experiments\11_19_15\analysis_111915.mat',...
+%     'Angie_analysis\DOI_experiments\12_02_15\analysis_120215.mat',...
+%     'Angie_analysis\DOI_experiments\12_09_15\analysis_120915.mat',...
+%     'Angie_analysis\DOI_experiments\12_14_15\analysis_121415.mat',...
+%     'Angie_analysis\DOI_experiments\01_04_16\analysis_010416.mat',...
+%     'Angie_analysis\DOI_experiments\01_08_16\analysis_010816.mat',...
+%     'Angie_analysis\DOI_experiments\01_29_16\analysis_012916.mat'}
+
+
 %      
         
         
@@ -66,14 +83,14 @@ afiles = {'Angie_analysis\DOI_experiments\01_29_16\analysis_012916.mat'}%,...
 %     'Angie_analysis\DOI_experiments\10_02_15\analysis_100215.mat',...
 %     'Angie_analysis\DOI_experiments\10_09_15\analysis_100915.mat'}
 % %    
-    elseif dataset==2
-        %         %%lisuride
-        %afiles = {'Angie_analysis\DOI_experiments\08_13_15\08_13_15a\analysis_081315a.mat',...
-        %             'Angie_analysis\DOI_experiments\08_25_15\analysis_082515.mat',...
-        %             'Angie_analysis\DOI_experiments\08_26_15\analysis_082615.mat',...
-        %             'Angie_analysis\DOI_experiments\08_31_15\analysis_083115.mat'}
-        %
-    elseif dataset==3
+elseif dataset==2
+%         %         %%lisuride
+%         %afiles = {'Angie_analysis\DOI_experiments\08_13_15\08_13_15a\analysis_081315a.mat',...
+%         %             'Angie_analysis\DOI_experiments\08_25_15\analysis_082515.mat',...
+%         %             'Angie_analysis\DOI_experiments\08_26_15\analysis_082615.mat',...
+%         %             'Angie_analysis\DOI_experiments\08_31_15\analysis_083115.mat'}
+%         %
+   elseif dataset==3
         
         %%EtOH\DMSO\Saline
        % afiles = {'Angie_analysis\DOI_experiments\7_16_15\analysis_etoh_control.mat'};
@@ -150,7 +167,7 @@ afiles = {'Angie_analysis\DOI_experiments\01_29_16\analysis_012916.mat'}%,...
      %   alldata( cellrange,7:25)= wv';
         alldata(cellrange,26)=layer;
         
-        
+       
         GT(cellrange)=4-dataset;
         %         for dontuse =1:1
         %             %     for c = 1:n_units;
@@ -414,7 +431,7 @@ xlim([5 16])
 ylim([1 3.5])
 title('all units')
 
-for selectlyr=3:6
+for selectlyr=2:6 %alldata
     
     subplot(2,3,selectlyr-1)
     plot(alldata(find(inh & lyr==selectlyr),5),alldata(find(inh & lyr==selectlyr),6),'ro');
@@ -458,20 +475,20 @@ clear crf
 %divide CRFs by layer
 figure
 for i = 1:length(use)
-    subplot(30,30,i); hold on
-    set(gcf,'Position',[300 300 800 400])
+ subplot(5,5,i); hold on
+  set(gcf,'Position',[300 300 800 400])
     
     
     meandata = 0.5*(CRF{:,use(i)}(1:10)+CRF{:,use(i)}(20:-1:11));
     if inh(use(i))
-        plot(meandata,'r:');
+     plot(meandata,'r:');
     else
         plot(meandata,'b:');
     end
     crf(i,:,1) = meandata;
     meandata2 = 0.5*(CRF_post{:,use(i)}(1:10)+CRF_post{:,use(i)}(20:-1:11));
     if inh(use(i))
-        plot(meandata2,'r');
+       % plot(meandata2,'r');
     else
         plot(meandata2,'b');
     end
@@ -486,16 +503,16 @@ crf(10,:,:)= crf(10,:,:) + crf(11,:,:); crf(11,:,:)=NaN;
 clear spont sponterr
 figure
 subplot(2,3,1)
-spont(2,:) = squeeze(nanmean(crf(inh,1,:),1))
+spont(2,:) = squeeze(nanmean(crf(inh,1,:),1));
 sponterr(2,:) = squeeze(nanstd(crf(inh,1,:),1))/sqrt(sum(inh));
-spont(1,:) = squeeze(nanmean(crf(~inh,1,:),1))
+spont(1,:) = squeeze(nanmean(crf(~inh,1,:),1));
 sponterr(1,:) = squeeze(nanstd(crf(~inh,1,:),1))/sqrt(sum(~inh));
 barweb(spont,sponterr)
 set(gca,'Xticklabel',{'exc','inh'}); legend({'pre','post'})
 ylabel('spont sp/sec')
 title('all units')
 
-for selectlyr=3:6
+for selectlyr=2:6
 subplot(2,3,selectlyr)
 spont(2,:) = squeeze(nanmean(crf(inh & lyr==selectlyr,1,:),1))
 sponterr(2,:) = squeeze(nanstd(crf(inh & lyr==selectlyr,1,:),1))/sqrt(sum(inh& lyr==selectlyr));
@@ -522,7 +539,7 @@ set(gca,'Xticklabel',{'exc','inh'}); legend({'pre','post'})
 ylabel('evoked sp/sec')
 title('all layers')
 
-for selectlyr=3:6
+for selectlyr=2:6
 resp(2,:) = squeeze(nanmean(crf(inh & lyr==selectlyr,10,:),1))
 resperr(2,:) = squeeze(nanstd(crf(inh & lyr==selectlyr,10,:),1))/sqrt(sum(inh& lyr ==selectlyr));
 resp(1,:) = squeeze(nanmean(crf(~inh & lyr==selectlyr,10,:),1))
@@ -541,17 +558,24 @@ subplot(2,3,1)
 hold on
 %plot(crf(exc & pinped,10,1)-crf(exc& pinped,1,1),crf(exc& pinped,10,2)-crf(exc& pinped,1,2),'g.');
 plot(crf(exc,10,1)-crf(exc,1,1),crf(exc,10,2)-crf(exc,1,2),'b.');
-plot([0 10],[0 10]); axis equal
-title('all exc; evoked')
-
+hold on
+plot([0 10],[0 10]); 
+%axis equal; 
+axis square;
+xlim ([0 30]); ylim ([-10 30])
+%lsline; 
+title('all exc');
+xlabel 'Pre-DOI ';
+ylabel 'Post-DOI)';
 subplot(2,3,2)
 plot(crf(inh,10,1)-crf(inh,1,1),crf(inh,10,2)-crf(inh,1,2),'r.');
-hold on
-% plot(crf(inh & pinped,10,1)-crf(inh& pinped,1,1),crf(inh& pinped,10,2)-crf(inh& pinped,1,2),'g.');
-plot([0 10],[0 10]); axis equal
-title('all inh')
 
-for selectlyr=3:6
+% hold on
+% % plot(crf(inh & pinped,10,1)-crf(inh& pinped,1,1),crf(inh& pinped,10,2)-crf(inh& pinped,1,2),'g.');
+% plot([0 10],[0 10]); axis equal
+% title('all inh')
+
+for selectlyr=2:6
     subplot(2,3,selectlyr)
     plot(crf(exc&lyr==selectlyr,10,1) - crf(exc&lyr==selectlyr,1,1), crf(exc&lyr==selectlyr,10,2) - crf(exc&lyr==selectlyr,1,2),'b.')
     hold on
@@ -562,20 +586,16 @@ end
 
 
 %%% spont scatter plots
-figure
 subplot(2,3,1)
+plot(crf(exc,1,1),crf(exc,1,2),'b.'); 
 hold on
-plot(crf(exc,1,1),crf(exc,1,2),'b.');
-plot([0 10],[0 10]); axis equal
+%plot([0 10],[0 10]); axis equal
 title('all exc; spont')
-
-subplot(2,3,2)
-plot(crf(inh,1,1),crf(inh,1,2),'r.');
-hold on
-plot([0 10],[0 10]); axis equal
-title('all inh')
-
-for selectlyr=3:6
+% 
+% subplot(2,3,2)
+% plot(crf(inh,1,1),crf(inh,1,2),'r.');
+% %axis equal; 
+for selectlyr=2:6
     subplot(2,3,selectlyr)
     plot( crf(exc&lyr==selectlyr,1,1), crf(exc&lyr==selectlyr,1,2),'b.')
     hold on
@@ -583,6 +603,39 @@ for selectlyr=3:6
     axis equal
     title(sprintf('lyr %d',selectlyr))
 end
+
+%lsline; 
+% hold on
+% plot([0 10],[0 10]); axis equal
+% title('all inh')
+
+%%all units pre/post spont and evoked -- scatter
+figure
+subplot(1,2,1)
+plot(crf(exc,10,1)-crf(exc,1,1),crf(exc,10,2)-crf(exc,1,2),'b.');
+hold on
+plot(crf(inh,10,1)-crf(inh,1,1),crf(inh,10,2)-crf(inh,1,2),'r.');
+axis square;
+xlim ([0 30]); ylim ([-5 30]) 
+title('Evoked');
+xlabel 'Pre-DOI Firing Rate (sp/sec)';
+ylabel 'Post-DOI Firing Rate (sp/sec)';
+legend( 'excitatory', 'inhibitory')
+plot([0 50],[0 50]);
+%%% spont scatter plots 
+
+subplot(1,2,2)
+plot(crf(exc,1,1),crf(exc,1,2),'b.'); hold on
+plot(crf(inh,1,1),crf(inh,1,2),'r.');
+axis square;
+xlim ([0 30]); ylim ([-5 30])
+title('Spontaneous');
+xlabel 'Pre-DOI Firing Rate (sp/sec)';
+ylabel 'Post-DOI Firing Rate (sp/sec)';
+plot([0 50],[0 50]);
+% hold on
+% plot([0 10],[0 10]); axis equal
+% title('all inh')
 
 %%% drift spont scatter plots
 figure
@@ -616,13 +669,13 @@ plot(peak(exc,1),peak(exc,2),'b.');
 plot([0 10],[0 10]); axis equal
 title('all exc; drift peak')
 
-subplot(2,3,2)
-plot(peak(inh,1),peak(inh,2),'r.');
-hold on
-plot([0 10],[0 10]); axis equal
-title('all inh')
+% subplot(2,3,2)
+% plot(peak(inh,1),peak(inh,2),'r.');
+% hold on
+% plot([0 10],[0 10]); axis equal
+% title('all inh')
 
-for selectlyr=3:6
+for selectlyr=2:6
     subplot(2,3,selectlyr)
     plot( peak(exc&lyr==selectlyr,1), peak(exc&lyr==selectlyr,2),'b.')
     hold on

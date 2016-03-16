@@ -85,8 +85,8 @@ for ch = 1:nChan;
     hold on
     plot(mean(lfpnorm(moving,:),1),'g');
     axis([0 70/df 0 1.2*max(mean(lfpnorm(moving,:)))]);
-    set(gca,'XTick',(10:10:70)/df);
-    set(gca,'XTickLabel',{'10','20','30','40','50','60','70','70'})
+    set(gca,'XTick',(10:10:80)/df);
+    set(gca,'XTickLabel',{'10','20','30','40','50','60','70','80'})
     
     title(sprintf('site %d',ch));
      set(gcf, 'PaperPositionMode', 'auto');

@@ -210,6 +210,7 @@ for t = 1:2
     end
 end
 
+
 %plot spatial frequency tuning curves for all units
 for t = 1:2
     figure
@@ -223,9 +224,10 @@ for t = 1:2
         plot(drift_sf(useN(i),:,1,2),'Color',[1 0 0]);  plot(drift_sf(useN(i),:,2,2),'Color',[0 1 0]); %pre sal & DOI mv & stat
         plot([1 7], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
         plot([1 7], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
-        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 8.5])
+        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
     end
 end
+
 
 %%% plot speed histogram
 figure
@@ -236,31 +238,23 @@ subplot(2,1,2)
 plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==doi,1:25,:),1))); title('doi'); xlabel('speed')
 legend('pre','post')
 
-%%%%sf pre and post%%%
-%extract low and high SF responses for doi drift - mv
-% 
-% for t = 2
-%     useN = find(treatment==t)
-%     for i = 1:length(useN)
-%         np = ceil(sqrt(length(useN)));
-% lowsf_predoi(i) = (drift_sf(useN(i),2,1,1))
-% hsf_predoi(i) = (drift_sf(useN(i),6,1,1))
-% 
-% lowsf_postdoi(i) = (drift_sf(useN(i),2,1,2))
-% hsf_postdoi(i) = (drift_sf(useN(i),6,1,2))
-%     end
-% end
-% 
-% data_pre = [lowsf_predoi; hsf_predoi]'
-% 
-% %prepost low sf
-% figure
-% plot(lowsf_predoi, '.b'); hold on; plot(lowsf_postdoi,'.r')
-% 
-% %prepost high sf
-% figure
-% plot(hsf_predoi, '.b'); hold on; plot(hsf_postdoi,'.r')
-% 
+%extract low and high SF values for pre-doi drift - mv
+drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
+
+for t = 2
+    useN = find(treatment==t)
+    for i = 1:length(useN)
+        np = ceil(sqrt(length(useN)));
+lowsf_predoi(i) = (drift_sf(useN(i),2,1,1))
+hsf_predoi(i) = (drift_sf(useN(i),6,1,1))
+    end
+end
+
+figure
+plot(lowsf_predoi, '.b'); hold on; plot(hsf_predoi,'.r')
+
+
+
 
 
 
