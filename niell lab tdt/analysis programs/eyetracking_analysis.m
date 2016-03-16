@@ -106,10 +106,8 @@ for c = 1:length(spikeT)
     hold on
     plot(tsampBar,vsmoothBar,'-g');
     plot(0.1:0.1:size(data,3)/10,rad,'-b')
-   % plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m') % x-postion of
-   % center
-    %plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c')y-postion of
-   % center
+  plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m') % x-postion of center
+    plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c') %y-postion of center
     ylim([0 20]); xlim ([0 600]);
     legend('sp/sec','cm/sec','radius','x pos','ypos')
     set(gcf, 'PaperPositionMode', 'auto');

@@ -20,7 +20,7 @@ saline=1; doi=2; lisuride=3;
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
-for i = 1:3
+for i = 1:length(use)
     
     %%% extract filenames
     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];
@@ -239,17 +239,17 @@ legend('pre','post')
 %%%%sf pre and post%%%
 %extract low and high SF responses for doi drift - mv
 % 
-% for t = 2
-%     useN = find(treatment==t)
-%     for i = 1:length(useN)
-%         np = ceil(sqrt(length(useN)));
-% lowsf_predoi(i) = (drift_sf(useN(i),2,1,1))
-% hsf_predoi(i) = (drift_sf(useN(i),6,1,1))
-% 
-% lowsf_postdoi(i) = (drift_sf(useN(i),2,1,2))
-% hsf_postdoi(i) = (drift_sf(useN(i),6,1,2))
-%     end
-% end
+for t = 2
+    useN = find(treatment==t)
+    for i = 1:length(useN)
+        np = ceil(sqrt(length(useN)));
+lowsf_predoi(i) = (drift_sf(useN(i),2,1,1))
+hsf_predoi(i) = (drift_sf(useN(i),6,1,1))
+
+lowsf_postdoi(i) = (drift_sf(useN(i),2,1,2))
+hsf_postdoi(i) = (drift_sf(useN(i),6,1,2))
+    end
+end
 % 
 % data_pre = [lowsf_predoi; hsf_predoi]'
 % 
