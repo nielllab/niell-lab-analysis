@@ -7,6 +7,7 @@
 
 %%% read in cluster data, then connect to the tank and read the block
 
+function drift_analysis_move(clustfile,afile,pdfFile,Block_Name,blocknum)
 
 
 SU = 1;

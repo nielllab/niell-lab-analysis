@@ -11,7 +11,7 @@
 close all
 
 [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
-%psfilename = 'c:/test.ps';   %%% default location
+
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
 
@@ -37,8 +37,7 @@ selected_path = pname(1 :delims(length(delims))-1)
 Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
 Block_Name = pname(delims(length(delims))+1 :length(pname))
 end
-
-
+%%
 chans = 1:4:max(cells,1);
 
 laser = input('movement (0) or laser (1) : ');
@@ -77,11 +76,10 @@ blank_stim = 1; %%% is there an extra stimulus to measure spontaneous
 full_field = 1;  %%% is there a full-field flicker?
 
 
-
 % set number of conditions and display setup (generally rows = orientation, columns = frequency)
 n_rows=12;
 n_col=6;
-orients = [0 45 90 135 180 225 270 315];
+%orients = [0 45 90 135 180 225 270 315];
 orients = 0:30:330;
 spatfreqs = [.01 .02 .04 .08 .16 .32];
 %
@@ -117,7 +115,7 @@ if max(conds>100)   %%% two tfs
 end
 s(1,:)=conds;
 stimEpocs{block}=s;
-%keyboard
+
 
 for cell_n = cell_range;
    close all

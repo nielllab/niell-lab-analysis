@@ -1,7 +1,3 @@
-%load analysis file using input function to manually load relevant files
-
-% tip_loc = input('depth in uM of electrode tip : ');
-% angle = input('angle on electrode penetration : ');
 
 clear all
 close all
@@ -12,9 +8,11 @@ afile = fullfile(apname,afname);
 load(afile)
 
 %histology variables
+if ~exist ('tip_loc_1','var')
 tip_loc_1 = input('depth in uM of electrode tip first shank : '); %apply standard depth in uM for location of tip in top, middle or bottom third of any layer
 tip_loc_2 = input('depth in uM of electrode tip second shank : ');
 angle = input('angle on electrode penetration : ');
+end
 
  %extracts first site of all tetrodes
  
