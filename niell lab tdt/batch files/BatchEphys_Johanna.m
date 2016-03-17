@@ -1,7 +1,7 @@
 % file entry info for batch processing of single unit analysis E-phys
 % data with or without optogenetic tagging
 
-pathname = 'D:\';%computer drivew where data folders exist
+pathname = '\\niell-v2-w7\';%computer drivew where data folders exist
 
 n=0;
 
@@ -45,7 +45,7 @@ files(n).notes = ''; %could comment whether experiment was good bad or other fla
 
 %file parameters and paths
 
-files(n).path = 'D:\johanna_analysis\1_14_16\';
+files(n).path = 'D\johanna_analysis\1_14_16\';
 files(n).clusterfile = 'cluster_data_1_14_16_cluster.mat';
 files(n).analysisfile = 'analysis.mat';
 files(n).pathtank='D:\Johanna_tanks\1_14_16\';
@@ -75,10 +75,10 @@ files(n).notes = ''; %could comment whether experiment was good bad or other fla
 
 %file parameters and paths
 
-files(n).path = 'D:\johanna_analysis\1_19_16\';
+files(n).path = 'D\johanna_analysis\1_19_16\';
 files(n).clusterfile = 'cluster_data_1_19_16_cluster.mat';
 files(n).analysisfile = 'analysis.mat';
-files(n).pathtank='D:\Johanna_tanks\1_19_16\';
+files(n).pathtank='D\Johanna_tanks\1_19_16\';
 
 %block info
 files(n).blockDrift = {'drift_01'};

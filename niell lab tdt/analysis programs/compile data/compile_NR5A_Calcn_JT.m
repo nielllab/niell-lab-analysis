@@ -1,4 +1,120 @@
+close all
+clear all
+BatchEphys_Johanna
 
+use =  find( ~cellfun(@isempty,{files.prefPinp}) )
+use= use(1); %%% just analyze first one for now!
+
+
+n=0;
+for i = 1:length(use)
+    afile = [pathname files(use(i)).path  files(use(i)).analysisfile ];
+    clustfile = [pathname files(use(i)).path files(use(i)).clusterfile] ;
+    
+    %%% get cell type based on waveform
+    [inh mid] = getWaveform(clustfile,afile,0);
+    nc = length(inh); cellrange = n+1:n+nc;
+    inhAll(cellrange) = inh;
+    
+    %%% get layer info
+%     load(afile,'layer');
+%     layerAll(cellrange) = layer;
+  
+    %%% experiment parameters  
+    condition(cellrange)=files(use(i)).condition;
+    age(cellrange) = files(use(i)).age;
+    sex(cellrange) = files(use(i)).sex;
+    session(cellrange) = i;
+    
+    %%% get pinping info
+    trainPeriod = 5; freq = 5; showImg=0; makePDF=1; redo=0;
+    pinp = getPinp(clustfile,afile,files(use(i)).prefPinp,trainPeriod,freq,showImg,makePDF,redo);
+    pinped(cellrange) = pinp.pinped; %% append
+       
+    %%% get drifting grating response
+    redo = 0;
+    drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift,redo);
+    drift_orient(cellrange,:,:)=drift.orient_tune;
+    drift_sf(cellrange,:,:) = drift.sf_tune;
+    drift_spont(cellrange,:) = drift.interSpont;
+    drift_osi(cellrange,:) = drift.cv_osi;
+    drift_F1F0(cellrange) = drift.F1F0;   
+    
+    %%% get grating speed
+        spd = getSpeed(clustfile,afile,files(use(i)).blockDrift,0);
+        speedHistDrift(i,:) = hist(spd.v,0.5:1:100)/length(spd.v);
+        speedTrace{i}=spd.v;
+    
+    n= n+nc;
+end
+inh = inhAll;
+exc = ~inh;
+
+pinped = (pinped & exc); %%% pinped units should be excitatory
+
+maxresp = max(squeeze(drift_orient(:,:,2)),[],2);  %%% max grating response moving
+responsive = maxresp'>2;
+
+%%% examples of analyses
+
+%%% OSI by condition
+osibins = 0.05:0.1:1;
+figure
+hist(drift_osi(condition==1 &responsive),osibins);
+hold on
+hist(drift_osi(condition==2 & responsive),osibins);
+legend('condition 1','condition 2')
+
+%%% OSI pinped and non-pinped
+figure
+hist(drift_osi(~pinped & exc &responsive),osibins);
+hold on
+hist(drift_osi(pinped & responsive),osibins);
+legend('non-pinped','pinped')
+
+
+%%% plot OSI tuning curves
+%%% denotes pinped
+for s = 1:max(session)
+
+    figure
+    set(gcf,'Name',sprintf('%s condition %d',files(use(s)).expt,files(use(s)).condition));
+    useN = find(session ==s)
+    for i = 1:length(useN)
+        np = ceil(sqrt(length(useN)));
+        subplot(np,np,i);
+        hold on
+        plot(drift_orient(useN(i),:,1),'Color',[1 0 0]);  plot(drift_orient(useN(i),:,2),'Color',[0 1 0]); %pre sal & DOI mv & stat
+        plot([1 12], [1 1]*drift_spont(useN(i),1),':','Color',[1 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2),':','Color',[0 1 0]);
+        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
+        if pinped(useN(s))
+            plot(6,8,'b*')
+        end
+    end
+
+end
+
+%%% speed distribution
+figure
+plot(speedHistDrift);
+axis([0 40 0 1])
+xlabel('speed'); ylabel('fraction')
+
+figure
+for i = 1:length(speedTrace);
+    plot(0.1*(1:length(speedTrace{i}))/60,speedTrace{i});
+end
+xlabel('min'); ylabel('cm/sec')
+
+keyboard
+
+
+
+
+
+%%% old batch mode
+%%% lots of useful figures!
+%%% should be updated to new batch mode
 
 
 
@@ -28,7 +144,7 @@ for dataset = 1:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs. KO NR5A1-cre+ c
                 
             end
         end
-
+        
     elseif dataset==2
         for j=1:length(Cond);
             if  ismember(j,idx_KO);
@@ -45,7 +161,7 @@ for dataset = 1:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs. KO NR5A1-cre+ c
         
         sessionNum=sessionNum+1;
         clear params
-        clear wn 
+        clear wn
         clear wn_movement
         clear LFP_movement
         clear bars
@@ -56,16 +172,16 @@ for dataset = 1:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs. KO NR5A1-cre+ c
         clear layer
         clear psth
         
-%         h={files(1).path}
-%         l={files(1).analysisfile}
-%         m=[files(1).path files(1).analysisfile]
+        %         h={files(1).path}
+        %         l={files(1).analysisfile}
+        %         m=[files(1).path files(1).analysisfile]
         %%
         load(analysisfile{i})
         
         clusterfilename
-       
+        
         afiles(i)
-    
+        
         if exist(clusterfilename,'file')
             clusterFile = clusterfilename;
         elseif exist(clusterfilename((length(pname)+1):end),'file')
@@ -87,12 +203,12 @@ for dataset = 1:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs. KO NR5A1-cre+ c
             display('no cluster file')
         end
         
-      %%  
+        %%
         
         n_units = length(L_ratio);
         cellrange = N+1:N+n_units;
         N=N+n_units;
-       
+        
         session(cellrange)=sessionNum;
         number(i) = n_units;
         
@@ -107,203 +223,203 @@ for dataset = 1:2  %%% control ("wt") NR5A1-cre/CHR2 animals vs. KO NR5A1-cre+ c
         alldata( cellrange,6) = -trough_depth./peak_height;
         alldata( cellrange,7:25)= wv';
         alldata(cellrange,26)=layer;
-     
+        
         
         GT(cellrange)=3-dataset;
-%         for dontuse =1:1
-%             %     for c = 1:n_units;
-%             %         ch = alldata(c,1);
-%             %         cl = alldata(c,2);
-%             %         min_t = min(mean_wvform (:,ch : ch+3,cl),[],1);
-%             %         [trough_allc trig_chan] = min(min_t);
-%             %         trig_chan = ch+trig_chan-1;
-%             %         alldata(c,7) = mean_wvform(size(mean_wvform,1),trig_chan,cl)/peak_height(c);
-%             %
-%             %         t1= squeeze(event_times_all(ch,find(idx_all(ch,:) == cl)));
-%             %         dt = diff(t1);
-%             %         dt =dt(dt<.02);
-%             %         n=hist(dt,.001:0.002:.02);
-%             %         [y alldata(c,8)] = max(n);
-%             %         n=hist(dt,.0005:0.001:.02);
-%             %         alldata(c,9) = max(n(3:8))./mean(n(15:20))
-%             %     end;
-%             
-%             
-%                     %   A1(cellrange,:)=bars_A1;
-% %                     A2(cellrange,:)=bars_A2;
-% %                     w(cellrange,:)=bars_w;
-% %                     theta(cellrange,:)=bars_theta;
-% %                     bspont(cellrange,:)=barspont;
-      
-      
-      
-        if  exist('drift', 'var'); 
+        %         for dontuse =1:1
+        %             %     for c = 1:n_units;
+        %             %         ch = alldata(c,1);
+        %             %         cl = alldata(c,2);
+        %             %         min_t = min(mean_wvform (:,ch : ch+3,cl),[],1);
+        %             %         [trough_allc trig_chan] = min(min_t);
+        %             %         trig_chan = ch+trig_chan-1;
+        %             %         alldata(c,7) = mean_wvform(size(mean_wvform,1),trig_chan,cl)/peak_height(c);
+        %             %
+        %             %         t1= squeeze(event_times_all(ch,find(idx_all(ch,:) == cl)));
+        %             %         dt = diff(t1);
+        %             %         dt =dt(dt<.02);
+        %             %         n=hist(dt,.001:0.002:.02);
+        %             %         [y alldata(c,8)] = max(n);
+        %             %         n=hist(dt,.0005:0.001:.02);
+        %             %         alldata(c,9) = max(n(3:8))./mean(n(15:20))
+        %             %     end;
+        %
+        %
+        %                     %   A1(cellrange,:)=bars_A1;
+        % %                     A2(cellrange,:)=bars_A2;
+        % %                     w(cellrange,:)=bars_w;
+        % %                     theta(cellrange,:)=bars_theta;
+        % %                     bspont(cellrange,:)=barspont;
         
-        driftA1(cellrange,:)= field2array(drift,'A1');
-        driftA2(cellrange,:)=field2array(drift,'A2');
-        driftB(cellrange,:)= field2array(drift,'B');
-        driftpeak(cellrange,:)=field2array(drift,'maxFR');
-        driftstd(cellrange,:)=field2array(drift,'peakstd');
-        driftSigNoise(cellrange,:)=field2array(drift,'signoise');
-         
-        drift_theta_w(cellrange,:)=field2array(drift,'thetawidth');
-        drift_theta(cellrange,:)=field2array(drift,'theta');
         
-        driftspont(cellrange,:) = field2array(drift,'spont');
-              
-        driftwpref(cellrange,:) = field2array(drift,'wpref');
-        driftwbw(cellrange,:) = field2array(drift,'bw') ;
         
-        driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
-        driftF0(cellrange,:) = field2array(drift,'F0');
-        
-        cvDSI(cellrange,:) = field2array(drift,'cv_dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
-        cvOSI(cellrange,:)=field2array(drift,'cv_osi');
-        
+        if  exist('drift', 'var');
+            
+            driftA1(cellrange,:)= field2array(drift,'A1');
+            driftA2(cellrange,:)=field2array(drift,'A2');
+            driftB(cellrange,:)= field2array(drift,'B');
+            driftpeak(cellrange,:)=field2array(drift,'maxFR');
+            driftstd(cellrange,:)=field2array(drift,'peakstd');
+            driftSigNoise(cellrange,:)=field2array(drift,'signoise');
+            
+            drift_theta_w(cellrange,:)=field2array(drift,'thetawidth');
+            drift_theta(cellrange,:)=field2array(drift,'theta');
+            
+            driftspont(cellrange,:) = field2array(drift,'spont');
+            
+            driftwpref(cellrange,:) = field2array(drift,'wpref');
+            driftwbw(cellrange,:) = field2array(drift,'bw') ;
+            
+            driftF1F0(cellrange,:) = field2array(drift,'F1')./field2array(drift,'F0');
+            driftF0(cellrange,:) = field2array(drift,'F0');
+            
+            cvDSI(cellrange,:) = field2array(drift,'cv_dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+            cvOSI(cellrange,:)=field2array(drift,'cv_osi');
+            
         else
-        driftA1(cellrange,:)= NaN;
-        driftA2(cellrange,:)=NaN;
-        driftB(cellrange,:)= NaN;
-        driftpeak(cellrange,:)=NaN;
-        driftstd(cellrange,:)=NaN;
-        driftSigNoise(cellrange,:)=NaN;
-         
-        drift_theta_w(cellrange,:)=NaN;
-        drift_theta(cellrange,:)=NaN;
-        
-        driftspont(cellrange,:) = NaN;
-              
-        driftwpref(cellrange,:) = NaN;
-        driftwbw(cellrange,:) = NaN ;
-        
-        driftF1F0(cellrange,:) = NaN;
-        driftF0(cellrange,:) = NaN;
-        %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
-        cvDSI(cellrange,:) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
-        cvOSI(cellrange,:)=NaN; 
+            driftA1(cellrange,:)= NaN;
+            driftA2(cellrange,:)=NaN;
+            driftB(cellrange,:)= NaN;
+            driftpeak(cellrange,:)=NaN;
+            driftstd(cellrange,:)=NaN;
+            driftSigNoise(cellrange,:)=NaN;
+            
+            drift_theta_w(cellrange,:)=NaN;
+            drift_theta(cellrange,:)=NaN;
+            
+            driftspont(cellrange,:) = NaN;
+            
+            driftwpref(cellrange,:) = NaN;
+            driftwbw(cellrange,:) = NaN ;
+            
+            driftF1F0(cellrange,:) = NaN;
+            driftF0(cellrange,:) = NaN;
+            %       driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
+            cvDSI(cellrange,:) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+            cvOSI(cellrange,:)=NaN;
         end
         
         if exist('bars','var'); %#ok<EXIST>
-
-        bar_spont(cellrange,:)=field2array(bars,'spont');
-       
+            
+            bar_spont(cellrange,:)=field2array(bars,'spont');
+            
         else
-        bar_spont(cellrange,:)= NaN;
-        
+            bar_spont(cellrange,:)= NaN;
+            
         end
         
-     clear meanwaves snr stdwaves
-%         
-%          for c=1:length(cells);
-%             %%% get SNR
-%             tet =ceil(cells(c,1)/4);
-%             
-%             if exist('wave_all','var')
-%                 wvall = wave_all{tet};
-%                 wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
-%                 
-%                 amps =squeeze(min(wvclust(:,5:10,:),[],2));
-%                 mn = abs(nanmean(amps));
-%                 stdev = nanstd(amps);
-%                 [y ind] = max(mn);
-%                 snr(c) = mn(ind)/stdev(ind);
-%                 
-%                 meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
-%                 stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
-%             else
-%                 meanwaves=NaN;
-%                 snr=NaN
-%                 stdwaves=NaN
-%             end
-% % %             
-% % % %             
-%         end
-%         
-%         SNRall(cellrange)=snr;
-%         meanWavesAll(cellrange,:,:) = meanwaves;
-%         stdWavesAll(cellrange,:,:) = stdwaves;
+        clear meanwaves snr stdwaves
+        %
+        %          for c=1:length(cells);
+        %             %%% get SNR
+        %             tet =ceil(cells(c,1)/4);
+        %
+        %             if exist('wave_all','var')
+        %                 wvall = wave_all{tet};
+        %                 wvclust = wvall(find(idx_all{(tet-1)*4+1}==cells(c,2)),:,:);
+        %
+        %                 amps =squeeze(min(wvclust(:,5:10,:),[],2));
+        %                 mn = abs(nanmean(amps));
+        %                 stdev = nanstd(amps);
+        %                 [y ind] = max(mn);
+        %                 snr(c) = mn(ind)/stdev(ind);
+        %
+        %                 meanwaves(c,:,:) = squeeze(nanmean(wvclust,1));
+        %                 stdwaves(c,:,:) = squeeze(nanstd(wvclust,[],1));
+        %             else
+        %                 meanwaves=NaN;
+        %                 snr=NaN
+        %                 stdwaves=NaN
+        %             end
+        % % %
+        % % % %
+        %         end
+        %
+        %         SNRall(cellrange)=snr;
+        %         meanWavesAll(cellrange,:,:) = meanwaves;
+        %         stdWavesAll(cellrange,:,:) = stdwaves;
         
         if exist('params','var');
-
             
-        all_img_STA(cellrange)= all_img;
-        all_fit_STA(cellrange)=all_fit;
-        STA_nx(cellrange)=field2array(params,'nx');
-        STA_ny(cellrange)=field2array(params,'ny');
-        STA_phase(cellrange)=field2array(params,'phase');
-        STA_sigx(cellrange)=field2array(params,'sigx');
-        STA_sigy(cellrange)=field2array(params,'sigy');
-        STA_exp_var(cellrange)=field2array(params,'exp_var');
-        
-        
+            
+            all_img_STA(cellrange)= all_img;
+            all_fit_STA(cellrange)=all_fit;
+            STA_nx(cellrange)=field2array(params,'nx');
+            STA_ny(cellrange)=field2array(params,'ny');
+            STA_phase(cellrange)=field2array(params,'phase');
+            STA_sigx(cellrange)=field2array(params,'sigx');
+            STA_sigy(cellrange)=field2array(params,'sigy');
+            STA_exp_var(cellrange)=field2array(params,'exp_var');
+            
+            
         else
-        STA_nx(cellrange)= NaN;
-        STA_ny(cellrange)=  NaN;
-        STA_phase(cellrange)= NaN;
-        STA_sigx(cellrange)= NaN;
-        STA_sigy(cellrange)= NaN; 
-        STA_exp_var(cellrange)=NaN;
-
+            STA_nx(cellrange)= NaN;
+            STA_ny(cellrange)=  NaN;
+            STA_phase(cellrange)= NaN;
+            STA_sigx(cellrange)= NaN;
+            STA_sigy(cellrange)= NaN;
+            STA_exp_var(cellrange)=NaN;
+            
         end
         
-
-
-clear m ind x y t_lag STA1 c crf crf1
-
-if exist ('wn','var')
-    for w = 1:length(wn)
-    STA = wn(w).sta;
-    
-    %%%Dtermine time point with maximial response
-    [m ind] = max(abs(STA(:)-127));
-    [x y t_lag] = ind2sub(size(STA),ind);
-    
-    STA1{w} = STA(:,:,t_lag)-128;
-
-% figure
-% imagesc(STA1{1,w}',[-64 64]); axis equal
-    end
-    
-    STA_peak(cellrange)=STA1
-    
-    for c = 1:length(wn)
-          if isempty(wn(c).crf)
-            wn(c).crf = zeros(20,1);
-            %wn(c).spont = 0;
-          end
-          crf = wn(c).crf;
-    crf1{c} = crf;
-    end
-    
-    CRF(cellrange)=crf1;
-else
-    STA_peak(cellrange)=NaN
-    CRF(cellrange)=NaN
-end
-%close all
-%size(wvform)
+        
+        
+        clear m ind x y t_lag STA1 c crf crf1
+        
+        if exist ('wn','var')
+            for w = 1:length(wn)
+                STA = wn(w).sta;
+                
+                %%%Dtermine time point with maximial response
+                [m ind] = max(abs(STA(:)-127));
+                [x y t_lag] = ind2sub(size(STA),ind);
+                
+                STA1{w} = STA(:,:,t_lag)-128;
+                
+                % figure
+                % imagesc(STA1{1,w}',[-64 64]); axis equal
+            end
+            
+            STA_peak(cellrange)=STA1
+            
+            for c = 1:length(wn)
+                if isempty(wn(c).crf)
+                    wn(c).crf = zeros(20,1);
+                    %wn(c).spont = 0;
+                end
+                crf = wn(c).crf;
+                crf1{c} = crf;
+            end
+            
+            CRF(cellrange)=crf1;
+        else
+            STA_peak(cellrange)=NaN
+            CRF(cellrange)=NaN
+        end
+        %close all
+        %size(wvform)
         wvform(cellrange,:) = wv';
-       
+        
         %% get peristimulus histograms for PINPed units
-%        if exist('psth_power2','var'); 
-%         psth_pinp(cellrange,:)=psth_power2;
-%        else
-%            psth_pinp(cellrange,:)=psth;
-%        end
-       
+        %        if exist('psth_power2','var');
+        %         psth_pinp(cellrange,:)=psth_power2;
+        %        else
+        %            psth_pinp(cellrange,:)=psth;
+        %        end
+        
         psth_pinp(cellrange,:)=psth;
         histbins=histbins
-    
+        
         %get firing rate at all measured orients and SF, put into an array:
         %12 rows(orientations) by 7 columns(SpatialFreqs) for each cell
         
-%         drift_Ori_Sf(cellrange,:) = arrayfun(@(x)(getfield(x,'orientfreq_all')),drift,'UniformOutput',false);
-%        % drift_all(cellrange,:)=drift';
+        %         drift_Ori_Sf(cellrange,:) = arrayfun(@(x)(getfield(x,'orientfreq_all')),drift,'UniformOutput',false);
+        %        % drift_all(cellrange,:)=drift';
         
         if exist('locomotion');
-           Vel(i,dataset)=arrayfun(@(x)(getfield(x,'mouseV')),locomotion,'UniformOutput',false);  
+            Vel(i,dataset)=arrayfun(@(x)(getfield(x,'mouseV')),locomotion,'UniformOutput',false);
         end
-       
+        
     end %%% loop over conditions
 end
 
@@ -413,8 +529,8 @@ legend({'all','lyr 3','lyr4','lyr5','inh'})
 %%% choose pinped
 resp = peak(:,1)>=2;
 
-pinped = (zscore>8& evoked>26  & ~inh  ); 
-pinped_resp_grat = (zscore>8& evoked>26  & ~inh  & resp); 
+pinped = (zscore>8& evoked>26  & ~inh  );
+pinped_resp_grat = (zscore>8& evoked>26  & ~inh  & resp);
 sum(pinped)
 sum(pinped_resp_grat)
 %%% define wt
@@ -435,13 +551,13 @@ sum(pinped_resp_grat&N2B)
 sum(pinped_resp_grat&wt)
 % for c = 1:length(CRF)
 %     STA = wn(w).sta;
-%     
+%
 %     %%%Dtermine time point with maximial response
 %     [m ind] = max(abs(STA(:)-127));
 %     [x y t_lag] = ind2sub(size(STA),ind);
-%     
+%
 %     STA1{w} = STA(:,:,t_lag)-128;
-% 
+%
 %  end
 
 use = find(wt & pinped);
@@ -480,7 +596,7 @@ for i = 1:ceil(length((use))/8)
         else
             plot(meandata,'b:');
         end
-       
+        
     end
     %
 end
@@ -492,19 +608,19 @@ end
 plotrange = 50:80;
 
 for i=1:length(use)/8;
-       figure
-       for j= 1:8
- 
-    subplot(4,4,2*(j-1)+1);
-    plot(wvform(use((i-1)*8+j),:));axis off
-
-    subplot(4,4,2*(j-1)+2); 
-    plot(plotrange,psth_pinp(use((i-1)*8+j),plotrange));ylim([0 50]); xlim([min(plotrange) max(plotrange)]);
-     hold on; plot([54 54], [ 0 50],'g')
- hold on; plot([52 52], [ 0 50],'r')
-  title(sprintf('%0.0f %0.0f',evoked(use((i-1)*8+j)),zscore(use((i-1)*8+j))));
-  set(gca,'Ytick',[]); set(gca,'Xtick',[])
-   end
+    figure
+    for j= 1:8
+        
+        subplot(4,4,2*(j-1)+1);
+        plot(wvform(use((i-1)*8+j),:));axis off
+        
+        subplot(4,4,2*(j-1)+2);
+        plot(plotrange,psth_pinp(use((i-1)*8+j),plotrange));ylim([0 50]); xlim([min(plotrange) max(plotrange)]);
+        hold on; plot([54 54], [ 0 50],'g')
+        hold on; plot([52 52], [ 0 50],'r')
+        title(sprintf('%0.0f %0.0f',evoked(use((i-1)*8+j)),zscore(use((i-1)*8+j))));
+        set(gca,'Ytick',[]); set(gca,'Xtick',[])
+    end
 end
 
 
@@ -563,7 +679,7 @@ sprintf('%d pinped neurons total',sum(pinped))
 
 figure
 plot(baseline(~junk),ev(~junk),'ko')
- hold on
+hold on
 plot(baseline(pinped &GT'==1),ev(pinped&GT'==1),'ro');hold on
 plot(baseline(pinped &GT'==2),ev(pinped&GT'==2),'bo');hold on
 plot(baseline(pinped &GT'==3),ev(pinped&GT'==3),'go');hold on
@@ -609,12 +725,12 @@ frac_resp(3) = sum(resp& lyr==4 & GT'==2 & ~pinped)/sum( lyr==4 & GT'==2  & ~pin
 % figure
 % bar(frac_resp); ylim([0 2]); ylabel('fraction resp >2'); title('lyr 4')
 % set(gca,'xticklabel',{'2B non pinp','wt non pinp','2A pinp'}); ylim([0 1])
-% 
+%
 % %%% fraction responsive all layers
 % frac_resp(1) = sum(resp & GT'==1 & ~pinped)/sum(  GT'==1 & ~pinped);
 % frac_resp(2) = sum(resp& GT'==3  & ~pinped)/sum(  GT'==3  & ~pinped);
 % frac_resp(3) = sum(resp  & GT'==2 & ~pinped)/sum(  GT'==2  & ~pinped);
-% 
+%
 % figure
 % bar(frac_resp); ylim([0 2]); ylabel('fraction resp >2'); title('all layer')
 % set(gca,'xticklabel',{'2B non pinp','wt non pinp','2A pinp'}); ylim([0 1])
@@ -756,7 +872,7 @@ ylabel('SFpref')
 
 resp = peak(:,1)>=1;
 
-figure 
+figure
 [f,x]=hist(driftwpref(N2B & pinped & resp),0.02:0.04:0.3);
 H1=bar(x,f/sum(f));
 title 'SF pref N2B'
@@ -788,9 +904,9 @@ sf_N2A=driftwpref(N2A & pinped & resp );
 kstest2(sf_wt, sf_N2B)
 [h p] = kstest2(sf_wt,sf_N2B)
 
-clear f x f1 x1 f2 x2 
+clear f x f1 x1 f2 x2
 
-figure 
+figure
 [f,x]=hist(abs(STA_nx(N2B & pinped & resp)),0.1:0.04:1);
 H1=bar(x,f/sum(f),'g');
 title 'F1F0 ratio N2B'
@@ -821,7 +937,7 @@ bar(x,h')
 OS=resp & OSI(:,1)>=0.5;
 layerAgePlot_frac_simple(driftF1F0(:,1),GT,lyr,inh, pinped,simple,'F1F0');
 
-figure 
+figure
 [f,x]=hist(driftF1F0(N2B & pinped & OS),0:0.20:2);
 H1=bar(x,f/sum(f),'g');
 title 'F1F0 ratio N2B'
@@ -851,7 +967,7 @@ set(ch,'facea',.5)
 % pinplist = find(pinped);
 % for i=1:length(pinplist)
 % c = pinplist(i);
-% 
+%
 %     figure
 % plot(psth_pinp(c,:)')
 % hold on
@@ -872,19 +988,19 @@ figure
 plot(wvform(pinped & ~junk,:)','g')
 title('pinped')
 
-l=find(junk) 
+l=find(junk)
 l=find(N2B & pinped & SF_pref_stat);
 
 %generate STA for pinped cells
 
 for j=1:length(STA_peak)
-
+    
     if ismember(j,l)
-figure
-if ~isempty(STA_peak{1,j})
-    colormap jet
-    imagesc(STA_peak{1,j}',[-64 64]);
-end
+        figure
+        if ~isempty(STA_peak{1,j})
+            colormap jet
+            imagesc(STA_peak{1,j}',[-64 64]);
+        end
     end
 end
 
@@ -897,19 +1013,19 @@ driftwpref(629,1)
 
 %generate STA for inhibitory cells
 for j=1:length(STA_peak)
-
+    
     if ismember(j,I)
-figure
-imagesc(STA_peak{1,j},[-64 64]);
+        figure
+        imagesc(STA_peak{1,j},[-64 64]);
     end
 end
 
 figure
 plot(wvform(inh,:)','color','r');hold on
 for j=1:length(STA_peak)
-
+    
     if ismember(j,k)
-plot(wvform(j,:)','color','g'); hold on
+        plot(wvform(j,:)','color','g'); hold on
     end
 end
 
