@@ -4,18 +4,26 @@ framerate = 60;
 isi = 1;
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
+% sfrange = [ 0.04 0.16];
+% tfrange =[ 0 2];
 sfrange = [ 0.04 0.16];
-tfrange =[ 0 2];
+tfrange =[2];
 radiusRange = [0 1 2 4 8 1000];
+% radiusRange = [1];
 phaserange = [0 pi]
 
-ntheta = 4;
-nx = 2; ny =1;
+% ntheta = 4;
+ntheta = 8;
+% nx = 2; ny =1;
+nx = 1; ny =1;
 
 randomOrder=1;
-randomTheta=1;
+% randomTheta=1;
+randomTheta=0;
 binarize=0;
+% binarize=1;
 blank=0;
+
 
 totalduration = length(sfrange)*length(tfrange)*length(radiusRange)*length(phaserange)*ntheta*nx*(isi+duration);
 totalduration/60
@@ -30,7 +38,8 @@ degperpix = widthdeg/xsz
 
 
 blockwidth = ysz;
-xposrange = [1 xsz - blockwidth];
+% xposrange = [1 xsz - blockwidth];
+xposrange = 28;
 yposrange  = 1;
 
 
@@ -100,4 +109,10 @@ for i = 1:length(moviedata)/10
 imshow(moviedata(:,:,i));
 drawnow
 end
-save sizeSelect2sf5sz14min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
+
+% repeatFactor=2;
+repeatFactor=1;
+moviedata = repmat(moviedata,[1 1 repeatFactor]);
+% save sizeSelect2sf5sz14min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
+% save sizeSelect2sf1tf5sz14min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
+save sizeSelect2sf1tf1sz1minTest moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
