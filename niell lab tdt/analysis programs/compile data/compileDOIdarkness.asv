@@ -20,7 +20,7 @@ saline=1; doi=2; lisuride=3;
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
-for i = 1:length(use)
+for i = 1:3
     
     %%% extract filenames
     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];

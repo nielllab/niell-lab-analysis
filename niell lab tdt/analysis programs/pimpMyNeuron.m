@@ -86,7 +86,7 @@ for cell_n = cell_range;
         times=tdtData.MUspikeT{cell_n};
     end
     
-   histfig(cell_n)=figure;
+    OTagfig(cell_n)=figure;
    set(gcf,'position',[200 200 600 700]);
    subplot(3,2,1);
    plot(laserT,tdtData.laserTTL,'g');
@@ -97,7 +97,7 @@ for cell_n = cell_range;
    %title(sprintf('ch %d ',cell_n))
   
    
- % figure  
+ %figure  
  subplot(3,2,2)
  hold on
     for t = 1:length(edges);
@@ -152,7 +152,7 @@ for cell_n = cell_range;
 end
 
 %save(afile, 'base','Sdev','PinpFR','PINPed','PINP_sup','-append')
-histbins=histbins*1000
+histbins=histbins*1000;
 
 mainfig=figure;
 plot(histbins,psth(:,:));hold on
@@ -174,13 +174,12 @@ set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',fullfile(pname,fname),'-append');
 
 
-for i = 1:length(histfig)
-    figure(histfig(i))
+for i = 1:length(OTagfig)
+    figure(OTagfig(i))
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',fullfile(pname,fname),'-append');
 end
 if SU
-    ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
     ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
 else
     ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']);

@@ -1,10 +1,10 @@
+function appending_drift_layer(afile, tip_loc_1, tip_loc_2,angle)
 
-clear all
-close all
 
+if ~exist ('afile','var');
 [afname, apname] = uigetfile('*.mat','analysis data'); %load data set that you want to append layer data to
-noisepname = apname;
 afile = fullfile(apname,afname);
+end
 load(afile)
 
 %histology variables
@@ -84,7 +84,7 @@ end
 % end
 
 save(afile, 'layer','-append')
-
+end
 
 % %if you need to remove a corrupted field, 'layer' for example, evoke the following code:
 %  field = 'layer';

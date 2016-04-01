@@ -1,4 +1,4 @@
-function noise_analysis(clustfile,afile,pdfFile,movieFile,Block_Name,blocknum,movietype, stim_eye)
+function noise_analysis(clustfile,afile,pdfFile,movieFile,Block_Name,blocknum,movietype, stim_eye,sess)
 % Matlab codes for reading from TTank for movie data
 % Calculates RFs from spike triggered average, and spike triggered covariance
 % Uses clustering information from cluster_linear.m or cluster_tetrode.m
@@ -76,7 +76,7 @@ mv_noise=3;
 if movietype==cm_noise
     prompt = {'contrast modulated','frame rate','correct spectrum','crop to screen size','contra(1) or ipsi(2) eye'};
     num_lines = 1;
-    def = {'1','60','1','1','1'};
+    def = {'1','30','1','1','1'};
     if ~useArgin
         answer = inputdlg(prompt,'wn parameters',num_lines,def);
     else
@@ -1108,12 +1108,18 @@ delete(psfilename);
 % 
 
 if movietype==cm_noise
-    post = input('post doi? 0/1 : ');
+    if ~exist ('sess','var')
+    sess = input('post doi? 0/1 : ')+1;
+    end
+    
     wn(cell_n,stim_eye).degperpix=degperpix;
-    if post
+    load(afile,'wnblocks');
+    wnblocks{sess}=wn;
+    save(afile,'wnblocks','-append');
+    if sess==2
         wn_post=wn;
         save(afile,'wn_post','-append')
-    else
+    elseif sess==1;
         save(afile,'wn','-append')
     end
 elseif movietype==fl_noise

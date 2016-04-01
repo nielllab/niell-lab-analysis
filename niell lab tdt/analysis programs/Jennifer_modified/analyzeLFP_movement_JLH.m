@@ -32,7 +32,7 @@ end
 tdtData= getTDTdata(Tank_Name, Block_Name, 1:nChan, flags);
 
 for ch = 1:nChan;
-    
+   
     lfp = tdtData.spectData{ch};
     normalizer = 1:size(lfp,2);
     normalizer = repmat(normalizer,size(lfp,1),1);
@@ -42,14 +42,14 @@ for ch = 1:nChan;
     lfpnorm = imfilter(lfpnorm,H);
     
     figure
-    imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]);
-    axis xy
+    imagesc(lfpnorm',[0 prctile(lfpnorm(:),95)]); xlim ([0 400]); ylim ([0 500]);
+    axis xy;
     df = median(diff(tdtData.spectF{ch}));
     dt = median(diff(tdtData.spectT{ch}));
     set(gca,'YTick',(10:10:80)/df);
-    set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'})
+    set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'}); 
+    xlabel 'time (ms)' ; ylabel 'Frequency (Hz)';
     
-       
     if movement
         hold on
         tsamp = tdtData.mouseT;
@@ -58,20 +58,18 @@ for ch = 1:nChan;
         %plot(tsamp,(vsmooth/1.3-40),'g');
         plot(tsamp,(vsmooth/1-40),'g');
         axis([0 max(tsamp) -40 80/df])
-        
+        title(sprintf('channel = %d',ch));
         set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
+        print('-dpsc',psfilename,'-append');    
     end
-    title(sprintf('channel = %d',ch));
     
-   
     %%%%
-
+    
     theta = mean(lfpnorm(:,ceil(7/df):ceil(10/df)),2);
     gamma = mean(lfpnorm(:,ceil(55/df):ceil(65/df)),2);
     
     v_interp = interp1(tsamp,vsmooth,tdtData.spectT{ch});
-
+    
     %     figure
     %     plot(v_interp,gamma(t),'o');
     %     figure
@@ -79,21 +77,27 @@ for ch = 1:nChan;
     Smean = mean(lfpnorm,2)';
     stationary = find(v_interp<0.3 & Smean<(5*median(Smean)));
     moving = find(v_interp>0.35  & Smean<(5*median(Smean)));
-
+    
     figure
     plot(mean(lfpnorm(stationary,:),1));
     hold on
     plot(mean(lfpnorm(moving,:),1),'g');
     axis([0 70/df 0 1.2*max(mean(lfpnorm(moving,:)))]);
-    set(gca,'XTick',(10:10:80)/df);
+    set(gca,'XTick',(10:10:80)/df); 
     set(gca,'XTickLabel',{'10','20','30','40','50','60','70','80'})
+    xlabel 'Frequency (Hz)';
     
-    title(sprintf('site %d',ch));
-     set(gcf, 'PaperPositionMode', 'auto');
+    title(sprintf('channel = %d',ch));
+    
+    set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
+end
 
-    close all
-end %% tet
+set(gcf, 'PaperPositionMode', 'auto');
+print('-dpsc',psfilename,'-append');
+
+close all
+
 
 ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
 delete(psfilename);

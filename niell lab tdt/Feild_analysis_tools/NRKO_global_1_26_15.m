@@ -309,8 +309,8 @@ info(end).stimDur    = 1.5;
 info(end).stimType   = 'drift';
 info(end).genotype   = 1
 
-info(end+1).dataname = '3_25_15_analysis_3_25_15.mat'; 
-info(end).datafile   = fullfile(inputDir, '/Hoy_drift_data/3_25_15_analysis_3_25_15');
+info(end+1).dataname = '3_25_15_analysis_2.mat'; 
+info(end).datafile   = fullfile(inputDir, '/Hoy_drift_data/3_25_15_analysis_2');
 info(end).stimDur    = 1.5;
 info(end).stimType   = 'drift';
 info(end).genotype   = 0
@@ -509,8 +509,8 @@ info(end).stimDur    = 1.5;
 info(end).stimType   = 'drift';
 info(end).genotype   = 2;
 
-info(end+1).dataname = '11_2_5_analysis_2'; 
-info(end).datafile   = fullfile(inputDir, '/Hoy_drift_data/11_2_5_analysis_2');
+info(end+1).dataname = '11_2_15_analysis_2'; 
+info(end).datafile   = fullfile(inputDir, '/Hoy_drift_data/11_2_15_analysis_2');
 info(end).stimDur    = 1.5;
 info(end).stimType   = 'drift';
 info(end).genotype   = 2;

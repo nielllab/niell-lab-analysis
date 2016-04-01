@@ -153,10 +153,13 @@ ylabel('sp/sec')
 
 if SU && Pimp_session==0;
     psth_power1=psth;
+    save(fullfile(apname,afname),'psth_power1','histbins','-append');
 elseif SU && Pimp_session==1; 
     psth_power2=psth;
+    save(fullfile(apname,afname),'psth_power2','histbins','-append');
 elseif SU && Pimp_session==2; 
     psth_power3=psth;
+     save(fullfile(apname,afname),'psth_power3','histbins','-append');
 elseif SU && Pimp_session==3; 
     psth_NBQX_power1=psth;
 else SU && Pimp_session==4; 

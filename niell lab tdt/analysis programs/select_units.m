@@ -34,9 +34,9 @@ clear wv
 
 % %%% merge two clusters
 % %%% this is a total hack! but can't think of a good gui to do this
-% ch = 7;   %%% ch is tetrode number, i.. 1-16
-% c1=4;
-% c2=12;
+% ch = 3;   %%% ch is tetrode number, i.. 1-16
+% c1=2;
+% c2=4;
 % idx=idx_all{4*(ch-1)+1};
 % idx(idx==c2)=c1;
 % idx_all{4*(ch-1)+1}=idx;
@@ -52,9 +52,9 @@ clear wv
 % 
 % %%% merge two clusters
 % %%% this is a total hack! but can't think of a good gui to do this
-% ch = 8;   %%% ch is tetrode number, i.. 1-16
-% c1=3;
-% c2=5;
+% ch = 4;   %%% ch is tetrode number, i.. 1-16
+% c1=2;
+% c2=3;
 % idx=idx_all{4*(ch-1)+1};
 % idx(idx==c2)=c1;
 % idx_all{4*(ch-1)+1}=idx;
@@ -150,13 +150,16 @@ for tet=1:ceil(length(idx_all)/4);   %%% for each tetrode, show histograms, wave
                   end
                   
         subplot(2,2,3:4)
-        plot([0 tmerge],amps,'.','MarkerSize',2 ); hold on
+      if length(amps)~=0  %%% happens from merge
+          plot([0 tmerge],amps,'.','MarkerSize',2 ); hold on
         plot((binwidth:binwidth:max(tmerge))-binwidth/2,ampmean,'LineWidth',2);
         for b = 1:length(breaks)
             plot([tmerge(breaks(b)) tmerge(breaks(b))],[-10^-4 2*10^-5])
             bl = Block_Name{b}; bl(bl=='_')=' ';
             text(tmerge(breaks(b))-120,2*10^-5,bl,'Rotation',90,'HorizontalAlignment','right')
         end
+      end
+      
         
          end
          

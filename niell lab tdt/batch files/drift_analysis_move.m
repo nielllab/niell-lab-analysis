@@ -1,4 +1,4 @@
-%function drift_orientfreq_laser
+
 % Matlab codes for reading from TTank for drifting or counterphase gratings
 % plots histgrams and rasters and performs fourier analysis
 %function gratfreq_cluster
@@ -7,40 +7,69 @@
 
 %%% read in cluster data, then connect to the tank and read the block
 
-function drift_analysis_move(clustfile,afile,pdfFile,Block_Name,blocknum)
+function drift_analysis_move(clustfile,afile,pdfFile,Block_Name,blocknum,post)
 
+close all
+dbstop if error
 
-SU = 1;
+if ~exist('Block_Name','var');
+    SU = menu('recording type','multi-unit','single unit')-1;
+    useArgin=0;
+else
+    SU=1;
+    useArgin=1;
+end
+
 if SU
-    [fname, pname] = uigetfile('*.mat','cluster data');
-    load(fullfile(pname,fname));
-    for i =1:length(Block_Name);
-        sprintf('%d : %s ',i,Block_Name{i})
+    if ~useArgin
+        [fname, pname] = uigetfile('*.mat','cluster data');
+        clustfile=fullfile(pname,fname);
     end
-    block = input('which block to analyze ? ');
-    Block_Name = Block_Name{block}
-    [afname, apname] = uigetfile('*.mat','analysis data');
-    noisepname = apname;
-    afile = fullfile(apname,afname);
+    load(clustfile);
+    if ~useArgin
+        blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');
+        
+        
+        [afname, apname] = uigetfile('*.mat','analysis data');
+        driftpname = apname;
+        afile = fullfile(apname,afname);
+    end
     load(afile);
+    afile
+    [driftpname driftfname] = fileparts(afile);
+    Block_Name = Block_Name{blocknum}
     use_afile=1;
     cells
 else
-    pname = uigetdir('C:\data\TDT tanks','block data')
-delims = strfind(pname,'\');
-selected_path = pname(1 :delims(length(delims))-1)
-Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
-Block_Name = pname(delims(length(delims))+1 :length(pname))
+    pname = uigetdir('C:\data\','block data')
+    delims = strfind(pname,'\');
+    selected_path = pname(1 :delims(length(delims))-1)
+    Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
+    Block_Name = pname(delims(length(delims))+1 :length(pname))
+    nchan = input('number of channels : ');
+    flags = struct('visStim',1,'MUspike',1);
+    data = getTDTdata(Tank_Name,Block_Name,1:4:nchan,flags);
+    
 end
 
+Block_Name
 
+if useArgin
+    psfilename = [pdfFile(1:end-4) Block_Name '.ps'];
+else
+    [fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);
+end
+
+if exist(psfilename,'file')==2;delete(psfilename);end
+
+%%
 chans = 1:4:max(cells,1);
-
-laser = input('movement (0) or laser (1) : ');
+laser=0;
+%laser = input('movement (0) or laser (1) : ');
 
 if laser
     flags = struct('laserOn',1,'visStim',1)
-    tdtData= getTDTdata(Tank_Name, Block_Name, chans, flags);
+    tdtData= getTDTdata(Tank_Name, Block_Name{blocknum}, chans, flags);
     tsamp  = tdtData.laserT;
     vsmooth = tdtData.laserTTL;
 else
@@ -49,11 +78,6 @@ else
     tsamp = tdtData.mouseT;
     vsmooth = tdtData.mouseV;
 end
-
-
-[fname pname] =uiputfile('*.ps'); psfilename=fullfile(pname,fname);  %%% get ps filename
-%psfilename = 'c:/test.ps';   %%% default location
-if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
 thresh_velocity = 1.0; %%or use 1.3, 1.5 or 2 to determine whether it changes speed distribution
 figure
@@ -76,7 +100,6 @@ blank_stim = 1; %%% is there an extra stimulus to measure spontaneous
 full_field = 1;  %%% is there a full-field flicker?
 
 
-
 % set number of conditions and display setup (generally rows = orientation, columns = frequency)
 n_rows=12;
 n_col=6;
@@ -95,21 +118,35 @@ if full_field
     n_cond=n_cond+1;
 end
 
-%printfig = input('print ? ');
-printfig=0;
+printfig=0; %#ok<NASGU>
 
 if SU
     cell_range = 1:size(cells,1)
 else
     cell_range=1:4:nchan;
 end
+clear drift
+size(cell_range)
+
+s= stimEpocs{blocknum};
+conds = s(1,:);
+if max(conds>100)   %%% two tfs
+    conds(conds<=145)=ceil(conds(conds<=145)/2);
+    conds(conds==146)=74;
+    conds(conds==147)=74;
+end
+
+s(1,:)=conds;
+stimEpocs{blocknum}=s;
+
 for cell_n = cell_range;
+    close all
     % for cell_n=9:9
     cell_n
     if SU
         channel_no = cells(cell_n,1)
         clust_no = cells(cell_n,2)
-        channel_times =spikeT{cell_n} - (block-1)*10^5;
+        channel_times =spikeT{cell_n} - (blocknum-1)*10^5;
         times = channel_times(channel_times>0 & channel_times<10^5);
         hist_fig = figure('Name',sprintf('unit %d %d',channel_no,clust_no))
     else
@@ -119,14 +156,14 @@ for cell_n = cell_range;
     end
     
     for rep =1:2
-%         hist_fig = figure;
-         rast_fig = figure;
+        hist_fig = figure;
+        rast_fig = figure;
         % fft_fig = figure;
         %         spont_full= figure;
-%         spont_full_rast=figure;
+         spont_full_rast=figure;
         for cond =0:n_cond-1
                   if SU
-                [Spike_Timing index numtrials Epocs_TS] = getTrialsSU(stimEpocs{block},times, cond+1, stim_duration);
+                [Spike_Timing index numtrials Epocs_TS] = getTrialsSU(stimEpocs{blocknum},times, cond+1, stim_duration);
             
             else
                [Spike_Timing index numtrials Epocs_TS] = getTrialsSU(tdtData.stimEpocs,tdtData.MUspikeT{cell_n}, cond+1, stim_duration);
@@ -491,11 +528,11 @@ for cell_n = cell_range;
 
 %         xlabel('secs');
         
-%         saveas(tuning_fig,fullfile(pname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-         saveas(rast_fig,fullfile(apname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
-%         saveas(hist_fig,fullfile(apname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+%         saveas(tuning_fig,fullfile(driftpname,sprintf('grattuning_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+         saveas(rast_fig,fullfile(driftpname,sprintf('gratrast_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig')
+%         saveas(hist_fig,fullfile(driftpname,sprintf('grathist_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
        
-        %saveas(fft_fig,fullfile(pname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
+        %saveas(fft_fig,fullfile(driftpname,sprintf('gratfft_move%d%s_%d_%d',rep,Block_Name,channel_no,clust_no)),'fig');
         
         cell_n
 %         close(rast_fig);
@@ -522,7 +559,7 @@ for cell_n = cell_range;
 %     plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,1).spont,':')
 %     plot(theta_ind*180/pi,drift(cell_n,2).thetatuning+drift(cell_n,2).spont,'g')
 %     plot(theta_ind*180/pi,ones(12,1)*drift(cell_n,2).spont,'g:')
-% %     saveas(both_theta,fullfile(apname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+% %     saveas(both_theta,fullfile(driftpname,sprintf('grattheta_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
 %     
 %     both_sf=figure
 %     plot(interp_sfs,drift(cell_n,1).sftuning+drift(cell_n,1).spont);
@@ -530,7 +567,7 @@ for cell_n = cell_range;
 %     plot(interp_sfs,ones(25,1)*drift(cell_n,1).spont,':')
 %     plot(interp_sfs,ones(25,1)*drift(cell_n,2).spont,'g:')
 %     plot(interp_sfs,drift(cell_n,2).sftuning+drift(cell_n,2).spont,'g');
-% %    saveas(both_sf,fullfile(apname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
+% %    saveas(both_sf,fullfile(driftpname,sprintf('gratsf_move%s_%d_%d',Block_Name,channel_no,clust_no)),'fig')
   
 %     
 % for i = 1:length(cell_n)
@@ -557,14 +594,21 @@ if use_afile
     
     drift(1,1).orients = orients;
     drift(1,1).spatfreqs = spatfreqs;
-    
     drift(1,1).TF = tempfreq;
     
-    save(afile, 'drift','-append');
+    if ~exist ('post','var')
+    post = input('post doi? 0/1 : ');
+    end
+    
+    if post
+       drift_post=drift;
+       save(afile,'drift_post','-append')
+    else
+        save(afile,'drift','-append')
+    end
+    
 end
 
-%  ps2pdf('psfile', psfilename, 'pdffile', [psfilename(1:(end-2)) 'pdf']);
-%   delete(psfilename);
 
 % invoke(TTX, 'CloseTank');
 % invoke(TTX, 'ReleaseServer');

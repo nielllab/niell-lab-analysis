@@ -59,7 +59,7 @@ subplot(2,1,1)
 imagesc(cycAvg',[0 22]); colormap jet; colorbar; axis xy; ylabel 'cell #'; xlabel 'time (s)'
 
 subplot(2,1,2)
-plot(cycAvg); ylim ([0 65]);ylabel 'cell #'; xlabel 'time (s)'
+plot(cycAvg); ylim ([0 30]);ylabel 'sp/sec'; xlabel 'time (s)'
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
 

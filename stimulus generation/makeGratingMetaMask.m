@@ -5,7 +5,7 @@ targDur = 0.033;
 maskDur = 0.033;
 soa = [0 33 66 100]/1000;
 
-sigma = 5; %width of mask / annulus (deg)
+sigma = 5; %width of targ / annulus (deg)
 r = 15; % radius of annulus (deg)
 radius =r;
 binarize = 0;
