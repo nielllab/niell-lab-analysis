@@ -10,7 +10,7 @@ batchDOIephys; %%% load batch file
 use =  find(strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
 
 %use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
-%use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'030916'))
+%use =  find( strcmp({files.treatment},'Saline') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'040116'))
 
 
 sprintf('%d selected sessions',length(use))
@@ -20,7 +20,7 @@ saline=1; doi=2; lisuride=3;
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
-for i = 1:3
+for i = 10:10 %length(use)
     
     %%% extract filenames
     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];
@@ -32,11 +32,11 @@ for i = 1:3
     inhAll(cellrange) = inh;
     
     %%% get layer info
-    load(afile,'layer');
-    layerAll(cellrange) = layer;
+   % load(afile,'layer');
+   % layerAll(cellrange) = layer;
     %%% getLayers (needs histo information, but will give layers for all sites)
     
-    %%% getEyes  (needs camera files)
+    %%% getEyes  (needs camera files)d
     
     %%% session info
     sessionNum(cellrange)=i;
@@ -61,6 +61,10 @@ for i = 1:3
         drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
         drift_spont(cellrange,:,prepost) = drift.interSpont;
         drift_osi(cellrange,:,prepost) = drift.cv_osi;
+        drift_F1F0(:,cellrange,prepost)= drift.F1F0;
+        %drift_ot_tune(cellrange,:,prepost)=drift.orient_tune;
+        %drift_sf_trial(1,:,prepost) = drift.trialSF;
+        %drift_trial_psth(cellrange,:,:,prepost) = drift.trialPsth;
     end
     
     %%% get wn response
@@ -69,6 +73,7 @@ for i = 1:3
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
+        wn_gain(1,cellrange,prepost)=wn.gain
     end
     
     %%% lfp power
@@ -118,6 +123,7 @@ for i = 1:2
     plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
     xlabel('pre wn corr'); ylabel('post')
 end
+
 
 %%% plot correlation for darkness
 titles = {'saline','doi'};
@@ -219,8 +225,8 @@ for t = 1:2
         np = ceil(sqrt(length(useN)));
         subplot(np,np,i);
         hold on
-        plot(drift_sf(useN(i),:,1,1),'Color',[0.5 0 0]);  plot(drift_sf(useN(i),:,2,1),'Color',[0 0.5 0]); %pre sal & DOI mv==1?
-        plot(drift_sf(useN(i),:,1,2),'Color',[1 0 0]);  plot(drift_sf(useN(i),:,2,2),'Color',[0 1 0]); %pre sal & DOI mv & stat
+        plot(drift_sf(useN(i),:,1,1),'Color',[0.5 0 0]);  plot(drift_sf(useN(i),:,2,1),'Color',[0 0.5 0]); %pre, mv=2
+        plot(drift_sf(useN(i),:,1,2),'Color',[1 0 0]);plot(drift_sf(useN(i),:,2,2),'Color',[0 1 0]); %post
         plot([1 7], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
         plot([1 7], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
         yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 8.5])
@@ -238,19 +244,20 @@ legend('pre','post')
 
 %%%%sf pre and post%%%
 %extract low and high SF responses for doi drift - mv
+% this is averaging SF responses over all trials/condition -- do not use
+% for decoding
+% for t = 2
+%     useN = find(treatment==t)
+%     for i = 1:length(useN)
+%         np = ceil(sqrt(length(useN)));
+% lowsf_predoi(i) = (drift_sf(useN(i),2,1,1))
+% hsf_predoi(i) = (drift_sf(useN(i),6,1,1))
 % 
-for t = 2
-    useN = find(treatment==t)
-    for i = 1:length(useN)
-        np = ceil(sqrt(length(useN)));
-lowsf_predoi(i) = (drift_sf(useN(i),2,1,1))
-hsf_predoi(i) = (drift_sf(useN(i),6,1,1))
-
-lowsf_postdoi(i) = (drift_sf(useN(i),2,1,2))
-hsf_postdoi(i) = (drift_sf(useN(i),6,1,2))
-    end
-end
-% 
+% lowsf_postdoi(i) = (drift_sf(useN(i),2,1,2))
+% hsf_postdoi(i) = (drift_sf(useN(i),6,1,2))
+%     end
+% end
+% % 
 % data_pre = [lowsf_predoi; hsf_predoi]'
 % 
 % %prepost low sf
@@ -261,16 +268,97 @@ end
 % figure
 % plot(hsf_predoi, '.b'); hold on; plot(hsf_postdoi,'.r')
 % 
+% 
+% data_sf_pre = [drift_sf(:,2,1,1); drift_sf(:,6,1,1)]
+% %lowsf = data_sf_pre(1:106); hsf=data_sf_pre(107:end)
+% sf(1:106)=1; sf(107:212) =2;
+% 
+% pre_full = []
+% pre_full = [data_sf_pre  sf'];
+% 
+% figure  
+% plot(data_sf_pre)
+% figure
+% plot(sf)
+
+lowsf= find(drift.trialSF==2)
+highsf=find(drift.trialSF==6)
+%to separate high/low SF responses for classifier
+%need to separate prepost treatments
+% also separate treatment 
+for t=1:2
+    useN = find(treatment==t)
+    for i = 1:length(useN)
+        np = ceil(sqrt(length(useN)));
+        
+        resp_lowsf_pre= mean(drift.trialPsth(useN(i),lowsf,:,1),3) %each cell's response to lowsf, pre
+        resp_highsf_pre= mean(drift.trialPsth(useN(i),highsf,:,1),3)
+        resp_sf_pre= [resp_lowsf_pre;resp_highsf_pre]
+        
+        sf=zeros([1 length(resp_sf_pre)])
+        sf(1:length(resp_sf_pre)/2)=1
+        sf(sf~=1)=2
+        
+        data_full_sf_pre = [resp_sf_pre sf']
+    end
+end
+
+
+for t=1:2
+    useN = find(treatment==t)
+    for i = 1:length(useN)
+        np = ceil(sqrt(length(useN)));
+        
+        resp_lowsf_post= mean(drift_trial_psth(cellrange,lowsf,:,2),3) %each cell's response to lowsf, post
+        resp_highsf_post= mean(drift_trial_psth(cellrange,highsf,:,2),3)
+        resp_sf_post= [resp_lowsf_post;resp_highsf_post]
+        
+        sf=zeros([1 length(resp_sf_post)])
+        sf(1:length(resp_sf_post)/2)=1
+        sf(sf~=1)=2
+        data_full_sf_post = [resp_sf_post sf']
+    end
+end
+ 
+figure
+subplot(1,2,1)
+plot(data_full_sf_pre);title 'Pre SF responses';
+subplot(1,2,2)
+plot(data_full_sf_post);title 'Post SF responses';
 
 
 
 
 
 
-
-
-
-
-
-
-
+%to separate orientation responses for classifier
+orient90= find(drift.trialOrient==4)
+orient270=find(drift.trialOrient==10)
+for t=1:2
+    useN = find(treatment==t)
+    for i = 1:length(useN)
+        np = ceil(sqrt(length(useN)));
+        
+        resp_90= mean(drift.trialPsth(:,orient90,:),3);
+        resp_270= mean(drift.trialPsth(:,orient270,:),3);
+        resp_orient= [resp_90;resp_270];
+        
+        
+        ot=zeros([1 length(resp_orient)]);
+        ot(1:length(resp_orient)/2)=1;
+        ot(ot~=1)=2;
+        
+        data_full_orient = [resp_orient ot'];
+        
+    end
+end
+% 
+% %%%to set up trials with orientation
+% orient90= find(drift.trialOrient==4)
+% orient270=find(drift.trialOrient==10)
+% 
+% resp_90= mean(drift.trialPsth(:,orient90,:),3)
+% resp_270= mean(drift.trialPsth(:,orient270,:),3)
+% resp_orient= [resp_90;resp_270] 
+% ot(1:56)=1;ot(56:112)=2
+% data_full_orient = [resp_orient ot']
