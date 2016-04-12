@@ -38,9 +38,8 @@ plot(diff(cameraTTL));
 xlabel('frame #'); ylabel('secs');
 ylim([ 0 0.2])
 
-thresh = 0.85; %pupil threshold for binarization
-puprange = [20 55]; %set
-imshow(data(:,:,10)) % for an example frame
+thresh = 0.8; %pupil threshold for binarization
+puprange = [20 150]; %set
 
 %user input to select center and right points
 sprintf('Please select pupil center and top, eyeball top and right points, darkest part of eyeball')
@@ -64,8 +63,6 @@ end
 for i = 1:size(ddata,3)
     bindata(:,:,i) = (ddata(yc-vert:yc+vert,xc-horiz:xc+horiz,i)/binmax(i) > thresh);
 end
-figure
-imshow(bindata(:,:,10))
 
 %convert from uint8 into doubles and threshold, then binarize
 
@@ -86,39 +83,28 @@ for n = 2:size(data,3)
     end
 end
 toc
-%histogram of recorded radii
-figure
-hist(rad, 1:.5:55,'Color',[0,.5,1]); xlim ([0 20]); ylim([0 3000]); 
-xlabel 'pixels'; ylabel 'number of frames';
-
 
 clear R
 close all
-%for each unit, plot firing rate, running velocity, and radius
 for c = 1:length(spikeT)
     sp = spikeT{c};
     sp = sp-(blocknum-1)*10^5;
     sp = sp(sp>0 & sp<10^5);
     histbins = 5:5:max(tsampBar);
     R(1:length(histbins),c) = hist(sp,histbins)/10;
-    figure
-    plot(histbins,R(1:length(histbins),c),'-r');
-    hold on
+   figure
+    plot(histbins,R(1:length(histbins),c),'-r'); 
+   hold on
     plot(tsampBar,vsmoothBar,'-g');
-    plot(0.1:0.1:size(data,3)/10,rad,'-b')
-  plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m') % x-postion of center
-    plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c') %y-postion of center
-    ylim([0 20]); xlim ([0 600]);
-    legend('sp/sec','cm/sec','radius','x pos','ypos')
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
+   plot(0.1:0.1:size(data,3)/10,rad,'-b')
+   plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m')
+   plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c')
+   ylim([0 40]);
+   legend('sp/sec','cm/sec','radius','x pos','ypos')
+   set(gcf, 'PaperPositionMode', 'auto');
+   print('-dpsc',psfilename,'-append');
     
 end
-% figure
-% plot(tsampBar,vsmoothBar,'-g');
-% hold on
-% plot(0.1:0.1:size(data,3)/10,rad,'-b'); 
-% xlim([0 600]); ylim ([0 15]); xlabel 'pixels'; ylabel 'number of frames';
 
 startT = max(tsampBar(1),cameraTTL(1))
 endT = min(tsampBar(end),cameraTTL(end))
@@ -127,28 +113,27 @@ dt = 0.5;
 pts = startT:dt:endT;
 vInterp = interp1(tsampBar,vsmoothBar,pts);
 rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts);
-rInterp = naninterp(rInterp)
 
 figure
-plot(vInterp); hold on; plot(rInterp,'r'); legend ('cm/sec','pixels');
+plot(vInterp); hold on; plot(rInterp,'r')
 
 % %plot cross correlation of velocity and radius
-[corr_vrad lags] = xcorr(rInterp-nanmean(rInterp),vInterp-nanmean(vInterp),60/dt,'coeff');
+[corr_vrad lags] = xcorr(rInterp-mean(rInterp),vInterp-mean(vInterp),60/dt,'coeff');
 figure
 plot(lags*dt,corr_vrad);
-hold on
+hold
 plot([0 0],[0 1],'g-')
 
 set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append')
+ print('-dpsc',psfilename,'-append')
 
-%scatter plot of rad & velocity 
-figure
-scatter(vInterp, rInterp, '.b')
-xlabel('cm/sec');ylabel('radius')
-lsline;
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append')
+
+% figure
+% scatter(Vinterp, Rinterp, '.b')
+% xlabel('radius');ylabel('cm/sec')
+% lsline;
+% set(gcf, 'PaperPositionMode', 'auto');
+% print('-dpsc',psfilename,'-append')
 
 % %for FR and rad
 %scatter(vsmoothBar,R(1:length(histbins),c))
@@ -162,7 +147,8 @@ for c = 1:length(spikeT)
     rate=hist(sp,histbins)/dt;
     rate = rate(2:end);
     R(1:length(histbins),c) = hist(sp,histbins)/dt;
-    [corr_Frad lags] = xcorr(rate-mean(rate),rInterp-mean(rInterp),60/dt,'coeff');
+    [ corr_Frad lags] = xcorr(rate-mean(rate),rInterp-mean(rInterp),60/dt,'coeff');
+    [ corr_Fvel lags] = xcorr(rate-mean(rate),vInterp-mean(vInterp),60/dt,'coeff');
     
     figure
     subplot(2,2,1)
@@ -179,20 +165,22 @@ for c = 1:length(spikeT)
     plot(preISI,postISI,'.')
     xlabel('preISI'); ylabel('postISI')
   
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
+   
+   xcorr(rate-mean(rate),rate-mean(rate))
+    %
+        set(gcf, 'PaperPositionMode', 'auto');
+         print('-dpsc',psfilename,'-append');
 end
 
 
    
 %velocity and FR
-%    scatter(vsmoothBar,R(1:length(histbins),c))        
-
+% %    scatter(vsmoothBar,R(1:length(histbins),c))        
+% 
 % h2 = figure
-
-% plot(0.1:0.1:size(data,3)/10,rad,'b-')
 % hold on
-% plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m') 
+% plot(0.1:0.1:size(data,3)/10,rad,'b-')
+% plot(0.1:0.1:size(data,3)/10,(centroid(:,1)/1.1),'.m')
 % plot(0.1:0.1:size(data,3)/10,(centroid(:,2)/1.1),'.c')
 % hold off
 % legend('radius','x pos','ypos')
@@ -203,10 +191,10 @@ end
 % h3=figure
 % plot(rad, 
 
-% video with tracking
+% % video with tracking
 % h4 = figure
 % for i = 1:size(data,3)
-% %  
+%  
 %     subplot(1,2,1)
 %     imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
 %     colormap gray
@@ -222,10 +210,13 @@ end
 %     circle(centroid(i,1),centroid(i,2),rad(i))
 %     drawnow
 %     hold off 
+% %     mov(i) = getframe(gcf)
+% %     vid = VideoWriter('predoi_tracking.avi')
+% %     open(vid); writeVideo(vid,mov); close(vid)
 % end
 
 
-save(afile,'tsampBar','vsmoothBar','R','centroid','rad', 'corr_Frad','corr_vrad','-append');
+save(afile,'tsampBar','vsmoothBar','R','centroid','rad','-append');
 
 set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',psfilename,'-append');
