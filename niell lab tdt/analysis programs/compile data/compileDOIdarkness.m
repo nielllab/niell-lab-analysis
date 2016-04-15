@@ -1,5 +1,5 @@
 clear all
-close all
+close all 
 
 dbstop if error
 
@@ -16,11 +16,11 @@ use =  find(strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; lisuride=3;
-
+ 
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
-for i = 8:10 %length(use)
+for i = 1:17
     
     %%% extract filenames
     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];
@@ -31,12 +31,12 @@ for i = 8:10 %length(use)
     nc = length(inh); cellrange = n+1:n+nc;
     inhAll(cellrange) = inh;
     
-    %%% get layer info
-   % load(afile,'layer');
-   % layerAll(cellrange) = layer;
-    %%% getLayers (needs histo information, but will give layers for all sites)
+    %% get layer info
+   load(afile,'layer');
+   layerAll(cellrange) = layer;
+%getLayer %(needs histo information, but will give layers for all sites)
     
-    %%% getEyes  (needs camera files)d
+    %%% getEyes  (needs camera files)
     
     %%% session info
     sessionNum(cellrange)=i;
@@ -46,27 +46,32 @@ for i = 8:10 %length(use)
     if strcmp(files(use(i)).treatment,'Lisuride'), treatment(cellrange)=lisuride, end;
     sessionTreatment(i) = treatment(cellrange(1));
     
-    %%% get pre/post running speed
+      if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})  
+    %% get pre/post running speed
     for prepost = 1:2
         spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},0);
         speedHistWn(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
         speedTrace{i,prepost}=spd.v;
     end
-    
-    
-    %%% get grating responses
-    for prepost = 1:2
-        drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
-        drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
-        drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
-        drift_spont(cellrange,:,prepost) = drift.interSpont;
-        drift_osi(cellrange,:,prepost) = drift.cv_osi;
-        drift_F1F0(:,cellrange,prepost)= drift.F1F0;
-        %drift_ot_tune(cellrange,:,prepost)=drift.orient_tune;
-        %drift_sf_trial(1,:,prepost) = drift.trialSF;
-        %drift_trial_psth(cellrange,:,:,prepost) = drift.trialPsth;
+      end
+      
+    if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
+        %%% get grating responses
+        for prepost = 1:2
+            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+            drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
+            drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
+            drift_spont(cellrange,:,prepost) = drift.interSpont;
+            drift_osi(cellrange,:,prepost) = drift.cv_osi;
+            drift_F1F0(:,cellrange,prepost)= drift.F1F0;
+            %drift_ot_tune(cellrange,:,prepost)=drift.orient_tune;
+            %drift_sf_trial(1,:,prepost) = drift.trialSF;
+            %drift_trial_psth(cellrange,:,:,prepost) = drift.trialPsth;
+        end
     end
     
+        if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
+
     %%% get wn response
     for prepost = 1:2
         wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
@@ -75,13 +80,14 @@ for i = 8:10 %length(use)
         wn_evoked(cellrange,:,prepost)=wn.evoked;
         wn_gain(1,cellrange,prepost)=wn.gain
     end
+        end
     
     %%% lfp power
     %%%(right now averages over all sites, should use layer info)
-    for prepost=1:2
-        lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
-        LFPall(i,:,:,prepost) =squeeze(median(lfpMove.meanSpect, 1))/median(lfpMove.meanSpect(:));
-    end
+%     for prepost=1:2
+%         lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
+%         LFPall(i,:,:,prepost) =squeeze(median(lfpMove.meanSpect, 1))/median(lfpMove.meanSpect(:));
+%     end
     
     %%% darkness / correlation analysis
     
@@ -92,7 +98,7 @@ for i = 8:10 %length(use)
     
     %%% prepost correlation for white noise
     dt = 1;
-    [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,0);
+    [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,0);
     wnCorr(corrRange,1) = preCorr(:); wnCorr(corrRange,2)=postCorr(:);
     
     %%%% prepost correlation in darkness
@@ -136,9 +142,9 @@ for i = 1:2
 end
 
 %%% compare spontaneous rates measured with gratings and wn
-figure
-plot(drift_spont(:),wn_spont(:),'.'); hold on; plot([0 10], [0 10]); axis equal
-xlabel('drift spont'),ylabel('wn spont');
+% figure
+% plot(drift_spont(:),wn_spont(:),'.'); hold on; plot([0 10], [0 10]); axis equal
+% xlabel('drift spont'),ylabel('wn spont');
 
 %%% scatter plot of drift spont
 for mv = 1:2
@@ -189,14 +195,19 @@ for t = 1:2
     figure
     if t==1, set(gcf,'Name','saline wn CRF'), else set(gcf,'Name','doi wn CRF'),end
     useN = find(treatment==t)
+     
     for i = 1:length(useN)
         np = ceil(sqrt(length(useN)));
         subplot(np,np,i);
         hold on
+      
         plot(wn_crf(useN(i),:,1,1),'Color',[0.5 0 0]);  plot(wn_crf(useN(i),:,2,1),'Color',[0 0.5 0]);
         plot(wn_crf(useN(i),:,1,2),'Color',[1 0 0]);  plot(wn_crf(useN(i),:,2,2),'Color',[0 1 0]);
-        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)])
+        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]);
+        if inh(i) ==1 , xlabel('inh'); else  xlabel('exc'); 
+        end 
     end
+    
 end
 
 %%% plot orientation tuning curves for all units
@@ -213,6 +224,8 @@ for t = 1:2
         plot([1 12], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
         plot([1 12], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
         yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
+         if inh(i) ==1 , xlabel('inh'); else  xlabel('exc'); 
+        end 
     end
 end
 
@@ -230,6 +243,8 @@ for t = 1:2
         plot([1 7], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
         plot([1 7], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
         yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 8.5])
+         if inh(i) ==1 , xlabel('inh'); else  xlabel('exc'); 
+        end 
     end
 end
 
@@ -281,8 +296,8 @@ legend('pre','post')
 % figure
 % plot(sf)
 
-lowsf= find(drift.trialSF==2)
-highsf=find(drift.trialSF==6)
+% lowsf= find(drift.trialSF==2)
+% highsf=find(drift.trialSF==6)
 %to separate high/low SF responses for classifier
 %need to separate prepost treatments
 % also separate treatment 

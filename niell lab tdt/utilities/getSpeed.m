@@ -8,7 +8,7 @@ function speed = getSpeed(clustfile,afile, block,redo )
 
 load(clustfile,'Block_Name','Tank_Name');
 blocknum = find(strcmp(block,Block_Name));
-Block_Name = Block_Name{blocknum}
+ Block_Name = Block_Name{blocknum}
 
 load(afile,'speed');
 

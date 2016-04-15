@@ -1,4 +1,4 @@
-function drift_mv = getWn_mv(clustfile,afile, block,redo)
+function drift_mv = getDrift_mv(clustfile,afile, block,redo)
 %%% read in spike data for drifting gratings and sort by stimuli
 %%% works for gratings stim 6sf x 12 orient + spont + flicker
 

@@ -171,10 +171,9 @@ elseif SU && Pimp_session==1;
 elseif SU && Pimp_session==2; 
        save(fullfile(apname,afname),'psth_power3','histbins','-append');
 elseif SU && Pimp_session==3; 
-       save(fullfile(apname,afname),'psth_NBQX_power1','histbins','-append');
-
+       save(fullfile(apname,afname),'psth_power4','histbins','-append');
 else SU && Pimp_session==4; 
-       save(fullfile(apname,afname),'psth_NBQX_power2','histbins','-append'); 
+       save(fullfile(apname,afname),'psth_power5','histbins','-append'); 
     
 end
 
