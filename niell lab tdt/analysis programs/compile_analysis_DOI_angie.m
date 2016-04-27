@@ -19,7 +19,7 @@ for dataset = 1:1  %%% pre and post DOI
     if dataset==1
         %%DOI
 %         
-afiles = {'Angie_analysis\DOI_experiments\03_09_16\analysis_030916.mat'}
+afiles = {'Angie_analysis\DOI_experiments\04_01_16\analysis_040116.mat'}
 
 
 
@@ -589,7 +589,7 @@ end
 subplot(2,3,1)
 plot(crf(exc,1,1),crf(exc,1,2),'b.'); 
 hold on
-%plot([0 10],[0 10]); axis equal
+plot([0 10],[0 10]); axis equal
 title('all exc; spont')
 % 
 % subplot(2,3,2)
@@ -616,10 +616,10 @@ plot(crf(exc,10,1)-crf(exc,1,1),crf(exc,10,2)-crf(exc,1,2),'b.');
 hold on
 plot(crf(inh,10,1)-crf(inh,1,1),crf(inh,10,2)-crf(inh,1,2),'r.');
 axis square;
-xlim ([0 30]); ylim ([-5 30]) 
+xlim ([0 6]); ylim ([-1 6]) 
 title('Evoked');
-xlabel 'Pre-DOI Firing Rate (sp/sec)';
-ylabel 'Post-DOI Firing Rate (sp/sec)';
+xlabel 'Pre Firing Rate (sp/sec)';
+ylabel 'Post Firing Rate (sp/sec)';
 legend( 'excitatory', 'inhibitory')
 plot([0 50],[0 50]);
 %%% spont scatter plots 
@@ -628,11 +628,11 @@ subplot(1,2,2)
 plot(crf(exc,1,1),crf(exc,1,2),'b.'); hold on
 plot(crf(inh,1,1),crf(inh,1,2),'r.');
 axis square;
-xlim ([0 30]); ylim ([-5 30])
+xlim ([-.2 .75]); ylim ([-.2 .75])
 title('Spontaneous');
-xlabel 'Pre-DOI Firing Rate (sp/sec)';
-ylabel 'Post-DOI Firing Rate (sp/sec)';
-plot([0 50],[0 50]);
+xlabel 'Pre Firing Rate (sp/sec)';
+ylabel 'Post Firing Rate (sp/sec)';
+plot([0 1],[0 1]);
 % hold on
 % plot([0 10],[0 10]); axis equal
 % title('all inh')
@@ -684,7 +684,7 @@ for selectlyr=2:6
     title(sprintf('lyr %d',selectlyr))
 end
 % 
-% %%% dark pre/post scatter plots
+% % %%% dark pre/post scatter plots
 % figure
 % subplot(2,3,1)
 % hold on

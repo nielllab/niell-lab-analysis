@@ -103,7 +103,9 @@ if ~exist('pinp','var') | length(pinp)<blocknum  | isempty(pinp(blocknum).psth) 
         xlabel('msec')
         ylabel('sp/sec')
         
-        pinp(blocknum).psth(cell_n,:,:) = psth;
+        
+        psth(isnan(psth))=0;
+        pinp(blocknum).psth(cell_n,:) = psth;
         drawnow
         
         if makePDF
