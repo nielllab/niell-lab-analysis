@@ -1,38 +1,41 @@
 clear all
-duration = 1;
+
+xsz = 128;
+ysz = xsz*9/16;
+dist = 20;
+width = 50;
+widthdeg = 2*atand(0.5*width/dist)
+degperpix = widthdeg/xsz
+
+duration = 0.5;
 framerate = 60;
-isi = 1;
+isi = 0.5;
+reps = 5; %number of movie repetitions
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
-sfrange = [ 0.04 0.16];
-tfrange =[ 0 2];
-radiusRange = [0 1 2 4 8 1000];
-phaserange = [0 pi]
+sfrange = [0.04 0.16];
+tfrange =[2];
+% radiusRange = [0 1 2 4 8 1000];
+radiusRange = [0 5 10 20 30 40 50 60]/(8*degperpix);
+phaserange = [pi];
+contrastRange = [0.125 0.25 0.5 1];
 
-ntheta = 4;
-nx = 2; ny =1;
+ntheta = 2;
+nx = 1; ny =1;
 
 randomOrder=1;
 randomTheta=1;
+randomPhase=1;
 binarize=0;
 blank=0;
 
 totalduration = length(sfrange)*length(tfrange)*length(radiusRange)*length(phaserange)*ntheta*nx*(isi+duration);
 totalduration/60
 
-xsz = 128;
-ysz = xsz*9/16;
-dist = 25;
-width = 50;
-widthdeg = 2*atand(0.5*width/dist)
-degperpix = widthdeg/xsz
-
-
-
 blockwidth = ysz;
-xposrange = [1 xsz - blockwidth];
-yposrange  = 1;
-
+% xposrange = [1 xsz - blockwidth];
+xposrange = xsz/4;
+yposrange = 1;
 
 [x y] =meshgrid(1:blockwidth,1:blockwidth);
 xgrid=(x-mean(x(:)));; ygrid=(y-mean(y(:)));
@@ -55,13 +58,19 @@ for n= 1:length(thetarange);
             for k = 1:length(sfrange);
                 for l = 1:length(tfrange);
                     for m= 1:length(phaserange);
+                        for o = 1:length(contrastRange)
                         
-                        trial = trial+1;
-                        xpos(trial) = xposrange(i); ypos(trial)=yposrange(1); radius(trial)=j;
-                        sf(trial)=sfrange(k); tf(trial)=tfrange(l);
-                        phase(trial) = phaserange(m); theta(trial) = thetarange(n);
-                        if randomTheta
-                            theta(trial) = rand*2*pi;
+                            trial = trial+1;
+                            xpos(trial) = xposrange(i); ypos(trial)=yposrange(1); radius(trial)=j;
+                            sf(trial)=sfrange(k); tf(trial)=tfrange(l);
+                            phase(trial) = phaserange(m); theta(trial) = thetarange(n);
+                            contrasts(trial) = contrastRange(o);
+                            if randomTheta
+                                theta(trial) = rand*2*pi;
+                            end
+                            if randomPhase
+                                phase(trial) = rand*pi;
+                            end
                         end
                     end
                 end
@@ -72,7 +81,7 @@ end
 
 if randomOrder
 order = randperm(trial);
-xpos = xpos(order); ypos=ypos(order); sf =sf(order); tf=tf(order); phase=phase(order); theta=theta(order);radius = radius(order);
+xpos = xpos(order); ypos=ypos(order); sf =sf(order); tf=tf(order); phase=phase(order); theta=theta(order);radius = radius(order); contrasts = contrasts(order);
 end
 
 
@@ -80,7 +89,7 @@ end
 moviedata = zeros(xsz,ysz,trial*(duration+isi)*framerate,'uint8')+128;
 for tr = 1:trial
     tr
-    ph = (x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr);
+    ph = ((x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr))*contrasts(tr); %contrast modification
     if theta(tr)~=2*pi
     for t = 1:duration*framerate;
         frame = uint8(0.5*255*(cos(ph + 2*pi*t*tf(tr)/framerate).*gaussian{radius(tr)}+1));
@@ -88,8 +97,9 @@ for tr = 1:trial
     end
     end
 end
+
 if binarize
-moviedata(moviedata>128)=255;
+moviedata(moviedata>=128)=255;
 moviedata(moviedata<128)=0;
 end
 
@@ -100,4 +110,5 @@ for i = 1:length(moviedata)/10
 imshow(moviedata(:,:,i));
 drawnow
 end
+% moviedata = repmat(moviedata, [1 1 reps]);
 save sizeSelect2sf5sz14min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
