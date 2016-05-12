@@ -46,6 +46,8 @@ x = xgrid*degperpix; y=ygrid*degperpix;
 for r=1:length(radiusRange)
 g = (exp(-0.5*(x.^2 +y.^2)/radiusRange(r)^2));
 g(g<1/128)=0;
+%%% option for disk rather than gaussian envelope
+%%% g = sqrt(x.^2 + y.^2)<radiusRange(r);
 gaussian{r}=g;
 figure
 imagesc(gaussian{r},[0 1]);
