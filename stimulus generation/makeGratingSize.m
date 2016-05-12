@@ -18,9 +18,11 @@ tfrange =[2];
 % radiusRange = [0 1 2 4 8 1000];
 radiusRange = [0 5 10 20 30 40 50 60]/(8*degperpix);
 phaserange = [pi];
+phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:8);  %%%cmn
 contrastRange = [0.125 0.25 0.5 1];
 
 ntheta = 2;
+ntheta = 4; %cmn
 nx = 1; ny =1;
 
 randomOrder=1;
@@ -89,10 +91,10 @@ end
 moviedata = zeros(xsz,ysz,trial*(duration+isi)*framerate,'uint8')+128;
 for tr = 1:trial
     tr
-    ph = ((x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr))*contrasts(tr); %contrast modification
+    ph = ((x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr)); %contrast modification
     if theta(tr)~=2*pi
     for t = 1:duration*framerate;
-        frame = uint8(0.5*255*(cos(ph + 2*pi*t*tf(tr)/framerate).*gaussian{radius(tr)}+1));
+        frame = uint8(0.5*255*(cos(ph + 2*pi*t*tf(tr)/framerate).*gaussian{radius(tr)}*contrasts(tr)+1));
         moviedata(xpos(tr):xpos(tr)+blockwidth-1, ypos(tr):ypos(tr)+blockwidth-1,(tr-1)*duration*framerate +tr*isi*framerate+t) = frame;
     end
     end
