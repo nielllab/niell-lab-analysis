@@ -10,24 +10,22 @@ degperpix = widthdeg/xsz
 duration = 0.5;
 framerate = 60;
 isi = 0.5;
-reps = 5; %number of movie repetitions
+reps = 1; %number of movie repetitions
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
 sfrange = [0.04 0.16];
 tfrange =[2];
 % radiusRange = [0 1 2 4 8 1000];
 radiusRange = [0 5 10 20 30 40 50 60]/(8*degperpix);
-phaserange = [pi];
 phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:8);  %%%cmn
 contrastRange = [0.125 0.25 0.5 1];
 
-ntheta = 2;
 ntheta = 4; %cmn
 nx = 1; ny =1;
 
 randomOrder=1;
 randomTheta=1;
-randomPhase=1;
+randomPhase=0;
 binarize=0;
 blank=0;
 
@@ -93,7 +91,7 @@ end
 moviedata = zeros(xsz,ysz,trial*(duration+isi)*framerate,'uint8')+128;
 for tr = 1:trial
     tr
-    ph = ((x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr)); %contrast modification
+    ph = (x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr);
     if theta(tr)~=2*pi
     for t = 1:duration*framerate;
         frame = uint8(0.5*255*(cos(ph + 2*pi*t*tf(tr)/framerate).*gaussian{radius(tr)}*contrasts(tr)+1));
@@ -108,11 +106,11 @@ moviedata(moviedata<128)=0;
 end
 
 moviedata = moviedata(1:xsz,1:ysz,:);
-figure
-for i = 1:length(moviedata)/10
-    i
-imshow(moviedata(:,:,i));
-drawnow
-end
+% figure
+% for i = 1:length(moviedata)/10
+%     i
+% imshow(moviedata(:,:,i));
+% drawnow
+% end
 % moviedata = repmat(moviedata, [1 1 reps]);
-save sizeSelect2sf5sz14min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
+save sizeSelect2sf8sz34min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
