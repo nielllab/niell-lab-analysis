@@ -7,7 +7,7 @@ width = 50;
 widthdeg = 2*atand(0.5*width/dist)
 degperpix = widthdeg/xsz
 
-duration = 0.5;
+duration = 1;
 framerate = 60;
 isi = 0.5;
 reps = 1; %number of movie repetitions
@@ -17,7 +17,7 @@ sfrange = [0.04 0.16];
 tfrange =[2];
 % radiusRange = [0 1 2 4 8 1000];
 radiusRange = [0 5 10 20 30 40 50 60]/(8*degperpix);
-phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:8);  %%%cmn
+phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:6);  %%%cmn
 contrastRange = [0.125 0.25 0.5 1];
 
 ntheta = 4; %cmn
@@ -29,7 +29,7 @@ randomPhase=0;
 binarize=0;
 blank=0;
 
-totalduration = length(sfrange)*length(tfrange)*length(radiusRange)*length(phaserange)*ntheta*nx*(isi+duration);
+totalduration = length(sfrange)*length(contrastRange)*length(tfrange)*length(radiusRange)*length(phaserange)*ntheta*nx*(isi+duration);
 totalduration/60
 
 blockwidth = ysz;
@@ -113,4 +113,4 @@ moviedata = moviedata(1:xsz,1:ysz,:);
 % drawnow
 % end
 % moviedata = repmat(moviedata, [1 1 reps]);
-save sizeSelect2sf8sz34min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
+save sizeSelect2sf8sz38min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange
