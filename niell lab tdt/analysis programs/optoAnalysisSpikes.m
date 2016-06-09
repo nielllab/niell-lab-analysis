@@ -12,7 +12,7 @@ nchan = input('# chans : ');
 uselaser = 1
 % chans = 1:4:nchan;
 SU = input('multiunit (0) or single-unit (1) : ');
-Pimp_session=input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
+%Pimp_session=input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
 
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
@@ -64,9 +64,10 @@ end
 dt=0.001;
 histbins = -0.05:dt:0.05;
 longdt=2;
-longBins=-5:longdt:10; %changed from multiples of 17 to multiples of 5
+ longBins=-17:longdt:34;
 psth=zeros(length(cell_range),length(hist(0,histbins)));
 longPsth = zeros(length(cell_range),length(hist(0,longBins)));
+tdiff_total=zeros(length(cell_range),length(edges));
 
 nfig=0;
 for cell_n = cell_range;
@@ -85,7 +86,7 @@ for cell_n = cell_range;
         times=tdtData.MUspikeT{cell_n};
     end
     
-   histfig(cell_n)=figure;
+    OTagfig(cell_n)=figure;
    set(gcf,'position',[200 200 600 700]);
    subplot(3,2,1);
    plot(laserT,tdtData.laserTTL,'g');
@@ -95,19 +96,28 @@ for cell_n = cell_range;
    title(sprintf('unit %d %d',channel_no,clust_no))
    %title(sprintf('ch %d ',cell_n))
   
+   
+ %figure  
  subplot(3,2,2)
  hold on
     for t = 1:length(edges);
         tdiff = times-edges(t);
         tdiff = tdiff(abs(tdiff)<max(histbins));
-        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',1)
+       % tdiff_total(cell_n,:)=tdiff(cell_n,:);
+        
+        plot(tdiff*1000,t*ones(size(tdiff)),'ks','MarkerSize',3)
         psth(cell_n,:) = psth(cell_n,:) + hist(tdiff,histbins);
     end
-    psth(cell_n,:)=psth(cell_n,:)/(dt*length(edges));
-    subplot(3,2,4);
-    plot(histbins*1000,psth(cell_n,:));
+    
     hold on
-    plot([0 0],[0 max(psth(cell_n,:))],'g');
+    plot([0 0],[0 1000],'g','linewidth',2);
+    subplot(3,2,4);
+    psth(cell_n,:)=psth(cell_n,:)/(dt*length(edges));
+   
+    
+    plot(histbins*1000,psth(cell_n,:),'k','linewidth',2);
+    hold on
+    plot([0 0],[0 max(psth(cell_n,:))],'g','linewidth',2);
     
     xlabel('msec')
     ylabel('sp/sec')
@@ -138,11 +148,11 @@ for cell_n = cell_range;
     xlabel('sec')
     ylabel('sp/sec')
     xlim([min(longBins) max(longBins)])
-   % ylim([0 7]); plot([0 15],[6 6],'g','Linewidth',4);
+   % ylim([0 7]); plot([0 17],[6 6],'g','Linewidth',4);
 end
 
 %save(afile, 'base','Sdev','PinpFR','PINPed','PINP_sup','-append')
-histbins=histbins*1000
+histbins=histbins*1000;
 
 mainfig=figure;
 plot(histbins,psth(:,:));hold on
@@ -151,30 +161,8 @@ xlabel('msec')
 ylabel('sp/sec')
 
 
-if SU && Pimp_session==0;
-    psth_power1=psth;
-elseif SU && Pimp_session==1; 
-    psth_power2=psth;
-elseif SU && Pimp_session==2; 
-    psth_power3=psth;
-elseif SU && Pimp_session==3; 
-    psth_NBQX_power1=psth;
-else SU && Pimp_session==4; 
-    psth_NBQX_power2=psth;
-end
-   
-
-if SU && Pimp_session==0;
-    save(fullfile(apname,afname),'psth_power1','histbins','-append');
-elseif SU && Pimp_session==1; 
-       save(fullfile(apname,afname),'psth_power2','histbins','-append');
-elseif SU && Pimp_session==2; 
-       save(fullfile(apname,afname),'psth_power3','histbins','-append');
-elseif SU && Pimp_session==3; 
-       save(fullfile(apname,afname),'psth_power4','histbins','-append');
-else SU && Pimp_session==4; 
-       save(fullfile(apname,afname),'psth_power5','histbins','-append'); 
-    
+if SU 
+    save(fullfile(apname,afname),'psth','histbins','-append');
 end
 
 
@@ -186,14 +174,13 @@ set(gcf, 'PaperPositionMode', 'auto');
 print('-dpsc',fullfile(pname,fname),'-append');
 
 
-for i = 1:length(histfig)
-    figure(histfig(i))
+for i = 1:length(OTagfig)
+    figure(OTagfig(i))
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',fullfile(pname,fname),'-append');
 end
 if SU
     ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'SU.pdf']);
-   
 else
     ps2pdf('psfile', psfname, 'pdffile', [psfname(1:(end-3)) 'MU.pdf']);
    

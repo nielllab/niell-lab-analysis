@@ -1,6 +1,6 @@
 close all
 
-load('rundata012716.mat')
+load('analysis_032816.mat')
 % if ~exist('drift_mv_all','var')
 %     %load ('adultData061715.mat')
 %    % load ('adultData090815.mat')
@@ -15,15 +15,7 @@ if ~exist('moviedata','var')
 end
 
 
-bad = [ 288 ... % below LGN
-        
-%%% main figsspi
-
-%%% supp by contrast
-
-%%% gain across population
-
-%%% bursting across population
+%bad = [ 288 ... % below LGN
 
 %%%for c = 1:length(movement_all);
 clear spikebins spikepatterns
@@ -32,7 +24,7 @@ moviedata = double(moviedata);
 m= (moviedata-mean(moviedata(:)))/mean(moviedata(:));
 
 
-
+%%% sta analysis
 if ~exist('sta_all','var')
     
     for c = 1:length(movement_all)
@@ -283,85 +275,89 @@ if ~exist('sta_all','var')
     end
 end
 
+
+%%% plot session quality
 psfilename = 'test.ps';
 dt=1;
 close all
-for sess = 1:max(site)
-    units = find(site == sess);
-    clear sp_hist
-    if ~isempty(movement_all(units(1)).spikes)
-        for i=1:length(units)
-            sp = movement_all(units(i)).spikes;
-            sp_hist(i,:) = hist(sp,dt/2:dt:max(movement_all(units(i)).lfpT));
-            sp_hist(i,:) = sp_hist(i,:)/std(sp_hist(i,:));
+if false
+    for sess = 1:max(site)
+        units = find(site == sess);
+        clear sp_hist
+        if ~isempty(movement_all(units(1)).spikes)
+            for i=1:length(units)
+                sp = movement_all(units(i)).spikes;
+                sp_hist(i,:) = hist(sp,dt/2:dt:max(movement_all(units(i)).lfpT));
+                sp_hist(i,:) = sp_hist(i,:)/std(sp_hist(i,:));
+            end
+            clear ticklabel
+            for j = 1:length(units)
+                ticklabel{j} = num2str(units(j));
+            end
+            
+            figure
+            imagesc(sp_hist(:,301:450));
+            title(sprintf('%d',sess))
+            set(gca,'Ytick',1:size(sp_hist,1));
+            set(gca,'YTickLabel',ticklabel);
+            
+            figure
+            imagesc(sp_hist);
+            title(sprintf('%d',sess))
+            set(gca,'Ytick',1:size(sp_hist,1));
+            set(gca,'YTickLabel',ticklabel);
+            
+            
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            
+            
+            figure
+            imagesc(imresize(cov(sp_hist'),1),[-1 1]); colormap jet
+            set(gca,'Ytick',1:size(sp_hist,1));
+            set(gca,'YTickLabel',ticklabel);
+            
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            
+            [coeff score latent] = pca(sp_hist');
+            figure
+            plot(latent/sum(latent));
+            
+            figure
+            plot(score(:,1),score(:,2));
+            
+            npca = min(size(score,2),5);
+            figure
+            for j=1:npca
+                subplot(npca+1,1,j)
+                plot(score(:,j)); xlim([0 1200])
+            end
+            subplot(npca+1,1,npca+1);
+            plot(movement_all(units(i)).speed); xlim([0 1200]); ylim([0 20])
+            
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
+            figure
+            range = max(abs(coeff(:)));
+            imagesc(coeff,[-range range]); colorbar
+            set(gca,'Ytick',1:size(sp_hist,1));
+            set(gca,'YTickLabel',ticklabel);
+            
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+            
         end
-        clear ticklabel
-        for j = 1:length(units)
-            ticklabel{j} = num2str(units(j));
-        end
-        
-        figure
-        imagesc(sp_hist(:,301:450));
-        title(sprintf('%d',sess))
-        set(gca,'Ytick',1:size(sp_hist,1));
-        set(gca,'YTickLabel',ticklabel);
-        
-        figure
-        imagesc(sp_hist);
-        title(sprintf('%d',sess))
-        set(gca,'Ytick',1:size(sp_hist,1));
-        set(gca,'YTickLabel',ticklabel);
-        
-        
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-        
-        
-        
-        figure
-        imagesc(imresize(cov(sp_hist'),1),[-1 1]); colormap jet
-        set(gca,'Ytick',1:size(sp_hist,1));
-        set(gca,'YTickLabel',ticklabel);
-        
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-        
-        
-        [coeff score latent] = pca(sp_hist');
-        figure
-        plot(latent/sum(latent));
-        
-        figure
-        plot(score(:,1),score(:,2));
-        
-        npca = min(size(score,2),5);
-        figure
-        for j=1:npca
-            subplot(npca+1,1,j)
-            plot(score(:,j)); xlim([0 1200])
-        end
-        subplot(npca+1,1,npca+1);
-        plot(movement_all(units(i)).speed); xlim([0 1200]); ylim([0 20])
-        
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-        
-        figure
-        range = max(abs(coeff(:)));
-        imagesc(coeff,[-range range]); colorbar
-        set(gca,'Ytick',1:size(sp_hist,1));
-        set(gca,'YTickLabel',ticklabel);
-        
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-        
     end
+    
+    [f p] = uiputfile('*.pdf','pdf name');
+    ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
+    delete(psfilename);
+    
 end
-
-[f p] = uiputfile('*.pdf','pdf name');
-ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
-delete(psfilename);
-
 
 keyboard
 
@@ -391,22 +387,25 @@ xlabel('unit')
 ylabel('total running time (min)')
 
 refract = h(:,2)./mean(h(:,6:10),2);
-
 figure
 plot(run_total,refract,'o')
 xlabel('total running time');
 ylabel('isi contamination');
-
-
 
 figure
 plot(refract);
 xlabel('unit')
 ylabel('isi contaimination')
 
+figure
+cdfplot(refract); xlabel('isi contamination')
 
-goodunit = run_total>300 & refract'<0.25;
+figure
+cdfplot(run_total); xlabel('running time')
 
+goodunit = run_total>300 & refract'<0.25;  %%% most stringent
+goodunit = run_total>150 & refract'<0.5;  %%% least stringent
+sprintf('%d good out of %d total = %0.2f',sum(goodunit),length(refract),sum(goodunit)/length(refract))
 
 
 
@@ -574,8 +573,6 @@ F0 = squeeze(orient_amp(1,:,:));
 
 driftSBC = find(F0(1,:)<-5 | F0(2,:)<-5);
 
-
-
 figure
 plot(squeeze(orient_amp(2,1,:)),squeeze(orient_amp(2,2,:)),'o'); hold on
 plot(squeeze(orient_amp(2,1,goodunit)),squeeze(orient_amp(2,2,goodunit)),'go')
@@ -656,8 +653,7 @@ figure
 hist(squeeze(dr_spont_all(1,2,goodunit)),1:1:30);
 
 for i = 1:length(drift_mv_all)
- for i = 292:292
-     figure
+    figure
     for tf = 1:2
         for f = 1:2
             subplot(2,3,tf+(f-1)*3);
@@ -701,618 +697,618 @@ for i = 1:length(drift_mv_all)
     end
     
 end
-    
-    figure
-    plot(squeeze(orient_amp(1,1,driftsbc)),squeeze(orient_amp(1,2,driftsbc)),'o')
-    axis equal;hold on
-    plot([-20 0],[-20 0],'r');
-    
-    mean(orient_amp(1,2,driftsbc),3)
-    
-    figure
-    for r = 1:2
-        subplot(1,2,r);
-        imagesc(squeeze(nanmean(spikebinsAll(OS,r,:,:),1)));
-        axis equal
+
+figure
+plot(squeeze(orient_amp(1,1,driftsbc)),squeeze(orient_amp(1,2,driftsbc)),'o')
+axis equal;hold on
+plot([-20 0],[-20 0],'r');
+
+mean(orient_amp(1,2,driftsbc),3)
+
+figure
+for r = 1:2
+    subplot(1,2,r);
+    imagesc(squeeze(nanmean(spikebinsAll(OS,r,:,:),1)));
+    axis equal
+end
+
+
+
+figure
+errorbar(1:8,squeeze(mean(alignedOS(1,:,1,OS),4)), squeeze(std(alignedOS(1,:,1,OS),[],4))/sqrt(length(OS)),'r','Linewidth',2  )
+hold on
+errorbar(1:8,squeeze(mean(alignedOS(1,:,2,OS),4)), squeeze(std(alignedOS(1,:,2,OS),[],4))/sqrt(length(OS)),'b','Linewidth',2  )
+ylim([-8 8]); xlim([1 8])
+set(gca,'Fontsize',16)
+plot([1 8],[0 0],'b:','Linewidth',2)
+set(gca,'Xtick',[1 3 5 7]);
+set(gca,'Xticklabel',{'-90','0','90','180'})
+xlabel('direction');
+ylabel('F0 sp/sec')
+
+
+figure
+errorbar(1:8,squeeze(mean(alignedOS(1,:,1,driftsbc),4)), squeeze(std(alignedOS(1,:,1,driftsbc),[],4))/sqrt(length(driftsbc)),'r','Linewidth',2  )
+hold on
+errorbar(1:8,squeeze(mean(alignedOS(1,:,2,driftsbc),4)), squeeze(std(alignedOS(1,:,2,driftsbc),[],4))/sqrt(length(driftsbc)),'b','Linewidth',2  )
+ylim([-8 8]); xlim([1 8])
+set(gca,'Fontsize',16)
+plot([1 8],[0 0],'b:','Linewidth',2)
+set(gca,'Xtick',[1 3 5 7]);
+set(gca,'Xticklabel',{'-90','0','90','180'})
+xlabel('direction');
+ylabel('F0 sp/sec')
+
+
+figure
+errorbar(1:8,squeeze(mean(alignedOS(1,:,1,cc),4)), squeeze(std(alignedOS(1,:,1,cc),[],4))/sqrt(length(cc)),'r','Linewidth',2  )
+hold on
+errorbar(1:8,squeeze(mean(alignedOS(1,:,2,cc),4)), squeeze(std(alignedOS(1,:,2,cc),[],4))/sqrt(length(cc)),'b','Linewidth',2  )
+ylim([-8 8]); xlim([1 8])
+set(gca,'Fontsize',16)
+plot([1 8],[0 0],'b:','Linewidth',2)
+set(gca,'Xtick',[1 3 5 7]);
+set(gca,'Xticklabel',{'-90','0','90','180'})
+xlabel('direction');
+ylabel('F0 sp/sec')
+
+
+data = [squeeze(mean(alignedOS(1,3,1,cc),4)) squeeze(mean(alignedOS(1,3,2,cc),4)); ...
+    squeeze(mean(alignedOS(1,3,1,driftsbc),4)) squeeze(mean(alignedOS(1,3,2,driftsbc),4)) ; ...
+    squeeze(mean(alignedOS(1,3,1,OS),4)) squeeze(mean(alignedOS(1,3,2,OS),4))]
+
+err = [squeeze(std(alignedOS(1,3,1,cc),[],4)) squeeze(std(alignedOS(1,3,2,cc),[],4)); ...
+    squeeze(std(alignedOS(1,3,1,driftsbc),[],4)) squeeze(std(alignedOS(1,3,2,driftsbc),[],4)) ; ...
+    squeeze(std(alignedOS(1,3,1,OS),[],4)) squeeze(std(alignedOS(1,3,2,OS),[],4))]
+
+err(1,:)=err(1,:)/sqrt(length(cc));
+err(2,:)=err(2,:)/sqrt(length(driftsbc));
+err(3,:)=err(3,:)/sqrt(length(OS));
+err
+
+figure
+plot(squeeze(alignedOS(1,3,1,cc)),squeeze(alignedOS(1,3,2,cc)),'o'); hold on
+plot(squeeze(alignedOS(1,3,1,intersect(cc,find(goodunit)))),squeeze(alignedOS(1,3,2,intersect(cc,find(goodunit)))),'go');
+axis equal;
+plot([ 0 20],[0 20]);
+
+figure
+plot(squeeze(alignedOS(1,3,1,OS)),squeeze(alignedOS(1,3,2,OS)),'o'); hold on
+plot(squeeze(alignedOS(1,3,1,intersect(OS,find(goodunit)))),squeeze(alignedOS(1,3,2,intersect(OS,find(goodunit)))),'go');
+axis equal;
+plot([ 0 20],[0 20]);
+
+
+
+figure
+barweb(data,err)
+ylim([-8 8])
+set(gca,'Xticklabel',{'cc','sbc','OS'})
+ylabel('peak F0 sp/sec')
+legend('stationary','moving')
+set(gca,'Fontsize',16)
+
+
+OS = find(cvOSIall(1,1,:)>0.25 | cvOSIall(1,2,:)>0.25);
+
+figure
+plot(squeeze(orient_amp(1,1,:)),squeeze(orient_amp(1,2,:)),'ko')
+axis equal;hold on;
+xlabel('stop F0'); ylabel('move F0');
+plot(squeeze(orient_amp(1,1,staUse)),squeeze(orient_amp(1,2,staUse)),'bo')
+plot(squeeze(orient_amp(1,1,OS)),squeeze(orient_amp(1,2,OS)),'go')
+plot(squeeze(orient_amp(1,1,sbc)),squeeze(orient_amp(1,2,sbc)),'ro')
+legend({'all','sta_use','os','sbc'})
+plot([0 20],[0 20],'g')
+
+cc= setdiff(staUse,OS);
+cc=setdiff(cc,sbc);
+
+[median(orient_amp(1,1,cc)) median(orient_amp(1,2,cc))]
+[median(orient_amp(1,1,OS)) median(orient_amp(1,2,OS))]
+[median(orient_amp(1,1,sbc)) median(orient_amp(1,2,sbc))]
+
+[mean(orient_amp(1,1,cc)) mean(orient_amp(1,2,cc))]
+[mean(orient_amp(1,1,OS)) mean(orient_amp(1,2,OS))]
+[mean(orient_amp(1,1,sbc)) mean(orient_amp(1,2,sbc))]
+
+
+keyboard
+
+figure
+plot(wvform')
+
+
+
+figure
+plot(xferSpont(:,1),xferSpont(:,2),'o')
+axis([-5 40 -5 40])
+axis square
+hold on
+plot([0 40],[0 40])
+title('wn spont')
+
+figure
+plot(dr_spont_mv(:,1,1),dr_spont_mv(:,2,1),'o')
+axis([-5 40 -5 40])
+axis square
+hold on
+plot([0 40],[0 40])
+title('drift spont')
+
+figure
+plot(dr_spont_mv(:,1,1),xferSpont(:,1),'o')
+axis([-5 40 -5 40])
+axis square
+hold on
+plot([0 40],[0 40])
+xlabel('drift stop spont'); ylabel('wnstop spont')
+
+figure
+plot(dr_spont_mv(:,2,1),xferSpont(:,2),'o')
+axis([-5 40 -5 40])
+axis square
+hold on
+plot([0 40],[0 40])
+xlabel('drift mv spont'); ylabel('wn mv spont')
+
+
+
+
+figure
+plot(crfAll(:,1,1),crfAll(:,2,1),'o')
+axis([0 40 0 40])
+axis square
+hold on
+plot([0 40],[0 40])
+
+figure
+plot(xferGain(:,1),xferGain(:,2),'o')
+%axis([ 20 0 20])
+axis square
+hold on
+plot([0 20],[0 20])
+
+sbcGain = xferAll(:,:,7)-xferAll(:,:,6);
+figure
+plot(sbcGain(:,1),sbcGain(:,2),'o')
+%axis([ 20 0 20])
+axis square
+hold on
+plot([0 20],[0 20])
+plot([-5 20],[0 0]);
+plot([0 0],[-5 20])
+
+sbc = find(sbcGain(:,2)<-2 | sbcGain(:,1)<-2);
+%sbc = find(xferGain(:,2)<-1 | xferGain(:,1)<-1);
+% for i = 1:length(sbc)
+%     figure
+%     subplot(1,2,1); hold on
+%     plot(squeeze(xferAll(sbc(i),1,:)),'r')
+%     plot(squeeze(xferAll(sbc(i),2,:)),'g')
+%     xlim([1 11])
+%
+%     subplot(1,2,2);hold on
+%     plot(squeeze(crfAll(sbc(i),1,1:10)),'r')
+%     plot(squeeze(crfAll(sbc(i),2,1:10)),'g')
+%     xlim([1 10])
+% end
+
+
+
+
+for c = 1:size(meanSTAall,1)
+    sta= squeeze(meanSTAall(c,:,:)); sta=sta(:);
+    [val ind] = max(abs(sta));
+    onoff(c)=sign(sta(ind));
+end
+
+figure
+plot(tcAll(staUse,:)')
+
+figure
+hist(min(tcAll(staUse,6:9),[],2)-tcAll(staUse,1))
+
+[coeff score latent] = pca(tcAll(staUse,:));
+figure
+plot(score(:,1),score(:,2),'o')
+
+id = kmeans(score(:,1:2),2)
+figure
+plot(score(id==1,1),score(id==1,2),'ro');
+hold on
+plot(score(id==2,1),score(id==2,2),'go');
+
+tcGroup = zeros(size(score,1),1)
+%tcGroup(score(:,1)>0 & score(:,2)>-0.5)=1;
+tcGroup(score(:,1)>=score(:,2))=1;
+%tcGroup(score(:,1)<0 & score(:,1)>-1.25)=2;
+tcGroup(score(:,2)>score(:,1))=2;
+tcGroup(score(:,1)<-1.25)=3;
+tcGroup(score(:,1)>-0.5 & score(:,2)<-0.5)=4;
+tcGroup(tcAll(staUse,8)>0.2)=5;
+
+col = 'rgbcm';
+figure
+hold on
+for i = 1:5
+    plot(tcAll(staUse(tcGroup==i),:)',col(i));
+end
+figure
+hist(tcGroup)
+figure
+hold on
+for i = 1:5
+    plot(score(tcGroup==i,1),score(tcGroup==i,2),[col(i) 'o'])
+end
+hold on
+plot([-1 1],[-1 1])
+
+
+
+F1F0 = mean(osi_all(:,:,2),2)./(mean(osi_all(:,:,1),2) );
+figure
+h=hist(2*F1F0,0.1:0.2:2); bar(0.1:0.2:2,h/sum(h))
+hold on
+%h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
+xlabel('F1/F0'); xlim([0 2]);
+
+ev_osi = squeeze(osi_all(:,:,1)) - repmat(dr_spont',[1 8]);
+figure
+plot(ev_osi');
+
+
+figure
+data =[length(cc) length(sbc) length(OS) ]/length(ev_osi)
+err = [sqrt(length(cc)) sqrt(length(sbc)) sqrt(length(OS))]/length(ev_osi)
+
+bar(data); hold on
+errorbar(1:3,data,err,'k.','Linewidth',2)
+set(gca,'Xticklabel',{'cc','sbc','OS'})
+ylabel('fraction')
+set(gca,'Fontsize',16)
+
+evoked = mean(ev_osi,2);
+for i = 1:length(ev_osi)
+    if max(ev_osi(i,:))>4
+        cvosi(i) = abs(calcCVosi(ev_osi(i,:)));
+    else
+        cvosi(i) = NaN;
     end
-    
-    
-    
-    figure
-    errorbar(1:8,squeeze(mean(alignedOS(1,:,1,OS),4)), squeeze(std(alignedOS(1,:,1,OS),[],4))/sqrt(length(OS)),'r','Linewidth',2  )
-    hold on
-    errorbar(1:8,squeeze(mean(alignedOS(1,:,2,OS),4)), squeeze(std(alignedOS(1,:,2,OS),[],4))/sqrt(length(OS)),'b','Linewidth',2  )
-    ylim([-8 8]); xlim([1 8])
-    set(gca,'Fontsize',16)
-    plot([1 8],[0 0],'b:','Linewidth',2)
-    set(gca,'Xtick',[1 3 5 7]);
-    set(gca,'Xticklabel',{'-90','0','90','180'})
-    xlabel('direction');
-    ylabel('F0 sp/sec')
-    
-    
-    figure
-    errorbar(1:8,squeeze(mean(alignedOS(1,:,1,driftsbc),4)), squeeze(std(alignedOS(1,:,1,driftsbc),[],4))/sqrt(length(driftsbc)),'r','Linewidth',2  )
-    hold on
-    errorbar(1:8,squeeze(mean(alignedOS(1,:,2,driftsbc),4)), squeeze(std(alignedOS(1,:,2,driftsbc),[],4))/sqrt(length(driftsbc)),'b','Linewidth',2  )
-    ylim([-8 8]); xlim([1 8])
-    set(gca,'Fontsize',16)
-    plot([1 8],[0 0],'b:','Linewidth',2)
-    set(gca,'Xtick',[1 3 5 7]);
-    set(gca,'Xticklabel',{'-90','0','90','180'})
-    xlabel('direction');
-    ylabel('F0 sp/sec')
-    
-    
-    figure
-    errorbar(1:8,squeeze(mean(alignedOS(1,:,1,cc),4)), squeeze(std(alignedOS(1,:,1,cc),[],4))/sqrt(length(cc)),'r','Linewidth',2  )
-    hold on
-    errorbar(1:8,squeeze(mean(alignedOS(1,:,2,cc),4)), squeeze(std(alignedOS(1,:,2,cc),[],4))/sqrt(length(cc)),'b','Linewidth',2  )
-    ylim([-8 8]); xlim([1 8])
-    set(gca,'Fontsize',16)
-    plot([1 8],[0 0],'b:','Linewidth',2)
-    set(gca,'Xtick',[1 3 5 7]);
-    set(gca,'Xticklabel',{'-90','0','90','180'})
-    xlabel('direction');
-    ylabel('F0 sp/sec')
-    
-    
-    data = [squeeze(mean(alignedOS(1,3,1,cc),4)) squeeze(mean(alignedOS(1,3,2,cc),4)); ...
-        squeeze(mean(alignedOS(1,3,1,driftsbc),4)) squeeze(mean(alignedOS(1,3,2,driftsbc),4)) ; ...
-        squeeze(mean(alignedOS(1,3,1,OS),4)) squeeze(mean(alignedOS(1,3,2,OS),4))]
-    
-    err = [squeeze(std(alignedOS(1,3,1,cc),[],4)) squeeze(std(alignedOS(1,3,2,cc),[],4)); ...
-        squeeze(std(alignedOS(1,3,1,driftsbc),[],4)) squeeze(std(alignedOS(1,3,2,driftsbc),[],4)) ; ...
-        squeeze(std(alignedOS(1,3,1,OS),[],4)) squeeze(std(alignedOS(1,3,2,OS),[],4))]
-    
-    err(1,:)=err(1,:)/sqrt(length(cc));
-    err(2,:)=err(2,:)/sqrt(length(driftsbc));
-    err(3,:)=err(3,:)/sqrt(length(OS));
-    err
-    
-    figure
-    plot(squeeze(alignedOS(1,3,1,cc)),squeeze(alignedOS(1,3,2,cc)),'o'); hold on
-    plot(squeeze(alignedOS(1,3,1,intersect(cc,find(goodunit)))),squeeze(alignedOS(1,3,2,intersect(cc,find(goodunit)))),'go');
-    axis equal;
-    plot([ 0 20],[0 20]);
-    
-    figure
-    plot(squeeze(alignedOS(1,3,1,OS)),squeeze(alignedOS(1,3,2,OS)),'o'); hold on
-    plot(squeeze(alignedOS(1,3,1,intersect(OS,find(goodunit)))),squeeze(alignedOS(1,3,2,intersect(OS,find(goodunit)))),'go');
-    axis equal;
-    plot([ 0 20],[0 20]);
-    
-    
-    
-    figure
-    barweb(data,err)
-    ylim([-8 8])
-    set(gca,'Xticklabel',{'cc','sbc','OS'})
-    ylabel('peak F0 sp/sec')
-    legend('stationary','moving')
-    set(gca,'Fontsize',16)
-    
-    
-    OS = find(cvOSIall(1,1,:)>0.25 | cvOSIall(1,2,:)>0.25);
-    
-    figure
-    plot(squeeze(orient_amp(1,1,:)),squeeze(orient_amp(1,2,:)),'ko')
-    axis equal;hold on;
-    xlabel('stop F0'); ylabel('move F0');
-    plot(squeeze(orient_amp(1,1,staUse)),squeeze(orient_amp(1,2,staUse)),'bo')
-    plot(squeeze(orient_amp(1,1,OS)),squeeze(orient_amp(1,2,OS)),'go')
-    plot(squeeze(orient_amp(1,1,sbc)),squeeze(orient_amp(1,2,sbc)),'ro')
-    legend({'all','sta_use','os','sbc'})
-    plot([0 20],[0 20],'g')
-    
-    cc= setdiff(staUse,OS);
-    cc=setdiff(cc,sbc);
-    
-    [median(orient_amp(1,1,cc)) median(orient_amp(1,2,cc))]
-    [median(orient_amp(1,1,OS)) median(orient_amp(1,2,OS))]
-    [median(orient_amp(1,1,sbc)) median(orient_amp(1,2,sbc))]
-    
-    [mean(orient_amp(1,1,cc)) mean(orient_amp(1,2,cc))]
-    [mean(orient_amp(1,1,OS)) mean(orient_amp(1,2,OS))]
-    [mean(orient_amp(1,1,sbc)) mean(orient_amp(1,2,sbc))]
-    
-    
-    keyboard
-    
-    figure
-    plot(wvform')
-    
-    
-    
-    figure
-    plot(xferSpont(:,1),xferSpont(:,2),'o')
-    axis([-5 40 -5 40])
-    axis square
-    hold on
-    plot([0 40],[0 40])
-    title('wn spont')
-    
-    figure
-    plot(dr_spont_mv(:,1,1),dr_spont_mv(:,2,1),'o')
-    axis([-5 40 -5 40])
-    axis square
-    hold on
-    plot([0 40],[0 40])
-    title('drift spont')
-    
-    figure
-    plot(dr_spont_mv(:,1,1),xferSpont(:,1),'o')
-    axis([-5 40 -5 40])
-    axis square
-    hold on
-    plot([0 40],[0 40])
-    xlabel('drift stop spont'); ylabel('wnstop spont')
-    
-    figure
-    plot(dr_spont_mv(:,2,1),xferSpont(:,2),'o')
-    axis([-5 40 -5 40])
-    axis square
-    hold on
-    plot([0 40],[0 40])
-    xlabel('drift mv spont'); ylabel('wn mv spont')
-    
-    
-    
-    
-    figure
-    plot(crfAll(:,1,1),crfAll(:,2,1),'o')
-    axis([0 40 0 40])
-    axis square
-    hold on
-    plot([0 40],[0 40])
-    
-    figure
-    plot(xferGain(:,1),xferGain(:,2),'o')
-    %axis([ 20 0 20])
-    axis square
-    hold on
-    plot([0 20],[0 20])
-    
-    sbcGain = xferAll(:,:,7)-xferAll(:,:,6);
-    figure
-    plot(sbcGain(:,1),sbcGain(:,2),'o')
-    %axis([ 20 0 20])
-    axis square
-    hold on
-    plot([0 20],[0 20])
-    plot([-5 20],[0 0]);
-    plot([0 0],[-5 20])
-    
-    sbc = find(sbcGain(:,2)<-2 | sbcGain(:,1)<-2);
-    %sbc = find(xferGain(:,2)<-1 | xferGain(:,1)<-1);
-    % for i = 1:length(sbc)
-    %     figure
-    %     subplot(1,2,1); hold on
-    %     plot(squeeze(xferAll(sbc(i),1,:)),'r')
-    %     plot(squeeze(xferAll(sbc(i),2,:)),'g')
-    %     xlim([1 11])
-    %
-    %     subplot(1,2,2);hold on
-    %     plot(squeeze(crfAll(sbc(i),1,1:10)),'r')
-    %     plot(squeeze(crfAll(sbc(i),2,1:10)),'g')
-    %     xlim([1 10])
-    % end
-    
-    
-    
-    
-    for c = 1:size(meanSTAall,1)
-        sta= squeeze(meanSTAall(c,:,:)); sta=sta(:);
-        [val ind] = max(abs(sta));
-        onoff(c)=sign(sta(ind));
+end
+figure
+hist(cvosi,0:0.05:1)
+sum(cvosi>0.2)/length(cvosi)
+F0OS = find(cvosi>0.2);
+figure
+plot(ev_osi(F0OS,:)')
+
+
+figure
+h=hist(F1F0,0:0.1:1); bar(0:0.1:1,h)
+hold on
+h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
+h=hist(F1F0(F0OS),0:0.1:1); bar(0:0.1:1,h,'g');
+xlabel('F1/F0'); xlim([-0.1 1.1]);
+
+% for i = 1:length(F0OS);
+%
+%     figure
+%     imagesc(squeeze(meanSTAall(F0OS(i),:,:)),[-0.1 0.1])
+%     axis equal
+%
+% end
+
+
+
+% for i = 1:length(F0OS)
+%     figure
+%     plot(squeeze(osi_all(F0OS(i),:,:)));
+%     hold on
+%     plot([1 8], [dr_spont(F0OS(i)) dr_spont(F0OS(i)) ])
+%     title(sprintf('osi = %0.2f f1f0 = %0.2f sta = %d',cvosi(F0OS(i)),F1F0(F0OS(i)),ismember(F0OS(i),staUse)))
+% end
+
+
+onoffOS = find(cvosi>0.2 & F1F0'<0.4);
+onoffOS = OS;
+% for i = 1:length(onoffOS);
+%     figure
+%     imagesc(squeeze(meanSTAall(onoffOS(i),:,:)),[-0.1 0.1])
+%     axis equal
+% end
+
+% for i = 1:length(onoffOS)
+%     figure
+%     hold on
+%     plot(squeeze(crfAll(onoffOS(i),1,1:10))','r')
+%     plot(squeeze(crfAll(onoffOS(i),2,1:10))','g')
+% end
+%
+
+
+
+for i = 1:5
+    nanmean(burst_fraction(staUse(tcGroup==i),:),1)
+end
+
+titleList = {'sustain','transient','sbc','DS/OS'};
+figure
+for i = 1:4
+    subplot(2,2,i)
+    if i ==1
+        d= squeeze(nanmean(xferAll(staUse(tcGroup==1 ),:,:),1));
+    elseif i==2
+        d= squeeze(nanmean(xferAll(staUse(tcGroup==2 ),:,:),1));
+    elseif i==3
+        d= squeeze(nanmean(xferAll(sbc,:,:),1));
+    elseif i==4
+        d= squeeze(nanmean(xferAll(OS ,:,:),1));
     end
-    
-    figure
-    plot(tcAll(staUse,:)')
-    
-    figure
-    hist(min(tcAll(staUse,6:9),[],2)-tcAll(staUse,1))
-    
-    [coeff score latent] = pca(tcAll(staUse,:));
-    figure
-    plot(score(:,1),score(:,2),'o')
-    
-    id = kmeans(score(:,1:2),2)
-    figure
-    plot(score(id==1,1),score(id==1,2),'ro');
+    d = d(:,6:10)
+    d = (d-min(d(:)))/(max(d(:)-min(d(:))));
+    plot(0:0.2:0.8,d(1,:),'r','Linewidth',2)
     hold on
-    plot(score(id==2,1),score(id==2,2),'go');
-    
-    tcGroup = zeros(size(score,1),1)
-    %tcGroup(score(:,1)>0 & score(:,2)>-0.5)=1;
-    tcGroup(score(:,1)>=score(:,2))=1;
-    %tcGroup(score(:,1)<0 & score(:,1)>-1.25)=2;
-    tcGroup(score(:,2)>score(:,1))=2;
-    tcGroup(score(:,1)<-1.25)=3;
-    tcGroup(score(:,1)>-0.5 & score(:,2)<-0.5)=4;
-    tcGroup(tcAll(staUse,8)>0.2)=5;
-    
-    col = 'rgbcm';
-    figure
-    hold on
-    for i = 1:5
-        plot(tcAll(staUse(tcGroup==i),:)',col(i));
+    plot(0:0.2:0.8,d(2,:),'b','Linewidth',2)
+    xlim([0 0.8]); ylim([0 1]);
+    title(titleList{i},'FontSize',16)
+    if i==1
+        xlabel('contrast','FontSize',12)
+        ylabel('norm response','Fontsize',12)
+        
+        legend('stationary','moving')
     end
-    figure
-    hist(tcGroup)
-    figure
-    hold on
-    for i = 1:5
-        plot(score(tcGroup==i,1),score(tcGroup==i,2),[col(i) 'o'])
+end
+
+
+figure
+plot(sbcGain(staUse(tcGroup==1),1),sbcGain(staUse(tcGroup==1),2),'go','LineWidth',2);
+hold on
+plot(sbcGain(staUse(tcGroup==2),1),sbcGain(staUse(tcGroup==2),2),'bo','LineWidth',2);
+plot(sbcGain(sbc,1),sbcGain(sbc,2),'ro','LineWidth',2);
+plot(sbcGain(OS,1),sbcGain(OS,2),'ko','LineWidth',2);
+axis square
+plot([-10 25],[-10 25])
+axis([-10 25 -10 25])
+xlabel('response gain stationary')
+ylabel('response gain moving')
+
+
+legend('sustained','transient','sbc','OS')
+
+
+data = [nanmedian(sbcGain(staUse(tcGroup==1),2)) nanmedian(sbcGain(staUse(tcGroup==1),1)); ...
+    nanmedian(sbcGain(staUse(tcGroup==2),2)) nanmedian(sbcGain(staUse(tcGroup==2),1)); ...
+    nanmedian(sbcGain(sbc,2)) nanmedian(sbcGain(sbc,1)) ; ...
+    nanmedian(sbcGain(OS,2)),nanmedian(sbcGain(OS,1))]
+
+%
+% data = [nanmean(sbcGain(staUse(tcGroup==1),2)) nanmean(sbcGain(staUse(tcGroup==1),1)); ...
+%     nanmean(sbcGain(staUse(tcGroup==2),2)) nanmean(sbcGain(staUse(tcGroup==2),1)); ...
+%     nanmean(sbcGain(sbc,2)) nanmean(sbcGain(sbc,1)) ; ...
+%     nanmean(sbcGain(onoffOS,2)),nanmean(sbcGain(onoffOS,1))]
+
+err = [nanstd(sbcGain(staUse(tcGroup==1),2))/7 nanstd(sbcGain(staUse(tcGroup==1),1))/7; ...
+    nanstd(sbcGain(staUse(tcGroup==2),2))/7 nanstd(sbcGain(staUse(tcGroup==2),1))/7; ...
+    nanstd(sbcGain(sbc,2))/4 nanstd(sbcGain(sbc,1))/4 ; ...
+    nanstd(sbcGain(OS,2))/4,nanstd(sbcGain(OS,1))/4]
+figure
+barweb(data(:,[2 1])*10,err(:,[2 1])*10)
+set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
+ylabel('median gain (sp/sec)')
+legend('stationary','moving')
+ylim([-40 60])
+
+
+
+figure
+plot(xferSpont(staUse(tcGroup==1),1),xferSpont(staUse(tcGroup==1),2),'go','LineWidth',2);
+hold on
+plot(xferSpont(staUse(tcGroup==2),1),xferSpont(staUse(tcGroup==2),2),'bo','LineWidth',2);
+plot(xferSpont(sbc,1),xferSpont(sbc,2),'ro','LineWidth',2);
+plot(xferSpont(onoffOS,1),xferSpont(onoffOS,2),'ko','LineWidth',2);
+axis square
+plot([0 30],[0 30])
+axis([0 30 0 30])
+
+legend('sustained','transient','sbc','OS')
+xlabel('spont stationary (sp/sec)');
+ylabel('spont moving (sp/sec)')
+
+data = [nanmedian(xferSpont(staUse(tcGroup==1),2)) nanmedian(xferSpont(staUse(tcGroup==1),1)); ...
+    nanmedian(xferSpont(staUse(tcGroup==2),2)) nanmedian(xferSpont(staUse(tcGroup==2),1)); ...
+    nanmedian(xferSpont(sbc,2)) nanmedian(xferSpont(sbc,1)) ; ...
+    nanmedian(xferSpont(onoffOS,2)),nanmedian(xferSpont(onoffOS,1))]
+
+%
+% data = [nanmean(xferSpont(staUse(tcGroup==1),2)) nanmean(xferSpont(staUse(tcGroup==1),1)); ...
+%     nanmean(xferSpont(staUse(tcGroup==2),2)) nanmean(xferSpont(staUse(tcGroup==2),1)); ...
+%     nanmean(xferSpont(sbc,2)) nanmean(xferSpont(sbc,1)) ; ...
+%     nanmean(xferSpont(onoffOS,2)),nanmean(xferSpont(onoffOS,1))]
+
+err = [nanstd(xferSpont(staUse(tcGroup==1),2))/7 nanstd(xferSpont(staUse(tcGroup==1),1))/7; ...
+    nanstd(xferSpont(staUse(tcGroup==2),2))/7 nanstd(xferSpont(staUse(tcGroup==2),1))/7; ...
+    nanstd(xferSpont(sbc,2))/4 nanstd(xferSpont(sbc,1))/4 ; ...
+    nanstd(xferSpont(onoffOS,2))/4,nanstd(xferSpont(onoffOS,1))/4]
+figure
+barweb(data(:,[2 1]),err(:,[2 1]))
+set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
+ylabel('median spont rate (sp/sec)')
+legend('stationary','moving')
+ylim([0 12])
+
+
+
+figure
+plot(burst_fraction(staUse(tcGroup==1),1),burst_fraction(staUse(tcGroup==1),2),'go','LineWidth',2);
+hold on
+plot(burst_fraction(staUse(tcGroup==2),1),burst_fraction(staUse(tcGroup==2),2),'bo','LineWidth',2);
+plot(burst_fraction(sbc,1),burst_fraction(sbc,2),'ro','LineWidth',2);
+plot(burst_fraction(onoffOS,1),burst_fraction(onoffOS,2),'ko','LineWidth',2);
+axis square
+plot([0 0.3],[0 0.3])
+axis([0 0.25 0 0.25])
+legend('sustained','transient','sbc','OS')
+xlabel('burst fraction stationary');
+ylabel('burst fraction moving')
+
+data = [nanmedian(burst_fraction(staUse(tcGroup==1),2)) nanmedian(burst_fraction(staUse(tcGroup==1),1)); ...
+    nanmedian(burst_fraction(staUse(tcGroup==2),2)) nanmedian(burst_fraction(staUse(tcGroup==2),1)); ...
+    nanmedian(burst_fraction(sbc,2)) nanmedian(burst_fraction(sbc,1)) ; ...
+    nanmedian(burst_fraction(onoffOS,2)),nanmedian(burst_fraction(onoffOS,1))]
+
+%
+% data = [nanmean(burst_fraction(staUse(tcGroup==1),2)) nanmean(burst_fraction(staUse(tcGroup==1),1)); ...
+%     nanmean(burst_fraction(staUse(tcGroup==2),2)) nanmean(burst_fraction(staUse(tcGroup==2),1)); ...
+%     nanmean(burst_fraction(sbc,2)) nanmean(burst_fraction(sbc,1)) ; ...
+%     nanmean(burst_fraction(onoffOS,2)),nanmean(burst_fraction(onoffOS,1))]
+
+err = [nanstd(burst_fraction(staUse(tcGroup==1),2))/7 nanstd(burst_fraction(staUse(tcGroup==1),1))/7; ...
+    nanstd(burst_fraction(staUse(tcGroup==2),2))/7 nanstd(burst_fraction(staUse(tcGroup==2),1))/7; ...
+    nanstd(burst_fraction(sbc,2))/6 nanstd(burst_fraction(sbc,1))/6 ; ...
+    nanstd(burst_fraction(onoffOS,2))/6,nanstd(burst_fraction(onoffOS,1))/6]
+
+
+figure
+barweb(data(:,2:-1:1),err(:,2:-1:1))
+set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
+ylabel('median burst fraction')
+legend('stationary','moving')
+ylim([0 0.08])
+
+figure
+hold on
+for i = 1:length(score)
+    if ~isnan(burst_fraction(staUse(i),1))
+        plot(score(i,1),score(i,2),'o','Color',cmapVar(burst_fraction(staUse(i),1),0,0.25))
     end
-    hold on
-    plot([-1 1],[-1 1])
-    
-    
-    
-    F1F0 = mean(osi_all(:,:,2),2)./(mean(osi_all(:,:,1),2) );
-    figure
-    h=hist(2*F1F0,0.1:0.2:2); bar(0.1:0.2:2,h/sum(h))
-    hold on
-    %h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
-    xlabel('F1/F0'); xlim([0 2]);
-    
-    ev_osi = squeeze(osi_all(:,:,1)) - repmat(dr_spont',[1 8]);
-    figure
-    plot(ev_osi');
-    
-    
-    figure
-    data =[length(cc) length(sbc) length(OS) ]/length(ev_osi)
-    err = [sqrt(length(cc)) sqrt(length(sbc)) sqrt(length(OS))]/length(ev_osi)
-    
-    bar(data); hold on
-    errorbar(1:3,data,err,'k.','Linewidth',2)
-    set(gca,'Xticklabel',{'cc','sbc','OS'})
-    ylabel('fraction')
-    set(gca,'Fontsize',16)
-    
-    evoked = mean(ev_osi,2);
-    for i = 1:length(ev_osi)
-        if max(ev_osi(i,:))>4
-            cvosi(i) = abs(calcCVosi(ev_osi(i,:)));
-        else
-            cvosi(i) = NaN;
-        end
+end
+
+figure
+hold on
+for i = 1:5
+    plot(crfAll(staUse(tcGroup==i),1,1),crfAll(staUse(tcGroup==i),2,1),[col(i) 'o'])
+end
+axis([0 40 0 40])
+axis square
+hold on
+plot([0 40],[0 40])
+
+
+transience =tcAll(:,7);
+
+
+
+figure
+hold on
+for i = 1:5
+    plot(xferGain(staUse(tcGroup==i),1),xferGain(staUse(tcGroup==i),2),[col(i) 'o'])
+end
+axis([-10 20 -10 20])
+axis square
+hold on
+plot([0 20],[0 20])
+xlabel('xfer gain')
+
+figure
+hold on
+for i = 1:5
+    plot(sbcGain(staUse(tcGroup==i),1),sbcGain(staUse(tcGroup==i),2),[col(i) 'o'])
+end
+axis([-10 20 -10 20])
+axis square
+hold on
+plot([0 20],[0 20])
+xlabel('sbc gain')
+
+
+figure
+hold on
+for i = 1:length(score)
+    if ~isnan(sustain(staUse(i)))
+        plot(score(i,1),score(i,2),'o','Color',cmapVar(sustain(staUse(i)),0,1))
     end
-    figure
-    hist(cvosi,0:0.05:1)
-    sum(cvosi>0.2)/length(cvosi)
-    F0OS = find(cvosi>0.2);
-    figure
-    plot(ev_osi(F0OS,:)')
-    
-    
-    figure
-    h=hist(F1F0,0:0.1:1); bar(0:0.1:1,h)
-    hold on
-    h=hist(F1F0(staUse),0:0.1:1); bar(0:0.1:1,h,'r');
-    h=hist(F1F0(F0OS),0:0.1:1); bar(0:0.1:1,h,'g');
-    xlabel('F1/F0'); xlim([-0.1 1.1]);
-    
-    % for i = 1:length(F0OS);
-    %
-    %     figure
-    %     imagesc(squeeze(meanSTAall(F0OS(i),:,:)),[-0.1 0.1])
-    %     axis equal
-    %
-    % end
-    
-    
-    
-    % for i = 1:length(F0OS)
-    %     figure
-    %     plot(squeeze(osi_all(F0OS(i),:,:)));
-    %     hold on
-    %     plot([1 8], [dr_spont(F0OS(i)) dr_spont(F0OS(i)) ])
-    %     title(sprintf('osi = %0.2f f1f0 = %0.2f sta = %d',cvosi(F0OS(i)),F1F0(F0OS(i)),ismember(F0OS(i),staUse)))
-    % end
-    
-    
-    onoffOS = find(cvosi>0.2 & F1F0'<0.4);
-    onoffOS = OS;
-    % for i = 1:length(onoffOS);
-    %     figure
-    %     imagesc(squeeze(meanSTAall(onoffOS(i),:,:)),[-0.1 0.1])
-    %     axis equal
-    % end
-    
-    % for i = 1:length(onoffOS)
-    %     figure
-    %     hold on
-    %     plot(squeeze(crfAll(onoffOS(i),1,1:10))','r')
-    %     plot(squeeze(crfAll(onoffOS(i),2,1:10))','g')
-    % end
-    %
-    
-    
-    
-    for i = 1:5
-        nanmean(burst_fraction(staUse(tcGroup==i),:),1)
+end
+
+
+figure
+hold on
+for i = 1:length(score)
+    if ~isnan(sustain(staUse(i)))
+        plot(sbcGain(staUse(i),1),sbcGain(staUse(i),2),'o','Color',cmapVar(transience(staUse(i)),-1,1))
     end
-    
-    titleList = {'sustain','transient','sbc','DS/OS'};
-    figure
-    for i = 1:4
-        subplot(2,2,i)
-        if i ==1
-            d= squeeze(nanmean(xferAll(staUse(tcGroup==1 ),:,:),1));
-        elseif i==2
-            d= squeeze(nanmean(xferAll(staUse(tcGroup==2 ),:,:),1));
-        elseif i==3
-            d= squeeze(nanmean(xferAll(sbc,:,:),1));
-        elseif i==4
-            d= squeeze(nanmean(xferAll(OS ,:,:),1));
-        end
-        d = d(:,6:10)
-        d = (d-min(d(:)))/(max(d(:)-min(d(:))));
-        plot(0:0.2:0.8,d(1,:),'r','Linewidth',2)
-        hold on
-        plot(0:0.2:0.8,d(2,:),'b','Linewidth',2)
-        xlim([0 0.8]); ylim([0 1]);
-        title(titleList{i},'FontSize',16)
-        if i==1
-            xlabel('contrast','FontSize',12)
-            ylabel('norm response','Fontsize',12)
-            
-            legend('stationary','moving')
-        end
+end
+plot([0 20],[0 20])
+
+figure
+plot(transience(staUse),sbcGain(staUse,2)-sbcGain(staUse,1),'o')
+
+figure
+hold on
+for i = 1:length(score)
+    if ~isnan(sustain(staUse(i)))
+        plot(tcAll(staUse(i),:),'Color',cmapVar(sustain(staUse(i)),0,1))
     end
-    
-    
-    figure
-    plot(sbcGain(staUse(tcGroup==1),1),sbcGain(staUse(tcGroup==1),2),'go','LineWidth',2);
-    hold on
-    plot(sbcGain(staUse(tcGroup==2),1),sbcGain(staUse(tcGroup==2),2),'bo','LineWidth',2);
-    plot(sbcGain(sbc,1),sbcGain(sbc,2),'ro','LineWidth',2);
-    plot(sbcGain(OS,1),sbcGain(OS,2),'ko','LineWidth',2);
-    axis square
-    plot([-10 25],[-10 25])
-    axis([-10 25 -10 25])
-    xlabel('response gain stationary')
-    ylabel('response gain moving')
-    
-    
-    legend('sustained','transient','sbc','OS')
-    
-    
-    data = [nanmedian(sbcGain(staUse(tcGroup==1),2)) nanmedian(sbcGain(staUse(tcGroup==1),1)); ...
-        nanmedian(sbcGain(staUse(tcGroup==2),2)) nanmedian(sbcGain(staUse(tcGroup==2),1)); ...
-        nanmedian(sbcGain(sbc,2)) nanmedian(sbcGain(sbc,1)) ; ...
-        nanmedian(sbcGain(OS,2)),nanmedian(sbcGain(OS,1))]
-    
-    %
-    % data = [nanmean(sbcGain(staUse(tcGroup==1),2)) nanmean(sbcGain(staUse(tcGroup==1),1)); ...
-    %     nanmean(sbcGain(staUse(tcGroup==2),2)) nanmean(sbcGain(staUse(tcGroup==2),1)); ...
-    %     nanmean(sbcGain(sbc,2)) nanmean(sbcGain(sbc,1)) ; ...
-    %     nanmean(sbcGain(onoffOS,2)),nanmean(sbcGain(onoffOS,1))]
-    
-    err = [nanstd(sbcGain(staUse(tcGroup==1),2))/7 nanstd(sbcGain(staUse(tcGroup==1),1))/7; ...
-        nanstd(sbcGain(staUse(tcGroup==2),2))/7 nanstd(sbcGain(staUse(tcGroup==2),1))/7; ...
-        nanstd(sbcGain(sbc,2))/4 nanstd(sbcGain(sbc,1))/4 ; ...
-        nanstd(sbcGain(OS,2))/4,nanstd(sbcGain(OS,1))/4]
-    figure
-    barweb(data(:,[2 1])*10,err(:,[2 1])*10)
-    set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
-    ylabel('median gain (sp/sec)')
-    legend('stationary','moving')
-    ylim([-40 60])
-    
-    
-    
-    figure
-    plot(xferSpont(staUse(tcGroup==1),1),xferSpont(staUse(tcGroup==1),2),'go','LineWidth',2);
-    hold on
-    plot(xferSpont(staUse(tcGroup==2),1),xferSpont(staUse(tcGroup==2),2),'bo','LineWidth',2);
-    plot(xferSpont(sbc,1),xferSpont(sbc,2),'ro','LineWidth',2);
-    plot(xferSpont(onoffOS,1),xferSpont(onoffOS,2),'ko','LineWidth',2);
-    axis square
-    plot([0 30],[0 30])
-    axis([0 30 0 30])
-    
-    legend('sustained','transient','sbc','OS')
-    xlabel('spont stationary (sp/sec)');
-    ylabel('spont moving (sp/sec)')
-    
-    data = [nanmedian(xferSpont(staUse(tcGroup==1),2)) nanmedian(xferSpont(staUse(tcGroup==1),1)); ...
-        nanmedian(xferSpont(staUse(tcGroup==2),2)) nanmedian(xferSpont(staUse(tcGroup==2),1)); ...
-        nanmedian(xferSpont(sbc,2)) nanmedian(xferSpont(sbc,1)) ; ...
-        nanmedian(xferSpont(onoffOS,2)),nanmedian(xferSpont(onoffOS,1))]
-    
-    %
-    % data = [nanmean(xferSpont(staUse(tcGroup==1),2)) nanmean(xferSpont(staUse(tcGroup==1),1)); ...
-    %     nanmean(xferSpont(staUse(tcGroup==2),2)) nanmean(xferSpont(staUse(tcGroup==2),1)); ...
-    %     nanmean(xferSpont(sbc,2)) nanmean(xferSpont(sbc,1)) ; ...
-    %     nanmean(xferSpont(onoffOS,2)),nanmean(xferSpont(onoffOS,1))]
-    
-    err = [nanstd(xferSpont(staUse(tcGroup==1),2))/7 nanstd(xferSpont(staUse(tcGroup==1),1))/7; ...
-        nanstd(xferSpont(staUse(tcGroup==2),2))/7 nanstd(xferSpont(staUse(tcGroup==2),1))/7; ...
-        nanstd(xferSpont(sbc,2))/4 nanstd(xferSpont(sbc,1))/4 ; ...
-        nanstd(xferSpont(onoffOS,2))/4,nanstd(xferSpont(onoffOS,1))/4]
-    figure
-    barweb(data(:,[2 1]),err(:,[2 1]))
-    set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
-    ylabel('median spont rate (sp/sec)')
-    legend('stationary','moving')
-    ylim([0 12])
-    
-    
-    
-    figure
-    plot(burst_fraction(staUse(tcGroup==1),1),burst_fraction(staUse(tcGroup==1),2),'go','LineWidth',2);
-    hold on
-    plot(burst_fraction(staUse(tcGroup==2),1),burst_fraction(staUse(tcGroup==2),2),'bo','LineWidth',2);
-    plot(burst_fraction(sbc,1),burst_fraction(sbc,2),'ro','LineWidth',2);
-    plot(burst_fraction(onoffOS,1),burst_fraction(onoffOS,2),'ko','LineWidth',2);
-    axis square
-    plot([0 0.3],[0 0.3])
-    axis([0 0.25 0 0.25])
-    legend('sustained','transient','sbc','OS')
-    xlabel('burst fraction stationary');
-    ylabel('burst fraction moving')
-    
-    data = [nanmedian(burst_fraction(staUse(tcGroup==1),2)) nanmedian(burst_fraction(staUse(tcGroup==1),1)); ...
-        nanmedian(burst_fraction(staUse(tcGroup==2),2)) nanmedian(burst_fraction(staUse(tcGroup==2),1)); ...
-        nanmedian(burst_fraction(sbc,2)) nanmedian(burst_fraction(sbc,1)) ; ...
-        nanmedian(burst_fraction(onoffOS,2)),nanmedian(burst_fraction(onoffOS,1))]
-    
-    %
-    % data = [nanmean(burst_fraction(staUse(tcGroup==1),2)) nanmean(burst_fraction(staUse(tcGroup==1),1)); ...
-    %     nanmean(burst_fraction(staUse(tcGroup==2),2)) nanmean(burst_fraction(staUse(tcGroup==2),1)); ...
-    %     nanmean(burst_fraction(sbc,2)) nanmean(burst_fraction(sbc,1)) ; ...
-    %     nanmean(burst_fraction(onoffOS,2)),nanmean(burst_fraction(onoffOS,1))]
-    
-    err = [nanstd(burst_fraction(staUse(tcGroup==1),2))/7 nanstd(burst_fraction(staUse(tcGroup==1),1))/7; ...
-        nanstd(burst_fraction(staUse(tcGroup==2),2))/7 nanstd(burst_fraction(staUse(tcGroup==2),1))/7; ...
-        nanstd(burst_fraction(sbc,2))/6 nanstd(burst_fraction(sbc,1))/6 ; ...
-        nanstd(burst_fraction(onoffOS,2))/6,nanstd(burst_fraction(onoffOS,1))/6]
-    
-    
-    figure
-    barweb(data(:,2:-1:1),err(:,2:-1:1))
-    set(gca,'xticklabel',{'sustain','transient','sbc','OS'})
-    ylabel('median burst fraction')
-    legend('stationary','moving')
-    ylim([0 0.08])
-    
-    figure
-    hold on
-    for i = 1:length(score)
-        if ~isnan(burst_fraction(staUse(i),1))
-            plot(score(i,1),score(i,2),'o','Color',cmapVar(burst_fraction(staUse(i),1),0,0.25))
-        end
+end
+
+figure
+hold on
+for i = 1:length(score)
+    if ~isnan(onoff(staUse(i)))
+        plot(tcAll(staUse(i),:),'Color',cmapVar(onoff(staUse(i)),-1.1,1))
     end
-    
+end
+
+figure
+hold on
+for i = 1:5
+    plot(xferGain(staUse(tcGroup==i),1),xferGain(staUse(tcGroup==i),2),[col(i) 'o'])
+end
+axis([-10 20 -10 20])
+axis square
+hold on
+plot([0 20],[0 20])
+
+
+obs = reshape(spikebinsAll(:,:,3:end,3:end),[size(spikebinsAll,1)*2 15*15]);
+obs(isnan(obs))=0;
+figure
+for i = 1:2
+    subplot(1,2,i);
+    imagesc(squeeze(nanmean(spikebinsAll(:,i,:,:),1)));axis equal; axis off
+end
+
+[u s v] = svd(obs);
+figure
+
+for i = 1:6
     figure
-    hold on
-    for i = 1:5
-        plot(crfAll(staUse(tcGroup==i),1,1),crfAll(staUse(tcGroup==i),2,1),[col(i) 'o'])
+    if mean(u(:,i))<0
+        u(:,i)=-u(:,i);
+        v(:,i)=-v(:,i)
     end
-    axis([0 40 0 40])
-    axis square
+    plot(u(1:204,i),u(205:end,i),'o')
+    axis equal;hold on; plot([-0.1 0.1],[-0.1 0.1])
+    title(sprintf('%d',i))
     hold on
-    plot([0 40],[0 40])
-    
-    
-    transience =tcAll(:,7);
-    
-    
-    
-    figure
-    hold on
-    for i = 1:5
-        plot(xferGain(staUse(tcGroup==i),1),xferGain(staUse(tcGroup==i),2),[col(i) 'o'])
-    end
-    axis([-10 20 -10 20])
-    axis square
-    hold on
-    plot([0 20],[0 20])
-    xlabel('xfer gain')
-    
-    figure
-    hold on
-    for i = 1:5
-        plot(sbcGain(staUse(tcGroup==i),1),sbcGain(staUse(tcGroup==i),2),[col(i) 'o'])
-    end
-    axis([-10 20 -10 20])
-    axis square
-    hold on
-    plot([0 20],[0 20])
-    xlabel('sbc gain')
-    
-    
-    figure
-    hold on
-    for i = 1:length(score)
-        if ~isnan(sustain(staUse(i)))
-            plot(score(i,1),score(i,2),'o','Color',cmapVar(sustain(staUse(i)),0,1))
-        end
-    end
-    
-    
-    figure
-    hold on
-    for i = 1:length(score)
-        if ~isnan(sustain(staUse(i)))
-            plot(sbcGain(staUse(i),1),sbcGain(staUse(i),2),'o','Color',cmapVar(transience(staUse(i)),-1,1))
-        end
-    end
-    plot([0 20],[0 20])
-    
-    figure
-    plot(transience(staUse),sbcGain(staUse,2)-sbcGain(staUse,1),'o')
-    
-    figure
-    hold on
-    for i = 1:length(score)
-        if ~isnan(sustain(staUse(i)))
-            plot(tcAll(staUse(i),:),'Color',cmapVar(sustain(staUse(i)),0,1))
-        end
-    end
-    
-    figure
-    hold on
-    for i = 1:length(score)
-        if ~isnan(onoff(staUse(i)))
-            plot(tcAll(staUse(i),:),'Color',cmapVar(onoff(staUse(i)),-1.1,1))
-        end
-    end
-    
-    figure
-    hold on
-    for i = 1:5
-        plot(xferGain(staUse(tcGroup==i),1),xferGain(staUse(tcGroup==i),2),[col(i) 'o'])
-    end
-    axis([-10 20 -10 20])
-    axis square
-    hold on
-    plot([0 20],[0 20])
-    
-    
-    obs = reshape(spikebinsAll(:,:,3:end,3:end),[size(spikebinsAll,1)*2 15*15]);
-    obs(isnan(obs))=0;
-    figure
-    for i = 1:2
-        subplot(1,2,i);
-        imagesc(squeeze(nanmean(spikebinsAll(:,i,:,:),1)));axis equal; axis off
-    end
-    
-    [u s v] = svd(obs);
-    figure
-    
-    for i = 1:6
-        figure
-        if mean(u(:,i))<0
-            u(:,i)=-u(:,i);
-            v(:,i)=-v(:,i)
-        end
-        plot(u(1:204,i),u(205:end,i),'o')
-        axis equal;hold on; plot([-0.1 0.1],[-0.1 0.1])
-        title(sprintf('%d',i))
-        hold on
-        plot(u(staUse,i),u(staUse+204,i),'go')
-        plot(u(sbc,i),u(sbc+204,i),'ro')
-        plot(u(onoffOS,i),u(onoffOS+204,i),'ko')
-    end
-    
-    figure
-    for i = 1:9
-        subplot(3,3,i);
-        imagesc(reshape(v(:,i),[15 15]),[-0.5 0.5])
-    end
-    
-    figure
-    plot(diag(s(1:10,1:10)))
-    
-    %%% find sbc
-    %%% find OS/DS
-    %%% find sust/transient
-    
-    %%% look at change in gain, spont
-    %%% look at burst pattern
-    %%% look at lfp?
+    plot(u(staUse,i),u(staUse+204,i),'go')
+    plot(u(sbc,i),u(sbc+204,i),'ro')
+    plot(u(onoffOS,i),u(onoffOS+204,i),'ko')
+end
+
+figure
+for i = 1:9
+    subplot(3,3,i);
+    imagesc(reshape(v(:,i),[15 15]),[-0.5 0.5])
+end
+
+figure
+plot(diag(s(1:10,1:10)))
+
+%%% find sbc
+%%% find OS/DS
+%%% find sust/transient
+
+%%% look at change in gain, spont
+%%% look at burst pattern
+%%% look at lfp?

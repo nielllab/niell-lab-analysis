@@ -47,8 +47,8 @@ for ch = 1:nChan;
     df = median(diff(tdtData.spectF{ch}));
     dt = median(diff(tdtData.spectT{ch}));
     set(gca,'YTick',(10:10:80)/df);
-    set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'}); 
-    xlabel 'time (s)' ; ylabel 'Frequency (Hz)';
+    set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'});set(gca,'fontsize',20); 
+    xlabel 'time (ms)' ; ylabel 'Frequency (Hz)';
     
     if movement
         hold on
@@ -79,14 +79,18 @@ for ch = 1:nChan;
     moving = find(v_interp>0.35  & Smean<(5*median(Smean)));
     
     figure
-    plot(mean(lfpnorm(stationary,:),1));
+    plot(mean(lfpnorm(stationary,:),1),'LineWidth',4);
     hold on
-    plot(mean(lfpnorm(moving,:),1),'g');
+   % plot(mean(lfpnorm(moving,:),1),'g');
     axis([0 70/df 0 1.2*max(mean(lfpnorm(moving,:)))]);
     set(gca,'XTick',(10:10:80)/df); 
     set(gca,'XTickLabel',{'10','20','30','40','50','60','70','80'});
+    ylim([0 7500])
+    set(gca,'fontsize',20)
     xlabel 'Frequency (Hz)';
+    
     title(sprintf('channel = %d',ch));
+    
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
