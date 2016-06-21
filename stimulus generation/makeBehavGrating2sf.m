@@ -1,20 +1,20 @@
 clear all
 close all
 
-duration = 1;
+duration = 2;
 framerate = 60;
 isi = 1;
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
 sfrange = [ 0.057 0.114];
-sfrange = 0.1067;
+sfrange = [0.1067 0.2134];
 tfrange =[ 0 ];
 %phaserange = [0 0 0 0 0];
 phaserange = linspace(0, 2*pi,21);
 phaserange=phaserange(1:20);
 
-ntheta =4;
-nx = 3; ny =1;
+ntheta =2;
+nx = 2; ny =1;
 sigma=0.015;
 randomOrder=1;
 randomTheta=0;
@@ -61,7 +61,7 @@ sfrange = sfrange*degperpix;
 
 blockwidth = 100*5/7;
 
-xposrange = [0.33 0.5 0.66]*xsz - blockwidth/2
+xposrange = [0.33  0.66]*xsz - blockwidth/2
 ypos = linspace(1,ysz-1,ny+1);
 yposrange = ypos(1:end-1);
 yposrange = 0.5*ysz - blockwidth/2;
@@ -135,7 +135,7 @@ moviedata = moviedata(1:xsz,1:ysz,:);
 % imshow(moviedata(:,:,i));
 % drawnow
 % end
-save behavStim3x8min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny sigma
+save behavStim2sf8min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny sigma
 size(moviedata)
 length(moviedata)/(60)
 figure
