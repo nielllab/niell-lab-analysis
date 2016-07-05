@@ -24,7 +24,7 @@ if SU
         [fname, pname] = uigetfile('*.mat','cluster data');
         clustfile=fullfile(pname,fname);
     end
-    load(clustfile);
+    load(clustfile,'Block_Name','frameEpocs');
     if ~useArgin
         blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');
         
@@ -219,6 +219,8 @@ else
     cell_range=1:4:nchan
 end
 %cell_range=5;
+
+cell_range= [ 5 6 14 15]
 
 for cell_n = cell_range
     tic
@@ -1053,6 +1055,8 @@ for cell_n = cell_range
      fl(cell_n).rf = rf;
      fl(cell_n).resps = resps; %%% timecourse averaged over sizes
      fl(cell_n).flash_resp = flash_resp;  %%% mean response for on/off and size
+     fl(cell_n).pix_resp = pix_trace;
+     fl(cell_n).pix_baseline = pix_baseline;
    else
      fl(cell_n).sustainBias=NaN;
      fl(cell_n).onoffbias = NaN;
@@ -1093,7 +1097,7 @@ for cell_n = cell_range
         
     end
 
-close all
+%close all
 %         OnOffFlash
 end  %%%cell
 
@@ -1129,8 +1133,6 @@ elseif movietype==mv_noise
     mv(cell_n).degperpix=degperpix;
     save(afile,'mv','-append')
 end
-
-
 
 
 

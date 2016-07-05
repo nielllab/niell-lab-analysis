@@ -30,28 +30,43 @@ for xi=1:nx
 end
 clear onset err base
 
-%%% get on/off responses, with baseline subtracted off
-stimbins = onset_bins>=0.3 & onset_bins<=0.6;
+
+%%% show all traces
+
+stimbins = onset_bins>=0.2 & onset_bins<=0.7;
+
+%%% get min/max
+clear resps
 for rep = 1:2
     resps(:,:,rep,:) = squeeze(mean(onset_hist(:,:,rep,2:5,stimbins),4))-baseline_hist(:,:,stimbins);
 end
 
 
-%%% show all traces
 sfactor=8;
 rf_fig = figure;
-% for x = 1:nx/sfactor
-%     for y = 1:ny/sfactor
-%         xi= x*sfactor; yi = y*sfactor;
-%         subplot(nx/sfactor,ny/sfactor,(x-1)*ny/sfactor + y)
-%         plot(squeeze(mean(onset_hist(xi,yi,1,1:4,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)));
-%         hold on
-%         plot(squeeze(mean(onset_hist(xi,yi,2,1:4,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)),'r');
-%         ylim([min(resps(:)) max(resps(:))])
-%         axis off
-%         set(gca,'LooseInset',get(gca,'TightInset'));
-%     end
-% end
+for x = 1:nx/sfactor
+    for y = 1:ny/sfactor
+        xi= x*sfactor; yi = y*sfactor;
+        subplot(nx/sfactor,ny/sfactor,(x-1)*ny/sfactor + y)
+        plot(squeeze(mean(onset_hist(xi,yi,1,2:5,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)));
+        hold on
+        plot(squeeze(mean(onset_hist(xi,yi,2,2:5,stimbins),4))-squeeze(baseline_hist(xi,yi,stimbins)),'r');
+        ylim([min(resps(:)) max(resps(:))]); xlim([1 sum(stimbins)])
+        axis off
+        set(gca,'LooseInset',get(gca,'TightInset'));
+    end
+end
+
+pix_trace = squeeze(mean(onset_hist(:,:,:,2:5,stimbins),4));
+pix_baseline = baseline_hist(:,:,stimbins);
+
+%%% get on/off responses, with baseline subtracted off
+stimbins = onset_bins>=0.3 & onset_bins<=0.55;
+clear resps
+for rep = 1:2
+    resps(:,:,rep,:) = squeeze(mean(onset_hist(:,:,rep,2:5,stimbins),4))-baseline_hist(:,:,stimbins);
+end
+
 
 datafig=figure;
 
@@ -121,7 +136,7 @@ amp = rfzAbs/10; amp(amp>1)=1; amp(amp<0.5)=0.;
 amp = repmat(amp,[1 1 3]);
 rfpos = rf; rfpos(rf<0.001)=0.001;
 onoffbias = (rfpos(:,:,2)-rfpos(:,:,1))./(rfpos(:,:,1)+rfpos(:,:,2));
-onoffIm = mat2im(onoffbias,cmap,[-1.5 1.5]);
+onoffIm = mat2im(onoffbias,cmap,[-1 1]);
 
 subplot(1,2,1)
 imshow(imresize(onoffIm .*amp,10));
@@ -129,11 +144,11 @@ title('on off')
 
 %%% get sustain ratio over space 
 
-sustain = mean(resps(:,:,:,2:end),4)./max(resps(:,:,:,2:end),[],4);
+sustain = mean(resps(:,:,:,1:end),4)./max(resps(:,:,:,1:end),[],4);
 sustain(:,:,1)=medfilt2(sustain(:,:,1)); sustain(:,:,2)=medfilt2(sustain(:,:,2)); 
 sustain = (rfpos(:,:,1).*sustain(:,:,1) + rfpos(:,:,2).*sustain(:,:,2) )./(rfpos(:,:,1) + rfpos(:,:,2));
-% sustainIm = mat2im(sustain,cmap,[0 1]);
-% 
-% subplot(1,2,2)
-% imshow(imresize(sustainIm.*amp,10));
-% title('sustain')
+sustainIm = mat2im(sustain,cmap,[0 1]);
+
+subplot(1,2,2)
+imshow(imresize(sustainIm.*amp,10));
+title('sustain')
