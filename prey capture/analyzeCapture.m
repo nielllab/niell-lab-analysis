@@ -1,4 +1,4 @@
-function [xc vxc h r] = analyzeCapture(fname)
+function [h_d targ body r thetaR thetaSac vhead vbody abody vtarg atarg head sub] = analyzeCapture(fname,fps,scale,sub)
 if isempty(fname)
 [f p] = uigetfile('*.*','behav data');
 fname = fullfile(p,f);
@@ -9,14 +9,14 @@ catch
     data =dlmread(fname);
 end
 
-missing = isnan(mean(data,2));
-data = data(~missing,:);
+ missing = isnan(mean(data(:,7),2));
+ data = data(~missing,:);
+ data=data(4:end,:);%excludes boundry coordinates and column label
 
 figure
 
-%%% read in points
+% read in points
 body = data(:,5:6);
-%body(245:246,1)=350; body(245:246,2)=530; %%%% fill in Nans
 pt1 = data(:,3:4);%left ear coordinates
 pt2 = data(:,1:2);%right ear
 targ = data(:,7:8);
@@ -30,54 +30,107 @@ head = 0.5*(pt1+pt2);
 % targ=targ(1:final,:);
 % end
 
-%%% plot head and target trajectories
+% plot head and target trajectories
 subplot(2,3,1)
 plot(head(:,1),head(:,2));
 hold on
-plot(targ(:,1),targ(:,2),'g')
+plot(targ(:,1),targ(:,2),'g');
 axis([ 0 2000 0 1200])
+title (sub)
 
-
-%%% distance between head and target
+% distance between head and target
 r = sqrt((head(:,1) - targ(:,1)).^2 + (head(:,2) - targ(:,2)).^2);
+r=r./scale;
 subplot(2,3,2)
-plot((1:length(r))/60,r); ylabel('distance to target')
-xlim([1 length(r)]/60); ylim([0 2000])
+plot((1:length(r))/fps,r); ylabel('distance to target (cm)');
+xlim([1 length(r)]/fps); ylim([0 80]);hold on
+% plot((1:length(isTouch))/fps,isTouch*10,'r')
 
-%%%% mouse speed
-vbody = diff(body); vbody = sqrt(vbody(:,1).^2 + vbody(:,2).^2);
-vbody = conv(vbody,ones(1,10),'same');
+%% mouse and target speed
+
+
+%% mouse velocity
+vbody = diff(body); vbody = sqrt(vbody(:,1).^2 + vbody(:,2).^2);%distance/60hz
+abody= diff(vbody);
+vbody = conv(vbody,ones(1,12),'same'); %filters/smoothes the velocity data
+vscale=vbody/5 % to put on scale more comparable to acceleration
+abody = conv(abody,ones(1,12),'same');
+
+%  figure
+%  plot(vbody); ylabel('body speed');hold on
+%  plot(vscale,'g');hold on
+%  plot(abody,'r');hold on
+
+ %% prey speed
+ 
+vtarg = diff(targ); vtarg = sqrt(vtarg(:,1).^2 + vtarg(:,2).^2);
+atarg= diff(vtarg);
+vtarg = conv(vtarg,ones(1,12),'same'); %filters the velcity data
+vscaleT=vtarg/5
+atarg= conv(atarg,ones(1,12),'same');
+ascale=atarg/2
+
 % figure
-% plot(vbody); ylabel('body speed')
+%  plot(ascale,'r');hold on
+%  plot(abody,'g');hold on
 
-%%% get angles
+%%acceleration correlation
+% [axc lags] = xcorr(abody,atarg,'coeff');
+% %vxc = conv(vxc,ones(1,100),'same')/100;
+% axc = axc(lags>=-300 & lags<=300);
+% lags = lags(lags>=-300 & lags<=300);
+% subplot(2,3,4)
+% plot(lags/fps,axc,'Linewidth',2);
+% xlabel('secs')
+% ylabel('acceleration body corr'); %legend('head vs targ angular vel')
+% axis([ -2 2 -0.25 0.5 ]); hold on; plot([0 0],[-0.25 0.5],'r:')
+ 
+%% get angles
 headvec = pt2-pt1;
-headtheta = getSmoothAngle(headvec)-pi/2;
+headtheta = getSmoothAngle(headvec)-pi/2;%head angle relative to coordinate system
 
 targvec = targ-head;
-targtheta = getSmoothAngle(targvec);
+targtheta = getSmoothAngle(targvec); %target angle relative to coordinate system
 
 neckvec = head-body;
 necktheta = getSmoothAngle(neckvec);
-headtheta = necktheta;
 
-% plot((necktheta-headtheta)*180/pi)
-% ylabel('head angle wrt body'); ylim([-45 45])
+saccadetheta=necktheta-headtheta;
+Rtheta=headtheta-targtheta;
 
+%% head angle and target position
+% subplot(2,3,3)
+% plot((1:length(headtheta))/fps,mod(headtheta*180/pi,360)); hold on; plot((1:length(headtheta))/fps,mod(targtheta*180/pi,360),'g');
+% legend('head','targ'); ylabel('theta'); xlabel('time');
+% xlim([1 length(headtheta)]/fps)
 
-%%% head angle and target position
-subplot(2,3,3)
-plot((1:length(headtheta))/60,mod(headtheta*180/pi,360)); hold on; plot((1:length(headtheta))/60,mod(targtheta*180/pi,360),'g');
-legend('head','targ'); ylabel('theta'); xlabel('time');
-xlim([1 length(headtheta)]/60)
+thetaH=mod(headtheta*180/pi,360);
+thetaT=mod(targtheta*180/pi,360);
+thetaR=mod(Rtheta*180/pi,360);
+thetaSac= mod(saccadetheta*180/pi,360);
 
-% %%% angle between head and target
-% figure
-%  plot((headtheta-targtheta)*180/pi,'k','Linewidth',2); hold on
-%  plot([1 length(targtheta)],[0 0 ],'r');
-% ylabel('head wrt target')
+%% head angle and change in distance
+thetaR_sym=mod(thetaR-180,360);
+thetaSac_sym=mod(thetaSac-180,360);
 
-% %%% calculate correlation between head angle and target location
+subplot(2,3,3);
+%figure
+binr=0:5:50;
+bint=0:10:360;
+hrt=hist2(r,thetaR_sym,binr,bint);
+hrt= hrt/sum(hrt(:));
+imagesc(flipud(hrt));
+title 'ThetaTarget'
+
+subplot(2,3,4);
+binr=0:5:50;
+bint=0:10:360;
+hrt=hist2(r,thetaSac_sym,binr,bint);
+hrt= hrt/sum(hrt(:));
+imagesc(flipud(hrt));
+title 'head saccade/thetaBody'
+
+%% calculate correlation between head angle and target location
 % opt = 'unbiased';
 % [xc lags] = xcorr(headtheta(r>200),targtheta(r>200),opt); t0= find(lags==0);
 % cc = corrcoef(headtheta(r>200),targtheta(r>200));
@@ -96,68 +149,77 @@ xlim([1 length(headtheta)]/60)
 % targxc = targxc(lags>=-100 & lags<=100);
 % xc = xc(lags>=-100 & lags<=100);
 
-lags = -300:300;
-subplot(2,3,4); hold off
-xc=lagCircRMS(headtheta,targtheta,lags);
-plot(lags/60,xc,'k');
-hold on
-plot(lags/60,lagCircRMS(headtheta,headtheta,lags),'b')
-plot(lags/60,lagCircRMS(targtheta,targtheta,lags),'g')
-axis([lags(1)/60 lags(end)/60 -1 1]); plot([0 0], [-1 1],'r:');
-ylabel('angle corr')
+%% if I want to plot head angle correlations between prey and mouse
+% lags = -300:300;
+% subplot(2,3,4); hold off
+% xc=lagCircRMS(headtheta,targtheta,lags);
+% plot(lags/fps,xc,'k');
+% hold on
+% plot(lags/fps,lagCircRMS(headtheta,headtheta,lags),'b')
+% plot(lags/fps,lagCircRMS(targtheta,targtheta,lags),'g')
+% axis([lags(1)/fps lags(end)/fps -1 1]); plot([0 0], [-1 1],'r:');
+% ylabel('angle corr')
 
-
-%%% correlation between target movement and head movement
-dt = 6;
+%% correlation between target movement and head movement
+dt = .1*fps;
 
 vhead = headtheta((1+dt):end)- headtheta(1:end-dt);
 vtarg = targtheta((1+dt):end)- targtheta(1:end-dt);
-% subplot(2,3,4); hold off
+
+% subplot(2,3,5); hold off
 % plot(vhead,'b');
 % hold on
 % plot(vtarg,'g')
 % xlim([1 length(vtarg)])
 
-%plot(vhead); hold on; plot(vtarg,'g')
-[vxc lags] = xcorr(vhead,vtarg,'coeff');
-%vxc = conv(vxc,ones(1,100),'same')/100;
-vxc = vxc(lags>=-120 & lags<=120);
-lags = lags(lags>=-120 & lags<=120);
-subplot(2,3,5)
-plot(lags/60,vxc,'Linewidth',2);
-xlabel('secs')
-ylabel('speed corr'); %legend('head vs targ angular vel')
-axis([ -2 2 -0.25 0.5 ]); hold on; plot([0 0],[-0.25 0.5],'r:')
+% %plot(vhead); hold on; plot(vtarg,'g')
+% [vxc lags] = xcorr(vhead,vtarg,'coeff');
+% %vxc = conv(vxc,ones(1,100),'same')/100;
+% vxc = vxc(lags>=-120 & lags<=120);
+% lags = lags(lags>=-120 & lags<=120);
+% subplot(2,3,5)
+% plot(lags/fps,vxc,'Linewidth',2);
+% xlabel('secs')
+% ylabel('speed corr'); %legend('head vs targ angular vel')
+% axis([ -2 2 -0.25 0.5 ]); hold on; plot([0 0],[-0.25 0.5],'r:')
+% 
 
 %%% how far off? head angle and distance
 % figure
 % plot(r, 'Linewidth',2); hold on; plot((headtheta-targtheta)*180/pi,':','Linewidth',2)
 
-%%% location of target relative to animal's view
-x = r.*cos(headtheta-targtheta); y = r.*sin(headtheta-targtheta);
-subplot(2,3,6)
-plot(y,x); hold on; plot(0,0,'r*'); axis([-1600 1600 -1600 1600])
+%% location of target relative to animal's view
 
-% figure 
-bins = -1025:50:1025;
-h = hist2(x,y,bins,bins);
-h= h/sum(h(:));
+if max(r)>=6
+r_dis=r(r>=6 & r<50);
+Rtheta_dis=Rtheta(r>=6 & r<50);
+x_d = r_dis.*cos(Rtheta_dis); y_d = r_dis.*sin(Rtheta_dis);
+subplot(2,3,6)
+plot(y_d,x_d); hold on; plot(0,0,'r*'); axis([-50 50 -50 50]);
+
+%figure 
+bins = -80:5:80;
+h_d = hist2(x_d,y_d,bins,bins);
+h_d= h_d/sum(h_d(:));
+
+else 
+    h_d(:,:)=NaN;
+    
+% x = r.*cos(Rtheta); y = r.*sin(Rtheta);
+% subplot(2,3,6)
+% plot(y,x); hold on; plot(0,0,'r*'); axis([-1000 1000 -1000 1000])
+% %figure 
+% bins = -1025:50:1025;
+% h = hist2(x_d,y_d,bins,bins);
+% h= h_d/sum(h(:)); 
+end
 % imagesc(flipud(h))
 % hold on
 % plot(floor(length(bins)/2) ,floor(length(bins)/2) + 1,'ro','Linewidth',2)
-
+%%
 figure
-hist(r,25:50:1000);
+hist(r,1:2:80);
+close all
 
-% lost = r'>200;
-% contact = find(diff(chase)>0);
-% interval = [0 diff(contact)];
-% contact = contact(interval>60);
-% figure
-% plot(r); hold on; plot(contact,zeros(size(contact)),'g*');
-% 
-% ylost = y; xlost=x; xlost(~lost)=NaN; ylost(~lost)=NaN;
-% figure
-% plot(ylost,xlost); hold on; plot(0,0,'r*'); axis([-1600 1600 -1600 1600])
 
 

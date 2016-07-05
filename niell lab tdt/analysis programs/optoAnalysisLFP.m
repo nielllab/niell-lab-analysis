@@ -43,7 +43,7 @@ nx=2; ny =2;
 
 
 if uselaser
-    smoothwindow_secs = 0.25;
+    smoothwindow_secs = 0.5;
     laserT = tdtData.laserT;
     laserRaw = tdtData.laserTTL;
     laserdt = median(diff(laserT));
@@ -56,6 +56,10 @@ if uselaser
     
     rising = find(diff(laserRaw)>1)+1;
     trainstart = rising(find(diff(laserT(rising))>10)+1);
+    if isempty(trainstart)
+        display ('only one start')
+        trainstart = rising(1);
+    end
     
     %    figure
     %    plot(laserT(rising),1,'*')
@@ -92,14 +96,14 @@ if uselaser
     xlabel('secs'); %legend('lfp','laser')
     
     
-    lfplocked = zeros(length(rising),1+round(0.5/lfpdt));
+    lfplocked = zeros(length(rising),1+round(1/lfpdt));
     lfpInterpLocked = lfplocked; laserLock = lfplocked;
     for i = 1:length(rising)
         % startlfp = min(find(lfptimes > laserT(rising(i))-0.1));
         startlfp = rising(i)-round(0.1/lfpdt);
-        lfplocked(i,:) = lfp(startlfp : startlfp + round(0.5/lfpdt));
-        lfpInterpLocked(i,:) = lfpinterp(startlfp : startlfp + round(0.5/lfpdt));
-        laserLock(i,:) = laserRaw(startlfp : startlfp + round(0.5/lfpdt));
+        lfplocked(i,:) = lfp(startlfp : startlfp + round(1/lfpdt));
+        lfpInterpLocked(i,:) = lfpinterp(startlfp : startlfp + round(1/lfpdt));
+        laserLock(i,:) = laserRaw(startlfp : startlfp + round(1/lfpdt));
     end
     
     subplot(2,2,4)
@@ -109,7 +113,7 @@ if uselaser
     plot(((1:size(lfplocked,2))*lfpdt-0.1)*1000, mnLfpLocked);
     hold on
     % plot((0:round(30/lfpdt))*lfpdt-5, mnLfpInterp,'g');
-    plot( ((1:size(lfplocked,2))*lfpdt-0.1)*1000, mean(laserLock,1)*10,'g')
+    plot( ((1:size(lfplocked,2))*lfpdt-0.1)*1000, mean(laserLock,1)*2,'g')
     xlim(1000*[-0.005 median(diff(laserT(rising)))])
     xlabel('msecs'); %legend('lfp','laser')
     
@@ -159,7 +163,8 @@ if uselaser
     
     
     for ch = chans;
-        freqs{ch} = tdtData.spectF{ch};
+       maingfig=figure;
+       freqs{ch} = tdtData.spectF{ch};
         df = median(diff(tdtData.spectF{ch}));
         specdata = tdtData.spectData{ch};
         normalizer = 1:size(specdata,2);
@@ -175,15 +180,21 @@ if uselaser
         end
         figure(mainfig)
         subplot(2,2,1)
-        imagesc(spect_avg',1.5*[0 prctile(spect_avg(:),95)])
-        axis xy
-        df = median(diff(tdtData.spectF{ch}));
-        dt = median(diff(timeRange));
+        
+        imagesc(specdata',1.5*[0 prctile(specdata(:),98)]);
         ylim([0 100/df])
         set(gca,'YTick',(10:10:80)/df);
         set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'})
-        set(gca,'XTick',(5:5:40)/dt);
-        set(gca,'XTickLabel',{'-5','0','5','10','15','20','25','30'})
+        axis xy
+%         imagesc(spect_avg',1.5*[0 prctile(spect_avg(:),95)])
+%         axis xy
+%         df = median(diff(tdtData.spectF{ch}));
+%         dt = median(diff(timeRange));
+%         ylim([0 100/df])
+%         set(gca,'YTick',(10:10:80)/df);
+%         set(gca,'YTickLabel',{'10','20','30','40','50','60','70','80'})
+%         set(gca,'XTick',(5:5:40)/dt);
+%         set(gca,'XTickLabel',{'-5','0','5','10','15','20','25','30'})
         title(sprintf('ch=%d',ch));
         figure(mainfig)
         
@@ -204,11 +215,13 @@ if uselaser
         end
         subplot(2,2,2)
         plot(tdtData.spectF{ch}, squeeze(laserlfp(ch,:,:)));
-        ylim([0 1.5*prctile(laserlfp(ch,1,:),95)])
+        ylim([0 1.5*prctile(laserlfp(ch,1,:),98)])
         xlim([0 90])
-        
+           drawnow 
     end
     % legend({'laser off ','laser on '})
+
+    
 end
 
 

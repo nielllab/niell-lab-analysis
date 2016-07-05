@@ -9,6 +9,7 @@ blocknum = find(strcmp(block,Block_Name));
 Block_Name = Block_Name{blocknum}
 
 load(afile,'wn_mv');
+load(afile,'wn');
 
 if ~exist('wn_mv','var') | length(wn_mv)<blocknum  | isempty(wn_mv(blocknum).frms) | redo
     try
@@ -38,7 +39,7 @@ if ~exist('wn_mv','var') | length(wn_mv)<blocknum  | isempty(wn_mv(blocknum).frm
                     crf_err(i,mv) = std(R(trials))/sqrt(length(trials));
                 end
             end
-             wn_mv(blocknum).crf(c,:,:) = crf;
+            wn_mv(blocknum).crf(c,:,:) = crf;
             wn_mv(blocknum).crf_err(c,:,:) = crf_err;
             wn_mv(blocknum).spont(c,:)= mean(crf([1 20],:),1);
             wn_mv(blocknum).evoked(c,:) = mean(crf(9:12,:),1) - wn_mv(blocknum).spont(c,:);

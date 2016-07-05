@@ -92,7 +92,12 @@ if ~exist('pinp','var') | length(pinp)<blocknum  | isempty(pinp(blocknum).psth) 
         ylabel('sp/sec')
         xlim([min(longBins) max(longBins)])
         % ylim([0 7]); plot([0 17],[6 6],'g','Linewidth',4);
-      
+        
+        if makePDF
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfname,'-append');
+        end
+        
         if ~showImg
             close(gcf)
         end
@@ -108,10 +113,7 @@ if ~exist('pinp','var') | length(pinp)<blocknum  | isempty(pinp(blocknum).psth) 
         pinp(blocknum).psth(cell_n,:) = psth;
         drawnow
         
-        if makePDF
-            set(gcf, 'PaperPositionMode', 'auto');
-            print('-dpsc',psfname,'-append');
-        end
+
     end
     
     

@@ -8,11 +8,11 @@ psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
 apath = 'D:\Jen_analysis\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
-N =0; cells=0;  all_img_STA={};PINPed=0; STA_peak={};stopCRF={}; moveCRF={};
+N =0; cells=0;  all_img_STA={};STA_peak={};stopCRF={}; moveCRF={};
 sessionNum=0;
 
         
-        afiles = {'NR5A_Pinping\12_22_14_pos_ctl\analysis_12_22_14_1st_clust.mat',...
+        afiles = {'NR5A_Pinping\12_22_14_pos_ctl\analysis_2.mat',...
            'NR5A_Pinping\2_25_15\analysis_2_25_15_rec1.mat',...
            'NR5A_Pinping\3_7_15\analysis_3_7_15.mat',...
            'NR5A_Pinping\3_11_15_wt\full\analysis_3_11_15_full.mat',...
@@ -326,7 +326,7 @@ lyr = alldata(:,26)
 resp = peak(:,1)>=2
 
 figure
-plot(psth_pinp(lyr==4 & exc,:)')
+plot(psth)';% (lyr==4 & exc,:)')
 set(gca,'xlim',[50 60])
 
 psth_pinp_1=psth_pinp
