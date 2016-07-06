@@ -32,7 +32,6 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
    end
    lfpMove(blocknum).meanSpect = meanSpect;
    lfpMove(blocknum).freq = 0.5:0.5:100;
-   
     catch
         lfpMove(blocknum).meanSpect=[];
         lfpMove(blocknum).freq=[];

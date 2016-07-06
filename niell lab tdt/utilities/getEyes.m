@@ -1,4 +1,4 @@
-function eyes = getEyes(clustfile,afile,cfile, block)
+function eyes = getEyes(clustfile,afile,cfile, block,redo)
 %%% Extract eye tracking data for a given block
 %%% Checks to see if data already exists
 %%% If not, reads in camera data and asks for points
@@ -11,7 +11,7 @@ Block_Name = Block_Name{blocknum}
 
 load(afile,'eyes');
 
-if ~exist('eyes','var') | isempty(eyes(blocknum))
+if ~exist('eyes','var') | length(eyes)<blocknum | isempty(eyes(blocknum)) | redo
     try
         load(cfile);  %%% contains eye images in variable 'data'
         
@@ -29,7 +29,7 @@ if ~exist('eyes','var') | isempty(eyes(blocknum))
         ylim([ 0 0.2])
         
         thresh = 0.8; %pupil threshold for binarization
-        puprange = [8 45]; %set
+        puprange = [2 25]; %set range of pupil radius
         
         %user input to select center and right points
         sprintf('Please select pupil center and top, eyeball top and right points, darkest part of eyeball')
