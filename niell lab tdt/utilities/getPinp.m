@@ -17,7 +17,7 @@ end
 
 
 
-if ~exist('pinp','var') | length(pinp)<blocknum  | isempty(pinp(blocknum).psth) | redo
+if ~exist('pinp','var') | length(pinp)<blocknum  | ~isfield(pinp(blocknum),'psth') | isempty(pinp(blocknum).psth) | redo
     
     spikes = getSpikes(clustfile,afile, block,redo);
     flags = struct('laserOn',1);
@@ -109,13 +109,14 @@ if ~exist('pinp','var') | length(pinp)<blocknum  | isempty(pinp(blocknum).psth) 
         ylabel('sp/sec')
         
         
-        psth(isnan(psth))=0;
-        pinp(blocknum).psth(cell_n,:) = psth;
+  
         drawnow
         
 
     end
     
+    psth(isnan(psth))=0;
+    pinp(blocknum).psth = psth;
     
     
     %%% calculate baseline, evoked, and artifact by choosing windows
