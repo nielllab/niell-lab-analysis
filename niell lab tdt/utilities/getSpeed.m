@@ -19,8 +19,13 @@ if ~exist('speed','var') | length(speed)<blocknum  | isempty(speed(blocknum).t) 
         speed(blocknum).t= tdtData.mouseT;
         speed(blocknum).v = tdtData.mouseV;
     catch
-        speed(blocknum).t=[];
+       
+       display('couldnt get speed data')
+       keyboard
+       speed(blocknum).t=[];
         speed(blocknum).v=[];
+       
+
     end
     save(afile,'speed','-append')
 end

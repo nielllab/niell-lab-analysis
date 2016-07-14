@@ -32,7 +32,7 @@ for c = 1:length(preSpikes);
             col = 'b';
             sp = preSpikes{c};
             preISI  = diff(sp(1:end-1));
-            postISI = diff(sp(2:end))
+            postISI = diff(sp(2:end));
 %             subplot(2,2,4)
 %             loglog(preISI*10^3,postISI*10^3,'b.'); xlabel 'pre ISI'; ylabel 'postISI'; axis square
 %             hold on
@@ -40,7 +40,7 @@ for c = 1:length(preSpikes);
             col = 'r';
             sp = postSpikes{c};
             preISI  = diff(sp(1:end-1));
-            postISI = diff(sp(2:end))
+            postISI = diff(sp(2:end));
             %subplot(2,2,4)
             %loglog(preISI*10^3,postISI*10^3,'r.'); axis([1 10^4 1 10^4])
         end
