@@ -1,18 +1,18 @@
 clear all
-%close all
+close all
 
 dbstop if error
 
-batchDOIephys; %%% load batch file
+batchDOIephys_filtered; %%% load batch file
 
 %%% select the sessions you want based on filters
 %%% example
-use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.treatment},'DOI')  )
+%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.treatment},'DOI')  )
 %use =  find( strcmp({files.treatment},'KetanserinDOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 %use =  find( strcmp({files.treatment},'DOI') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'bad data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'120915'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'060216'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ketanserin=3; ketandoi=4; lisuride=5;
@@ -130,16 +130,16 @@ for i = 1:length(use)
             wn_spont(cellrange,:,prepost)=wn.spont;
             wn_evoked(cellrange,:,prepost)=wn.evoked;
             wn_gain(1,cellrange,prepost)=wn.gain;
-            wn_frameR(cellrange,:,:,prepost) = downsamplebin(wn.frameR,2,15)/15;
+        wn_frameR(cellrange,:,:,prepost) = downsamplebin(wn.frameR,2,15)/15;
         end
     end
     
   figure
   subplot(2,2,1); imagesc(squeeze(wn_frameR(cellrange,:,1,1)),[ 0 50]); title('pre stop')
   subplot(2,2,2); imagesc(squeeze(wn_frameR(cellrange,:,1,2)),[ 0 50]); title('post stop')
-    subplot(2,2,3); imagesc(squeeze(wn_frameR(cellrange,:,2,1)),[ 0 50]); title('pre move');
+  subplot(2,2,3); imagesc(squeeze(wn_frameR(cellrange,:,2,1)),[ 0 50]); title('pre move');
   subplot(2,2,4); imagesc(squeeze(wn_frameR(cellrange,:,2,2)),[ 0 50]); title('post move')
-    set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
+  set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
   drawnow
   
 %   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));

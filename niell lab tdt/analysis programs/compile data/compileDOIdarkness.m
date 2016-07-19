@@ -12,7 +12,7 @@ batchDOIephys; %%% load batch file
 %use =  find( strcmp({files.treatment},'') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'071116'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'071416'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ketanserin=3; ketandoi=4; lisuride=5;
