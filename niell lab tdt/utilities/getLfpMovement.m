@@ -1,4 +1,4 @@
-function lfpMove = getLFP(clustfile,afile,block, redo)
+function lfpMove = getLfpMovement(clustfile,afile,block, redo)
 %%% read in lfp spectrum data for a given block
 %%% checks to see if data already exists
 %%% otherwise reads it in and saves to analysis file, with entry for each block
@@ -16,8 +16,8 @@ load(afile,'lfpMove');
 if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknum).freq) | redo
   
    try
-   lfp = getLFP(clustfile,afile,block,redo);
-   spd = getSpeed(clustfile,afile,block,redo);
+   lfp = getLFP(clustfile,afile,block,0);
+   spd = getSpeed(clustfile,afile,block,0);
    s = lfp.normspect;
    v = interp1(spd.t,spd.v,lfp.t);
    for ch = 1:size(s,1);
@@ -32,10 +32,12 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
    end
    lfpMove(blocknum).meanSpect = meanSpect;
    lfpMove(blocknum).freq = 0.5:0.5:100;
-    catch
+   keyboard
+   catch ME
         lfpMove(blocknum).meanSpect=[];
         lfpMove(blocknum).freq=[];
         display('couldnt get lfp movement')
+        getReport(ME)
     end
     save(afile,'lfpMove','-append')
 end

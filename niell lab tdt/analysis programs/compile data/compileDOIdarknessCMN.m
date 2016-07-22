@@ -3,11 +3,12 @@ clear all
 
 dbstop if error
 
-batchDOIephys; %%% load batch file
+batchDOIephys_filtered; %%% load batch file
 
 %%% select the sessions you want based on filters
 %%% example
 use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.treatment},'DOI')  )
+useSess = use;
 %use =  find( strcmp({files.treatment},'KetanserinDOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 %use =  find( strcmp({files.treatment},'DOI') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
 
@@ -116,7 +117,8 @@ for i = 1:length(use)
             drift_sf_trial{prepost} = drift.trialSF;
             drift_orient_trial{prepost} = drift.trialOrient;
             for c = 1:length(cellrange)
-                drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
+                drift_trial_psth{cellrange(c),prepost} = squeeze(drift.trialPsth(c,:,:));
+                mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
             end
         end
     end
@@ -144,17 +146,25 @@ for i = 1:length(use)
   
 %   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
 %   drawnow
-    %%% lfp power
-    %     %%%(right now averages over all sites, should use layer info)
+%   
+  
+    %% lfp power
+        %%%(right now averages over all sites, should use layer info)
 %     for prepost=1:2
-%         lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
-%         LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1))/nanmedian(lfpMove.meanSpect(:));
+%         lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},1);
+%         LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
+%         size(lfpMove.meanSpect)
+%         if size(lfpMove.meanSpect,1)==16
+%             LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
+%         end
 %     end
-%     
+   
 %     for prepost=1:2
 %         lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},0);
-%         LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1))/nanmedian(lfpMove.meanSpect(:));
-%         
+%         LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
+%         if size(lfpMove.meanSpect,1)==16
+%             LFPallChDark(i,:,:,:,prepost) = lfpMove.meanSpect;
+%         end
 %     end
 %     
 %     %% darkness / correlation analysis
@@ -189,7 +199,28 @@ for i = 1:length(use)
 %     ncorr= ncorr+nc^2;
 end
 
+
     
+dt = 0.05;
+for i=1:3
+    if i==1
+        mn = squeeze(mean(mnPsth(find(goodAll & ~inhAll & layerAll==5),:,:),1))'; t = 'grating lyr 5';
+    elseif i==2
+        mn = squeeze(mean(mnPsth(find(goodAll & ~inhAll & layerAll<5),:,:),1))'; t = 'grating lyr 2-4';
+    elseif i==3
+        mn = squeeze(mean(mnPsth(find(goodAll & inhAll),:,:),1))'; t = 'grating inh';
+    end
+mn = mn - repmat(mn(1,:),[50 1]);
+mn = circshift(mn,10)
+figure
+plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:)); title(t); xlabel('secs'); ylabel('sp/sec')
+%ylim([0 max(mn(:))+1])
+end
+
+
+
+
+
   figure
   subplot(2,2,1); imagesc(squeeze(wn_frameR(find(goodAll),:,1,1)),[ 0 50]); title('pre stop')
   subplot(2,2,2); imagesc(squeeze(wn_frameR(find(goodAll),:,1,2)),[ 0 50]); title('post stop')
@@ -227,11 +258,14 @@ subplot(2,2,4); plot(squeeze(mean(cycR(find(goodAll),:,2,2),1))); title('post mo
 spont = squeeze(mean(cycR(:,[1 2 19 20],:,:),2));
 evoked = squeeze(mean(cycR(:,9:11,:,:),2)) - spont;
 
+clear spontbar evokedbar spont_err evoked_err
+
+
     figure
 for lyr = 2:5
     for i=1:2
         if i==1
-            use = find(goodAll & layerAll==lyr & ~inhAll ); symb = 'bo';
+            use = find(goodAll & layerAll==lyr & ~inhAll & (squeeze(evoked(:,2,1)>1)' & squeeze(evoked(:,2,2)>1)') ); symb = 'bo';
         else
             use = find(goodAll & layerAll==lyr  & inhAll ); symb = 'ro';
         end
@@ -248,9 +282,101 @@ for lyr = 2:5
         plot(evoked(use,2,1),evoked(use,2,2),symb); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
         if lyr==2,  title({'evoked move',''}), end
     end
+ 
 end
 
+
+
+figure
+for lyr = 2:5
+    use = find(goodAll & layerAll==lyr & ~inhAll & (squeeze(evoked(:,2,1)>1)' & squeeze(evoked(:,2,2)>1)') ); symb = 'bo';
+    evokedbar(lyr-1,:,:) = median(evoked(use,:,:)); evoked_err(lyr-1,:,:) = std(evoked(use,:,:))/sqrt(length(use));
+end
+
+figure
+for lyr = 2:5
+    use = find(goodAll & layerAll==lyr & ~inhAll  ); symb = 'bo';
+    spontbar(lyr-1,:,:) = median(spont(use,:,:)); spont_err(lyr-1,:,:) = std(spont(use,:,:))/sqrt(length(use));
+end
+
+figure
+barweb(squeeze(spontbar(:,2,:)), squeeze(spont_err(:,2,:))/2, [],{'layer 2/3','layer 5'},'spontaneous',[],'sp/sec',[],[],{'pre','post'}); 
+ylim([0 1.25])
+
+figure
+barweb(squeeze(evokedbar(:,2,:)), squeeze(evoked_err(:,2,:))/1.5, [],{'layer 2/3','layer 5'},'evoked',[],'sp/sec',[],[],{'pre','post'});
+ylim([0 7])
+
+lyr23 = [squeeze(spontbar(1,2,:)) squeeze(evokedbar(1,2,:))]; lyr23_err = [squeeze(spont_err(1,2,:)) squeeze(evoked_err(1,2,:))];
+
+lyr5 = [squeeze(spontbar(4,2,:)) squeeze(evokedbar(4,2,:))]; lyr5_err = [squeeze(spont_err(4,2,:)) squeeze(evoked_err(4,2,:))];
+
+figure
+barweb(lyr23', lyr23_err'/1.5, [],{'spont','evoked'},'layer 2/3',[],'sp/sec',[],[],{'pre','post'});
+ylim([0 7])
+
+figure
+barweb(lyr5', lyr5_err'/2, [],{'spont','evoked'},'layer 5',[],'sp/sec',[],[],{'pre','post'});
+ylim([0 4])
+
 keyboard
+
+    figure
+for lyr = 2:5
+    for i=1:2
+        if i==1
+            use = find(goodAll & layerAll==lyr & ~inhAll ); symb = 'bo';
+        else
+            use = find(goodAll & layerAll==lyr  & inhAll ); symb = 'ro';
+        end
+        subplot(4,4,1 + 4*(lyr-2));
+        plot(spont(use,1,1),spont(use,2,1),symb); hold on; plot([0 50],[0 50]);  axis square; axis([0 30 0 30])
+        if lyr==2,  title({'spont pre','layer 2'}), end; if lyr>2, title(sprintf('layer %d',lyr)); end
+        subplot(4,4,2+ 4*(lyr-2));
+        plot(spont(use,1,2),spont(use,2,2),symb);  hold on; plot([0 50],[0 50]); axis square; axis([0 30 0 30])
+        if lyr==2,  title({'spont post',''}), end
+        subplot(4,4,3+ 4*(lyr-2));
+        plot(evoked(use,1,1),evoked(use,2,1),symb); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
+        if lyr==2,  title({'evoked pre',''}), end
+        subplot(4,4,4+ 4*(lyr-2))
+        plot(evoked(use,1,2),evoked(use,2,2),symb); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
+        if lyr==2,  title({'evoked post',''}), end
+    end
+end
+
+
+for i = 1:size(LFPall,1)
+    figure
+    plot((1:116)/2,squeeze(LFPall(i,1:116,1,1)),'r--'); hold on
+    plot((1:116)/2,squeeze(LFPall(i,1:116,2,1)),'g--');
+    plot((1:116)/2,squeeze(LFPall(i,1:116,1,2)),'r');
+    plot((1:116)/2,squeeze(LFPall(i,1:116,2,2)),'g');
+    title(sprintf('wn session %d %s %s,',i,files(useSess(i)).expt,files(useSess(i)).treatment))
+end
+
+% for i = 1:size(LFPall,1)
+%     figure
+%     plot((1:116)/2,squeeze(LFPallDark(i,1:116,1,1)),'r--'); hold on
+%     plot((1:116)/2,squeeze(LFPallDark(i,1:116,2,1)),'g--');
+%     plot((1:116)/2,squeeze(LFPallDark(i,1:116,1,2)),'r');
+%     plot((1:116)/2,squeeze(LFPallDark(i,1:116,2,2)),'g');
+%     title(sprintf('dark session %d %s %s,',i,files(useSess(i)).expt,files(useSess(i)).treatment))
+% end
+
+for i = 1:size(LFPallCh,1)
+    
+    d = LFPallCh(i,:,:,:,:);
+    range = prctile(d(:),99);
+    if range>0
+        figure
+        subplot(2,2,1); imagesc(squeeze(LFPallCh(i,:,:,1,1)),[0 range]); title('pre stop')
+        subplot(2,2,2); imagesc(squeeze(LFPallCh(i,:,:,1,2)),[0 range]);  title('post stop')
+        subplot(2,2,3); imagesc(squeeze(LFPallCh(i,:,:,2,1)),[0 range]); title('pre move');
+        subplot(2,2,4); imagesc(squeeze(LFPallCh(i,:,:,2,2)),[0 range]);
+        
+        title(sprintf('dark session %d %s %s,',i,files(useSess(i)).expt,files(useSess(i)).treatment))
+    end
+end
 
 
 for lyr = 3:6
@@ -275,79 +401,47 @@ end
 
 
 
-figure
-plot(spont(find(goodAll),1,1),spont(find(goodAll),1,2),'o'); title('spont pre vs post stop'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),1,1),spont(find(goodAll & inhAll),1,2),'ro'); title('spont pre vs post stop'); hold on; plot([0 50],[0 50]); axis([0 15 0 15])
-figure
-plot(spont(find(goodAll),2,1),spont(find(goodAll),2,2),'o'); title('spont pre vs post move'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),2,1),spont(find(goodAll & inhAll),2,2),'ro'); title('spont pre vs post move'); hold on; plot([0 50],[0 50]); axis([0 15 0 15])
-figure
-plot(evoked(find(goodAll),1,1),evoked(find(goodAll),1,2),'o'); title('evoked pre vs post stop'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),1,1),evoked(find(goodAll & inhAll),1,2),'ro'); title('evoked pre vs post stop'); hold on; plot([0 50],[0 50]); axis([-10 10 -10 10])
-figure
-plot(evoked(find(goodAll),2,1),evoked(find(goodAll),2,2),'o'); title('evoked pre vs post move'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),2,1),evoked(find(goodAll & inhAll),2,2),'ro'); title('evoked pre vs post move'); hold on; plot([0 50],[0 50]); axis([-10 10 -10 10])
-
-
-
-figure
-plot(spont(find(goodAll),1,1),spont(find(goodAll),2,1),'o'); title('spont stop vs move pre'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),1,1),spont(find(goodAll & inhAll),2,1),'ro'); title('spont stop vs move pre'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
-
-
-figure
-plot(evoked(find(goodAll),1,1),evoked(find(goodAll),2,1),'o'); title('evoked stop vs move pre'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),1,1),evoked(find(goodAll & inhAll),2,1),'ro'); title('evoked stop vs move pre'); hold on; plot([0 50],[0 50]); axis([0 50 0 50 ])
-
-figure
-plot(spont(find(goodAll),1,2),spont(find(goodAll),2,2),'o'); title('spont stop vs move post'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),1,2),spont(find(goodAll & inhAll),2,2),'ro'); title('spont stop vs move post'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
-
-
-figure
-plot(evoked(find(goodAll),1,2),evoked(find(goodAll),2,2),'o'); title('evoked stop vs move post'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),1,2),evoked(find(goodAll & inhAll),2,2),'ro'); title('evoked stop vs move post'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
-
-
-keyboard
-
-
 pre = [cycR(find(goodAll & ~inhAll),:,1,1) cycR(find(goodAll & ~inhAll),:,2,1)];
 
-post = [cycR(find(goodAll & ~inhAll),:,2,1) cycR(find(goodAll & ~inhAll),:,2,2)];
+post = [cycR(find(goodAll & ~inhAll),:,1,2) cycR(find(goodAll & ~inhAll),:,2,2)];
 
+data = [pre post];
+[y ind] = sort(layerAll(goodAll & ~inhAll));
+data = data(ind,:);
+for i = 1:size(data,1);
+    normdata(i,:) = data(i,:)/std(data(i,:));
+end
 
-[coeff score latent] = pca(pre','algorithm','als','variableweight','variance');
+% [coeff score latent] = pca(data','variableweight','variance');
+% [coeff score latent] = pca(normdata');
+
+[score A w] = fastica(normdata,'numOfIC',3,'lastEig',4);
+score = score';
 
 figure
-plot(latent(1:10)/sum(latent));
+imagesc(A);
 figure
-imagesc(coeff(:,1:10));
+imagesc(w');
+
 figure
-for i = 1:10;
-    subplot(10,1,i);
+for i = 1:min(size(score,2),5);
+    subplot(5,1,i);
     plot(score(:,i))
 end
 
+figure
+plot(score(1:20,1),score(1:20,2),'r--'); hold on; plot(score(21:40,1),score(21:40,2),'g--');
+plot(score(41:60,1),score(41:60,2),'r'); plot(score(61:80,1),score(61:80,2),'g');
 
 figure
-plot(score(:,1)); hold on; plot(score(:,2),'r')
-figure
-plot(score(:,1)); hold on; plot(score(:,3),'r')
-
-preS = pre'*coeff;
-postS = post'*coeff;
+plot(score(1:20,1),score(1:20,3),'r--'); hold on; plot(score(21:40,1),score(21:40,3),'g--');
+plot(score(41:60,1),score(41:60,3),'r'); plot(score(61:80,1),score(61:80,3),'g');
 
 figure
-for i = 1:8
-    subplot(8,1,i)
-    plot(preS(:,i)); hold on; plot(postS(:,i),'r');
-end
+plot(score(1:20,2),score(1:20,3),'r--'); hold on; plot(score(21:40,2),score(21:40,3),'g--');
+plot(score(41:60,2),score(41:60,3),'r'); plot(score(61:80,2),score(61:80,3),'g');
 
 
-figure
-plot(score(:,1),score(:,2))
-%%eyetracking
 
 % figure % radius histogram
 % h1=hist(rad{1},1:1: max(rad{1}));
