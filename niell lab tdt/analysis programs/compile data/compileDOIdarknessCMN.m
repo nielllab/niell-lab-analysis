@@ -243,23 +243,10 @@ for f = 1:20;
     cycR(:,f,:,:) = nanmean(wn_frameR(:,f:20:end,:,:),2);
 end
 
-figure
-subplot(2,2,1); imagesc(squeeze(cycR(find(goodAll),:,1,1)),[ 0 50]); title('pre stop')
-subplot(2,2,2); imagesc(squeeze(cycR(find(goodAll),:,1,2)),[ 0 50]); title('post stop')
-subplot(2,2,3); imagesc(squeeze(cycR(find(goodAll),:,2,1)),[ 0 50]); title('pre move');
-subplot(2,2,4); imagesc(squeeze(cycR(find(goodAll),:,2,2)),[ 0 50]); title('post move')
-
-figure
-subplot(2,2,1); plot(squeeze(mean(cycR(find(goodAll),:,1,1),1))); title('pre stop'); ylim([1.5 4])
-subplot(2,2,2); plot(squeeze(mean(cycR(find(goodAll),:,1,2),1))); title('post stop'); ylim([1.5 4])
-subplot(2,2,3); plot(squeeze(mean(cycR(find(goodAll),:,2,1),1))); title('pre move'); ylim([1.5 4])
-subplot(2,2,4); plot(squeeze(mean(cycR(find(goodAll),:,2,2),1))); title('post move'); ylim([1.5 4])
-
 spont = squeeze(mean(cycR(:,[1 2 19 20],:,:),2));
 evoked = squeeze(mean(cycR(:,9:11,:,:),2)) - spont;
 
 clear spontbar evokedbar spont_err evoked_err
-
 
     figure
 for lyr = 2:5
@@ -299,27 +286,7 @@ for lyr = 2:5
     spontbar(lyr-1,:,:) = median(spont(use,:,:)); spont_err(lyr-1,:,:) = std(spont(use,:,:))/sqrt(length(use));
 end
 
-figure
-barweb(squeeze(spontbar(:,2,:)), squeeze(spont_err(:,2,:))/2, [],{'layer 2/3','layer 5'},'spontaneous',[],'sp/sec',[],[],{'pre','post'}); 
-ylim([0 1.25])
 
-figure
-barweb(squeeze(evokedbar(:,2,:)), squeeze(evoked_err(:,2,:))/1.5, [],{'layer 2/3','layer 5'},'evoked',[],'sp/sec',[],[],{'pre','post'});
-ylim([0 7])
-
-lyr23 = [squeeze(spontbar(1,2,:)) squeeze(evokedbar(1,2,:))]; lyr23_err = [squeeze(spont_err(1,2,:)) squeeze(evoked_err(1,2,:))];
-
-lyr5 = [squeeze(spontbar(4,2,:)) squeeze(evokedbar(4,2,:))]; lyr5_err = [squeeze(spont_err(4,2,:)) squeeze(evoked_err(4,2,:))];
-
-figure
-barweb(lyr23', lyr23_err'/1.5, [],{'spont','evoked'},'layer 2/3',[],'sp/sec',[],[],{'pre','post'});
-ylim([0 7])
-
-figure
-barweb(lyr5', lyr5_err'/2, [],{'spont','evoked'},'layer 5',[],'sp/sec',[],[],{'pre','post'});
-ylim([0 4])
-
-keyboard
 
     figure
 for lyr = 2:5
@@ -343,6 +310,26 @@ for lyr = 2:5
         if lyr==2,  title({'evoked post',''}), end
     end
 end
+
+figure
+barweb(squeeze(spontbar(:,2,:)), squeeze(spont_err(:,2,:)), [],{'layer 2/3','layer 5'},'spontaneous',[],'sp/sec',[],[],{'pre','post'}); 
+ylim([0 1.25])
+
+figure
+barweb(squeeze(evokedbar(:,2,:)), squeeze(evoked_err(:,2,:)), [],{'layer 2/3','layer 5'},'evoked',[],'sp/sec',[],[],{'pre','post'});
+ylim([0 7])
+
+lyr23 = [squeeze(spontbar(1,2,:)) squeeze(evokedbar(1,2,:))]; lyr23_err = [squeeze(spont_err(1,2,:)) squeeze(evoked_err(1,2,:))];
+
+lyr5 = [squeeze(spontbar(4,2,:)) squeeze(evokedbar(4,2,:))]; lyr5_err = [squeeze(spont_err(4,2,:)) squeeze(evoked_err(4,2,:))];
+
+figure
+barweb(lyr23', lyr23_err', [],{'spont','evoked'},'layer 2/3',[],'sp/sec',[],[],{'pre','post'});
+ylim([0 7])
+
+figure
+barweb(lyr5', lyr5_err', [],{'spont','evoked'},'layer 5',[],'sp/sec',[],[],{'pre','post'});
+ylim([0 4])
 
 
 for i = 1:size(LFPall,1)
