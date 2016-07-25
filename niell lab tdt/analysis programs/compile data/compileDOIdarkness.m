@@ -12,7 +12,7 @@ batchDOIephys_filtered; %%% load batch file
 %use =  find( strcmp({files.treatment},'') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'071416'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'120215'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ketanserin=3; ketandoi=4; mglur2=5; mglur2doi=6; lisuride=7;
@@ -226,29 +226,28 @@ spont = squeeze(mean(cycR(:,[1 2 19 20],:,:),2));
 evoked = squeeze(mean(cycR(:,9:11,:,:),2)) - spont;
 
     figure
-for lyr = 2:5
+for lyr = 2:6
     for i=1:2
         if i==1
             use = find(goodAll & layerAll==lyr & ~inhAll ); symb = 'bo';
         else
             use = find(goodAll & layerAll==lyr  & inhAll ); symb = 'ro';
         end
-        subplot(4,4,1 + 4*(lyr-2));
+        subplot(5,4,1 + 4*(lyr-2));
         plot(spont(use,1,1),spont(use,1,2),symb); hold on; plot([0 50],[0 50]);  axis square; axis([0 30 0 30])
         if lyr==2,  title({'spont stop','layer 2'}), end; if lyr>2, title(sprintf('layer %d',lyr)); end
-        subplot(4,4,2+ 4*(lyr-2));
+        subplot(5,4,2+ 4*(lyr-2));
         plot(spont(use,2,1),spont(use,2,2),symb);  hold on; plot([0 50],[0 50]); axis square; axis([0 30 0 30])
         if lyr==2,  title({'spont move',''}), end
-        subplot(4,4,3+ 4*(lyr-2));
+        subplot(5,4,3+ 4*(lyr-2));
         plot(evoked(use,1,1),evoked(use,1,2),symb); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
         if lyr==2,  title({'evoked stop',''}), end
-        subplot(4,4,4+ 4*(lyr-2))
+        subplot(5,4,4+ 4*(lyr-2))
         plot(evoked(use,2,1),evoked(use,2,2),symb); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
         if lyr==2,  title({'evoked move',''}), end
     end
 end
 
-keyboard
 
 
 for lyr = 3:6
@@ -304,8 +303,6 @@ plot(evoked(find(goodAll),1,2),evoked(find(goodAll),2,2),'o'); title('evoked sto
 plot(evoked(find(goodAll&inhAll),1,2),evoked(find(goodAll & inhAll),2,2),'ro'); title('evoked stop vs move post'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
 
 
-keyboard
-
 
 pre = [cycR(find(goodAll & ~inhAll),:,1,1) cycR(find(goodAll & ~inhAll),:,2,1)];
 post = [cycR(find(goodAll & ~inhAll),:,2,1) cycR(find(goodAll & ~inhAll),:,2,2)];
@@ -333,6 +330,7 @@ plot(score(:,1)); hold on; plot(score(:,3),'r')
 preS = pre'*coeff;
 postS = post'*coeff;
 
+%using 8 units...can change to however many units you want to look at
 figure
 for i = 1:8
     subplot(8,1,i)
@@ -373,7 +371,7 @@ for i = 1:6
     set(gcf,'Name','Wn Corr')
 end
 
-titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGlur2'};
+titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGlur2', 'MGlur2 + DOI'};
 figure
 for i = 1:6
     subplot(2,3,i);
@@ -385,7 +383,7 @@ end
 
 
 %%% plot correlation for darkness
-titles = {'saline','doi','ketanserin', 'ketanserin + DOI','MGlur2'};
+titles = {'saline','doi','ketanserin', 'ketanserin + DOI','MGlur2','MGlur2 + DOI'};
 figure
 for i = 1:6
     subplot(2,3,i);
@@ -395,7 +393,7 @@ for i = 1:6
     set(gcf,'Name','Dark Corr')
 end
 
-titles = {'saline','doi','ketanserin', 'ketanserin + DOI','MGluR2'};
+titles = {'saline','doi','ketanserin', 'ketanserin + DOI','MGluR2','MGlur2 + DOI'};
 figure
 for i = 1:4
     subplot(2,2,i);
@@ -421,7 +419,8 @@ for mv = 1:2
         plot(drift_spont(treatment==doi& layerAll ==i,mv,1),drift_spont(treatment==doi& layerAll ==i,mv,2),'r.');
         plot(drift_spont(treatment==ketanserin& layerAll ==i,mv,1),drift_spont(treatment==ketanserin& layerAll ==i,mv,2),'m.');
         plot(drift_spont(treatment==ketandoi& layerAll ==i,mv,1),drift_spont(treatment==ketandoi& layerAll ==i,mv,2),'c.');
-         plot(drift_spont(treatment==mglur2& layerAll ==i,mv,1),drift_spont(treatment==mglur2& layerAll ==i,mv,2),'g.');
+        plot(drift_spont(treatment==mglur2& layerAll ==i,mv,1),drift_spont(treatment==mglur2& layerAll ==i,mv,2),'g.');
+        plot(drift_spont(treatment==mglur2doi& layerAll ==i,mv,1),drift_spont(treatment==mglur2doi& layerAll ==i,mv,2),'y.');
         plot([0 10],[0 10]); axis equal
         title(sprintf('layer %d',i)); ylabel('post');
         if mv ==1 , xlabel('stop drift spont'), set(gcf, 'Name', 'prepost stationary drift spont');
