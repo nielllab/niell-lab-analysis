@@ -6,6 +6,7 @@ end
 try
 data = xlsread(fname);
 catch
+    
     data =dlmread(fname);
 end
 
