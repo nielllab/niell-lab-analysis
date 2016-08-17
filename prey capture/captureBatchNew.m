@@ -1,6 +1,7 @@
 ON=1; OFF=0;
-pathname = 'X:\';%miyazaki path to prey capture folder stored on Eyre
+%pathname = 'X:\';%miyazaki path to prey capture folder stored on Eyre
 %pathname='E:\Prey_capture_data\'; %eyre path
+pathname = 'Y:\' % is path on Niell V2
 
 % if ismac
 %     pathname = '/Users/crisniell/Dropbox/Prey capture/Prey_tracks/'
