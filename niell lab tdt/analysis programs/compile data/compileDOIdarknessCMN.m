@@ -1,5 +1,5 @@
 clear all
-%close all
+close all
 
 dbstop if error
 
@@ -120,6 +120,17 @@ for i = 1:length(use)
                 drift_trial_psth{cellrange(c),prepost} = squeeze(drift.trialPsth(c,:,:));
                 mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
             end
+            for cond = 1:72
+                for mv = 1:2
+                    if mv ==1
+                        tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd<1);
+                    else
+                        tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
+                    end
+                    drift_tcourse(cellrange,cond,mv,prepost,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
+                end
+            end
+            
         end
     end
     
@@ -198,6 +209,195 @@ for i = 1:length(use)
 
 %     ncorr= ncorr+nc^2;
 end
+
+d= squeeze(drift_tcourse(:,:,1,:,1));  %%% stationary first timepoint
+d = downsamplebin(d,2,2,1);
+d = reshape(d,size(d,1),size(d,2)*size(d,3));
+nanratio = mean(isnan(d),2);
+figure
+plot(nanratio)
+
+for prepost = 1:2
+    
+    tcourse = squeeze(drift_tcourse(:,:,1,prepost,:));
+    tcourse = downsamplebin(tcourse(:,:,2:49),3,4,1);
+    tcourse = downsamplebin(tcourse,2,2,1);
+    tcourse = permute(tcourse,[1 3 2]);
+    trace = reshape(tcourse,size(tcourse,1),size(tcourse,2)*size(tcourse,3));
+    
+    figure
+    imagesc(isnan(squeeze(trace)))
+    
+    if prepost ==1
+        s = nanstd(trace,[],2);
+    end
+    figure
+    hist(s,0.25:0.5:15)
+    usespks = find(s>1 & nanratio<0.04);
+    figure
+    imagesc(isnan(squeeze(trace(usespks,:))));
+ 
+    mn = nanmean(trace,2);
+    
+    normtrace = (trace - repmat(mn,[1 size(trace,2)]))./repmat(s,[1 size(trace,2)]);
+    figure
+    imagesc(normtrace(usespks,:),[ -5 5])
+    
+    if prepost==1
+        [coeff score latent] = pca(normtrace(usespks,:)');  score(:,12) = mean(normtrace(usespks,:),1);
+        %[coeff score latent] = pca(normtrace(usespks,:)');
+        
+        figure
+        plot(latent(1:20)/sum(latent));
+        
+    end
+       data = normtrace(usespks,:)';
+       score = data*coeff;
+    
+    figure
+    for i = 1:5;
+        subplot(5,1,i);
+        plot(score(:,i));
+    end
+    
+    condtuning = reshape(score',size(score,2),size(tcourse,2),size(tcourse,3));
+    tuning = reshape(condtuning,size(condtuning,1),size(condtuning,2),3,12);
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2);
+        plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=circshift(squeeze(mean(tuning(i,:,:,:),3)),2);
+        plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=squeeze(mean(mean(tuning(i,2:7,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+        plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=squeeze(mean(tuning(i,2:7,:,:),2))- squeeze(mean(tuning(i,10:12,:,:),2));
+        plot(d'); range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=squeeze(mean(mean(tuning(i,1,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+        plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+    end
+    
+end
+
+tcourse = squeeze(drift_tcourse(:,:,1,:,:));
+tcourse = downsamplebin(tcourse(:,:,:,2:49),4,4,1);
+tcourse = downsamplebin(tcourse,2,2,1);
+tcourse = permute(tcourse,[1 4 2 3]);
+trace = reshape(tcourse,size(tcourse,1),size(tcourse,2)*size(tcourse,3)*size(tcourse,4));
+
+figure
+imagesc(isnan(squeeze(trace)))
+
+if prepost ==1
+    s = nanstd(trace,[],2);
+end
+figure
+hist(s,0.25:0.5:15)
+usespks = find(s>1 & nanratio<0.04);
+figure
+imagesc(isnan(squeeze(trace(usespks,:))));
+
+mn = nanmean(trace,2);
+
+normtrace = (trace - repmat(mn,[1 size(trace,2)]))./repmat(s,[1 size(trace,2)]);
+figure
+imagesc(normtrace(usespks,:),[ -5 5])
+
+[coeff scoreAll latent] = pca(normtrace(usespks,:)');
+%[coeff score latent] = pca(normtrace(usespks,:)');
+
+
+figure
+for i = 1:5;
+    subplot(5,1,i);
+    plot(scoreAll(:,i));
+end
+
+for prepost = 1:2
+    if prepost==1
+        score = scoreAll(1:size(scoreAll,1)/2,:);
+    else
+        score = scoreAll((size(scoreAll,1)/2+1):end,:);
+    end
+    
+    condtuning = reshape(score',size(score,2),size(tcourse,2),size(tcourse,3));
+    tuning = reshape(condtuning,size(condtuning,1),size(condtuning,2),3,12);
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2);
+        plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=circshift(squeeze(mean(tuning(i,:,:,:),3)),2);
+        plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=squeeze(mean(mean(tuning(i,2:7,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+        plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=squeeze(mean(tuning(i,2:7,:,:),2))- squeeze(mean(tuning(i,10:12,:,:),2));
+        plot(d'); range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+    end
+    
+    figure
+    for i = 1:12
+        subplot(3,4,i)
+        d=squeeze(mean(mean(tuning(i,1,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+        plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+    end
+end
+
+
+keyboard
+
+
+
+
+
+
+% for i = 1:5
+%     figure
+% for cond = 1:36;
+%     subplot(12,3,cond);
+%     plot(squeeze(condtuning(i,:,cond))); xlim([0.5 25.5]); ylim([-7.5 7.5]); set(gca,'Xtick',[]);
+%     set(gca,'LooseInset',get(gca,'TightInset'))
+% end
+% end
+
+
 
 
     
