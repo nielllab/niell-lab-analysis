@@ -384,22 +384,6 @@ end
 keyboard
 
 
-
-
-
-
-% for i = 1:5
-%     figure
-% for cond = 1:36;
-%     subplot(12,3,cond);
-%     plot(squeeze(condtuning(i,:,cond))); xlim([0.5 25.5]); ylim([-7.5 7.5]); set(gca,'Xtick',[]);
-%     set(gca,'LooseInset',get(gca,'TightInset'))
-% end
-% end
-
-
-
-
     
 dt = 0.05;
 for i=1:3
