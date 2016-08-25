@@ -740,7 +740,7 @@ files(n).postbars = '';
 files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [];
-%files(n).layersites = (1:16)=5;(17:32)=6;(33:49)=5;(40:64)=6
+files(n).layersites = (1:16)=5;(17:32)=6;(33:
 files(n).notes = 'good data';
 files(n).misc = '';
 files(n).badsites = [13 10 9 8 3 2 1];

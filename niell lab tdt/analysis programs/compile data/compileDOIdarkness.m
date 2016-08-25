@@ -4,16 +4,17 @@ close all
 dbstop if error
 
 batchDOIephys_filtered; %%% load batch file
+%set(groot,'defaultFigureVisible','off') %disable figure plotting
+set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
 %%% example
 %use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
 %useSess = use;
-use =  find( strcmp({files.treatment},'Lisuride') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
-%use =  find( strcmp({files.treatment},'') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
+%use =  find( strcmp({files.treatment},'Saline') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'081516'))
+%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'082416'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ketanserin=3; ketandoi=4; mglur2=5; mglur2doi=6; lisuride=7;
@@ -110,7 +111,7 @@ for i = 1:length(use)
     if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
         %%% get grating responses
         for prepost = 1:2
-            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
             drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
             drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
             drift_spont(cellrange,:,prepost) = drift.interSpont;
@@ -121,6 +122,8 @@ for i = 1:length(use)
             drift_orient_trial{prepost} = drift.trialOrient;
             for c = 1:length(cellrange)
                 drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
+                mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
+                
             end
         end
     end
@@ -168,13 +171,14 @@ for i = 1:length(use)
     
     %%% need to keep track of n^2 values for correlations
     corrRange=ncorr+1:ncorr+nc^2;
-    corrTreatment(corrRange)=treatment(cellrange(1));
+    corrTreatment(corrRange)=treatment(goodAll(1));
     
     
     %%% prepost correlation for white noise
     dt = 1;
     [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,0);
     wnCorr(corrRange,1) = preCorr(:); wnCorr(corrRange,2)=postCorr(:);
+    
     
     %%%% prepost correlation in darkness
     dt = 1;
@@ -194,6 +198,39 @@ for i = 1:length(use)
     n= n+nc;
     ncorr= ncorr+nc^2;
 end
+
+
+%%% plot mean timecourse across all drift stim and cells, by layer / cell-type
+%%% this should be updated to select active cells and separate
+%%% moving/stationary. Also maybe choose optimal stim for each cell?
+
+amp = squeeze(max(drift_orient,[],2));
+%useOS = amp(:,1,1)>2 %non-selective cells
+%useOS = drift_osi(:,1,1)>.2  & amp(:,1,1)>2
+titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
+dt = 0.05;
+for i=1:3
+    figure 
+    for t=1:7
+        
+        if i==1
+            set(gcf,'Name','grating lyr5');
+            mn = squeeze(mean(mnPsth(find(goodAll & useOS' & ~inhAll & layerAll==5 & treatment==t),:,:),1))'; 
+        elseif i==2
+            set(gcf,'Name','grating lyr2-4');
+            mn = squeeze(mean(mnPsth(find(goodAll & useOS' & ~inhAll & layerAll<5 & treatment==t),:,:),1))'; 
+        elseif i==3
+            set(gcf,'Name','grating inh');
+            mn = squeeze(mean(mnPsth(find(goodAll & useOS'  &  inhAll & treatment==t),:,:),1))';
+        end
+        mn = mn - repmat(mn(1,:),[50 1]);
+        mn = circshift(mn,10)
+        subplot(2,4,t)
+        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:)); title(titles{t}); xlabel('secs'); ylabel('sp/sec');
+        %ylim([0 max(mn(:))+1])
+    end
+end
+
 
 figure
 subplot(2,2,1); imagesc(squeeze(wn_frameR(find(goodAll),:,1,1)),[ 0 50]); title('pre stop')
@@ -336,7 +373,7 @@ plot(score(:,1)); hold on; plot(score(:,3),'r')
 preS = pre'*coeff;
 postS = post'*coeff;
 
-%using 8 units...can change to however many units you want to look at
+%using 8 components...can change to however many you want to look at
 figure
 for i = 1:8
     subplot(8,1,i)
@@ -371,21 +408,22 @@ titles = {'saline','doi','ketanserin', 'ketanserin + DOI','MGluR2', 'MGluR2 + DO
 figure
 for i = 1:7
     subplot(2,4,i);
+    
     plot(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),'.'); hold on; axis equal
     plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
     xlabel('pre wn corr'); ylabel('post')
     set(gcf,'Name','Wn Corr')
 end
 
-titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGlur2', 'MGlur2 + DOI', 'Lisuride'};
-figure
-for i = 1:7
-    subplot(2,4,i);
-    wnCorrHist= myHist2(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),-.5:.1:1.5,-.5:.1:1.5);
-    %wnCorrHist_pre= myHist2(wnCorr(corrTreatment==i,1),-.5:.1:1.5,-.5:.1:1.5)
-    plot(wnCorrHist);hold on; axis square;title(titles{i})
-    set(gcf,'Name','Wn Corr'); ylim([0 6000])
-end
+% titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGlur2', 'MGlur2 + DOI', 'Lisuride'};
+% figure
+% for i = 1:7
+%     subplot(2,4,i);
+%     wnCorrHist= myHist2(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),-.5:.1:1.5,-.5:.1:1.5);
+%     %wnCorrHist_pre= myHist2(wnCorr(corrTreatment==i,1),-.5:.1:1.5,-.5:.1:1.5)
+%     plot(wnCorrHist);hold on; axis square;title(titles{i})
+%     set(gcf,'Name','Wn Corr'); ylim([0 6000])
+% end
 
 
 %%% plot correlation for darkness
@@ -420,14 +458,14 @@ for mv = 1:2
     figure 
     for i = 1:6
         subplot(2,3,i)
-        plot(drift_spont(treatment==saline & layerAll ==i,mv,1),drift_spont(treatment==saline& layerAll ==i,mv,2),'k.');
+        plot(drift_spont(goodAll & treatment==saline & layerAll ==i,mv,1),drift_spont(goodAll &treatment==saline& layerAll ==i,mv,2),'k.');
         hold on
-        plot(drift_spont(treatment==doi& layerAll ==i,mv,1),drift_spont(treatment==doi& layerAll ==i,mv,2),'r.');
-        plot(drift_spont(treatment==ketanserin& layerAll ==i,mv,1),drift_spont(treatment==ketanserin& layerAll ==i,mv,2),'m.');
-        plot(drift_spont(treatment==ketandoi& layerAll ==i,mv,1),drift_spont(treatment==ketandoi& layerAll ==i,mv,2),'c.');
-        plot(drift_spont(treatment==mglur2& layerAll ==i,mv,1),drift_spont(treatment==mglur2& layerAll ==i,mv,2),'g.');
-        plot(drift_spont(treatment==mglur2doi& layerAll ==i,mv,1),drift_spont(treatment==mglur2doi& layerAll ==i,mv,2),'y.');
-         plot(drift_spont(treatment==lisuride& layerAll ==i,mv,1),drift_spont(treatment==lisuride& layerAll ==i,mv,2),'b.');
+        plot(drift_spont(goodAll & treatment==doi& layerAll ==i,mv,1),drift_spont(goodAll &treatment==doi& layerAll ==i,mv,2),'r.');
+        plot(drift_spont(goodAll &treatment==ketanserin& layerAll ==i,mv,1),drift_spont(goodAll &treatment==ketanserin& layerAll ==i,mv,2),'m.');
+        plot(drift_spont(goodAll &treatment==ketandoi& layerAll ==i,mv,1),drift_spont(goodAll &treatment==ketandoi& layerAll ==i,mv,2),'c.');
+        plot(drift_spont(goodAll &treatment==mglur2& layerAll ==i,mv,1),drift_spont(goodAll &treatment==mglur2& layerAll ==i,mv,2),'g.');
+        plot(drift_spont(goodAll &treatment==mglur2doi& layerAll ==i,mv,1),drift_spont(goodAll &treatment==mglur2doi& layerAll ==i,mv,2),'y.');
+         plot(drift_spont(goodAll &treatment==lisuride& layerAll ==i,mv,1),drift_spont(goodAll &treatment==lisuride& layerAll ==i,mv,2),'b.');
         plot([0 10],[0 10]); axis equal
         title(sprintf('layer %d',i)); ylabel('post');
         if mv ==1 , xlabel('stop drift spont'), set(gcf, 'Name', 'prepost stationary drift spont');
@@ -460,14 +498,14 @@ for mv = 1:2
     figure
     for i = 1:6
         subplot(2,3,i)
-        plot(wn_spont(treatment==saline & layerAll ==i,mv,1),wn_spont(treatment==saline& layerAll ==i,mv,2),'k.');
+        plot(wn_spont(goodAll &treatment==saline & layerAll ==i,mv,1),wn_spont(goodAll &treatment==saline& layerAll ==i,mv,2),'k.');
         % ylim ([-2 50]); xlim([-2 50]);
         hold on
-        plot(wn_spont(treatment==doi& layerAll ==i,mv,1),wn_spont(treatment==doi& layerAll ==i,mv,2),'r.');
-        plot(wn_spont(treatment==ketanserin& layerAll ==i,mv,1),wn_spont(treatment==ketanserin& layerAll ==i,mv,2),'m.');
-        plot(wn_spont(treatment==ketandoi& layerAll ==i,mv,1),wn_spont(treatment==ketandoi& layerAll ==i,mv,2),'c.');
-        plot(wn_spont(treatment==mglur2& layerAll ==i,mv,1),wn_spont(treatment==mglur2& layerAll ==i,mv,2),'g.');
-        plot(wn_spont(treatment==lisuride& layerAll ==i,mv,1),wn_spont(treatment==lisuride& layerAll ==i,mv,2),'b.');
+        plot(wn_spont(goodAll &treatment==doi& layerAll ==i,mv,1),wn_spont(goodAll &treatment==doi& layerAll ==i,mv,2),'r.');
+        plot(wn_spont(goodAll &treatment==ketanserin& layerAll ==i,mv,1),wn_spont(goodAll &treatment==ketanserin& layerAll ==i,mv,2),'m.');
+        plot(wn_spont(goodAll &treatment==ketandoi& layerAll ==i,mv,1),wn_spont(goodAll &treatment==ketandoi& layerAll ==i,mv,2),'c.');
+        plot(wn_spont(goodAll &treatment==mglur2& layerAll ==i,mv,1),wn_spont(goodAll &treatment==mglur2& layerAll ==i,mv,2),'g.');
+        plot(wn_spont(goodAll &treatment==lisuride& layerAll ==i,mv,1),wn_spont(goodAll &treatment==lisuride& layerAll ==i,mv,2),'b.');
         plot([0 10],[0 10]); axis equal
         title(sprintf('layer %d',i));  ylabel('post');
         if mv ==1 , xlabel('stop wn spont'); else  xlabel('move wn spont'); end
@@ -480,13 +518,13 @@ for mv = 1:2
     figure
     for i = 1:6
         subplot(2,3,i)
-        plot(wn_evoked(treatment==saline & layerAll ==i,mv,1),wn_evoked(treatment==saline& layerAll ==i,mv,2),'k.');
+        plot(wn_evoked(goodAll &treatment==saline & layerAll ==i,mv,1),wn_evoked(goodAll &treatment==saline& layerAll ==i,mv,2),'k.');
         hold on
-        plot(wn_evoked(treatment==doi& layerAll ==i,mv,1),wn_evoked(treatment==doi& layerAll ==i,mv,2),'r.');
-        plot(wn_evoked(treatment==ketanserin& layerAll ==i,mv,1),wn_evoked(treatment==ketanserin& layerAll ==i,mv,2),'m.');
-        plot(wn_evoked(treatment==ketandoi& layerAll ==i,mv,1),wn_evoked(treatment==ketandoi& layerAll ==i,mv,2),'c.');
-        plot(wn_evoked(treatment==mglur2& layerAll ==i,mv,1),wn_evoked(treatment==mglur2& layerAll ==i,mv,2),'g.');
-        plot(wn_evoked(treatment==lisuride& layerAll ==i,mv,1),wn_evoked(treatment==lisuride& layerAll ==i,mv,2),'b.');
+        plot(wn_evoked(goodAll &treatment==doi& layerAll ==i,mv,1),wn_evoked(goodAll &treatment==doi& layerAll ==i,mv,2),'r.');
+        plot(wn_evoked(goodAll &treatment==ketanserin& layerAll ==i,mv,1),wn_evoked(goodAll &treatment==ketanserin& layerAll ==i,mv,2),'m.');
+        plot(wn_evoked(goodAll &treatment==ketandoi& layerAll ==i,mv,1),wn_evoked(goodAll &treatment==ketandoi& layerAll ==i,mv,2),'c.');
+        plot(wn_evoked(goodAll &treatment==mglur2& layerAll ==i,mv,1),wn_evoked(goodAll &treatment==mglur2& layerAll ==i,mv,2),'g.');
+        plot(wn_evoked(goodAll &treatment==lisuride& layerAll ==i,mv,1),wn_evoked(goodAll &treatment==lisuride& layerAll ==i,mv,2),'b.');
         plot([0 10],[0 10]); xl = get(gca,'Xlim'); yl = get(gca,'Ylim'); axis square; %axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
         title(sprintf('layer %d',i));  ylabel('post'); ylim([-5 50]);xlim([-5 50])
         if mv ==1 , xlabel('stop wn evoked'); else  xlabel('move wn evoked'); end
@@ -501,22 +539,22 @@ for mv = 1:2
     for c=0:1
     for t=1:7
         subplot(7,7,t)
-        plot(wn_evoked(treatment==t & layerAll ==1 & inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==1& inhAll==c,mv,2),'.');axis equal;ylim([-5 20]);xlim([-5 20])
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==1 & inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==1& inhAll==c,mv,2),'.');axis equal;ylim([-5 20]);xlim([-5 20])
         hold on; plot([0 45],[0 45])
         subplot(7,7,t+7)
-        plot(wn_evoked(treatment==t & layerAll ==2& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==2& inhAll==c,mv,2),'.');axis equal;ylim([-5 30]);xlim([-5 30])
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==2& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==2& inhAll==c,mv,2),'.');axis equal;ylim([-5 30]);xlim([-5 30])
         hold on; plot([0 45],[0 45])
         subplot(7,7,t+14)
-        plot(wn_evoked(treatment==t & layerAll ==3& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==3& inhAll==c,mv,2),'.');axis equal;ylim([-5 40]);xlim([-5 40])
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==3& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==3& inhAll==c,mv,2),'.');axis equal;ylim([-5 40]);xlim([-5 40])
         hold on; plot([0 45],[0 45])
         subplot(7,7,t+21)
-        plot(wn_evoked(treatment==t & layerAll ==4& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==4& inhAll==c,mv,2),'.');axis equal;ylim([-5 40]);xlim([-5 40])
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==4& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==4& inhAll==c,mv,2),'.');axis equal;ylim([-5 40]);xlim([-5 40])
         hold on; plot([0 45],[0 45])
         subplot(7,7,t+28)
-        plot(wn_evoked(treatment==t & layerAll ==5& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==5& inhAll==c,mv,2),'.');axis equal;ylim([-5 30]);xlim([-5 30])
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==5& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==5& inhAll==c,mv,2),'.');axis equal;ylim([-5 30]);xlim([-5 30])
         hold on; plot([0 45],[0 45])
         subplot(7,7,t+32)
-        plot(wn_evoked(treatment==t & layerAll ==6& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==6& inhAll==c,mv,2),'.');axis equal; ylim([-5 20]);xlim([-5 20]);hold on
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==6& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==6& inhAll==c,mv,2),'.');axis equal; ylim([-5 20]);xlim([-5 20]);hold on
         plot([0 45],[0 45]); %axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
         ylabel('post'); xlabel('pre');
     end 
@@ -529,23 +567,23 @@ for mv = 1:2
     if mv ==1 , set(gcf,'Name','stop wn evoked'); else  set(gcf,'Name','move wn evoked'); end
     for c=0:1
     for t=1:7
-        subplot(6,6,t)
-        plot(wn_evoked(treatment==t & layerAll ==1 & inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==1& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
+        subplot(6,7,t)
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==1 & inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==1& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
         hold on; plot([0 45],[0 45])
-        subplot(6,6,t+6)
-        plot(wn_evoked(treatment==t & layerAll ==2& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==2& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
+        subplot(6,7,t+6)
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==2& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==2& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
         hold on; plot([0 45],[0 45])
-        subplot(6,6,t+12)
-        plot(wn_evoked(treatment==t & layerAll ==3& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==3& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
+        subplot(6,7,t+12)
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==3& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==3& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
         hold on; plot([0 45],[0 45])
-        subplot(6,6,t+18)
-        plot(wn_evoked(treatment==t & layerAll ==4& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==4& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
+        subplot(6,7,t+18)
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==4& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==4& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
         hold on; plot([0 45],[0 45])
-        subplot(6,6,t+24)
-        plot(wn_evoked(treatment==t & layerAll ==5& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==5& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
+        subplot(6,7,t+24)
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==5& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==5& inhAll==c,mv,2),'.');axis equal;ylim([-5 45]);xlim([-5 45])
         hold on; plot([0 45],[0 45])
-        subplot(6,6,t+30)
-        plot(wn_evoked(treatment==t & layerAll ==6& inhAll==c,mv,1),wn_evoked(treatment==t& layerAll ==6& inhAll==c,mv,2),'.');axis equal; ylim([-5 45]);xlim([-5 45]);hold on
+        subplot(6,7,t+32)
+        plot(wn_evoked(goodAll &treatment==t & layerAll ==6& inhAll==c,mv,1),wn_evoked(goodAll &treatment==t& layerAll ==6& inhAll==c,mv,2),'.');axis equal; ylim([-5 45]);xlim([-5 45]);hold on
         plot([0 45],[0 45]); %axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
         ylabel('post'); xlabel('pre');
     end 
@@ -558,22 +596,22 @@ titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DO
     for c=0:1
     for t=1:7
         subplot(6,7,t)
-        plot(meanRdark(treatment==t & layerAll ==1 & inhAll==c,1),meanRdark(treatment==t& layerAll ==1& inhAll==c,2),'.');axis equal;ylim([0 20]);xlim([0 20])
+        plot(meanRdark(goodAll &treatment==t & layerAll ==1 & inhAll==c,1),meanRdark(goodAll &treatment==t& layerAll ==1& inhAll==c,2),'.');axis equal;ylim([0 20]);xlim([0 20])
         hold on; plot([0 45],[0 45]);
         subplot(6,7,t+7)
-        plot(meanRdark(treatment==t & layerAll ==2& inhAll==c,1),meanRdark(treatment==t& layerAll ==2& inhAll==c,2),'.');axis equal;ylim([0 20]);xlim([0 20])
+        plot(meanRdark(goodAll &treatment==t & layerAll ==2& inhAll==c,1),meanRdark(goodAll &treatment==t& layerAll ==2& inhAll==c,2),'.');axis equal;ylim([0 20]);xlim([0 20])
         hold on; plot([0 45],[0 45])
         subplot(6,7,t+14)
-        plot(meanRdark(treatment==t & layerAll ==3& inhAll==c,1),meanRdark(treatment==t& layerAll ==3& inhAll==c,2),'.');axis equal;ylim([0 40]);xlim([0 40])
+        plot(meanRdark(goodAll &treatment==t & layerAll ==3& inhAll==c,1),meanRdark(goodAll &treatment==t& layerAll ==3& inhAll==c,2),'.');axis equal;ylim([0 40]);xlim([0 40])
         hold on; plot([0 45],[0 45])
         subplot(6,7,t+21)
-        plot(meanRdark(treatment==t & layerAll ==4& inhAll==c,1),meanRdark(treatment==t& layerAll ==4& inhAll==c,2),'.');axis equal;ylim([0 45]);xlim([0 45])
+        plot(meanRdark(goodAll &treatment==t & layerAll ==4& inhAll==c,1),meanRdark(goodAll &treatment==t& layerAll ==4& inhAll==c,2),'.');axis equal;ylim([0 45]);xlim([0 45])
         hold on; plot([0 45],[0 45])
         subplot(6,7,t+28)
-        plot(meanRdark(treatment==t & layerAll ==5& inhAll==c,1),meanRdark(treatment==t& layerAll ==5& inhAll==c,2),'.');axis equal;ylim([0 45]);xlim([0 45])
+        plot(meanRdark(goodAll &treatment==t & layerAll ==5& inhAll==c,1),meanRdark(goodAll &treatment==t& layerAll ==5& inhAll==c,2),'.');axis equal;ylim([0 45]);xlim([0 45])
         hold on; plot([0 45],[0 45])
         subplot(6,7,t+32)
-        plot(meanRdark(treatment==t & layerAll ==6& inhAll==c,1),meanRdark(treatment==t& layerAll ==6& inhAll==c,2),'.');axis equal; ylim([0 20]);xlim([0 20]);hold on
+        plot(meanRdark(goodAll &treatment==t & layerAll ==6& inhAll==c,1),meanRdark(goodAll &treatment==t& layerAll ==6& inhAll==c,2),'.');axis equal; ylim([0 20]);xlim([0 20]);hold on
         plot([0 45],[0 45]); %axis([min(xl(1),yl(1)) max(xl(2),yl(2)) min(xl(1),yl(1)) max(xl(2),yl(2)) ])
         ylabel('post'); xlabel('pre');
     end 
@@ -586,8 +624,8 @@ for mv=1:2
     if mv==1 set(gcf,'Name','stationary'), else set(gcf,'Name','moving');end
    for c=0:1
     for t=1:7
-        subplot(3,2,t)
-        plot(wn_evoked(treatment==t & inhAll ==c,mv,1),wn_evoked(treatment==t & inhAll==c ,mv,2),'.');hold on; plot([0 45],[0 45]);axis equal; ylim([-5 40]);xlim([-5 40]);
+        subplot(4,2,t)
+        plot(wn_evoked(goodAll &treatment==t & inhAll ==c,mv,1),wn_evoked(goodAll &treatment==t & inhAll==c ,mv,2),'.');hold on; plot([0 45],[0 45]);axis equal; ylim([-5 40]);xlim([-5 40]);
         % plot(wn_evoked(treatment==t & inhAll(useN(i)) ==1,mv,1),wn_evoked(treatment==t &inhAll(useN(i)) ==1 ,mv,2),'r.');hold on; plot([0 10],[0 10]);axis equal; ylim([-5 40])
         ylabel('post'); xlabel('pre')
         hold on ;title(titles{t});
@@ -599,8 +637,8 @@ end
 figure
 for t = 1:7
     for c=0:1
-subplot(3,2,t)
-plot(meanRdark(treatment==t & inhAll==c,1),meanRdark(treatment==t & inhAll==c,2),'.');hold on; plot([0 45],[0 45]);axis equal;ylim([0 45]); xlim([0 45]);
+subplot(4,2,t)
+plot(meanRdark(goodAll &treatment==t & inhAll==c,1),meanRdark(goodAll &treatment==t & inhAll==c,2),'.');hold on; plot([0 45],[0 45]);axis equal;ylim([0 45]); xlim([0 45]);
 title(titles{t});ylabel('post'); xlabel('pre')
 end
 end
@@ -617,7 +655,7 @@ for t = 1:6
     elseif t==6, set(gcf, 'Name','MGluR2+ DOI wn CRF')
     else set(gcf,'Name','Lisuride'),end
     
-    useN = find(treatment==t)
+    useN = find(goodAll &treatment==t)
     for i = 1:ceil(length(useN))
         np = ceil(sqrt(length(useN)));
         subplot(np,np,i);
@@ -640,7 +678,7 @@ for t = 1:6
     elseif t==5, set(gcf,'Name','MGlur2 OT')
      elseif t==6, set(gcf,'Name','MGlur2 _ DOI OT')
     else set(gcf,'Name','Lisuride'),end
-    useN = find(treatment==t)
+    useN = find(goodAll & treatment==t)
     for i = 1:length(useN)
         np = ceil(sqrt(length(useN)));
         subplot(np,np,i);
@@ -657,7 +695,7 @@ end
 
 %plot spatial frequency tuning curves for all units
 for t = 1:7
-    figure
+    
     figure
     if t==1, set(gcf,'Name','saline SF'),
     elseif t==2, set(gcf,'Name','doi SF'),
@@ -666,7 +704,7 @@ for t = 1:7
     elseif t==5, set(gcf,'Name','mglur2 SF')
     elseif t==6, set(gcf,'Name','mglur2 + DOI SF')
     else set(gcf,'Name','lisuride SF'),end
-    useN = find(treatment==t)
+    useN = find(goodAll & treatment==t)
     for i = 1:length(useN)
         np = ceil(sqrt(length(useN)));
         subplot(np,np,i);
@@ -719,7 +757,7 @@ plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==mglur2,1:25,:),1))); ti
 subplot(4,2,6)
 plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==mglur2doi,1:25,:),1))); title('mglur2 + DOI'); xlabel('speed')
 subplot(4,2,7)
-plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==mglur2doi,1:25,:),1))); title('mglur2 + DOI'); xlabel('speed')
+plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==lisuride,1:25,:),1))); title('Lisuride'); xlabel('speed')
 legend('pre','post')
 
 
@@ -730,10 +768,10 @@ titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI', 'MGluR2','MGlur2 + DO
 figure
 for t = 1:7
     useDark = meanRdark(:,1)>.3 | meanRdark(:,2)>.3;
-    useN = find(treatment==t)
+    useN = find(goodAll & treatment==t)
     MIdark= (meanRdark(:,2)-meanRdark(:,1))./(meanRdark(:,2)+meanRdark(:,1));
     
-    subplot(4,2,t+2)
+    subplot(5,2,t+2)
     h= hist(MIdark(useDark(treatment==t)),-1:.1:1);
     Mbins=-1:.1:1
     bar(Mbins,h/sum(useDark(treatment==t)))
@@ -741,7 +779,7 @@ for t = 1:7
     xlabel('MI'); ylabel('fraction of cells');title(titles{t});
     set(gcf,'Name','MI Dark')
     %hold on
-    subplot(4,2,2)
+    subplot(5,2,2)
     meanMIdark(t) = nanmean(MIdark(treatment==t))
     %err(t) = nanstd(MIdark(treatment==t))/sqrt(sum(MIdark (treatment==t)));
     bar(meanMIdark)
@@ -754,7 +792,7 @@ end
 titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI','MGluR2', 'MGluR2 + DOI', 'Lisuride'};
 figure
 for t = 1:7
-    useN = find(treatment==t)
+    useN = find(goodAll & treatment==t)
     MIdarkCorr= (darkCorr(:,2)-darkCorr(:,1))./(darkCorr(:,2)+darkCorr(:,1));
     subplot(4,2,t)
     h= hist(MIdarkCorr(useN),-1:.1:1);
@@ -766,19 +804,19 @@ for t = 1:7
 end
 
 % % mod for WN corr
-titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI','MGluR2', 'MGluR2 + DOI'};
-figure
-for t = 1:7
-    useN = find(treatment==t)
-    MIwnCorr= (wnCorr(:,2)-wnCorr(:,1))./(wnCorr(:,2)+wnCorr(:,1));
-    subplot(4,2,t)
-    h= hist(MIwnCorr(useN),-1:.1:1);
-    Mbins=-1:.1:1
-    bar(Mbins,h/sum(useN))
-    xlim([-1.5 1.5]); ylim([0 .35]);axis xy
-    xlabel('wn pairwise MI'); ylabel('fraction of cells');title(titles{t});
-    set(gcf,'Name','Corr MI Wn')
-end
+% titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI','MGluR2', 'MGluR2 + DOI'};
+% figure
+% for t = 1:7
+%     useN = find(treatment==t)
+%     MIwnCorr= (wnCorr(:,2)-wnCorr(:,1))./(wnCorr(:,2)+wnCorr(:,1));
+%     subplot(5,2,t)
+%     h= hist(MIwnCorr(useN),-1:.1:1);
+%     Mbins=-1:.1:1
+%     bar(Mbins,h/sum(useN))
+%     xlim([-1.5 1.5]); ylim([0 .35]);axis xy
+%     xlabel('wn pairwise MI'); ylabel('fraction of cells');title(titles{t});
+%     set(gcf,'Name','Corr MI Wn')
+% end
 % 
 % % MI MOVING! WN evoked 
 % figure
@@ -854,10 +892,10 @@ end
 %     bar(meanMI_mv_spont);ylim([-1 1]);
 % end
 
-titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI','MGluR2', 'MGluR2 + DOI'};
+titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI','MGluR2', 'MGluR2 + DOI', 'Lisuride'};
 figure
 for t=1:7
-    useN = find(treatment==t)
+    useN = find(goodAll & treatment==t)
     for i = 1:length(useN)
         subplot(4,2,t)
         plot(cv2Dark(treatment==t,1), cv2Dark(treatment==t,2),'.');title(titles{t});
@@ -865,6 +903,8 @@ for t=1:7
         plot([0 2],[0 2])
     end
 end
+
+%save('compileSalineAll_filtered')
 
 % %%%%%%%% ===================================================== %%%%%%%%%%
 % %%% try to decode SF, compare pre and post sessions for each treatment %%%
