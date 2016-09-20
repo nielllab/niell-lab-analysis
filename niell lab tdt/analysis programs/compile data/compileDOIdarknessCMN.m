@@ -344,7 +344,7 @@ for prepost = 1:2
     condtuning = reshape(score',size(score,2),size(tcourse,2),size(tcourse,3));
     tuning = reshape(condtuning,size(condtuning,1),size(condtuning,2),3,12);
     
-    figure
+ 
     for i = 1:12
         subplot(3,4,i)
         d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2);
