@@ -7,14 +7,16 @@ batchDOIephys_filtered; %%% load batch file
 
 %%% select the sessions you want based on filters
 %%% example
-%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.treatment},'DOI')  )
-useSess = use;
+use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.treatment},'Saline')  )
+
 %use =  find( strcmp({files.treatment},'KetanserinDOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 %use =  find( strcmp({files.treatment},'DOI') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'bad data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'083115'))
+%use =  find(strcmp({files.notes},'bad data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'083115'))
 sprintf('%d selected sessions',length(use))
+
+useSess = use;
 
 saline=1; doi=2; ketanserin=3; ketandoi=4; lisuride=5;
 
@@ -37,24 +39,6 @@ for i = 1:length(use)
     good(files(use(i)).badsites) =0;
     goodAll(cellrange)=good;
     
-%     if ~isempty(files(use(i)).prepinpFile)
-%         pinp =getPinpHTR2A(clustfile,afile, files(use(i)).prepinpFile,3,5,0,0,1)
-%         pinpAll(cellrange,1) = pinp.pinped;
-%         %         pinpPsth(cellrange,:,1)=pinp.psth;
-%     else
-%         pinpAll(cellrange,1)=NaN;
-%         %         pinpPsth(cellrange,:,1)=NaN;
-%     end
-%     
-%     if ~isempty(files(use(i)).postpinpFile)
-%         pinp =getPinpHTR2A(clustfile,afile, files(use(i)).postpinpFile,3,5,0,0,1)
-%         pinpAll(cellrange,2) = pinp.pinped;
-%         %         pinpPsth(cellrange,:,2)=pinp.psth;
-%     else
-%         pinpAll(cellrange,2)=NaN;
-%         %        pinpPsth(cellrange,:,2)=NaN;
-%     end
-%     
     
     %% get layer info
     clear layer
@@ -128,6 +112,8 @@ for i = 1:length(use)
                         tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
                     end
                     drift_tcourse(cellrange,cond,mv,prepost,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
+                    sf = mod(cond-1,6)+1; ori = ceil(cond/6);
+                    drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
                 end
             end
             
@@ -209,6 +195,145 @@ for i = 1:length(use)
 
 %     ncorr= ncorr+nc^2;
 end
+
+keyboard
+
+usespks = find(goodAll);
+for i = 1:length(usespks);
+    if mod(i,48)==1
+        figure
+    end
+    subplot(6,8,mod(i-1,48)+1);
+    hold on
+    plot(drift_orient(usespks(i),:,1,1),'Color',[0.5 0 0]);
+    plot(drift_orient(usespks(i),:,1,2),'Color',[1 0 0]);
+    plot(drift_orient(usespks(i),:,2,1),'Color',[0 0.5 0]);
+    plot(drift_orient(usespks(i),:,2,2),'Color',[0 1 0]);
+    xlim([1 12]); yl = get(gca,'Ylim'); ylim([0 max(5,yl(2))]);
+end
+
+%drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:)
+
+titles = {'pre stop','post stop','pre move','exc lyr<5'};
+figure
+for prepost=1:2
+    clear ori_data
+    for ori = 1:6
+        ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,:,prepost,[ori ori+6],:,:),5),4));
+    end
+    for n= 1:size(ori_data,1);
+        [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
+        ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
+    end
+    
+    ori_data =downsamplebin(ori_data,4,2,1);
+    ori_data = circshift(ori_data,5,4);
+    
+    for mv = 1:2
+        subplot(2,2,prepost+2*(mv-1));
+        plot(squeeze(nanmean(ori_data(find(goodAll & ~inhAll & layerAll<5),mv,:,:),1))');
+        title(titles{prepost+2*(mv-1)}); ylim([1 4])
+    end
+end
+
+
+
+mv = 1
+  clear ori_data
+    for ori = 1:6
+        ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,mv,:,[ori ori+6],:,:),5),4));
+    end
+    for n= 1:size(ori_data,1);
+        [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
+        ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
+    end
+    
+    ori_data =downsamplebin(ori_data,4,2,1);
+    ori_data = circshift(ori_data,5,4);
+
+combinedParams = {{1, [1 3]}, {2, [2 3]}, {3}, {[1 2], [1 2 3]}};
+margNames = {'prepost', 'orientation', 'Condition-independent', 'treatment/stim Interaction'};
+margColours = [23 100 171; 187 20 25; 150 150 150; 114 97 171]/256;
+
+d = ori_data(:,:);
+clean = ~isnan(mean(d,2));
+data = ori_data(find(clean & goodAll'),:,:,:);
+data = permute(data,[1 3 2 4]);
+
+d = permute(data,[1 4 2 3]);
+d = d(:,:);
+
+celltype = layerAll; celltype(inhAll) = 7;
+[y order] = sort(celltype(find(clean & goodAll')));
+
+resp = d(:,:);
+for n= 1:size(resp,1);
+    m = max(resp(n,:)); m= max(5,m); resp(n,:) = resp(n,:)/m;
+    data(n,:,:,:) = data(n,:,:,:)/m;
+end
+
+dist = pdist(d,'correlation');  %%% sort based on correlation coefficient
+display('doing cluster')
+tic, Z = linkage(dist,'ward'); toc
+figure
+subplot(3,4,[1 5 9 ])
+display('doing dendrogram')
+[h t perm] = dendrogram(Z,0,'Orientation','Left','ColorThreshold' ,5);
+axis off
+subplot(3,4,[2 3 4 6 7 8 10 11 12 ]);
+imagesc((resp(perm,:)),[0 1]); axis xy   %%% show sorted data
+
+lyr = layerAll(goodAll & clean'); sess = sessionNum(goodAll & clean'); type = celltype(goodAll & clean');
+figure
+imagesc(lyr(perm)'); title('layers clustered'); colormap jet; axis xy
+figure
+imagesc(sess(perm)'); title('sessions clustered'); colormap jet; axis xy
+figure
+imagesc(type(perm)'); title('type clustered'); colormap jet; axis xy
+
+figure
+imagesc(layerAll(goodAll & clean')'); title('layer by session'); colormap jet;
+
+figure
+imagesc(inhAll(goodAll & clean')'); title('inh by session'); colormap jet;
+
+figure
+imagesc(resp(order,:),[0 1]); hold on; title('layers');
+borders = find(diff(y)); for i = 1:length(borders); plot([1 size(d(:,:),2)],[borders(i) borders(i)],'m','Linewidth',2);end
+
+figure
+imagesc(resp,[0 1]); hold on; borders = find(diff(sessionNum(find(goodAll & clean')))); for i = 1:length(borders); plot([1 size(d(:,:),2)],[borders(i) borders(i)],'m','Linewidth',2);end
+title('sessions')
+
+
+
+tic
+[W,V,whichMarg] = dpca(data, 20, ...
+    'combinedParams', combinedParams);
+toc
+
+explVar = dpca_explainedVariance(data, W, V, ...
+    'combinedParams', combinedParams);
+
+
+time= (1:25)*0.1; timeEvents = 0.5;
+dpca_plot(data, W, V, @dpca_plot_default, ...
+    'explainedVar', explVar, ...
+    'marginalizationNames', margNames, ...
+    'marginalizationColours', margColours, ...
+    'whichMarg', whichMarg,                 ...
+        'time', time,                        ...
+    'timeEvents', timeEvents,               ...
+    'timeMarginalization', 3, ...
+    'legendSubplot', 16);
+
+
+figure
+imagesc(V(order,1:15),[-0.5 0.5]); colormap jet; title('encoder by layer');
+
+keyboard
+
+
 
 d= squeeze(drift_tcourse(:,:,1,:,1));  %%% stationary first timepoint
 d = downsamplebin(d,2,2,1);
