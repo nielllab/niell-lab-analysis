@@ -321,13 +321,13 @@ end
 %     print('-dpsc',psfilename,'-append');
 % end
 
-figure
-for i = 1:3
-    subplot(4,1,i)
-    plot(score(:,i)); ylabel(sprintf('pca %d',i))
-end
-subplot(4,1,4)
-plot(allT,allV); ylabel('speed')
+% figure
+% for i = 1:3
+%     subplot(4,1,i)
+%     plot(score(:,i)); ylabel(sprintf('pca %d',i))
+% end
+% subplot(4,1,4)
+% plot(allT,allV); ylabel('speed')
 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');

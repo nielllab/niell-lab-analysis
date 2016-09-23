@@ -62,7 +62,6 @@ timelimit=0;
 maxT = 1000;
 
 for tet=use_tets
-    %close all
    clear X
     %%%% read in all waveforms for this tetrode
     for tet_ch=1:4

@@ -57,8 +57,10 @@ maxV= max(max(phi(:,1:duration_samps)));
 for c= 0:(nchan/4-1)
     if nchan==16
         subplot(2,2,c+1);
-    else
+    elseif nchan ==32
         subplot(4,2,c+1)%enter "32" for 64 channel recording to plot one shank's CSD
+    else
+        subplot(4,4,c+1)
     end
     plot((phi((4*c+1):(4*c+4),1:duration_samps)'));
     axis([0 duration_samps minV*1.1 maxV*1.1])

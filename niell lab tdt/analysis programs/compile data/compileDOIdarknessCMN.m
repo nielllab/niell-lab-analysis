@@ -266,7 +266,7 @@ for prepost = 1:2
     figure
     for i = 1:12
         subplot(3,4,i)
-        d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2);
+        d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2); %%% average over either sf or orientation
         plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
     end
     

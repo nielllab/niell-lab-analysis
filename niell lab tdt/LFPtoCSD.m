@@ -24,7 +24,7 @@ tetrode_linear=0;
 if tetrode_linear
     ch_map = [14 8 10 4 13 7 9 3 11 1 15 5 12 2 16 6];
 else
-    ch_map = 1:16;
+    ch_map = 1:64;
 end
 
 

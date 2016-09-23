@@ -1,9 +1,9 @@
 clear all
 close all
 
-dir = 'D:\Angie_tanks\eyetracking data_mat';
-name = 'atropine_test.mat'; %data file
-thresh = 0.875; %pupil threshold for binarization
+dir = 'D:\Angie_analysis\DOI_experiments\01_27_16';
+name = '01_27_16_bars_eye'; %data file
+thresh = 0.80; %pupil threshold for binarization
 puprange = [15 55]; %set
 
 %%closed loop parameters

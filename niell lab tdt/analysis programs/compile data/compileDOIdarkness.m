@@ -8,13 +8,12 @@ batchDOIephys_filtered; %%% load batch file
 set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-%%% example
 %use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
 %useSess = use;
 %use =  find( strcmp({files.treatment},'Saline') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'082416'))
+%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'092116'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ketanserin=3; ketandoi=4; mglur2=5; mglur2doi=6; lisuride=7;
@@ -108,24 +107,34 @@ for i = 1:length(use)
           if prepost==2,  title(sprintf('%s post %s',files(use(i)).expt, files(use(i)).treatment)); end
       end
       
-    if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
-        %%% get grating responses
-        for prepost = 1:2
-            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
-            drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
-            drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
-            drift_spont(cellrange,:,prepost) = drift.interSpont;
-            drift_osi(cellrange,:,prepost) = drift.cv_osi;
-            drift_F1F0(:,cellrange,prepost)= drift.F1F0;
-            drift_ot_tune(cellrange,:,:,prepost)=drift.orient_tune;
-            drift_sf_trial{prepost} = drift.trialSF;
-            drift_orient_trial{prepost} = drift.trialOrient;
-            for c = 1:length(cellrange)
-                drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
-                mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
-                
+      if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
+          %%% get grating responses
+          for prepost = 1:2
+              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+              drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
+              %drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
+              drift_spont(cellrange,:,prepost) = drift.interSpont;
+              drift_osi(cellrange,:,prepost) = drift.cv_osi;
+              drift_F1F0(:,cellrange,prepost)= drift.F1F0;
+              drift_ot_tune(cellrange,:,:,prepost)=drift.orient_tune;
+              drift_sf_trial{prepost} = drift.trialSF;
+              drift_orient_trial{prepost} = drift.trialOrient;
+              for c = 1:length(cellrange)
+                  drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
+                  mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
+              end
+          end
+        for cond = 1:72
+            for mv = 1:2
+                if mv ==1
+                    tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd<1);
+                else
+                    tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
+                end
+                drift_tcourse(cellrange,cond,mv,prepost,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
             end
         end
+        
     end
     
         if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
@@ -136,8 +145,10 @@ for i = 1:length(use)
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
-        wn_gain(1,cellrange,prepost)=wn.gain
+        wn_gain(1,cellrange,prepost)=wn.gain;
         wn_frameR(cellrange,:,:,prepost) = downsamplebin(wn.frameR,2,15)/15;
+        wn_reliability(1,cellrange,prepost) = wn.reliability;
+
     end
         end
         
@@ -165,7 +176,7 @@ for i = 1:length(use)
 
 %   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
 %   drawnow
-%   
+  
 
     %% darkness / correlation analysis
     
@@ -200,28 +211,246 @@ for i = 1:length(use)
 end
 
 
+% d= squeeze(drift_tcourse(:,:,1,:,1));  %%% stationary first timepoint
+% d = downsamplebin(d,2,2,1);
+% d = reshape(d,size(d,1),size(d,2)*size(d,3));
+% nanratio = mean(isnan(d),2);
+% figure
+% plot(nanratio)
+% 
+% for prepost = 1:2
+%     
+%     tcourse = squeeze(drift_tcourse(:,:,1,prepost,:));
+%     tcourse = downsamplebin(tcourse(:,:,2:49),3,4,1);
+%     tcourse = downsamplebin(tcourse,2,2,1);
+%     tcourse = permute(tcourse,[1 3 2]);
+%     trace = reshape(tcourse,size(tcourse,1),size(tcourse,2)*size(tcourse,3));
+%     
+%     figure
+%     imagesc(isnan(squeeze(trace)))
+%     
+%     if prepost ==1
+%         s = nanstd(trace,[],2);
+%     end
+%     figure
+%     hist(s,0.25:0.5:15)
+%     usespks = find(s>1 & nanratio<0.04);
+%     figure
+%     imagesc(isnan(squeeze(trace(usespks,:))));
+%  
+%     mn = nanmean(trace,2);
+%     
+%     normtrace = (trace - repmat(mn,[1 size(trace,2)]))./repmat(s,[1 size(trace,2)]);
+%     figure
+%     imagesc(normtrace(usespks,:),[ -5 5])
+%     
+%     if prepost==1
+%         [coeff score latent] = pca(normtrace(usespks,:)');  score(:,12) = mean(normtrace(usespks,:),1);
+%         %[coeff score latent] = pca(normtrace(usespks,:)');
+%         
+%         figure
+%         plot(latent(1:20)/sum(latent));
+%         
+%     end
+%        data = normtrace(usespks,:)';
+%        score = data*coeff;
+%     
+%     figure
+%     for i = 1:5;
+%         subplot(5,1,i);
+%         plot(score(:,i));
+%     end
+%     
+%     condtuning = reshape(score',size(score,2),size(tcourse,2),size(tcourse,3));
+%     tuning = reshape(condtuning,size(condtuning,1),size(condtuning,2),3,12);
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2); %%% average over either sf or orientation
+%         plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=circshift(squeeze(mean(tuning(i,:,:,:),3)),2);
+%         plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=squeeze(mean(mean(tuning(i,2:7,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+%         plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=squeeze(mean(tuning(i,2:7,:,:),2))- squeeze(mean(tuning(i,10:12,:,:),2));
+%         plot(d'); range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=squeeze(mean(mean(tuning(i,1,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+%         plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+%     end
+%     
+% end
+% 
+% tcourse = squeeze(drift_tcourse(:,:,1,:,:));
+% tcourse = downsamplebin(tcourse(:,:,:,2:49),4,4,1);
+% tcourse = downsamplebin(tcourse,2,2,1);
+% tcourse = permute(tcourse,[1 4 2 3]);
+% trace = reshape(tcourse,size(tcourse,1),size(tcourse,2)*size(tcourse,3)*size(tcourse,4));
+% 
+% figure
+% imagesc(isnan(squeeze(trace)))
+% 
+% if prepost ==1
+%     s = nanstd(trace,[],2);
+% end
+% figure
+% hist(s,0.25:0.5:15)
+% usespks = find(s>1 & nanratio<0.04);
+% figure
+% imagesc(isnan(squeeze(trace(usespks,:))));
+% 
+% mn = nanmean(trace,2);
+% 
+% normtrace = (trace - repmat(mn,[1 size(trace,2)]))./repmat(s,[1 size(trace,2)]);
+% figure
+% imagesc(normtrace(usespks,:),[ -5 5])
+% 
+% [coeff scoreAll latent] = pca(normtrace(usespks,:)');
+% %[coeff score latent] = pca(normtrace(usespks,:)');
+% 
+% 
+% figure
+% for i = 1:5;
+%     subplot(5,1,i);
+%     plot(scoreAll(:,i));
+% end
+% 
+% for prepost = 1:2
+%     if prepost==1
+%         score = scoreAll(1:size(scoreAll,1)/2,:);
+%     else
+%         score = scoreAll((size(scoreAll,1)/2+1):end,:);
+%     end
+%     
+%     condtuning = reshape(score',size(score,2),size(tcourse,2),size(tcourse,3));
+%     tuning = reshape(condtuning,size(condtuning,1),size(condtuning,2),3,12);
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2);
+%         plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=circshift(squeeze(mean(tuning(i,:,:,:),3)),2);
+%         plot(d);  range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 size(d,1)+0.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=squeeze(mean(mean(tuning(i,2:7,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+%         plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=squeeze(mean(tuning(i,2:7,:,:),2))- squeeze(mean(tuning(i,10:12,:,:),2));
+%         plot(d'); range = max(abs(d(:)))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+%     end
+%     
+%     figure
+%     for i = 1:12
+%         subplot(3,4,i)
+%         d=squeeze(mean(mean(tuning(i,1,:,:),3),2))- squeeze(mean(mean(tuning(i,10:12,:,:),3),2));
+%         plot(d); range = max(abs(d))*1.25; range = max(range,4); ylim([-range range]); xlim([0.5 12.5])
+%     end
+% end
+% 
+
+% amp_wn = squeeze(max(wn_crf,[],2));
+% useResp = amp_wn(:,1,1)>.5 & amp_wn(:,1,2)>.5;
+% data = goodAll==1 & useResp' & ~inhAll
+% 
+% 
+% figure
+% plot(wn_reliability(1,data & treatment==doi,1)); hold on;
+% plot(wn_reliability(1,data & treatment==doi,2))
+
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>2 | amp(:,1,2)>2;
+data = find(goodAll & useResp' & ~inhAll & treatment==doi) %which cells to include
+dataInh = find(goodAll & useResp' & inhAll & treatment==doi)
+
+figure
+subplot(1,2,1)
+imagesc(mnPsth(data,1)); %%% show full dataset (n x t)
+subplot(1,2,2)
+imagesc(mnPsth(data,2))
+
+drift_psth= cellfun(@mean, drift_trial_psth(data,1,:),'UniformOutput', false)
+
+
+data = reshape(data,size(data,1),size(data,2))
+%for t=1:7
+%dist = pdist(squeeze(mnPsth(data,1,:)),'correlation');  %%% sort based on correlation coefficient...want to do this for just one orientation or SF
+dist = pdist(squeeze(drift_psth(data,1,:)),'correlation'); 
+
+display('doing cluster')
+tic, Z = linkage(dist,'ward'); toc
+figure
+subplot(3,4,[1 5 9 ])
+display('doing dendrogram')
+[h t perm] = dendrogram(Z,0,'Orientation','Left','ColorThreshold' ,5);
+axis off
+subplot(3,4,[2 3 4 6 7 8 10 11 12 ]);
+imagesc(mnPsth(perm,:)); axis xy   %%% show sorted data
+%end
+
+[Y e] = mdscale(dist,1);
+[y sortind] = sort(Y);
+figure
+imagesc(mnPsth(sortind,:),[0 1])
+
+
 %%% plot mean timecourse across all drift stim and cells, by layer / cell-type
 %%% this should be updated to select active cells and separate
 %%% moving/stationary. Also maybe choose optimal stim for each cell?
 
-amp = squeeze(max(drift_orient,[],2));
-%useOS = amp(:,1,1)>2 %non-selective cells
-%useOS = drift_osi(:,1,1)>.2  & amp(:,1,1)>2
+
+%data2 = reshape(data,size(data,1),size(data,2),size(data,3))
 titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 dt = 0.05;
-for i=1:3
+for i=1:4
     figure 
     for t=1:7
-        
         if i==1
             set(gcf,'Name','grating lyr5');
-            mn = squeeze(mean(mnPsth(find(goodAll & useOS' & ~inhAll & layerAll==5 & treatment==t),:,:),1))'; 
+            mn = squeeze(mean(mnPsth(data & layerAll==5 & treatment==t,:,:),1))';
+
         elseif i==2
             set(gcf,'Name','grating lyr2-4');
-            mn = squeeze(mean(mnPsth(find(goodAll & useOS' & ~inhAll & layerAll<5 & treatment==t),:,:),1))'; 
+            mn = squeeze(mean(mnPsth(data & layerAll<5 & treatment==t,:,:),1))'; 
         elseif i==3
             set(gcf,'Name','grating inh');
-            mn = squeeze(mean(mnPsth(find(goodAll & useOS'  &  inhAll & treatment==t),:,:),1))';
+            mn = squeeze(mean(mnPsth(dataInh & treatment==t,:,:),1))';
+        elseif i==4
+            set(gcf,'Name','grating lyr6');
+            mn = squeeze(mean(mnPsth(data & layerAll==6 & treatment==t,:,:),1'));
         end
         mn = mn - repmat(mn(1,:),[50 1]);
         mn = circshift(mn,10)
@@ -232,13 +461,154 @@ for i=1:3
 end
 
 
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>2 | amp(:,1,2)>2;
 figure
+useN= find(goodAll==1 & useResp' & layerAll==2 & ~inhAll)
+
+% for t=1:7
+%     figure 
+%     set (gcf,'Name','Lyr 2 psth/unit')
+% for c=1:length(useN)
+%     subplot(11,11,c)
+%     plot(squeeze(mnPsth(useN(c) & treatment==t,1,:)));hold on;
+%     plot(squeeze(mnPsth(useN(c) &treatment==t,2,:)),'r')
+% end
+% end
+
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>2 | amp(:,1,2)>2;
+figure
+useN= find(goodAll==1 & useResp' & layerAll==3 & ~inhAll)
+for c=1:length(useN)
+    set (gcf,'Name','Lyr 3 psth/unit')
+    subplot(8,10,c)
+    plot(squeeze(mnPsth(useN(c),1,:)));hold on;
+    plot(squeeze(mnPsth(useN(c),2,:)),'r')
+end
+
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>2 | amp(:,1,2)>2;
+figure
+useN= find(goodAll==1 & useResp' & layerAll==4 & ~inhAll & treatment==saline)
+for c=1:length(useN)
+    set (gcf,'Name','Lyr 4 psth/unit')
+    subplot(5,10,c)
+    plot(squeeze(mnPsth(useN(c),1,:)));hold on;
+    plot(squeeze(mnPsth(useN(c),2,:)),'r')
+end
+
+
+figure
+for c=1:length(useN)
+    set(gcf,'Name','hist of change prepost lyr4 exc psth')
+    MImnPsth= (mnPsth(useN,2,:)-mnPsth(useN,1,:))./(mnPsth(useN,2,:)+mnPsth(useN,1,:));
+    hist(MImnPsth)
+    %subplot(4,2,t)
+    h= hist(MImnPsth(useN),-1:.1:1);
+    Mbins=-1:.1:1
+    bar(Mbins,h/sum(useN))
+end
+
+amp = squeeze(max(drift_orient,[],2));
+useOS = amp(:,1,1)>2 | amp(:,1,2)>2;
+figure
+useN= find(goodAll==1 & useOS' & layerAll==6 & ~inhAll & treatment==saline)
+for c=1:length(useN)
+    set (gcf,'Name','Lyr 5 psth/unit')
+    subplot(5,10,c)
+    plot(squeeze(mnPsth(useN(c),1,:)));hold on;
+    plot(squeeze(mnPsth(useN(c),2,:)),'r')
+end
+
+
+figure
+for c=1:length(useN)
+    set(gcf,'Name','hist of change prepost lyr5 exc psth')
+    MImnPsth= (mnPsth(useN,2,:)-mnPsth(useN,1,:))./(mnPsth(useN,2,:)+mnPsth(useN,1,:));
+    hist(MImnPsth)
+    %subplot(4,2,t)
+    h= hist(MImnPsth(useN),-1:.1:1);
+    Mbins=-1:.1:1
+    bar(Mbins,h/sum(useN))
+end
+
+
+figure
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>2 | amp(:,1,2)>2;
+useInh= find(goodAll==1 & useResp' & inhAll==1)
+for c=1:length(useInh)
+    set (gcf,'Name','inh psth/unit')
+    subplot(5,6,c)
+    plot(squeeze(mnPsth(useInh(c),1,:)));axis square;hold on;
+    plot(squeeze(mnPsth(useInh(c),2,:)),'r')
+end
+
+figure
+useInh= find(goodAll==1 & layerAll==5 & inhAll==1)
+for c=1:length(useInh)
+    set (gcf,'Name','Lyr 5 inh psth/unit')
+    subplot(3,5,c)
+    plot(squeeze(mnPsth(useInh(c),1,:)));axis square;hold on;
+    plot(squeeze(mnPsth(useInh(c),2,:)),'r')
+end
+
+figure
+useInh= find(goodAll==1 & layerAll==5 & inhAll==1)
+for c=1:length(useInh)
+    set(gcf,'Name','hist of change prepost lyr5 inh psth')
+    MImnPsth= (mnPsth(useInh,2,:)-mnPsth(useInh,1,:))./(mnPsth(useInh,2,:)+mnPsth(useInh,1,:));
+    hist(MImnPsth)
+    %subplot(4,2,t)
+    h= hist(MImnPsth(useInh),-1:.1:1);
+    Mbins=-1:.1:1
+    bar(Mbins,h/sum(useInh))
+end
+
+
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>2 | amp(:,1,2)>2;
+data = goodAll==1 & useResp'
+titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI', 'MGluR2','MGlur2 + DOI', 'Lisuride'};
+figure
+for t=1:7
+        subplot(2,4,t)
+    plot(drift_osi(data & treatment==t,1,1),drift_osi(data & treatment==t,1,2),'.')
+    hold on;
+    plot([-1.5 1.5], [-1.5 1.5]);
+    title(titles{t})
+end
+
+
+
+meanOSI = [mean(drift_osi(goodAll==1 & useResp',1,1))  mean(drift_osi(goodAll==1 & useResp',1,2))];
+figure(1)
+hb = bar(meanOSI)
+
+amp = squeeze(max(drift_orient,[],2));
+useResp = amp(:,1,1)>1 %non-selective cells
+
+figure
+useN = goodAll==1 & useResp' & inhAll==0
+for l=1:6
+osi(2,:) = squeeze(nanmean(drift_osi(useN & layerAll==l,1,2),1))
+osierr(2,:) = squeeze(nanstd(drift_osi(useN & layerAll==l,1,2),1))/sqrt(sum(drift_osi(useN & layerAll==l,1,2)));
+osi(1,:) = squeeze(nanmean(drift_osi(useN & layerAll==l,1,1),1))
+osierr(1,:) = squeeze(nanstd(drift_osi(useN & layerAll==l,1,1),1))/sqrt(sum(drift_osi(useN & layerAll==l,1,1)));
+subplot(2,3,l)
+% barweb(osi,osierr)
+bar(osi)
+end
+
+
 subplot(2,2,1); imagesc(squeeze(wn_frameR(find(goodAll),:,1,1)),[ 0 50]); title('pre stop')
 subplot(2,2,2); imagesc(squeeze(wn_frameR(find(goodAll),:,1,2)),[ 0 50]); title('post stop')
 subplot(2,2,3); imagesc(squeeze(wn_frameR(find(goodAll),:,2,1)),[ 0 50]); title('pre move');
 subplot(2,2,4); imagesc(squeeze(wn_frameR(find(goodAll),:,2,2)),[ 0 50]); title('post move')
 set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
 drawnow
+
       
 figure
 subplot(2,2,1); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,1,1),1))); title('pre stop'); ylim([0 5])
@@ -268,13 +638,16 @@ subplot(2,2,4); plot(squeeze(mean(cycR(find(goodAll),:,2,2),1))); title('post mo
 spont = squeeze(mean(cycR(:,[1 2 19 20],:,:),2));
 evoked = squeeze(mean(cycR(:,9:11,:,:),2)) - spont;
 
-    figure
+titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
+for t=1:7
+   figure
+   set(gcf,'Name',titles{t});
 for lyr = 2:6
     for i=1:2
         if i==1
-            use = find(goodAll & layerAll==lyr & ~inhAll ); symb = 'bo';
+            use = find(goodAll & layerAll==lyr & ~inhAll & treatment==t); symb = 'bo';
         else
-            use = find(goodAll & layerAll==lyr  & inhAll ); symb = 'ro';
+            use = find(goodAll & layerAll==lyr  & inhAll & treatment==t); symb = 'ro';
         end
         subplot(5,4,1 + 4*(lyr-2));
         plot(spont(use,1,1),spont(use,1,2),symb); hold on; plot([0 50],[0 50]);  axis square; axis([0 30 0 30])
@@ -290,14 +663,17 @@ for lyr = 2:6
         if lyr==2,  title({'evoked move',''}), end
     end
 end
+end
 
 
-
-for lyr = 3:6
+for lyr = 2:6
     figure
     if lyr<6
-        use = find(goodAll & layerAll==lyr & ~inhAll);
+        use = find(goodAll & layerAll==lyr & ~inhAll); 
         set(gcf,'Name',sprintf('layer %d',lyr));symb = 'bo';
+    elseif lyr==6
+          use = find(goodAll & layerAll==lyr & ~inhAll);
+          set(gcf,'Name',sprintf('layer %d',lyr));symb = 'bo'; 
     else
         use = find(goodAll & inhAll);
         set(gcf,'Name',sprintf('inh',lyr));symb = 'ro';
@@ -312,59 +688,101 @@ for lyr = 3:6
     plot(evoked(use,1,2),evoked(use,2,2),symb); title('evoked post stop vs move'); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
 end
 
+titles = {'saline','doi','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 figure
-plot(spont(find(goodAll),1,1),spont(find(goodAll),1,2),'o'); title('spont pre vs post stop'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),1,1),spont(find(goodAll & inhAll),1,2),'ro'); title('spont pre vs post stop'); hold on; plot([0 50],[0 50]); axis([0 15 0 15])
-figure
-plot(spont(find(goodAll),2,1),spont(find(goodAll),2,2),'o'); title('spont pre vs post move'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),2,1),spont(find(goodAll & inhAll),2,2),'ro'); title('spont pre vs post move'); hold on; plot([0 50],[0 50]); axis([0 15 0 15])
-figure
-plot(evoked(find(goodAll),1,1),evoked(find(goodAll),1,2),'o'); title('evoked pre vs post stop'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),1,1),evoked(find(goodAll & inhAll),1,2),'ro'); title('evoked pre vs post stop'); hold on; plot([0 50],[0 50]); axis([-10 10 -10 10])
-figure
-plot(evoked(find(goodAll),2,1),evoked(find(goodAll),2,2),'o'); title('evoked pre vs post move'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),2,1),evoked(find(goodAll & inhAll),2,2),'ro'); title('evoked pre vs post move'); hold on; plot([0 50],[0 50]); axis([-10 10 -10 10])
-
-
+for t=1:7
+set(gcf,'Name', 'spont pre vs post stop')
+subplot(2,4,t)
+plot(spont(find(goodAll & treatment==t),1,1),spont(find(goodAll& treatment==t),1,2),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(spont(find(goodAll&inhAll& treatment==t),1,1),spont(find(goodAll & inhAll& treatment==t),1,2),'ro'); hold on; plot([0 50],[0 50]); axis([0 15 0 15])
+end
 
 figure
-plot(spont(find(goodAll),1,1),spont(find(goodAll),2,1),'o'); title('spont stop vs move pre'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),1,1),spont(find(goodAll & inhAll),2,1),'ro'); title('spont stop vs move pre'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
+for t=1:7
+set(gcf,'Name', 'spont pre vs post stop')
+subplot(2,4,t)
+plot(spont(find(goodAll& treatment==t),2,1),spont(find(goodAll& treatment==t),2,2),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(spont(find(goodAll&inhAll& treatment==t),2,1),spont(find(goodAll & inhAll& treatment==t),2,2),'ro'); hold on; plot([0 50],[0 50]); axis([0 15 0 15])
+end
+
+figure
+for t=1:7
+set(gcf,'Name', 'evoked pre vs post stop')
+subplot(2,4,t)
+plot(evoked(find(goodAll& treatment==t),1,1),evoked(find(goodAll& treatment==t),1,2),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(evoked(find(goodAll&inhAll& treatment==t),1,1),evoked(find(goodAll & inhAll& treatment==t),1,2),'ro'); hold on; plot([0 50],[0 50]); axis([-10 10 -10 10])
+end
+
+figure
+for t=1:7
+set(gcf,'Name', 'evoked pre vs post move')
+subplot(2,4,t)
+plot(evoked(find(goodAll& treatment==t),2,1),evoked(find(goodAll& treatment==t),2,2),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(evoked(find(goodAll&inhAll& treatment==t),2,1),evoked(find(goodAll & inhAll& treatment==t),2,2),'ro'); hold on; plot([0 50],[0 50]); axis([-10 10 -10 10])
+end
 
 
 figure
-plot(evoked(find(goodAll),1,1),evoked(find(goodAll),2,1),'o'); title('evoked stop vs move pre'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),1,1),evoked(find(goodAll & inhAll),2,1),'ro'); title('evoked stop vs move pre'); hold on; plot([0 50],[0 50]); axis([0 50 0 50 ])
+for t=1:7
+set(gcf,'Name', 'spont stop vs move pre')
+subplot(2,4,t)
+plot(spont(find(goodAll & treatment==t),1,1),spont(find(goodAll &treatment==t),2,1),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(spont(find(goodAll&inhAll &treatment==t),1,1),spont(find(goodAll & inhAll &treatment==t),2,1),'ro'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
+end
 
 figure
-plot(spont(find(goodAll),1,2),spont(find(goodAll),2,2),'o'); title('spont stop vs move post'); hold on; plot([0 50],[0 50]);
-plot(spont(find(goodAll&inhAll),1,2),spont(find(goodAll & inhAll),2,2),'ro'); title('spont stop vs move post'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
-
+for t=1:7
+set(gcf,'Name', 'evoked stop vs move pre')
+subplot(2,4,t)
+plot(evoked(find(goodAll & treatment==t),1,1),evoked(find(goodAll& treatment==t),2,1),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(evoked(find(goodAll&inhAll& treatment==t),1,1),evoked(find(goodAll & inhAll& treatment==t),2,1),'ro'); hold on; plot([0 50],[0 50]); axis([0 50 0 50 ])
+end
 
 figure
-plot(evoked(find(goodAll),1,2),evoked(find(goodAll),2,2),'o'); title('evoked stop vs move post'); hold on; plot([0 50],[0 50]);
-plot(evoked(find(goodAll&inhAll),1,2),evoked(find(goodAll & inhAll),2,2),'ro'); title('evoked stop vs move post'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
+for t=1:7
+set(gcf,'Name', 'spont stop vs move post')    
+subplot(2,4,t)
+plot(spont(find(goodAll& treatment==t),1,2),spont(find(goodAll& treatment==t),2,2),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(spont(find(goodAll&inhAll& treatment==t),1,2),spont(find(goodAll & inhAll& treatment==t),2,2),'ro'); hold on; plot([0 50],[0 50]); axis([0 50 0 50])
+end
 
+figure
+for t=1:7
+set(gcf,'Name', 'evoked stop vs move post')
+subplot(2,4,t)
+plot(evoked(find(goodAll& treatment==t),1,2),evoked(find(goodAll& treatment==t),2,2),'o'); title(titles{t}); hold on; plot([0 50],[0 50]);
+plot(evoked(find(goodAll&inhAll& treatment==t),1,2),evoked(find(goodAll & inhAll& treatment==t),2,2),'ro');hold on; plot([0 50],[0 50]); axis([0 50 0 50])
+end
 
-
-pre = [cycR(find(goodAll & ~inhAll),:,1,1) cycR(find(goodAll & ~inhAll),:,2,1)];
-post = [cycR(find(goodAll & ~inhAll),:,2,1) cycR(find(goodAll & ~inhAll),:,2,2)];
-
-
+figure
+for t=1:7
+subplot(2,4,t)
+set(gcf,'Name', 'latent')
+pre = [cycR(find(goodAll & ~inhAll & treatment==t),:,1,1) cycR(find(goodAll & ~inhAll& treatment==t),:,2,1)];
+post = [cycR(find(goodAll & ~inhAll& treatment==t),:,1,2) cycR(find(goodAll & ~inhAll& treatment==t),:,2,2)];
 [coeff score latent] = pca(pre','algorithm','als','variableweight','variance');
+plot(latent(1:10)/sum(latent));title(titles{t});
 
-figure
-plot(latent(1:10)/sum(latent));
-figure
-imagesc(coeff(:,1:10));
+end
 
-figure
-for i = 1:10;
+% how much does each cell contribute to component
+figure 
+for t=1:7
+subplot(2,4,t)
+set(gcf,'Name', 'latent')
+pre = [cycR(find(goodAll & ~inhAll & treatment==t),:,1,1) cycR(find(goodAll & ~inhAll& treatment==t),:,2,1)];
+post = [cycR(find(goodAll & ~inhAll& treatment==t),:,1,2) cycR(find(goodAll & ~inhAll& treatment==t),:,2,2)];
+[coeff score latent] = pca(pre','algorithm','als','variableweight','variance');
+imagesc(coeff(:,1:10));title(titles{t});
+end
+
+for i = 1:10; %pre stationary then moving
     subplot(10,1,i);
     plot(score(:,i))
 end
 
-
+%============
+%first two components plotted...stationary then moving
 figure
 plot(score(:,1)); hold on; plot(score(:,2),'r')
 figure
@@ -382,7 +800,8 @@ end
 
 
 figure
-plot(score(:,1),score(:,2))
+plot(preS(1:20,1),preS(1:20,2),'b'); hold on;plot(preS(21:40,1),preS(21:40,2),'b');
+plot(postS(1:20,1),postS(1:20,2),'r'); plot(postS(21:40,1),postS(21:40,2),'r');
 
 
 %%eyetracking
@@ -719,8 +1138,48 @@ for t = 1:7
     end
 end
 
+% amp = squeeze(max(drift_orient,[],2));
+% useOS = amp(:,1,1)>2 %non-selective cells
+% titles = {'Saline','DOI','Ketanserin', 'Ketanserin + DOI', 'MGluR2','MGlur2 + DOI', 'Lisuride'};
+% figure
+% for t=1:7
+%     subplot(2,4,t)
+% plot(drift_osi(goodAll==1 & useOS & treatment==t,:,1),drift_osi(goodAll==1 & useOS & treatment==t,:,2),'.')
+% hold on;
+% plot([-1.5 1.5], [-1.5 1.5]);
+% title(titles{t})
+% %h=hist(drift_osi(goodAll==1,:,:),0:.01:1)
+% % figure
+% % plot(h)
+% end
 
 
+figure
+for t=1:7
+    set(gcf,'Name','drift osi dist pre/post')
+    subplot(2,4,t)
+    h= hist(drift_osi(goodAll==1 & treatment==t,:,1),-1:.1:1);
+    h2= hist(drift_osi(goodAll==1 & treatment==t,:,2),-1:.1:1);
+    Mbins=-1:.1:1
+    bar(Mbins,h/sum(goodAll&treatment==t));hold on
+    bar(Mbins,h2/sum(goodAll & treatment==t))
+end
+
+figure
+set(gcf,'Name','drift osi dist pre/post')
+for t=1:7
+    subplot(2,4,t)
+    h= [ mean(abs(drift_osi(goodAll==1 & treatment==t & layerAll==5,1,1))) mean(abs(drift_osi(goodAll==1 & treatment==t & layerAll==5,1,2)))];
+    bar(h)
+    set(gca,'XTickLabel',{'pre' 'post'})
+    title(titles{t})
+    %     Mbins=-1:.1:1
+    %     bar(Mbins,h/sum(goodAll&treatment==t))
+    %     bar(Mbins,h2/sum(goodAll & treatment==t))
+end
+
+
+% 
 % for t = 1:4
 %     figure
 %     figure
@@ -904,7 +1363,7 @@ for t=1:7
     end
 end
 
-%save('compileSalineAll_filtered')
+% save('compile5HT_092116')
 
 % %%%%%%%% ===================================================== %%%%%%%%%%
 % %%% try to decode SF, compare pre and post sessions for each treatment %%%
