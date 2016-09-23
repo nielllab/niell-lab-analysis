@@ -18,7 +18,7 @@ duration = 0.5;
 flags = struct('lfpTseries',1,'visStim',1,'lfpSpectra',1);
 data = getTDTdata(Tank_Name,Block_Name,1:nchan,flags);
 dt = median(diff(data.lfpT{1}))
-phi = zeros(nchan,duration/dt);
+phi = zeros(nchan,floor(duration/dt));
 
 for ch = 1:nchan
     ch
@@ -30,8 +30,8 @@ for ch = 1:nchan
     end;
 end
 
-csdfig_1=figure;
-csdfig_2=figure;
+csdfig_1=figure; set(gcf,'Name','shank 1');
+csdfig_2=figure; set(gcf,'Name','shank 2');
 
 %%% temporal filtering of LFP (done in frequency domain)
 Sample_Interval=dt;
@@ -45,11 +45,11 @@ maxfreqIndex = round(maxFreq/freqInt);
 freq(maxfreqIndex:size(phi,2)-maxfreqIndex,:)=0;
 
 figure(csdfig_1)
-subplot(2,2,2)
+subplot(2,2,3)
 plot(abs(freq(1:200,1:32)));
 
 figure(csdfig_2)
-subplot(2,2,2)
+subplot(2,2,3)
 plot(abs(freq(1:200,33:64)));
 
 phi = real(ifft(freq)');
@@ -93,6 +93,13 @@ plot((1:duration_samps)*dt*1000,phi(1:32,1:duration_samps)');
 xlabel('msecs')
 title(Tank_Name);
 
+figure(csdfig_2)
+subplot(2,2,1)
+%plot((phi-meanLFP)');
+plot((1:duration_samps)*dt*1000,phi(33:64,1:duration_samps)');
+xlabel('msecs')
+title(Tank_Name);
+
 
 %%% calculate CSD with 2-site spacing (50M spaced probe, or 1-site for
 %%% 25uMspace probe)
@@ -133,15 +140,15 @@ subplot(2,2,2);
 imagesc(newc(:,(1:duration_samps*dt*1000)),1.5*[-prctile(CSD_2(:),95) prctile(CSD_2(:),95)]);
 title(Tank_Name);
 
-
-figure
-imagesc(newc(:,1:duration_samps*5),1.5*[-prctile(CSD_1(:),95) prctile(CSD_1(:),95)]);
-title(Tank_Name);
-
-
-figure
-imagesc(newc(:,1:duration_samps*5),1.5*[-prctile(CSD_2(:),95) prctile(CSD_2(:),95)]);
-title(Tank_Name);
+% 
+% figure
+% imagesc(newc(:,1:duration_samps*5),1.5*[-prctile(CSD_1(:),95) prctile(CSD_1(:),95)]);
+% title(Tank_Name);
+% 
+% 
+% figure
+% imagesc(newc(:,1:duration_samps*5),1.5*[-prctile(CSD_2(:),95) prctile(CSD_2(:),95)]);
+% title(Tank_Name);
 
 
 

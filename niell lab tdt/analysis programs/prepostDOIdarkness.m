@@ -14,11 +14,11 @@ postRunT = spd.t;
 postRunV = spd.v;
 
 load(afile,'layer','cells');
-
-if savePDF
-    psfilename = 'C:\analysisPS.ps';
-    if exist(psfilename,'file')==2;delete(psfilename);end %%%
-end
+% 
+% if savePDF
+%     psfilename = 'C:\analysisPS.ps';
+%     if exist(psfilename,'file')==2;delete(psfilename);end %%%
+% end
 
 dur = min(max(preRunT),max(postRunT));
 %dt = 1;
@@ -153,16 +153,16 @@ imagesc(normR(:,:,1),[0 rmax]); title('pre'); xlabel('secs'); ylabel('cell #')
 subplot(2,1,2)
 imagesc(normR(:,:,2),[0 rmax]); title('post'); xlabel('secs'); ylabel('cell #')
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
 
 preCorr = corrcoef(squeeze(normR(:,:,1))');
 postCorr = corrcoef(squeeze(normR(:,:,2))');
-
-
+% 
+% 
 figure
 subplot(1,2,1);
 imagesc(preCorr,[-1 1]); colormap jet; title('Pre DOI'); xlabel('cell #'); ylabel('cell #'); axis square;
@@ -170,10 +170,10 @@ subplot(1,2,2);
 imagesc(postCorr,[-1 1]); colormap jet; title('Post DOI');xlabel('cell #'); ylabel('cell #');
 axis square;
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
 figure
 plot(preCorr(:),postCorr(:),'.')
@@ -211,9 +211,9 @@ postCorrClean = postCorr; postCorrClean(isnan(postCorrClean))=0;
 clear eigs
 eigs(:,1) = sort(eig(preCorrClean),'descend');
 eigs(:,2) = sort(eig(postCorrClean),'descend');
-figure
-plot(eigs); hold on; plot([1 length(eigs)],[1 1],'k:')
-legend({'pre','post'}); ylabel('eigenvalues');
+% figure
+% plot(eigs); hold on; plot([1 length(eigs)],[1 1],'k:')
+% legend({'pre','post'}); ylabel('eigenvalues');
 
 normR(isnan(normR))=0;
 [coeff score prelatent] = pca(squeeze(normR(:,:,1))');
@@ -222,9 +222,9 @@ normR(isnan(normR))=0;
 latents(:,1)=prelatent/sum(prelatent);
 latents(:,2)=postlatent/sum(postlatent);
 
-figure
-plot(latents);
-ylabel('latents'); legend('pre','post');
+% figure
+% plot(latents);
+% ylabel('latents'); legend('pre','post');
 
 
 
@@ -232,33 +232,33 @@ preRunV = preRunV(preRunT<dur); preRunT= preRunT(preRunT<dur);
 postRunV = postRunV(postRunT<dur);postRunT= postRunT(postRunT<dur);
 
 %figure
-subplot(2,1,1);
-plot(preRunT,preRunV); xlim([0 dur]); xlabel('secs'); ylabel('pre speed')
-subplot(2,1,2);
-plot(postRunT,postRunV);xlim([0 dur]); xlabel('secs'); ylabel('post speed')
+% subplot(2,1,1);
+% plot(preRunT,preRunV); xlim([0 dur]); xlabel('secs'); ylabel('pre speed')
+% subplot(2,1,2);
+% plot(postRunT,postRunV);xlim([0 dur]); xlabel('secs'); ylabel('post speed')
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
 meanR = squeeze(mean(R,2));
 figure
 plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);axis equal
 xlabel('pre rate'); ylabel('post rate');
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
-% meanRpre = mean(meanR(:,1))
-% meanRpost = mean(meanR(:,2))
-% barx = [meanRpre meanRpost]
-% 
-% figure
-% subplot(2,1,1)
-% barweb(meanR(:,1),meanR(:,2))
+meanRpre = mean(meanR(:,1))
+meanRpost = mean(meanR(:,2))
+barx = [meanRpre meanRpost]
+
+figure
+subplot(2,1,1)
+barweb(meanR(:,1),meanR(:,2))
 % 
 % subplot(2,1,2)
 % bar(barx); title 'mean FR'; ylabel 'sp/sec'
@@ -279,32 +279,32 @@ axis xy;
 hold on
 plot(allT/dt,5*allV/max(allV)-5 ,'g'); ylim([-5 size(allR,1)+0.5]);
 plot([dur dur],[-5 size(allR,1)],'r'); colorbar;
-
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% 
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
 [coeff score latent] = pca(allR');
-figure
-plot(latent/sum(latent))
+% figure
+% plot(latent/sum(latent))
+% 
+% if savePDF
+% set(gcf, 'PaperPositionMode', 'auto');
+% print('-dpsc',psfilename,'-append');
+% end
 
-if savePDF
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-end
-
-figure
-subplot(2,1,1)
-imagesc(coeff); axis square
-subplot(2,1,2)
+% figure
+% subplot(2,1,1)
+% imagesc(coeff); axis square
+% subplot(2,1,2)
 
 %hist of PCA loadings
-hist(coeff); axis square
-if savePDF
-set(gcf, 'PaperPositionMode', 'auto');
-print('-dpsc',psfilename,'-append');
-end
+% hist(coeff); axis square
+% if savePDF
+% set(gcf, 'PaperPositionMode', 'auto');
+% print('-dpsc',psfilename,'-append');
+% end
 
 
 figure
@@ -316,43 +316,43 @@ end
     xlabel 'PC1'; ylabel 'PC2';
     
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
-figure
-for i = 1:3
-    subplot(4,1,i)
-    plot(score(:,i)); ylabel(sprintf('pca %d',i))
-end
+% figure
+% for i = 1:3
+%     subplot(4,1,i)
+%     plot(score(:,i)); ylabel(sprintf('pca %d',i))
+% end
 % subplot(4,1,4)
 % plot(allT,allV); ylabel('speed')
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
-
-%timeponts
-figure
-imagesc(corrcoef(allR)); axis square; xlabel('secs'); ylabel('secs'); colorbar; title('correlation')
-colormap jet;
-
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
-
-%corr units
-figure
-imagesc(corrcoef(allR'),[-1 1]); axis square; xlabel('cell #'); ylabel('cell #'); colorbar; title('correlation')
-colormap jet;
-
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
+% 
+% %timeponts
+% figure
+% imagesc(corrcoef(allR)); axis square; xlabel('secs'); ylabel('secs'); colorbar; title('correlation')
+% colormap jet;
+% 
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
+% 
+% %corr units
+% figure
+% imagesc(corrcoef(allR'),[-1 1]); axis square; xlabel('cell #'); ylabel('cell #'); colorbar; title('correlation')
+% colormap jet;
+% 
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
 if savePDF
     [f p] = uiputfile('*.pdf','pdf name');

@@ -3,6 +3,343 @@ n=0;
 
 
 n=n+1;
+files(n).expt = '092116';
+files(n).dir = '09_21_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_21_16_cluster_092116';
+files(n).analysisfile = 'analysis_092116';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'DOI'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data'; %few units, not very stable
+files(n).misc = ''; 
+files(n).tip1 = 650; files(n).tip2 = 650; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+
+
+n=n+1;
+files(n).expt = '091516';
+files(n).dir = '09_15_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_15_16_cluster_091516';
+files(n).analysisfile = 'analysis_091516';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'DOI'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data'; %few units, not very stable
+files(n).misc = ''; 
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [3 4 5];
+
+
+
+n=n+1;
+files(n).expt = '091216';
+files(n).dir = '09_12_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_12_16_cluster_091216';
+files(n).analysisfile = 'analysis_091216';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'bad data'; %few units, not very stable
+files(n).misc = ''; 
+files(n).tip1 = 550; files(n).tip2 = 550; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [2 3 7 8];
+
+
+n=n+1;
+files(n).expt = '090916';
+files(n).dir = '09_09_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_09_16_cluster_090916';
+files(n).analysisfile = 'analysis_090916';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'DOI'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = ''; 
+files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+
+
+n=n+1;
+files(n).expt = '090816';
+files(n).dir = '09_08_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_08_16_cluster_090816';
+files(n).analysisfile = 'analysis_090816';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = ''; 
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+n=n+1;
+files(n).expt = '090716';
+files(n).dir = '09_07_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_07_16_cluster_090716';
+files(n).analysisfile = '';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post2';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre2';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'bad data';
+files(n).misc = ''; 
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '090616';
+files(n).dir = '09_06_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_06_16_cluster_090616';
+files(n).analysisfile = 'analysis_090616_quiet';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Lisuride'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = ''; 
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '090116';
+files(n).dir = '09_01_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_01_16_cluster_090116';
+files(n).analysisfile = 'analysis_090116';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = 'injection_mglur2';
+files(n).injection = 'injection_doi';
+files(n).treatment = 'MGluR2DOI'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = ''; 
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+
+% n=n+1;
+% files(n).expt = '083016';
+% files(n).dir = '08_30_16';
+% files(n).tank = '';
+% files(n).clusterfile = 'cluster_data_08_30_16_cluster_083016';
+% files(n).analysisfile = 'analysis_083016';
+% files(n).predark = 'dark_pre1';
+% files(n).postdark = 'dark_post1';
+% files(n).prewn = 'wn_pre1';
+% files(n).postwn = 'wn_post1';  
+% files(n).predrift = 'drift_pre1';
+% files(n).postdrift = 'drift_post1';
+% files(n).prebars = '';
+% files(n).postbars = '';
+% files(n).pretreatment = '';
+% files(n).injection = 'injection';
+% files(n).treatment = 'DOI'; 
+% files(n).prepinpFile = ''
+% files(n).postpinpFile = ''
+% files(n).layers = [];
+% files(n).notes = 'good data';
+% files(n).misc = 'Behavior Mouse'; 
+% files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% % files(n).predark_camera = 'dark_pre_051216_eye';  
+% % files(n).postdark_camera = 'dark_post_051216_eye';
+% files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '082616';
+files(n).dir = '08_26_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_08_26_16_cluster_082616';
+files(n).analysisfile = 'analysis_082616';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = ''; 
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_051216_eye';  
+% files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '082416';
+files(n).dir = '08_24_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_08_24_16_cluster_082416';
+files(n).analysisfile = 'analysis_082416';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = ''; 
+files(n).tip1 = 650; files(n).tip2 = 600; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_051216_eye';  
+% files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).badsites = [];
+
+n=n+1;
+files(n).expt = '081716';
+files(n).dir = '08_17_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_08_17_16_cluster_081816';
+files(n).analysisfile = 'analysis_081716';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = 'injection_mglur2';
+files(n).injection = 'injection_doi';
+files(n).treatment = 'MGluR2DOI';
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = '15 mg/kg ly37... _ 10 mg/kg DOI'; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 50;  %%% example
+% files(n).predark_camera = 'dark_pre_051216_eye';  
+% files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).badsites = [];
+
+
+n=n+1;
 files(n).expt = '081516';
 files(n).dir = '08_15_16';
 files(n).tank = '';
@@ -18,13 +355,13 @@ files(n).prebars = '';
 files(n).postbars = '';
 files(n).pretreatment = '';
 files(n).injection = 'injection_bars';
-files(n).treatment = 'Lisuride'; %actually lisuride
+files(n).treatment = 'Lisuride'; 
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '4 mg/kg'; 
-files(n).tip1 = 770; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+files(n).tip1 = 600; files(n).tip2 = 650; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [];
@@ -51,7 +388,7 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '10 mg/kg'; 
-files(n).tip1 = 770; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+files(n).tip1 = 700; files(n).tip2 = 725; files(n).angle = 45; 
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [2 3 4 7 8];
@@ -79,7 +416,7 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data'; %Ian did recording 
 files(n).misc = '4 mg/kg'; 
-files(n).tip1 = 750; files(n).tip2 = 700; files(n).angle = 45;  %%% example
+files(n).tip1 = 575; files(n).tip2 = 600; files(n).angle = 40;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [];
@@ -107,7 +444,7 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'bad data';
 files(n).misc = '10 mg/kg'; 
-files(n).tip1 = 750; files(n).tip2 = 700; files(n).angle = 45;  %%% example
+files(n).tip1 = 675; files(n).tip2 = 675; files(n).angle = 35;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = []; 
@@ -134,10 +471,10 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '10 mg/kg'; 
-files(n).tip1 = 650; files(n).tip2 = 600; files(n).angle = 45;  %%% example
+files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 35;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
-files(n).badsites = []; 
+files(n).badsites = [3 7 10 15 26]; 
 
 
 n=n+1;
@@ -162,10 +499,10 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '10 mg/kg'; 
-files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 35;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
-files(n).badsites = []; %do not cluster sites 28,30,32,59,61,63 (used Johanna's probe (995F))
+files(n).badsites = [4 6 10]; %do not cluster sites 28,30,32,59,61,63 (used Johanna's probe (995F))
 
 n=n+1;
 files(n).expt = '072616';
@@ -189,7 +526,7 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '15mg/kg ly379268'; 
-files(n).tip1 = 700; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = []; %do not cluster sites 28,30,32,59,61,63 (used Johanna's probe (995F))
@@ -686,6 +1023,7 @@ files(n).postbars = '';
 files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [];
+%files(n).layersites = (1:16)=5;(17:32)=6;(33:49)=5;(40:64)=6
 files(n).notes = 'good data';
 files(n).misc = '';
 files(n).badsites = [13 10 9 8 3 2 1];
@@ -918,7 +1256,7 @@ files(n).postbackground = 'background_postsal1';
 files(n).injection = 'injection';
 files(n).treatment = 'Saline';
 files(n).layers = [];
-files(n).notes = 'units disappeared';
+files(n).notes = 'drift';
 files(n).misc = '';
 files(n).badsites = [7 ];
 
@@ -1011,7 +1349,7 @@ files(n).postbackground = 'background_postsal1';
 files(n).injection = 'inject_period';
 files(n).treatment = 'Saline';
 files(n).layers = [];
-files(n).notes = 'units all faded';
+files(n).notes = 'drift';
 files(n).misc = '';
 files(n).badsites = [19 18 16 15];
 
@@ -1034,30 +1372,31 @@ files(n).badsites = [19 18 16 15];
 % files(n).injection = 'injection_period';
 % files(n).treatment = 'Saline';
 % files(n).layers = [];
-% files(n).notes = 'good data';
+% files(n).notes = 'good data'; getSpeed error...not sure why
 % files(n).misc = '';
 
-% n=n+1;
-% files(n).expt = '091415';
-% files(n).dir = '09_14_15';
-% files(n).tank = '';
-% files(n).clusterfile = 'cluster_data_09_14_15_cluster_09_14_15';
-% files(n).analysisfile = 'analysis_091415';
-% files(n).predark = 'dark_presal1';
-% files(n).postdark = 'dark_postsaline1';
-% files(n).prewn = 'wn_presal1';
-% files(n).postwn = 'wn_postsal1';
-% files(n).predrift = 'drift_presal1';
-% files(n).postdrift = 'drift_postsaline1';
-% files(n).prebars = 'bars_presal1';
-% files(n).postbars = 'bars_postsaline1';
-% files(n).prebackground = 'background_presal1';
-% files(n).postbackground = 'background_postsaline';
-% files(n).injection = 'injection_period';
-% files(n).treatment = 'Saline';
-% files(n).layers = [];
-% files(n).notes = 'good data';
-% files(n).misc = '';
+n=n+1;
+files(n).expt = '091415';
+files(n).dir = '09_14_15';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_14_15_cluster_09_14_15';
+files(n).analysisfile = 'analysis_091415';
+files(n).predark = 'dark_presal1';
+files(n).postdark = 'dark_postsaline1';
+files(n).prewn = 'wn_presal1';
+files(n).postwn = 'wn_postsaline1';
+files(n).predrift = 'drift_presal1';
+files(n).postdrift = 'drift_postsaline1';
+files(n).prebars = 'bars_presal1';
+files(n).postbars = 'bars_postsaline1';
+files(n).prebackground = 'background_presal1';
+files(n).postbackground = 'background_postsaline';
+files(n).injection = 'injection_period';
+files(n).treatment = 'Saline';
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = '';
+files(n).badsites = [3 4 5 6 7 8 9 10 11 12 14 16 17 21 26 27 28 30 31 34 36 37 38];
 
 n=n+1;
 files(n).expt = '090815';
@@ -1237,10 +1576,11 @@ files(n).postbackground = '';
 files(n).injection = 'injection_period';
 files(n).treatment = 'Saline';
 files(n).layers = [];
-files(n).notes = 'something shift during first drift. maybe redo from wn on? also clipped units';
+files(n).notes = 'something shifted during first drift. maybe redo from wn on? also clipped units';
 files(n).misc = '';
 files(n).badsites = [30 27 26 24 23 22 21 20 19 15 14 13 12]
-% 
+
+
 n=n+1;
 files(n).expt = '081915';
 files(n).dir = '08_19_15';
@@ -1353,7 +1693,7 @@ files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = '';
-files(n).badsites = [ 6 2]
+files(n).badsites = [1 2 3 4 6]
 
 n=n+1;
 files(n).expt = '080315';

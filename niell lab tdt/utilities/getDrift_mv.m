@@ -102,7 +102,7 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
     drift_mv(blocknum).interSpont_err(:,2) =std(mean(trialPsth(:,frameSpd(1:end-1)>vthresh,end-10:end),3),[],2)/sqrt(sum(frameSpd(1:end-1)>1));
     
     drift_mv(blocknum).orient_tune(:,:,:) =squeeze(nanmean(drift_mv(blocknum).tuning,3));
-    drift_mv(blocknum).sf_tune(:,2:7,:) = squeeze(nanmean(drift_mv(blocknum).tuning,2));
+   % drift_mv(blocknum).sf_tune(:,2:7,:) = squeeze(nanmean(drift_mv(blocknum).tuning,2));
     drift_mv(blocknum).sf_tune(:,1,:) = drift_mv(blocknum).flicker;
     for i = 1:size(drift_mv(blocknum).orient_tune,1)
         for mv = 1:2
