@@ -62,6 +62,7 @@ timelimit=0;
 maxT = 1000;
 
 for tet=use_tets
+    close all
    clear X
     %%%% read in all waveforms for this tetrode
     for tet_ch=1:4
@@ -529,11 +530,11 @@ if bname~=0
 
     for t=use_tets
         fname = fullfile(output_path,sprintf('hist%s_%s_t%d.fig',Tank_Name,bname(1:(end-4)),t));
-        savefig(histfig(t),fname);
+      %  savefig(histfig(t),fname);
         fname = fullfile(output_path,sprintf('snip%s_%s_t%d.fig',Tank_Name,bname(1:(end-4)),t));
-        savefig(snipfig(t),fname);
+       % savefig(snipfig(t),fname);
         fname = fullfile(output_path,sprintf('clust%s_%s_t%d.fig',Tank_Name,bname(1:(end-4)),t));
-        savefig(clustfig(t),fname);
+       % savefig(clustfig(t),fname);
     end
     
     close all

@@ -3,6 +3,34 @@ n=0;
 
 
 n=n+1;
+files(n).expt = '092616';
+files(n).dir = '09_26_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_09_26_16_cluster_092616';
+files(n).analysisfile = 'analysis_092616';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'bad data'; %few units, not very stable
+files(n).misc = ''; 
+files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_090116_eye';  
+% files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).badsites = [];
+
+
+n=n+1;
 files(n).expt = '092116';
 files(n).dir = '09_21_16';
 files(n).tank = '';
