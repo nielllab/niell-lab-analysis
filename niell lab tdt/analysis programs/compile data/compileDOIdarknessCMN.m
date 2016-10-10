@@ -213,26 +213,36 @@ for i = 1:length(usespks);
 end
 
 %drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:)
-
 titles = {'pre stop','post stop','pre move','exc lyr<5'};
-figure
-for prepost=1:2
-    clear ori_data
-    for ori = 1:6
-        ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,:,prepost,[ori ori+6],:,:),5),4));
-    end
-    for n= 1:size(ori_data,1);
-        [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
-        ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
+for c = 1:3
+    figure
+    if c==1
+        select = (~inhAll & layerAll<5); set(gcf,'Name','layer 2-4');
+    elseif c==2
+        select = (~inhAll & layerAll==5); set(gcf,'Name','layer 5');
+    elseif c==3
+        select = (inhAll); set(gcf,'Name','inh');
     end
     
-    ori_data =downsamplebin(ori_data,4,2,1);
-    ori_data = circshift(ori_data,5,4);
     
-    for mv = 1:2
-        subplot(2,2,prepost+2*(mv-1));
-        plot(squeeze(nanmean(ori_data(find(goodAll & ~inhAll & layerAll<5),mv,:,:),1))');
-        title(titles{prepost+2*(mv-1)}); ylim([1 4])
+    for prepost=1:2
+        clear ori_data
+        for ori = 1:6
+            ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,:,prepost,[ori ori+6],:,:),5),4));
+        end
+        for n= 1:size(ori_data,1);
+            [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
+            ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
+        end
+        
+        ori_data =downsamplebin(ori_data,4,2,1);
+        ori_data = circshift(ori_data,5,4);
+        
+        for mv = 1:2
+            subplot(2,2,prepost+2*(mv-1));
+            plot(squeeze(nanmean(ori_data(find(goodAll & select),mv,:,:),1))');
+            title(titles{prepost+2*(mv-1)}); if c<=2; ylim([0 6]); else ylim([0 10]); end
+        end
     end
 end
 
