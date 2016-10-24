@@ -212,7 +212,7 @@ clear eigs
 eigs(:,1) = sort(eig(preCorrClean),'descend');
 eigs(:,2) = sort(eig(postCorrClean),'descend');
 % figure
-% plot(eigs); hold on; plot([1 length(eigs)],[1 1],'k:')
+% plot(eigs); hold on; plot([1 length(eigs)],[1 1],'k:')norm
 % legend({'pre','post'}); ylabel('eigenvalues');
 
 normR(isnan(normR))=0;
@@ -252,13 +252,13 @@ xlabel('pre rate'); ylabel('post rate');
 %     print('-dpsc',psfilename,'-append');
 % end
 
-meanRpre = mean(meanR(:,1))
-meanRpost = mean(meanR(:,2))
-barx = [meanRpre meanRpost]
+% meanRpre = mean(meanR(:,1))
+% meanRpost = mean(meanR(:,2))
+% barx = [meanRpre meanRpost]
 
-figure
-subplot(2,1,1)
-barweb(meanR(:,1),meanR(:,2))
+% figure
+% subplot(2,1,1)
+% barweb(meanR(:,1),meanR(:,2))
 % 
 % subplot(2,1,2)
 % bar(barx); title 'mean FR'; ylabel 'sp/sec'

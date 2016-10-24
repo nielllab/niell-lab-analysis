@@ -238,9 +238,9 @@ elseif dataset==2
             driftA1(cellrange,1:2)= NaN;
             driftA2(cellrange,1:2)=NaN;
             driftB(cellrange,1:2)= NaN;
-%             driftpeak(cellrange,1:2)=NaN;
-%             driftstd(cellrange,1:2)=NaN;
-%             driftSigNoise(cellrange,1:2)=NaN;
+            %             driftpeak(cellrange,1:2)=NaN;
+            %             driftstd(cellrange,1:2)=NaN;
+            %             driftSigNoise(cellrange,1:2)=NaN;
             
             drift_theta_w(cellrange,1:2)=NaN;
             drift_theta(cellrange,1:2)=NaN;
@@ -252,9 +252,9 @@ elseif dataset==2
             
             driftF1F0(cellrange,1:2) = NaN;
             driftF0(cellrange,1:2) = NaN;
-%            driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
-%             cvDSI(cellrange,1:2) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
-%             cvOSI(cellrange,1:2)=NaN;
+            %            driftorientfreq_all(cellrange,:)=field2array(drift, 'orientfreq_all');
+            %             cvDSI(cellrange,1:2) = NaN; %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+            %             cvOSI(cellrange,1:2)=NaN;
         end
 % %         
         if exist('bars','var'); %#ok<EXIST>
