@@ -10,24 +10,28 @@ degperpix = widthdeg/xsz
 duration = 0.5;
 framerate = 60;
 isi = 0.5;
-reps = 1; %number of movie repetitions
+nreps = 12; %number of movie repetitions
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
-sfrange = [0.04 0.16];
-tfrange =[2];
+% sfrange = [0.04 0.16];
+sfrange = [0.01 0.04 0.16];
+tfrange =[1 4];
 % radiusRange = [0 1 2 4 8 1000];
-sizeVals = [0 5 10 20 30 40 50 60];
+% sizeVals = [0 5 10 20 30 40 50 60];
+sizeVals = [30];
 radiusRange = sizeVals/(8*degperpix);
-phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:6);  %%%cmn
-contrastRange = [0.125 0.25 0.5 1];
+% phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:6);  %%%cmn
+phaserange = [0];
+% contrastRange = [0.125 0.25 0.5 1];
+contrastRange = [1];
 
 
-ntheta = 4; %cmn
+ntheta = 12; %cmn
 nx = 1; ny =1;
 
 randomOrder=1;
-randomTheta=1;
-randomPhase=0;
+randomTheta=0;
+randomPhase=1;
 binarize=0;
 blank=0;
 
@@ -84,14 +88,16 @@ for n= 1:length(thetarange);
 end
 
 if randomOrder
-order = randperm(trial);
+order = randperm(trial*nreps);
+xpos=repmat(xpos,[1,nreps]);ypos=repmat(ypos,[1,nreps]);sf=repmat(sf,[1,nreps]);tf=repmat(tf,[1,nreps]);
+phase=repmat(phase,[1,nreps]);theta=repmat(theta,[1,nreps]);radius=repmat(radius,[1,nreps]);contrasts=repmat(contrasts,[1,nreps]);
 xpos = xpos(order); ypos=ypos(order); sf =sf(order); tf=tf(order); phase=phase(order); theta=theta(order);radius = radius(order); contrasts = contrasts(order);
 end
 
 
 
-moviedata = zeros(xsz,ysz,trial*(duration+isi)*framerate,'uint8')+128;
-for tr = 1:trial
+moviedata = zeros(xsz,ysz,trial*(duration+isi)*framerate*nreps,'uint8')+128;
+for tr = 1:trial*nreps
     tr
     ph = (x*cos(theta(tr)) + y*sin(theta(tr)))*2*pi*sf(tr) + phase(tr);
     if theta(tr)~=2*pi
@@ -108,11 +114,12 @@ moviedata(moviedata<128)=0;
 end
 
 moviedata = moviedata(1:xsz,1:ysz,:);
-% figure
-% for i = 1:length(moviedata)/10
-%     i
-% imshow(moviedata(:,:,i));
-% drawnow
-% end
-% moviedata = repmat(moviedata, [1 1 reps]);
-save sizeSelect2sf8sz26min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
+figure
+for i = 1:length(moviedata)/10
+    i
+imshow(moviedata(:,:,i));
+drawnow
+end
+
+% save sizeSelect2sf8sz26min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
+save patchOrientations15min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
