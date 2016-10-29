@@ -105,8 +105,8 @@ if ~exist('wn_mv','var') | length(wn_mv)<blocknum  | ~isfield(wn_mv(blocknum),'f
 %                  [x y t_lag] = ind2sub(size(STA),ind);
 %                  
 %                  STA1{w} = STA(:,:,t_lag)-128;
-%                  % figure
-%                  % imagesc(STA1{1,w}',[-64 64]); axis equal
+%                  figure
+%                  imagesc(STA1{1,w}',[-64 64]); axis equal
 %              end
 %          end
 %              STA_peak(cellrange)=STA1

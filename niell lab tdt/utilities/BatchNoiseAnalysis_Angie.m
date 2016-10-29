@@ -1,48 +1,33 @@
 dbstop if error
+clear all
+close all 
 
-afile = {'D:\Angie_analysis\DOI_experiments\03_09_16\analysis_030916.mat'};                       
+batchDOIephys_filtered;
+%set(groot,'defaultFigureVisible','off') %disable figure plotting
+set(groot,'defaultFigureVisible','on')
 
-clusterfilenames= { 'D:\Angie_analysis\DOI_experiments\03_09_16\cluster_data_03_09_16_cluster_030916.mat'}
-             % MLRstim #16}
-
-
-
-for i = 1:length(afile);
-    i
-    afile
-    
-    analysisFile = afile{i};
-    load(analysisFile);
-   
-    clusterFile = clusterfilenames{i};
-    load(clusterFile);
-    
-%     [fname pname] = uigetfile('*.mat','cluster file');
-%      clusterFile = fullfile(pname,fname);
-%      clusterfilename = clusterFile;     
-%      save(analysisFile,'clusterfilename','-append');
-  
-  
-   
-    for i = 1:length(Block_Name)
-        if strcmp('sp',Block_Name{i}(1:2)) %'sp' if spot analysis 'wn' if cm_noise
-            blocknum=i;
-        end
-    end
-    pdfname = [analysisFile(1:end-4) '.pdf'];
-    
-    
-movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
-load(movieFile);
-    
-
-    %pptgSpeedAnalysis(clusterFile,analysisFile,pdfname,Block_Name{blocknum},blocknum,1, 30);
-    noise_analysis(clusterFile,analysisFile,pdfname,movieFile,Block_Name{blocknum},blocknum,2, 1)
+%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
+use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
+%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'101216'))
+parpool
+ for i = 1:length(use)
+     close all
+     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];
+     clustfile = [pathname '\' files(use(i)).dir '\' files(use(i)).clusterfile '.mat'] ;
+     
+     movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
+     load(movieFile);
+   if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
+         
+         for prepost = 1:2
+             %  noise_analysis_angie(clustfile,afile,movieFile,block,movietype, redo,periofFrames,stim_eye)
+             noise_analysis_angie(clustfile,afile,movieFile,files(use(i)).blockWn{prepost},1,1,300,1)
+             %fit2dgabor(afile)
+         end
+     end
 % movietype==fl_noise==2; 
 % movietype==cm_noise==1 
 % movietype==mv_noise==3
-    toc
-
-    %plot(vdata)
-    end
-    
+    toc 
+ end
+   delete(gcp('nocreate'))
