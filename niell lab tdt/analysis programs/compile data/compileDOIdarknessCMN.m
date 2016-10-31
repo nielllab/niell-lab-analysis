@@ -7,7 +7,7 @@ batchDOIephys_filtered; %%% load batch file
 
 %%% select the sessions you want based on filters
 %%% example
-use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.treatment},'Saline')  )
+use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & ~cellfun(@isempty,{files.prewn}) & strcmp({files.treatment},'DOI')  )
 
 %use =  find( strcmp({files.treatment},'KetanserinDOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 %use =  find( strcmp({files.treatment},'DOI') &  ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}))
@@ -198,6 +198,7 @@ end
 
 keyboard
 
+%%% plot all unit responses
 usespks = find(goodAll);
 for i = 1:length(usespks);
     if mod(i,48)==1
@@ -213,7 +214,7 @@ for i = 1:length(usespks);
 end
 
 %drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:)
-titles = {'pre stop','post stop','pre move','exc lyr<5'};
+titles = {'pre stop','post stop','pre move','post move'};
 for c = 1:3
     figure
     if c==1
@@ -241,7 +242,7 @@ for c = 1:3
         for mv = 1:2
             subplot(2,2,prepost+2*(mv-1));
             plot(squeeze(nanmean(ori_data(find(goodAll & select),mv,:,:),1))');
-            title(titles{prepost+2*(mv-1)}); if c<=2; ylim([0 6]); else ylim([0 10]); end
+            title(titles{prepost+2*(mv-1)}); if c<=2; ylim([0 6]); else ylim([0 12]); end
         end
     end
 end
@@ -278,11 +279,12 @@ celltype = layerAll; celltype(inhAll) = 7;
 
 resp = d(:,:);
 for n= 1:size(resp,1);
-    m = max(resp(n,:)); m= max(5,m); resp(n,:) = resp(n,:)/m;
+    m = max(resp(n,:)); m= max(5,m); resp(n,:) = resp(n,:)/m;  %%% normalized
     data(n,:,:,:) = data(n,:,:,:)/m;
 end
 
-dist = pdist(d,'correlation');  %%% sort based on correlation coefficient
+dsmall = downsamplebin(d,2,5,1);
+dist = pdist(dsmall(:,1:end/2),'correlation');  %%% sort based on correlation coefficient
 display('doing cluster')
 tic, Z = linkage(dist,'ward'); toc
 figure
@@ -291,7 +293,7 @@ display('doing dendrogram')
 [h t perm] = dendrogram(Z,0,'Orientation','Left','ColorThreshold' ,5);
 axis off
 subplot(3,4,[2 3 4 6 7 8 10 11 12 ]);
-imagesc((resp(perm,:)),[0 1]); axis xy   %%% show sorted data
+imagesc((d(perm,:)),[0 10]); axis xy   %%% show sorted data
 
 lyr = layerAll(goodAll & clean'); sess = sessionNum(goodAll & clean'); type = celltype(goodAll & clean');
 figure
@@ -307,12 +309,23 @@ imagesc(layerAll(goodAll & clean')'); title('layer by session'); colormap jet;
 figure
 imagesc(inhAll(goodAll & clean')'); title('inh by session'); colormap jet;
 
+celltype = layerAll; celltype(inhAll) = 7;
+[y order] = sort(celltype(find(clean & goodAll')));
+
 figure
 imagesc(resp(order,:),[0 1]); hold on; title('layers');
 borders = find(diff(y)); for i = 1:length(borders); plot([1 size(d(:,:),2)],[borders(i) borders(i)],'m','Linewidth',2);end
 
 figure
 imagesc(resp,[0 1]); hold on; borders = find(diff(sessionNum(find(goodAll & clean')))); for i = 1:length(borders); plot([1 size(d(:,:),2)],[borders(i) borders(i)],'m','Linewidth',2);end
+title('sessions')
+
+figure
+imagesc(d(order,:),[0 10]); hold on; title('layers');
+borders = find(diff(y)); for i = 1:length(borders); plot([1 size(d(:,:),2)],[borders(i) borders(i)],'m','Linewidth',2);end
+
+figure
+imagesc(d(:,:),[0 10]); hold on; borders = find(diff(sessionNum(find(goodAll & clean')))); for i = 1:length(borders); plot([1 size(d(:,:),2)],[borders(i) borders(i)],'m','Linewidth',2);end
 title('sessions')
 
 
