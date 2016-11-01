@@ -13,11 +13,12 @@ set(groot,'defaultFigureVisible','on')
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'102716'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'102516'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
- 
+movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
+     load(movieFile); 
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
@@ -118,7 +119,7 @@ for i = 1:length(use)
       if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
           %%% get grating responses
           for prepost = 1:2
-              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
               drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
 %               drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
               drift_spont(cellrange,:,prepost) = drift.interSpont;
@@ -152,7 +153,7 @@ for i = 1:length(use)
 
 %     %%% get wn response
     for prepost = 1:2
-        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},1,300);
+        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
@@ -162,7 +163,21 @@ for i = 1:length(use)
 
     end
         end
-        
+% 
+%    if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
+% 
+%        
+%        for prepost =1:2
+%            for c = 1:length(cellrange)
+%                wn_spatial = noise_analysis_angie(clustfile,afile,movieFile,files(use(i)).blockWn{prepost},1,1,300,1)
+%                wn_sta{cellrange(c),:,prepost} = wn.sta;
+%                %             wn_svd_xy(cellrange,:,prepost) = wn.svd_xy
+%                %             wn_svd_t(cellrange,:,prepost) = wn.svd_t
+%                %             wn_responsiveness(cellrange,:,prepost) = wn.responsiveness
+%            end
+%        end
+%    end
+%         
 %         figure
 %         subplot(2,2,1); imagesc(squeeze(wn_frameR(cellrange,:,1,1)),[ 0 50]); title('pre stop')
 %         subplot(2,2,2); imagesc(squeeze(wn_frameR(cellrange,:,1,2)),[ 0 50]); title('post stop')
@@ -226,7 +241,7 @@ for i = 1:length(use)
     ncorr= ncorr+nc^2;
 end
 
-%   save('compileALL_102416')
+%save('compileALL_103016_filtered')
 
 % d= squeeze(drift_tcourse(goodAll==1 & treatment==doi,:,1,:,1));  %%% stationary first timepoint
 % d = downsamplebin(d,2,2,1);
@@ -404,14 +419,14 @@ amp_wn = max_wn-low_wn
 useResp = amp_wn(:,1,1)>0 & amp_wn(:,1,2)>0 & amp_wn(:,2,1)>0 & amp_wn(:,2,2)>0;
 data_wn = goodAll==1 & useResp' & ~inhAll
 
-figure
-for t=1:2
-subplot(1,2,t)
-plot(wn_evoked(data_wn&treatment==t&~inhAll,:,1,1),wn_evoked(data_wn&treatment==t&~inhAll,:,1,2),'.');hold on;axis square;
-
-plot(wn_evoked(data_wn&treatment==t&inhAll==1,:,1,1),wn_evoked(data_wn&treatment==t&inhAll==1,:,1,2),'.r');
-
-end
+% figure
+% for t=1:2
+% subplot(1,2,t)
+% plot(wn_evoked(data_wn&treatment==t&~inhAll,:,1,1),wn_evoked(data_wn&treatment==t&~inhAll,:,1,2),'.');hold on;axis square;
+% 
+% plot(wn_evoked(data_wn&treatment==t&inhAll==1,:,1,1),wn_evoked(data_wn&treatment==t&inhAll==1,:,1,2),'.r');
+% 
+% end
 
 %ketanserin & ketan doi  more stable than saline????
 titles = {'layer 1','layer 2','layer 3','layer 4','layer 5','layer 6'};
@@ -545,11 +560,11 @@ subplot(1,2,2)
 imagesc(mnPsth(data,2))
 
 clear max
-useN =data & treatment==doi
+useN =data & treatment==ht
 clear c
 %for prepost=1:2
 
-for c= 1:length(data & treatment==doi)
+for c= 1:length(data & treatment==ht)
     for prepost =1:2
         [resp oind] = max(drift_orient(c,:,1,prepost));
         [g h]=(max(resp(:)));
@@ -561,11 +576,16 @@ size(prefOri')
 prefOri_pre = prefOri(1,:)'
 prefOri_post = prefOri(2,:)'
 
+% figure
+% scatterhist(prefOri_pre,prefOri_post,12)
+
 figure
 subplot(1,2,1)
 hist(prefOri_pre);ylim([0 180]);title('hist pref orientation pre');
 subplot(1,2,2)
 hist(prefOri_post);ylim([0 180]);title('post');
+
+prefOri = [prefOri_pre'; prefOri_post']'
 
 
 %drift_psth= cellfun(@mean, drift_trial_psth(data,1,:),'UniformOutput', false)
@@ -676,7 +696,7 @@ for i=1:5
             
         elseif i==2
             set(gcf,'Name','grating lyr 2/3');
-            mn = squeeze(mean(mnPsth(data & layerAll==2 |layerAll==3 & treatment==t,:,:),1))';
+            mn = squeeze(mean(mnPsth(data & (layerAll==2 |layerAll==3) & treatment==t,:,:),1))';
         elseif i ==3
             set(gcf,'Name','grating lyr 4');
             mn = squeeze(mean(mnPsth(data & layerAll==4 & treatment==t,:,:),1))';
@@ -745,7 +765,7 @@ for c=1:length(useN)
 end
 
 figure
-useN= find(data & layerAll==5 & treatment==ht)
+useN= find(data & layerAll==5 & treatment==doi)
 for c=1:length(useN)
     set (gcf,'Name','Lyr 5 psth/unit')
     subplot(5,10,c)
@@ -767,7 +787,7 @@ end
 
 
 figure
-useInh= find(dataInh)
+useInh= find(dataInh &treatment==doi)
 for c=1:length(useInh)
     set (gcf,'Name','inh psth/unit')
     subplot(5,6,c)
@@ -1239,24 +1259,26 @@ for mv = 1:2
 end
 end
 
-titles={'Saline', 'DOI'}
+titles={'Saline', 'DOI', '5HT'}
 figure
-for t=1:2
-    subplot(1,2,t)
-    plot(meanRdark(~inhAll &treatment==t,1), meanRdark(~inhAll&treatment==t,2),'.');hold on; axis square;
+for t=1:3
+    subplot(1,3,t)
+    plot(meanRdark(~inhAll &data & treatment==t,1), meanRdark(~inhAll& data& treatment==t,2),'.');hold on; axis square;
+        plot(meanRdark(inhAll &dataInh & treatment==t,1), meanRdark(inhAll& dataInh& treatment==t,2),'r.');hold on; axis square;
+
     xlim([0 35]);ylim([0 35]); xlabel('Pre FR');ylabel('Post FR');
     plot([0 35],[0 35]);
-    plot(meanRdark(inhAll==1 &treatment==t,1), meanRdark(inhAll==1&treatment==t,2),'r.');hold on;
+    %plot(meanRdark(inhAll==1 &data &treatment==t,1), meanRdark(inhAll==1& data &treatment==t,2),'r.');hold on;
     title(titles{t});
 end
 
 
-titles={'Saline', 'DOI'}
+titles={'Saline', 'DOI', '5HT'}
 figure
-for t=1:2
-    subplot(2,2,t)
+for t=1:3
+    subplot(3,2,t)
     hist(meanRdark(treatment==t,1),1:2:40);xlim([0 35]);
-    subplot(2,2,t+2)
+    subplot(3,2,t+2)
     hist(meanRdark(treatment==t,2),1:2:40);xlim([0 35]);
 %     xlim([0 35]);ylim([0 35]); xlabel('Pre FR');ylabel('Post FR');
 %     plot([0 35],[0 35]);
@@ -1299,7 +1321,7 @@ for mv=1:2
    for c=0:1
     for t=1:8
         subplot(4,2,t)
-        plot(wn_evoked(goodAll &treatment==t & inhAll ==c,mv,1),wn_evoked(goodAll &treatment==t & inhAll==c ,mv,2),'.');hold on; plot([0 45],[0 45]);axis equal; ylim([-5 40]);xlim([-5 40]);
+        plot(wn_evoked(data &treatment==t & inhAll ==c,mv,1),wn_evoked(data &treatment==t & inhAll==c ,mv,2),'.');hold on; plot([0 45],[0 45]);axis equal; ylim([-5 40]);xlim([-5 40]);
         % plot(wn_evoked(treatment==t & inhAll(useN(i)) ==1,mv,1),wn_evoked(treatment==t &inhAll(useN(i)) ==1 ,mv,2),'r.');hold on; plot([0 10],[0 10]);axis equal; ylim([-5 40])
         ylabel('post'); xlabel('pre')
         hold on ;title(titles{t});
@@ -1312,7 +1334,7 @@ figure
 for t = 1:8
     for c=0:1
 subplot(4,2,t)
-plot(meanRdark(goodAll &treatment==t & inhAll==c,1),meanRdark(goodAll &treatment==t & inhAll==c,2),'.');hold on; plot([0 45],[0 45]);axis equal;ylim([0 45]); xlim([0 45]);
+plot(meanRdark(data &treatment==t & inhAll==c,1),meanRdark(data &treatment==t & inhAll==c,2),'.');hold on; plot([0 45],[0 45]);axis equal;ylim([0 45]); xlim([0 45]);
 title(titles{t});ylabel('post'); xlabel('pre')
 end
 end

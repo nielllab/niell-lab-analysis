@@ -1,4 +1,4 @@
-function noise_analysis_angie(clustfile,afile,movieFile,block,movietype, redo,periofFrames,stim_eye,sess)
+function noise_analysis_angie(clustfile,afile,movieFile,block,movietype, redo,periofFrames,stim_eye)
 % Matlab codes for reading from TTank for movie data
 % Calculates RFs from spike triggered average, and spike triggered covariance
 % Uses clustering information from cluster_linear.m or cluster_tetrode.m

@@ -7,8 +7,8 @@ batchDOIephys_filtered;
 set(groot,'defaultFigureVisible','on')
 
 %use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
-use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
-%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'101216'))
+%use =  find( strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'102516'))
 parpool
  for i = 1:length(use)
      close all
@@ -21,13 +21,13 @@ parpool
          
          for prepost = 1:2
              %  noise_analysis_angie(clustfile,afile,movieFile,block,movietype, redo,periofFrames,stim_eye)
-             noise_analysis_angie(clustfile,afile,movieFile,files(use(i)).blockWn{prepost},1,1,300,1)
-             %fit2dgabor(afile)
+             noise_analysis_angie(clustfile,afile,movieFile,files(use(i)).blockWn{prepost},1,0,300,1)
+             fit2dgabor_angie(afile, files(use(i)).blockWn{prepost},1)
          end
      end
 % movietype==fl_noise==2; 
 % movietype==cm_noise==1 
 % movietype==mv_noise==3
-    toc 
+%    toc 
  end
    delete(gcp('nocreate'))
