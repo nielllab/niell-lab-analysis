@@ -141,10 +141,10 @@ imagesc(R(:,:,1),[0 rmax]); title('pre'); xlabel('secs'); ylabel('cell #')
 subplot(2,1,2)
 imagesc(R(:,:,2),[0 rmax]); title('post'); xlabel('secs'); ylabel('cell #')
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+% end
 
 rmax = 10;
 figure

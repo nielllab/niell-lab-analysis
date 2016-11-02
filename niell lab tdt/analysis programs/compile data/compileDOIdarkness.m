@@ -13,7 +13,7 @@ set(groot,'defaultFigureVisible','on')
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'102516'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'082416'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -119,7 +119,7 @@ for i = 1:length(use)
       if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
           %%% get grating responses
           for prepost = 1:2
-              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
               drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
 %               drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
               drift_spont(cellrange,:,prepost) = drift.interSpont;
@@ -153,7 +153,7 @@ for i = 1:length(use)
 
 %     %%% get wn response
     for prepost = 1:2
-        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
+        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},1,300);
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
@@ -200,8 +200,8 @@ for i = 1:length(use)
 %       end
     
 
-%   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
-%   drawnow
+  getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
+  drawnow
   
 
     %% darkness / correlation analysis

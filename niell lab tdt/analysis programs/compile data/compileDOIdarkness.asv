@@ -8,16 +8,17 @@ batchDOIephys_filtered; %%% load batch file
 set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
+%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
 %useSess = use;
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'102716'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'082416'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
- 
+movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
+     load(movieFile); 
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
@@ -162,20 +163,21 @@ for i = 1:length(use)
 
     end
         end
-
-   if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
-        for prepost =1:2
-            wn_spatial = noise_analysis_angie(clustfile,afile,movieFile,files(use(i)).blockWn{prepost},1,0,300,1)
-            wn_sta(cellrange,:,prepost) = wn.sta
-              wn(cell_n,stim_eye).crf=cycledata;
-            wn(cell_n,stim_eye).N=N;
-            wn(cell_n,stim_eye).svd_xy = svdt;
-            wn(cell_n,stim_eye).svd_t = v;
-            wn(cell_n,stim_eye).sta=sta_t;
-            
-        end
-end
-        
+% 
+%    if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
+% 
+%        
+%        for prepost =1:2
+%            for c = 1:length(cellrange)
+%                wn_spatial = noise_analysis_angie(clustfile,afile,movieFile,files(use(i)).blockWn{prepost},1,1,300,1)
+%                wn_sta{cellrange(c),:,prepost} = wn.sta;
+%                %             wn_svd_xy(cellrange,:,prepost) = wn.svd_xy
+%                %             wn_svd_t(cellrange,:,prepost) = wn.svd_t
+%                %             wn_responsiveness(cellrange,:,prepost) = wn.responsiveness
+%            end
+%        end
+%    end
+%         
 %         figure
 %         subplot(2,2,1); imagesc(squeeze(wn_frameR(cellrange,:,1,1)),[ 0 50]); title('pre stop')
 %         subplot(2,2,2); imagesc(squeeze(wn_frameR(cellrange,:,1,2)),[ 0 50]); title('post stop')
@@ -198,8 +200,8 @@ end
 %       end
     
 
-%   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
-%   drawnow
+  getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
+  drawnow
   
 
     %% darkness / correlation analysis
