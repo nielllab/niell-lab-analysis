@@ -4,16 +4,16 @@ close all
 dbstop if error
 
 batchDOIephys_filtered; %%% load batch file
-%set(groot,'defaultFigureVisible','off') %disable figure plotting
-set(groot,'defaultFigureVisible','on')
+set(groot,'defaultFigureVisible','off') %disable figure plotting
+%set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
+use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) )
 %useSess = use;
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'082416'))
+%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark}) & strcmp({files.expt},'082416'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -200,8 +200,8 @@ for i = 1:length(use)
 %       end
     
 
-  getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
-  drawnow
+%   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
+%   drawnow
   
 
     %% darkness / correlation analysis

@@ -532,7 +532,7 @@ files(n).expt = '090716';
 files(n).dir = '09_07_16';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_09_07_16_cluster_090716';
-files(n).analysisfile = 'analysis_090715a';
+files(n).analysisfile = 'analysis_090716';
 files(n).predark = 'dark_pre1';
 files(n).postdark = 'dark_post2';
 files(n).prewn = 'wn_pre1';
@@ -549,10 +549,10 @@ files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
-files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [1 6];
+files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;
 
 
 n=n+1;
