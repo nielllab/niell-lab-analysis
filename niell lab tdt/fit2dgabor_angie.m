@@ -1,19 +1,6 @@
-function fit2dgabor(afile,block,redo)
-
-if ~exist('afile','var')   
-[afname, apname] = uigetfile('*.mat','analysis data');
-afile = fullfile(apname,afname);
-end
-
-wn=0;
-load(afile);
-
-% 
-% psfilename=[afile(1:end-4) '.ps'];
-% if exist(psfilename,'file')==2;delete(psfilename);end
+function [params all_fit all_img] = fit2dgabor_angie(wn)
 
 
-tic
 
 
 parfor w = 1:length(wn)
@@ -35,14 +22,14 @@ figure
 colormap(redblue)
 imagesc(STA1); axis equal
 
-%%%crop image
+%%crop image
 width = 61;
 img = maxsubregion(STA1,width,'abs');
 img = imresize(img,0.5);
-% 
-% stafig1 = figure;
-% colormap(redblue);
-% imagesc(img)
+
+stafig1 = figure;
+colormap(redblue);
+imagesc(img)
 
 
 width=size(img,1);
@@ -149,7 +136,7 @@ end
 toc
 %delete(gcp('nocreate'))
 
-save(afile, 'params','all_img','all_fit','all_test_img',-append');
+% save(afile,'params','all_img','all_fit','all_test_img','-append');
 
 for w = 1:length(all_img)
   img = all_img{w};

@@ -10,7 +10,7 @@ function layerInfo = getLayer(clustfile,afile,tip1,tip2, angle, redo )
 load(afile,'layerInfo','peakchan');
 
 if ~exist('layerInfo','var')  | isempty(layerInfo.units) | redo
-    try
+  try
         %%% geometry of sites
         dist(1:32) = 775:-25:0;
         if ~isempty(tip2)
@@ -38,9 +38,9 @@ if ~exist('layerInfo','var')  | isempty(layerInfo.units) | redo
         layerInfo.sites = layer;
         layerInfo.units = unitlayer;
         
-    catch
+  catch
         layerInfo.sites=[];
         layerInfo.units=[];
-    end
+  end
     save(afile,'layerInfo','-append')
 end

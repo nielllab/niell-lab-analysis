@@ -70,47 +70,6 @@ if ~exist('wn_mv','var') | length(wn_mv)<blocknum  | ~isfield(wn_mv(blocknum),'f
 
         end
        
-%          if exist('params','var');
-%             
-%             
-%             all_img_STA(cellrange)= all_img;
-%             all_fit_STA(cellrange)=all_fit;
-%             STA_nx(cellrange)=field2array(params,'nx');
-%             STA_ny(cellrange)=field2array(params,'ny');
-%             STA_phase(cellrange)=field2array(params,'phase');
-%             STA_sigx(cellrange)=field2array(params,'sigx');
-%             STA_sigy(cellrange)=field2array(params,'sigy');
-%             STA_exp_var(cellrange)=field2array(params,'exp_var');
-%             
-%             
-%         else
-%             STA_nx(cellrange)= NaN;
-%             STA_ny(cellrange)=  NaN;
-%             STA_phase(cellrange)= NaN;
-%             STA_sigx(cellrange)= NaN;
-%             STA_sigy(cellrange)= NaN;
-%             STA_exp_var(cellrange)=NaN;
-%             
-%          end
-%          
-%          clear m ind x y t_lag STA STA1 STA_post STA1_post c crf crf1 crf_post crf1_post
-%          
-%          if exist ('wn','var')
-%              for w = 1:length(wn)
-%                  sta[s,t,E] = sta(spikes.sp,lfpMove,smp,plt,w,T,D,err)
-%                 wn(blocknum).STA = sta;
-%                  
-%                  %%%Dtermine time point with maximial response
-%                  [m ind] = max(abs(STA(:)-127));
-%                  [x y t_lag] = ind2sub(size(STA),ind);
-%                  
-%                  STA1{w} = STA(:,:,t_lag)-128;
-%                  figure
-%                  imagesc(STA1{1,w}',[-64 64]); axis equal
-%              end
-%          end
-%              STA_peak(cellrange)=STA1
-            
         wn_mv(blocknum).frms = frms(1:end-1);
         wn_mv(blocknum).cycFrames = cycFrames(1:end-1);
         wn_mv(blocknum).frameSpd = frameSpd(1:end-1);

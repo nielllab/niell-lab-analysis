@@ -1,4 +1,4 @@
-function noise_analysis_angie(clustfile,afile,movieFile,block,movietype, redo,periofFrames,stim_eye)
+function wn = noise_analysis_angie(clustfile,afile,movieFile,block)
 % Matlab codes for reading from TTank for movie data
 % Calculates RFs from spike triggered average, and spike triggered covariance
 % Uses clustering information from cluster_linear.m or cluster_tetrode.m
@@ -15,6 +15,7 @@ Block_Name = Block_Name{blocknum}
 
 load(afile,'wn_mv');
 load(afile,'wn');
+movietype = 1; %%% noise
 
 % if ~exist('wn_mv','var') | length(wn_mv)<blocknum  | ~isfield(wn_mv(blocknum),'frameR')  | isempty(wn_mv(blocknum).frameR) | redo
 %    % try
@@ -317,7 +318,7 @@ for cell_n = cell_range
             
             f_null=find(c==0);
             spont = sum(n_spikes(f_null).*ntrials(f_null)')/sum(ntrials(f_null));
-            wn(cell_n,stim_eye).spont=spont;
+            wn(cell_n).spont=spont; %stim_eye
             
             nf = zeros(cyc_frames,1);
             contrastdata = zeros(cyc_frames,1);
@@ -339,8 +340,8 @@ for cell_n = cell_range
             
             
             
-            wn(cell_n,stim_eye).responsiveness = 2*abs(fftsignal(fft_chan))/(abs(fftsignal(1)));  %%double to normalize FFT relative to DC
-            wn(cell_n,stim_eye).phase = angle(fftsignal(fft_chan));
+            wn(cell_n).responsiveness = 2*abs(fftsignal(fft_chan))/(abs(fftsignal(1)));  %%double to normalize FFT relative to DC %stim_eye
+            wn(cell_n).phase = angle(fftsignal(fft_chan)); %stim_eye
             phaseangle = angle(fftsignal(fft_chan))
             cycledata = zeros(cyc_frames,1);
             for i = 1:n_frames;
@@ -1032,11 +1033,11 @@ for cell_n = cell_range
 %             set(gcf, 'PaperPositionMode', 'auto');
 %             print('-dpsc',psfilename,'-append');
             
-            wn(cell_n,stim_eye).crf=cycledata;
-            wn(cell_n,stim_eye).N=N;
-            wn(cell_n,stim_eye).svd_xy = svdt;
-            wn(cell_n,stim_eye).svd_t = v;
-            wn(cell_n,stim_eye).sta=sta_t;
+            wn(cell_n).crf=cycledata;
+            wn(cell_n).N=N;
+            wn(cell_n).svd_xy = svdt;
+            wn(cell_n).svd_t = v;
+            wn(cell_n).sta=sta_t;
             %wn(cell_n,stim_eye).spont=spont;
             
             close all
@@ -1131,7 +1132,7 @@ end  %%%cell
 
 % parpool close
 if movietype==cm_noise
-    wn(cell_n,stim_eye).degperpix=degperpix;
+    wn(cell_n).degperpix=degperpix; %stim_eye
     save(afile,'wn','-append')
 elseif movietype==fl_noise
     fl(cell_n).degperpix=degperpix;
