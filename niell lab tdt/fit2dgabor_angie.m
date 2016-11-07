@@ -18,18 +18,18 @@ STA = wn(w).sta;
 [x y t_lag] = ind2sub(size(STA),ind);
 
 STA1 = STA(:,:,t_lag)-128;
-figure
-colormap(redblue)
-imagesc(STA1); axis equal
+% figure
+% colormap(redblue)
+% imagesc(STA1); axis equal
 
 %%crop image
 width = 61;
 img = maxsubregion(STA1,width,'abs');
-img = imresize(img,0.5);
+%img = imresize(img,0.5);
 
 stafig1 = figure;
 colormap(redblue);
-imagesc(img)
+% imagesc(img)
 
 
 width=size(img,1);

@@ -9,15 +9,15 @@ set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
 %use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.postdark}) )%useSess = use;
-use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
+%use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'110316' ))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'012916'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
-movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
-     load(movieFile); 
+% movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
+%      load(movieFile); 
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
@@ -94,13 +94,13 @@ for i = 1:length(use)
     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
         % get pre/post running speed
         for prepost = 1:2
-            spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},1);
+            spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},0);
             speedHistWn(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
             speedTrace{i,prepost}=spd.v;
         end
     else
         for prepost = 1:2
-            spd = getSpeed(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+            spd = getSpeed(clustfile,afile,files(use(i)).blockDrift{prepost},0);
             speedHistDrift(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
             speedTrace{i,prepost}=spd.v;
         end
@@ -118,7 +118,7 @@ for i = 1:length(use)
       if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
           %%% get grating responses
           for prepost = 1:2
-              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
               drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
               drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
               drift_spont(cellrange,:,prepost) = drift.interSpont;
@@ -152,7 +152,7 @@ for i = 1:length(use)
 
 %     %%% get wn response
     for prepost = 1:2
-        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},1,300);
+        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
@@ -161,18 +161,21 @@ for i = 1:length(use)
         wn_reliability(1,cellrange,prepost) = wn.reliability;
 
     end
-        end
+       
         
         for prepost=1:2
-            sta = getWn_mv(clustfile,afile, blockWn{prepost},1)
-            sta_x(cellrange,prepost)=sta.x;
-            sta_y(cellrange,prepost)=sta.y;
+            sta = getSTA(clustfile,afile,files(use(i)).blockWn{prepost},0)
+            sta_nx(cellrange,prepost) = sta.nx
+            sta_ny(cellrange,prepost)=sta.ny
+            sta_sigx(cellrange,prepost)=sta.sigx
+            sta_sigy(cellrange,prepost)=sta.sigy
+            sta_exp_var(cellrange,prepost)=sta.exp_var
             sta_all_fit(cellrange,prepost)=sta.all_fit;
-            sta_params(cellrange,prepost)=sta.
+            sta_all_img(cellrange,prepost)=sta.all_img;
+            sta_params(cellrange,prepost)=sta.params;
             
         end
-        
-        sta_x(cellrange,prepost)=sta.x;
+        end
 % 
 %    if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
 % load(afile,'wn')
@@ -223,18 +226,18 @@ for i = 1:length(use)
     %%% prepost correlation for white noise
     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
         dt = 1;
-        [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,0);
+        [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,1);
         wnCorr(corrRange,1) = preCorr(:); wnCorr(corrRange,2)=postCorr(:);
     end
     if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
         dt = 1;
-        [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockDrift,dt,0);
+        [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockDrift,dt,1);
         driftCorr(corrRange,1) = preCorr(:); driftCorr(corrRange,2)=postCorr(:);
     end
     
     %%%% prepost correlation in darkness
     dt = 1;
-    [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,0);
+    [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,1);
     darkCorr(corrRange,1) = preCorr(:); darkCorr(corrRange,2)=postCorr(:);
     
     cv2Dark(cellrange,:) = cv2;
@@ -423,11 +426,11 @@ end
 %     end
 % end
 
-% low_wn = squeeze(min(wn_crf,[],2));
-% max_wn = squeeze(max(wn_crf,[],2));
-% amp_wn = max_wn-low_wn
-% useResp = amp_wn(:,1,1)>0 & amp_wn(:,1,2)>0 & amp_wn(:,2,1)>0 & amp_wn(:,2,2)>0;
-% data_wn = goodAll==1 & useResp' & ~inhAll
+low_wn = squeeze(min(wn_crf,[],2));
+max_wn = squeeze(max(wn_crf,[],2));
+amp_wn = max_wn-low_wn
+useResp = amp_wn(:,1,1)>0 & amp_wn(:,1,2)>0 & amp_wn(:,2,1)>0 & amp_wn(:,2,2)>0;
+data_wn = goodAll==1 & useResp' & ~inhAll
 
 % figure
 % for t=1:2
@@ -506,6 +509,18 @@ for c=1:ceil(length(CRFsuppress))
     plot(wn_crf(CRFsuppress(c),:,1,2),'Color',[1 0 0]);  plot(wn_crf(CRFsuppress(c),:,2,2),'Color',[0 1 0]);
     yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]);
 end
+
+
+
+
+% figure
+% for c=1:length(data_wn)
+% subplot(7,2,c)
+% imagesc(sta_all_img{c,1})
+% subplot(7,2,c+1)
+% imagesc(sta_all_fit{c,1})
+% end
+
 
 % figure
 % plot(wn_reliability(1,data & treatment==doi,1)); hold on;

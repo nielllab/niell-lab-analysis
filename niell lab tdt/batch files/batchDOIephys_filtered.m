@@ -610,60 +610,60 @@ files(n).badsites = [1 6];
 files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;
 
 
-n=n+1;
-files(n).expt = '090616';
-files(n).dir = '09_06_16';
-files(n).tank = '';
-files(n).clusterfile = 'cluster_data_09_06_16_cluster_090616';
-files(n).analysisfile = 'analysis_090616_quiet';
-files(n).predark = 'dark_pre1';
-files(n).postdark = 'dark_post1';
-files(n).prewn = 'wn_pre1';
-files(n).postwn = 'wn_post1';  
-files(n).predrift = 'drift_pre1';
-files(n).postdrift = 'drift_post1';
-files(n).prebars = '';
-files(n).postbars = '';
-files(n).pretreatment = '';
-files(n).injection = 'injection';
-files(n).treatment = 'Lisuride'; 
-files(n).prepinpFile = ''
-files(n).postpinpFile = ''
-files(n).layers = [];
-files(n).notes = 'good data';
-files(n).misc = ''; 
-files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
-% files(n).predark_camera = 'dark_pre_090116_eye';  
-% files(n).postdark_camera = 'dark_post_090116_eye';
-files(n).badsites = [];
+% n=n+1;
+% files(n).expt = '090616';
+% files(n).dir = '09_06_16';
+% files(n).tank = '';
+% files(n).clusterfile = 'cluster_data_09_06_16_cluster_090616';
+% files(n).analysisfile = 'analysis_090616_quiet';
+% files(n).predark = 'dark_pre1';
+% files(n).postdark = 'dark_post1';
+% files(n).prewn = 'wn_pre1';
+% files(n).postwn = 'wn_post1';  
+% files(n).predrift = 'drift_pre1';
+% files(n).postdrift = 'drift_post1';
+% files(n).prebars = '';
+% files(n).postbars = '';
+% files(n).pretreatment = '';
+% files(n).injection = 'injection';
+% files(n).treatment = 'Lisuride'; 
+% files(n).prepinpFile = ''
+% files(n).postpinpFile = ''
+% files(n).layers = [];
+% files(n).notes = 'good data';
+% files(n).misc = ''; 
+% files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% % files(n).predark_camera = 'dark_pre_090116_eye';  
+% % files(n).postdark_camera = 'dark_post_090116_eye';
+% files(n).badsites = [];
 
-
-n=n+1;
-files(n).expt = '090116';
-files(n).dir = '09_01_16';
-files(n).tank = '';
-files(n).clusterfile = 'cluster_data_09_01_16_cluster_090116';
-files(n).analysisfile = 'analysis_090116';
-files(n).predark = 'dark_pre1';
-files(n).postdark = 'dark_post1';
-files(n).prewn = 'wn_pre1';
-files(n).postwn = 'wn_post1';  
-files(n).predrift = 'drift_pre1';
-files(n).postdrift = 'drift_post1';
-files(n).prebars = '';
-files(n).postbars = '';
-files(n).pretreatment = 'injection_mglur2';
-files(n).injection = 'injection_doi';
-files(n).treatment = 'MGluR2DOI'; 
-files(n).prepinpFile = ''
-files(n).postpinpFile = ''
-files(n).layers = [];
-files(n).notes = 'good data';
-files(n).misc = ''; 
-files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
-% files(n).predark_camera = 'dark_pre_090116_eye';  
-% files(n).postdark_camera = 'dark_post_090116_eye';
-files(n).badsites = [];
+%compile stopped here, but still good data
+% n=n+1;
+% files(n).expt = '090116';
+% files(n).dir = '09_01_16';
+% files(n).tank = '';
+% files(n).clusterfile = 'cluster_data_09_01_16_cluster_090116';
+% files(n).analysisfile = 'analysis_090116';
+% files(n).predark = 'dark_pre1';
+% files(n).postdark = 'dark_post1';
+% files(n).prewn = 'wn_pre1';
+% files(n).postwn = 'wn_post1';  
+% files(n).predrift = 'drift_pre1';
+% files(n).postdrift = 'drift_post1';
+% files(n).prebars = '';
+% files(n).postbars = '';
+% files(n).pretreatment = 'injection_mglur2';
+% files(n).injection = 'injection_doi';
+% files(n).treatment = 'MGluR2DOI'; 
+% files(n).prepinpFile = ''
+% files(n).postpinpFile = ''
+% files(n).layers = [];
+% files(n).notes = 'good data';
+% files(n).misc = ''; 
+% files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+% % files(n).predark_camera = 'dark_pre_090116_eye';  
+% % files(n).postdark_camera = 'dark_post_090116_eye';
+% files(n).badsites = [];
 
 
 % n=n+1;
@@ -702,8 +702,8 @@ files(n).clusterfile = 'cluster_data_08_26_16_cluster_082616';
 files(n).analysisfile = 'analysis_082616a';
 files(n).predark = 'dark_pre1';
 files(n).postdark = 'dark_post1';
-files(n).prewn = 'wn_pre1';
-files(n).postwn = 'wn_post1';  
+files(n).prewn = ''%'wn_pre1'; compile getting stuck here on STAs
+files(n).postwn = ''%'wn_post1'; compile getting stuck here 
 files(n).predrift = 'drift_pre1';
 files(n).postdrift = 'drift_post1';
 files(n).prebars = '';

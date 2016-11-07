@@ -8,11 +8,11 @@ set(groot,'defaultFigureVisible','off') %disable figure plotting
 %set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.postdark}) )%useSess = use;
+use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.postdark}) )%useSess = use;
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'102516' ))
+%use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'082616'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -94,13 +94,13 @@ for i = 1:length(use)
     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
         % get pre/post running speed
         for prepost = 1:2
-            spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},1);
+            spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},0);
             speedHistWn(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
             speedTrace{i,prepost}=spd.v;
         end
     else
         for prepost = 1:2
-            spd = getSpeed(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+            spd = getSpeed(clustfile,afile,files(use(i)).blockDrift{prepost},0);
             speedHistDrift(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
             speedTrace{i,prepost}=spd.v;
         end
@@ -118,7 +118,7 @@ for i = 1:length(use)
       if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
           %%% get grating responses
           for prepost = 1:2
-              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+              drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
               drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
               drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
               drift_spont(cellrange,:,prepost) = drift.interSpont;
@@ -152,7 +152,7 @@ for i = 1:length(use)
 
 %     %%% get wn response
     for prepost = 1:2
-        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},1,300);
+        wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
         wn_crf(cellrange,:,:,prepost)=wn.crf;
         wn_spont(cellrange,:,prepost)=wn.spont;
         wn_evoked(cellrange,:,prepost)=wn.evoked;
@@ -164,10 +164,12 @@ for i = 1:length(use)
        
         
         for prepost=1:2
-            sta = getSTA(clustfile,afile,files(use(i)).blockWn{prepost},1)
-            sta_svd_xy(cellrange,prepost) = sta.svd_xy
-            sta_svd_t(cellrange,prepost)=sta.svd_t
-            sta_t(cellrange,prepost)=sta.t
+            sta = getSTA(clustfile,afile,files(use(i)).blockWn{prepost},0)
+            sta_nx(cellrange,prepost) = sta.nx
+            sta_ny(cellrange,prepost)=sta.ny
+            sta_sigx(cellrange,prepost)=sta.sigx
+            sta_sigy(cellrange,prepost)=sta.sigy
+            sta_exp_var(cellrange,prepost)=sta.exp_var
             sta_all_fit(cellrange,prepost)=sta.all_fit;
             sta_all_img(cellrange,prepost)=sta.all_img;
             sta_params(cellrange,prepost)=sta.params;
@@ -424,11 +426,11 @@ end
 %     end
 % end
 
-% low_wn = squeeze(min(wn_crf,[],2));
-% max_wn = squeeze(max(wn_crf,[],2));
-% amp_wn = max_wn-low_wn
-% useResp = amp_wn(:,1,1)>0 & amp_wn(:,1,2)>0 & amp_wn(:,2,1)>0 & amp_wn(:,2,2)>0;
-% data_wn = goodAll==1 & useResp' & ~inhAll
+low_wn = squeeze(min(wn_crf,[],2));
+max_wn = squeeze(max(wn_crf,[],2));
+amp_wn = max_wn-low_wn
+useResp = amp_wn(:,1,1)>0 & amp_wn(:,1,2)>0 & amp_wn(:,2,1)>0 & amp_wn(:,2,2)>0;
+data_wn = goodAll==1 & useResp' & ~inhAll
 
 % figure
 % for t=1:2
@@ -506,6 +508,20 @@ for c=1:ceil(length(CRFsuppress))
     plot(wn_crf(CRFsuppress(c),:,1,1),'Color',[0.5 0 0]); hold on;  plot(wn_crf(CRFsuppress(c),:,2,1),'Color',[0 0.5 0]);
     plot(wn_crf(CRFsuppress(c),:,1,2),'Color',[1 0 0]);  plot(wn_crf(CRFsuppress(c),:,2,2),'Color',[0 1 0]);
     yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]);
+end
+
+
+
+
+figure
+for c=1:length(data_wn)
+subplot(5,5,c)
+imagesc(sta_all_fit{c,1});axis square
+end
+figure
+for c=1:length(data_wn)
+subplot(5,5,c)
+imagesc(sta_all_fit{c,2});axis square
 end
 
 % figure

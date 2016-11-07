@@ -354,8 +354,8 @@ end
 %     print('-dpsc',psfilename,'-append');
 % end
 
-if savePDF
-    [f p] = uiputfile('*.pdf','pdf name');
-    ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
-    delete(psfilename);
+% if savePDF
+%     [f p] = uiputfile('*.pdf','pdf name');
+%     ps2pdf('psfile', psfilename, 'pdffile', fullfile(p,f));
+%     delete(psfilename);
 end
