@@ -162,7 +162,7 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
-files(n).badsites = [];
+files(n).badsites = [10];
 
 n=n+1;
 files(n).expt = '101316';
@@ -409,7 +409,7 @@ files(n).misc = '';
 files(n).tip1 = 550; files(n).tip2 = 580; files(n).angle = 45;  %%% example
 % files(n).predark_camera = '';  
 % files(n).postdark_camera = '';
-files(n).badsites = [];
+files(n).badsites = [6];
 
 
 n=n+1;
@@ -840,15 +840,15 @@ files(n).clusterfile = 'cluster_data_08_11_16_cluster_081116';
 files(n).analysisfile = 'analysis_081116';
 files(n).predark = 'darkness_pre02';
 files(n).postdark = 'darkness_post02';
-files(n).prewn = 'wn_pre01';
-files(n).postwn = 'wn_post01';  
+files(n).prewn = '';% 'wn_pre01'; stopping in compile for STAs
+files(n).postwn = '';% 'wn_post01';  
 files(n).predrift = 'gratings_pre01';
 files(n).postdrift = 'gratings_post01';
 files(n).prebars = '';
 files(n).postbars = '';
 files(n).pretreatment = '';
 files(n).injection = 'injection_bars';
-files(n).treatment = 'Lisuride'; %actually lisuride
+files(n).treatment = 'Lisuride'; 
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).layers = [];
