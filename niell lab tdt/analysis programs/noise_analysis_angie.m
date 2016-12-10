@@ -70,7 +70,8 @@ else
     selected_path = pname(1 :delims(length(delims))-1)
     Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
     Block_Name = pname(delims(length(delims))+1 :length(pname))
-    nchan = input('number of channels : ');
+   % nchan = input('number of channels : ');
+    nchan = 64
     flags = struct('visStim',1,'MUspike',1);
     data = getTDTdata(Tank_Name,Block_Name,1:4:nchan,flags);
     

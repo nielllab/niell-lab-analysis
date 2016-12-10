@@ -170,7 +170,7 @@ else
 		set(gca,'children', flipud(get(gca,'children')));
 	end
 	
-	ylim([-0.5 ymax*1.1]);
+	%ylim([-0.5 ymax*1.1]);
 	xlim([0.5 numgroups-change_axis+0.5]);
 	
 	if strcmp(legend_type, 'axis')

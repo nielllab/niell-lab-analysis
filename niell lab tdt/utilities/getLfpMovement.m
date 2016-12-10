@@ -32,12 +32,12 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
    end
    lfpMove(blocknum).meanSpect = meanSpect;
    lfpMove(blocknum).freq = 0.5:0.5:100;
-   keyboard
+   %keyboard
    catch ME
         lfpMove(blocknum).meanSpect=[];
         lfpMove(blocknum).freq=[];
         display('couldnt get lfp movement')
-        getReport(ME)
+       % getReport(ME)
     end
     save(afile,'lfpMove','-append')
 end

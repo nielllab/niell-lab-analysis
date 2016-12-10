@@ -269,6 +269,8 @@ xlabel('pre rate'); ylabel('post rate');
 %     print('-dpsc',psfilename,'-append');
 % end
 
+%allR=[squeeze(normR(:,1:600,1)) squeeze(normR(:,1:600,2))];
+
 allR = [squeeze(normR(:,:,1)) squeeze(normR(:,:,2))];
 allV = [preRunV postRunV];
 allT = [preRunT postRunT+dur];
@@ -277,8 +279,13 @@ figure
 imagesc(allR,[0 1]);
 axis xy;
 hold on
-plot(allT/dt,5*allV/max(allV)-5 ,'g'); ylim([-5 size(allR,1)+0.5]);
-plot([dur dur],[-5 size(allR,1)],'r'); colorbar;
+plot(allT/dt,5*allV/max(allV)-5 ,'g');
+ylim([-5 size(allR,1)+0.5]);
+%dur =600
+plot([dur dur],[-5 size(allR,1)],'r','Linewidth',4); %colorbar;
+
+%dbstop
+allR = [squeeze(normR(:,:,1)) squeeze(normR(:,:,2))];
 % 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');
@@ -294,10 +301,10 @@ plot([dur dur],[-5 size(allR,1)],'r'); colorbar;
 % print('-dpsc',psfilename,'-append');
 % end
 
-% figure
-% subplot(2,1,1)
-% imagesc(coeff); axis square
-% subplot(2,1,2)
+figure
+subplot(2,1,1)
+imagesc(coeff); axis square
+subplot(2,1,2)
 
 %hist of PCA loadings
 % hist(coeff); axis square
@@ -314,6 +321,7 @@ for i=1:length(score);
     plot(score(i,1),score(i,2),'.','Markersize',12,'Color',cmapVar(i,1,length(score),jet))
 end
     xlabel 'PC1'; ylabel 'PC2';
+    
     
 
 % if savePDF
@@ -348,6 +356,7 @@ end
 % figure
 % imagesc(corrcoef(allR'),[-1 1]); axis square; xlabel('cell #'); ylabel('cell #'); colorbar; title('correlation')
 % colormap jet;
+
 % 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');
