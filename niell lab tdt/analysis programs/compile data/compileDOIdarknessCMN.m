@@ -24,7 +24,7 @@ savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
 for i = 1:length(use)
-
+    
     %%% extract filenames
     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];
     clustfile = [pathname '\' files(use(i)).dir '\' files(use(i)).clusterfile '.mat'] ;
@@ -50,15 +50,15 @@ for i = 1:length(use)
         layerAll(cellrange) = layerInfo.units;
         layerSites= layerInfo.sites;
     end
-%     
-%     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
-%         
-%         for prepost =1:2
-%             eyes = getEyes(clustfile,afile,cfile{:,prepost}, files(use(i)).blockWn{prepost},1);
-%             rad{:,prepost} = eyes.rad
-%             t{prepost} = eyes.t
-%         end
-%     end
+    %
+    %     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
+    %
+    %         for prepost =1:2
+    %             eyes = getEyes(clustfile,afile,cfile{:,prepost}, files(use(i)).blockWn{prepost},1);
+    %             rad{:,prepost} = eyes.rad
+    %             t{prepost} = eyes.t
+    %         end
+    %     end
     
     %%% session info
     sessionNum(cellrange)=i;
@@ -133,67 +133,67 @@ for i = 1:length(use)
         end
     end
     
-  figure
-  subplot(2,2,1); imagesc(squeeze(wn_frameR(cellrange,:,1,1)),[ 0 50]); title('pre stop')
-  subplot(2,2,2); imagesc(squeeze(wn_frameR(cellrange,:,1,2)),[ 0 50]); title('post stop')
+    figure
+    subplot(2,2,1); imagesc(squeeze(wn_frameR(cellrange,:,1,1)),[ 0 50]); title('pre stop')
+    subplot(2,2,2); imagesc(squeeze(wn_frameR(cellrange,:,1,2)),[ 0 50]); title('post stop')
     subplot(2,2,3); imagesc(squeeze(wn_frameR(cellrange,:,2,1)),[ 0 50]); title('pre move');
-  subplot(2,2,4); imagesc(squeeze(wn_frameR(cellrange,:,2,2)),[ 0 50]); title('post move')
+    subplot(2,2,4); imagesc(squeeze(wn_frameR(cellrange,:,2,2)),[ 0 50]); title('post move')
     set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
-  drawnow
-  
-%   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
-%   drawnow
-%   
-  
+    drawnow
+    
+    %   getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
+    %   drawnow
+    %
+    
     %% lfp power
-        %%%(right now averages over all sites, should use layer info)
-%     for prepost=1:2
-%         lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},1);
-%         LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
-%         size(lfpMove.meanSpect)
-%         if size(lfpMove.meanSpect,1)==16
-%             LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
-%         end
-%     end
-   
-%     for prepost=1:2
-%         lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},0);
-%         LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
-%         if size(lfpMove.meanSpect,1)==16
-%             LFPallChDark(i,:,:,:,prepost) = lfpMove.meanSpect;
-%         end
-%     end
-%     
-%     %% darkness / correlation analysis
-%     
-%     %%% need to keep track of n^2 values for correlations
-%     corrRange=ncorr+1:ncorr+nc^2;
-%     corrTreatment(corrRange)=treatment(cellrange(1));
-%     
-%     
-%     %%% prepost correlation for white noise
-%     dt = 1;
-%     [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,0);
-%     wnCorr(corrRange,1) = preCorr(:); wnCorr(corrRange,2)=postCorr(:);
-%     
-%     %%%% prepost correlation in darkness
-%     dt = 1;
-%     [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,0);
-%     darkCorr(corrRange,1) = preCorr(:); darkCorr(corrRange,2)=postCorr(:);
-%     
-%     cv2Dark(cellrange,:) = cv2;
-%     meanRdark(cellrange,:) = mean(R,2);
-%     
-%     %%% keep track of cell type for correlations
-%     corrType1 = zeros(size(preCorr)); corrType2 = corrType1;
-%     for j= 1:length(inh);
-%         corrType1(j,:)=inh(j); corrType2(:,j)=inh(j);
-%     end
-%     corrType1all(corrRange) = corrType1(:) ; corrType2all(corrRange)= corrType2(:);
-%     
+    %%%(right now averages over all sites, should use layer info)
+    %     for prepost=1:2
+    %         lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},1);
+    %         LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
+    %         size(lfpMove.meanSpect)
+    %         if size(lfpMove.meanSpect,1)==16
+    %             LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
+    %         end
+    %     end
+    
+    %     for prepost=1:2
+    %         lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},0);
+    %         LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
+    %         if size(lfpMove.meanSpect,1)==16
+    %             LFPallChDark(i,:,:,:,prepost) = lfpMove.meanSpect;
+    %         end
+    %     end
+    %
+    %     %% darkness / correlation analysis
+    %
+    %     %%% need to keep track of n^2 values for correlations
+    %     corrRange=ncorr+1:ncorr+nc^2;
+    %     corrTreatment(corrRange)=treatment(cellrange(1));
+    %
+    %
+    %     %%% prepost correlation for white noise
+    %     dt = 1;
+    %     [preCorr postCorr cv2 R eigs] =  prepostDOIdarkness(clustfile,afile,files(use(i)).blockWn,dt,0);
+    %     wnCorr(corrRange,1) = preCorr(:); wnCorr(corrRange,2)=postCorr(:);
+    %
+    %     %%%% prepost correlation in darkness
+    %     dt = 1;
+    %     [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,0);
+    %     darkCorr(corrRange,1) = preCorr(:); darkCorr(corrRange,2)=postCorr(:);
+    %
+    %     cv2Dark(cellrange,:) = cv2;
+    %     meanRdark(cellrange,:) = mean(R,2);
+    %
+    %     %%% keep track of cell type for correlations
+    %     corrType1 = zeros(size(preCorr)); corrType2 = corrType1;
+    %     for j= 1:length(inh);
+    %         corrType1(j,:)=inh(j); corrType2(:,j)=inh(j);
+    %     end
+    %     corrType1all(corrRange) = corrType1(:) ; corrType2all(corrRange)= corrType2(:);
+    %
     n= n+nc;
-
-%     ncorr= ncorr+nc^2;
+    
+    %     ncorr= ncorr+nc^2;
 end
 
 keyboard
@@ -224,25 +224,28 @@ for c = 1:3
     elseif c==3
         select = (inhAll); set(gcf,'Name','inh');
     end
+
+    clear ori_data
     
+    %%% average across reps and both directions of motion
+    %%% ori_data(cell,mv,prepost,orientation,t)
     
+    for ori = 1:6
+        ori_data(:,:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,:,:,[ori ori+6],:,:),5),4));
+    end
+    
+    for n= 1:size(ori_data,1);
+        [y peak] = max(squeeze(mean(mean(mean(ori_data(n,:,:,:,5:30),5),3),2)));
+        ori_data(n,:,:,:,:) = circshift(ori_data(n,:,:,:,:),-peak,4);
+    end
+    
+    ori_data =downsamplebin(ori_data,5,2,1);
+    ori_data = circshift(ori_data,5,5);
     for prepost=1:2
-        clear ori_data
-        for ori = 1:6
-            ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,:,prepost,[ori ori+6],:,:),5),4));
-        end
-        for n= 1:size(ori_data,1);
-            [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
-            ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
-        end
-        
-        ori_data =downsamplebin(ori_data,4,2,1);
-        ori_data = circshift(ori_data,5,4);
-        
         for mv = 1:2
             subplot(2,2,prepost+2*(mv-1));
-            plot(squeeze(nanmean(ori_data(find(goodAll & select),mv,:,:),1))');
-            title(titles{prepost+2*(mv-1)}); if c<=2; ylim([0 6]); else ylim([0 12]); end
+            plot(squeeze(nanmean(ori_data(find(goodAll & select),mv,prepost,:,:),1))');
+            title(titles{prepost+2*(mv-1)}); if c<=2; ylim([0 4]); else ylim([0 10]); end
         end
     end
 end
@@ -250,17 +253,22 @@ end
 
 
 mv = 1
-  clear ori_data
-    for ori = 1:6
-        ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,mv,:,[ori ori+6],:,:),5),4));
-    end
-    for n= 1:size(ori_data,1);
-        [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
-        ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
-    end
-    
-    ori_data =downsamplebin(ori_data,4,2,1);
-    ori_data = circshift(ori_data,5,4);
+clear ori_data
+
+%%% average over repetitions and opposite directions of motion
+%%% oridata(cell,prepost,orientation, time)
+for ori = 1:6
+    ori_data(:,:,ori,:) = squeeze(nanmean(nanmean(drift_cond_tcourse(:,mv,:,[ori ori+6],:,:),5),4));
+end
+
+%%% align by peak orientation
+for n= 1:size(ori_data,1);
+    [y peak] = max(squeeze(mean(mean(ori_data(n,:,:,5:30),4),2)));
+    ori_data(n,:,:,:) = circshift(ori_data(n,:,:,:),-peak,3);
+end
+
+ori_data =downsamplebin(ori_data,4,2,1);
+ori_data = circshift(ori_data,5,4);
 
 combinedParams = {{1, [1 3]}, {2, [2 3]}, {3}, {[1 2], [1 2 3]}};
 margNames = {'prepost', 'orientation', 'Condition-independent', 'treatment/stim Interaction'};
@@ -345,7 +353,7 @@ dpca_plot(data, W, V, @dpca_plot_default, ...
     'marginalizationNames', margNames, ...
     'marginalizationColours', margColours, ...
     'whichMarg', whichMarg,                 ...
-        'time', time,                        ...
+    'time', time,                        ...
     'timeEvents', timeEvents,               ...
     'timeMarginalization', 3, ...
     'legendSubplot', 16);
@@ -384,7 +392,7 @@ for prepost = 1:2
     usespks = find(s>1 & nanratio<0.04);
     figure
     imagesc(isnan(squeeze(trace(usespks,:))));
- 
+    
     mn = nanmean(trace,2);
     
     normtrace = (trace - repmat(mn,[1 size(trace,2)]))./repmat(s,[1 size(trace,2)]);
@@ -399,8 +407,8 @@ for prepost = 1:2
         plot(latent(1:20)/sum(latent));
         
     end
-       data = normtrace(usespks,:)';
-       score = data*coeff;
+    data = normtrace(usespks,:)';
+    score = data*coeff;
     
     figure
     for i = 1:5;
@@ -492,7 +500,7 @@ for prepost = 1:2
     condtuning = reshape(score',size(score,2),size(tcourse,2),size(tcourse,3));
     tuning = reshape(condtuning,size(condtuning,1),size(condtuning,2),3,12);
     
- 
+    
     for i = 1:12
         subplot(3,4,i)
         d=circshift(squeeze(nanmean(tuning(i,:,:,:),4)),2);
@@ -542,35 +550,35 @@ for i=1:3
     elseif i==3
         mn = squeeze(mean(mnPsth(find(goodAll & inhAll),:,:),1))'; t = 'grating inh';
     end
-mn = mn - repmat(mn(1,:),[50 1]);
-mn = circshift(mn,10)
-figure
-plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:)); title(t); xlabel('secs'); ylabel('sp/sec')
-%ylim([0 max(mn(:))+1])
+    mn = mn - repmat(mn(1,:),[50 1]);
+    mn = circshift(mn,10)
+    figure
+    plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:)); title(t); xlabel('secs'); ylabel('sp/sec')
+    %ylim([0 max(mn(:))+1])
 end
 
 
 
 
 
-  figure
-  subplot(2,2,1); imagesc(squeeze(wn_frameR(find(goodAll),:,1,1)),[ 0 50]); title('pre stop')
-  subplot(2,2,2); imagesc(squeeze(wn_frameR(find(goodAll),:,1,2)),[ 0 50]); title('post stop')
-    subplot(2,2,3); imagesc(squeeze(wn_frameR(find(goodAll),:,2,1)),[ 0 50]); title('pre move');
-  subplot(2,2,4); imagesc(squeeze(wn_frameR(find(goodAll),:,2,2)),[ 0 50]); title('post move')
-    set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
-  drawnow
-  
-      
-  figure
-  subplot(2,2,1); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,1,1),1))); title('pre stop'); ylim([0 5])
-  subplot(2,2,2); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,1,2),1))); title('post stop');ylim([0 5])
-    subplot(2,2,3); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,2,1),1))); title('pre move'); ylim([0 5])
-  subplot(2,2,4); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,2,2),1))); title('post move'); ylim([0 5])
-    set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
-  drawnow
-  
-  clear cycR
+figure
+subplot(2,2,1); imagesc(squeeze(wn_frameR(find(goodAll),:,1,1)),[ 0 50]); title('pre stop')
+subplot(2,2,2); imagesc(squeeze(wn_frameR(find(goodAll),:,1,2)),[ 0 50]); title('post stop')
+subplot(2,2,3); imagesc(squeeze(wn_frameR(find(goodAll),:,2,1)),[ 0 50]); title('pre move');
+subplot(2,2,4); imagesc(squeeze(wn_frameR(find(goodAll),:,2,2)),[ 0 50]); title('post move')
+set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
+drawnow
+
+
+figure
+subplot(2,2,1); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,1,1),1))); title('pre stop'); ylim([0 5])
+subplot(2,2,2); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,1,2),1))); title('post stop');ylim([0 5])
+subplot(2,2,3); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,2,1),1))); title('pre move'); ylim([0 5])
+subplot(2,2,4); plot(squeeze(nanmean(wn_frameR(find(goodAll),:,2,2),1))); title('post move'); ylim([0 5])
+set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
+drawnow
+
+clear cycR
 for f = 1:20;
     cycR(:,f,:,:) = nanmean(wn_frameR(:,f:20:end,:,:),2);
 end
@@ -580,7 +588,7 @@ evoked = squeeze(mean(cycR(:,9:11,:,:),2)) - spont;
 
 clear spontbar evokedbar spont_err evoked_err
 
-    figure
+figure
 for lyr = 2:5
     for i=1:2
         if i==1
@@ -601,7 +609,7 @@ for lyr = 2:5
         plot(evoked(use,2,1),evoked(use,2,2),symb); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
         if lyr==2,  title({'evoked move',''}), end
     end
- 
+    
 end
 
 
@@ -620,7 +628,7 @@ end
 
 
 
-    figure
+figure
 for lyr = 2:5
     for i=1:2
         if i==1
@@ -644,7 +652,7 @@ for lyr = 2:5
 end
 
 figure
-barweb(squeeze(spontbar(:,2,:)), squeeze(spont_err(:,2,:)), [],{'layer 2/3','layer 5'},'spontaneous',[],'sp/sec',[],[],{'pre','post'}); 
+barweb(squeeze(spontbar(:,2,:)), squeeze(spont_err(:,2,:)), [],{'layer 2/3','layer 5'},'spontaneous',[],'sp/sec',[],[],{'pre','post'});
 ylim([0 1.25])
 
 figure
@@ -716,7 +724,7 @@ for lyr = 3:6
     subplot(2,2,4)
     plot(evoked(use,1,2),evoked(use,2,2),symb); title('evoked post stop vs move'); hold on; plot([-30 30],[-30 30]);  axis square; axis([-10 20 -10 20])
 end
-      
+
 
 
 

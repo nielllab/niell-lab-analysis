@@ -582,8 +582,8 @@ elseif sync==kWidefield
     % p.n = round(.75*numSecs*p.rate);
     
     p.msTolerance=1;
-    p.rate=10;
-    p.n=Duration*p.rate;
+    p.rate=11;
+    p.n=Duration*10;
 %     p.n = 3000;
     % p.addr = getPPaddr;
     p = init(pco(p));
