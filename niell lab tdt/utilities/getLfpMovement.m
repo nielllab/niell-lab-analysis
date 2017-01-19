@@ -14,9 +14,9 @@ Block_Name = Block_Name{blocknum}
 load(afile,'lfpMove');
 
 if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknum).freq) | redo
-  
+
    try
-   lfp = getLFP(clustfile,afile,block,0);
+   lfp = getLFP(clustfile,afile,block,redo);
    spd = getSpeed(clustfile,afile,block,0);
    s = lfp.normspect;
    v = interp1(spd.t,spd.v,lfp.t);
@@ -32,7 +32,7 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
    end
    lfpMove(blocknum).meanSpect = meanSpect;
    lfpMove(blocknum).freq = 0.5:0.5:100;
-   %keyboard
+
    catch ME
         lfpMove(blocknum).meanSpect=[];
         lfpMove(blocknum).freq=[];

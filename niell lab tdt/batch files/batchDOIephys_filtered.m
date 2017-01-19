@@ -1,6 +1,61 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
+
+n=n+1;
+files(n).expt = '011117';
+files(n).dir = '01_11_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_01_11_17_cluster_011117';
+files(n).analysisfile = 'analysis_011117';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).predetect = 'detection-pre1';
+files(n).postdetect = 'detection_post2';
+files(n).prebars = ''; 
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = '5HT'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
+files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '010917';
+files(n).dir = '01_09_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_01_09_17_cluster_010917';
+files(n).analysisfile = 'analysis_010917';
+files(n).predark = 'dark_pre2';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = '';
+files(n).postdrift = '';
+files(n).prebars = ''; 
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection_bars';
+files(n).treatment = '5HT'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45;
+files(n).badsites = [3 8 10 20];
+
+
 n=n+1;
 files(n).expt = '112116';
 files(n).dir = '11_21_16';
@@ -2293,7 +2348,7 @@ files(n).expt = '072315';
 files(n).dir = '7_23_15_recluster';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_07_23_15_cluster_data';
-files(n).analysisfile = 'analysis_07_23_15a';
+files(n).analysisfile = 'analysis_07_23_15b';
 files(n).predark = 'dark_predoi_rec1';
 files(n).postdark = 'dark_post_doi_rec2';
 files(n).prewn = 'wnmovie_pre_doi_rec1';

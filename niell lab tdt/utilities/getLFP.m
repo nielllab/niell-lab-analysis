@@ -14,8 +14,9 @@ Block_Name = Block_Name{blocknum}
 
 load(afile,'lfp');
 
+
 if ~exist('lfp','var') | length(lfp)<blocknum  | isempty(lfp(blocknum).t) | redo
-    try
+   try
         flags = struct('lfpTseries',1,'lfpSpectra',1);
         tdtData= getTDTdata(Tank_Name, Block_Name, 1:nChan, flags);
         lfp(blocknum).freq = tdtData.spectF{1};
@@ -24,11 +25,11 @@ if ~exist('lfp','var') | length(lfp)<blocknum  | isempty(lfp(blocknum).t) | redo
             lfpchan = tdtData.spectData{ch};
             normalizer = 1:size(lfpchan,2);
             normalizer = repmat(normalizer,size(lfpchan,1),1);
-            lfp(blocknum).normspect(ch,:,:) = lfpchan.*normalizer;
+            normspect(ch,:,:) = lfpchan.*normalizer;
         end
         %%% downsample lfp
         for f = 1:nChan/4;
-            ns(f,:,:) = median(lfp(blocknum).normspect((f-1)*4 + 1:4,:,4:4:end),1);
+            ns(f,:,:) = median(normspect((f-1)*4 + (1:4),:,4:4:end),1);
         end
         lfp(blocknum).normspect = ns;
         lfp(blocknum).freq = lfp(blocknum).freq(4:4:end);
@@ -37,6 +38,7 @@ if ~exist('lfp','var') | length(lfp)<blocknum  | isempty(lfp(blocknum).t) | redo
         lfp(blocknum).freq=[];
         lfp(blocknum).normspect=[];
     end
+
     save(afile,'lfp','-append')
 end
 

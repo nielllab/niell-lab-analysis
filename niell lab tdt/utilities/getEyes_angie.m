@@ -92,9 +92,9 @@ if ~exist('eyes','var') | length(eyes)<blocknum | isempty(eyes(blocknum)) | redo
         
         vInterp = interp1(tsampBar,vsmoothBar,pts);
 %         try
-        rInterp = interp1(cameraTTL(1:length(rad')),rad,pts); %if cameraTTL is longer than rad (due to blinks?)
+        %rInterp = interp1(cameraTTL(1:length(rad')),rad,pts); %if cameraTTL is longer than rad (due to blinks?)
 %         catch
-%         rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts); %if rad is longer
+        rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts); %if rad is longer
 %         end
         
        
