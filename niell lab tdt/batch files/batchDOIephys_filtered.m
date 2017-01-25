@@ -3,6 +3,30 @@ n=0;
 
 
 n=n+1;
+files(n).expt = '011817';
+files(n).dir = '01_18_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_01_18_17_cluster_011817';
+files(n).analysisfile = 'analysis_011817';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dar_post1';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'drift_pre3';
+files(n).postdrift = 'drift_post1';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'DOI'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
+files(n).badsites = [];
+
+
+n=n+1;
 files(n).expt = '011117';
 files(n).dir = '01_11_17';
 files(n).tank = '';
@@ -2302,7 +2326,7 @@ files(n).expt = '072915';
 files(n).dir = '7_29_15';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_07_29_15_cluster_072915';
-files(n).analysisfile = 'analysis_072915b';
+files(n).analysisfile = 'analysis_072915c';
 files(n).predark = 'dark_pre_doi1'; %very quiet...maybe leave this block out
 files(n).postdark = 'dark_post_injection2';
 files(n).prewn = 'wn_pre_doi1';

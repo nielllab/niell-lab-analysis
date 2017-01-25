@@ -2,6 +2,60 @@ pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
 
+
+n=n+1;
+files(n).expt = '012317a';
+files(n).dir = '01_23_17a_eye';
+files(n).Tank_Name = '01_23_17a_eye';
+files(n).predetection = 'detection_pre2';
+files(n).postdetection = 'detection_post1';
+files(n).flash = ''
+files(n).predetection_camera='01_23_17_detection_pre_eye';
+files(n).postdetection_camera='01_23_17_detection_post_eye';
+files(n).treatment = 'Saline'; 
+files(n).notes = 'good data'; 
+files(n).misc = 'J305b' %blue headplate
+
+% 
+% n=n+1;
+% files(n).expt = 'flashtest';
+% files(n).dir = 'flashtest';
+% files(n).Tank_Name = 'flashtest';
+% files(n).predetection = 'flashtest2';
+% files(n).postdetection = 'flashtest2';
+% files(n).flash = ''
+% files(n).predetection_camera='flashtest_monitor';
+% files(n).postdetection_camera='';
+% files(n).treatment = ''; 
+% files(n).notes = 'good data'; %taken 012017
+% files(n).misc = ''
+
+n=n+1;
+files(n).expt = '012017b';
+files(n).dir = '01_20_17b_eye';
+files(n).Tank_Name = '01_20_17b_eye';
+files(n).predetection = 'detection_pre1';
+files(n).postdetection = 'detection_post1';
+files(n).flash = ''
+files(n).predetection_camera='01_20_17b_detection_pre';
+files(n).postdetection_camera='01_20_17b_detection_post_eye';
+files(n).treatment = 'DOI'; 
+files(n).notes = 'good data'; 
+files(n).misc = 'J294c'
+
+n=n+1;
+files(n).expt = '012017a';
+files(n).dir = '01_20_17a_eye';
+files(n).Tank_Name = '01_20_17_eye';
+files(n).predetection = 'detection_pre3';
+files(n).postdetection = 'detection_post1';
+files(n).flash = 'flash_pre1'
+files(n).predetection_camera='01_20_17_detection_pre2_eye';
+files(n).postdetection_camera='01_20_17_detection_post_eye';
+files(n).treatment = 'Saline'; 
+files(n).notes = 'good data'; 
+files(n).misc = 'J294b'
+
 n=n+1;
 files(n).expt = '011817';
 files(n).dir = '01_18_17_eye';
@@ -19,9 +73,9 @@ n=n+1;
 files(n).expt = '011317';
 files(n).dir = '01_13_17_eye';
 files(n).Tank_Name = '01_13_17_eye';
-files(n).predetection = 'detection_pre1';
+files(n).predetection = 'flashtest_eye';
 files(n).postdetection = 'detection_post2';
-files(n).predetection_camera='01_13_17_detection_pre_eye';
+files(n).predetection_camera='01_13_17_flashtest_eye';
 files(n).postdetection_camera='01_13_17_detection_post_eye';
 files(n).treatment = 'Saline'; 
 files(n).notes = 'good data'; 

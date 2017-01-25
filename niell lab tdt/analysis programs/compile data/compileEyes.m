@@ -9,7 +9,7 @@ set(groot,'defaultFigureVisible','on')
 
 %%% select the session you want based on filters
 %use =  find(strcmp({files.notes},'good data'))
- use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'011817'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'011317'))
 sprintf('%d selected session',length(use))
 
 movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\DetectionStim3contrast10min.mat';
@@ -35,7 +35,7 @@ for i = 1:length(use)
 if ~isempty(files(use(i)).blockDetect{1}) & ~isempty(files(use(i)).blockDetect{2})
     
     for prepost =1:2
-        eyes = eye_detection_move(cfile{:,prepost}, prepost, files(use(i)).blockDetect{prepost},files(use(i)).Tank_Name, 0);
+        eyes = eye_detection_move(cfile{:,prepost}, prepost, files(use(i)).blockDetect{prepost},files(use(i)).Tank_Name, 1);
         rad{i,:,prepost} = eyes.rad
         rInterp{i,:,prepost}=eyes.rInterp
         vInterp{i,:,prepost}=eyes.vInterp
@@ -49,8 +49,7 @@ if ~isempty(files(use(i)).blockDetect{1}) & ~isempty(files(use(i)).blockDetect{2
         trialSamp{i,:,prepost} = eyes.trialSamp;
     end
 end   
-% 
-% 
+
 % if ~isempty(files(use(i)).blockHigh{1}) & ~isempty(files(use(i)).blockHigh{2})
 %     
 %     for prepost =1:2
@@ -75,17 +74,20 @@ end
 % end
 end
 
-figure
-plot(frameT{1},fInterpR{1});hold on; plot(frameT{2},fInterpR{2},'r')
 
 
+
+%corr of velocity and radius, check lags
+% does corr become decoupled post?
 
 % dt = 0.5;
 % figure
 % for prepost=1:2
-% %[corr_vrad lags] = xcorr((~isnan(rInterpHigh{prepost}-nanmean(rInterpHigh{prepost})),(~isnanvInterpHigh{prepost}-nanmean(vInterpHigh{prepost}))),60/dt,'coeff');
 % [corr_vrad lags] = cellfun(@xcorr,(~isnan(rInterpHigh{prepost}-(mean(rInterpHigh{prepost})))),(~isnan(vInterpHigh-(mean(vInterpHigh)))),60/dt,'coeff')
+% [corr_vrad lags] = cellfun(@xcorr,(~isnan(rInterp{prepost}-(mean(rInterp{prepost})))),(~isnan(vInterp-(mean(vInterp)))),60/dt,'coeff')
 % 
+
+
 % subplot(1,2,prepost)
 % plot(lags*dt,corr_vrad);
 % % hold on
@@ -99,7 +101,11 @@ trialContPre = [trialSampPre;contrast(1:length(trialSampPre))]'
 catch
 trialContPre = [trialSampPre(1:length(contrast));contrast;]'
 end
+try
 trialContPost = [trialSampPost;contrast(1:length(trialSampPost))]'
+catch
+trialContPost = [trialSampPost(1:length(contrast));contrast]'
+end
 
 use = unique(contrast)
 figure
@@ -143,17 +149,34 @@ end
 titles = {'0', '0.01', '0.04', '1.0'};
 figure
 for i= 1:length(use)
-subplot(1,4,i);plot(nanmean(preTrials(contrast(1:length(preTrials))==use(i),:)));
-xlim([0 80]);ylim([-.6 1]);axis square; hold on
+subplot(1,4,i);
+plot(nanmean(preTrials(contrast(1:length(preTrials))==use(i),:)));
+xlim([0 80]);axis square; hold on
+%ylim([-.6 1])
 title(titles{i});
 subplot(1,4,i)
 plot(nanmean(postTrials(contrast==use(i),:)));
-xlim([0 80]);ylim([-.6 1]);axis square
+line([60 0],'g')
+%xlim([0 80]);
+ylim([-1 3]);
+axis square
 end
 
-% figure
-% plot(nanmean(preTrials(contrast(1:length(preTrials))==0,:)));
-% hold on; plot(nanmean(preTrials(contrast(1:length(preTrials))==1,:)));
-% xlim([0 80]);ylim([-.6 1]);axis square; hold on
+figure
+subplot(1,2,1)
+plot(nanmean(preTrials(contrast(1:length(preTrials))==0,:)));
+hold on; plot(nanmean(preTrials(contrast(1:length(preTrials))==.01,:)));
+plot(nanmean(preTrials(contrast(1:length(preTrials))==.04,:)));
+plot(nanmean(preTrials(contrast(1:length(preTrials))==1,:)));
+xlim([0 80]);%ylim([-.6 1]);
+axis square;legend('0','0.01','0.04','1.0')
+subplot(1,2,2)
+plot(nanmean(postTrials(contrast(1:length(postTrials))==0,:)));
+hold on; plot(nanmean(postTrials(contrast(1:length(postTrials))==.01,:)));
+plot(nanmean(postTrials(contrast(1:length(postTrials))==.04,:)));
+plot(nanmean(postTrials(contrast(1:length(postTrials))==1,:)));
+xlim([0 80]);
+% ylim([-.6 1]);
+axis square;legend('0','0.01','0.04','1.0')
 
 

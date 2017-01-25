@@ -12,7 +12,7 @@ set(groot,'defaultFigureVisible','on')
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'072315'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'072915'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -194,6 +194,7 @@ for i = 1:length(use)
             LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
             if size(lfpMove.meanSpect,1)==16
                 LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
+                LFPfreq(:,:) = lfpMove.freq;
                 display('good lfp');
                 lfpMove
             else
@@ -203,18 +204,18 @@ for i = 1:length(use)
     end
         
         
-        for prepost=1:2
-            lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},1);
-            LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDark.meanSpect, 1))/nanmedian(lfpMoveDark.meanSpect(:));
-            if size(lfpMoveDark.meanSpect,1)==16
-                LFPallChDark(i,:,:,:,prepost) = lfpMoveDark.meanSpect;
-                  display('good lfp');
-              %  lfpMove
-            else
-                display('lfp wrong size')
-            end 
-       
-    end
+%         for prepost=1:2
+%             lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},1);
+%             LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDark.meanSpect, 1))/nanmedian(lfpMoveDark.meanSpect(:));
+%             if size(lfpMoveDark.meanSpect,1)==16
+%                 LFPallChDark(i,:,:,:,prepost) = lfpMoveDark.meanSpect;
+%                   display('good lfp');
+%               %  lfpMove
+%             else
+%                 display('lfp wrong size')
+%             end 
+%        
+%     end
      
     getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
     drawnow    
@@ -441,17 +442,17 @@ titles={'Saline','DOI','5HT'};
 useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.4
 useSTA = useSTA & data_wn'% &(layerAll==4)'
 for t=1:2 %5ht doesnt show up with exp var smaller than .4
-    mdl_nx = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_nx(useSTA&(treatment==t)',2))
-    mdl_ny= fitlm(sta_ny(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',2))
-    rsquared_nx(t) = mdl_nx.Rsquared.Ordinary
-    rsquared_ny(t) = mdl_ny.Rsquared.Ordinary
+   % mdl_nx = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_nx(useSTA&(treatment==t)',2))
+  %  mdl_ny= fitlm(sta_ny(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',2))
+ %   rsquared_nx(t) = mdl_nx.Rsquared.Ordinary
+   % rsquared_ny(t) = mdl_ny.Rsquared.Ordinary
    % subplot(2,2,t)
    subplot(1,2,1)
     plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)',1),sta_nx(useSTA&(inhAll==0)'&(treatment==t)',2),'.','Markersize',10);
     hold on;
     plot(sta_nx(useSTA & (inhAll==1)'&(treatment==t)',1),sta_nx(useSTA&(inhAll==1)'&(treatment==t)',2),'.r','Markersize',10);
     axis square;xlim([0 .7]); ylim([0 .7]); set(gca,'FontSize',18);
-    text(.02, .63, ['r^2 = ' num2str(rsquared_nx(t))],'FontSize',18)
+   % text(.02, .63, ['r^2 = ' num2str(rsquared_nx(t))],'FontSize',18)
     mpre=nanmean(mean(sta_nx(useSTA & (treatment==t)',1)))
     mpost=nanmean(mean(sta_nx(useSTA & (treatment==t)',2)))
     plot(mpre,mpost,'pg','Markersize',10);hold on
@@ -464,13 +465,13 @@ for t=1:2 %5ht doesnt show up with exp var smaller than .4
     plot(sta_ny(useSTA & (inhAll==1)'& (treatment==t)',1),sta_ny(useSTA &(inhAll==1)'&(treatment==t)',2),'.r','Markersize',10);
     axis square;xlim([0 .7]);ylim([0 .7]);set(gca,'FontSize',18);
     hold on; plot([0 1],[0 1]);
-    text(.02, .55, ['r^2 = ' num2str(rsquared_ny(t))],'FontSize',18)
+   % text(.02, .55, ['r^2 = ' num2str(rsquared_ny(t))],'FontSize',18)
     mpre=nanmean(mean(sta_ny(useSTA  & (treatment==t)',1)))
     mpost=nanmean(mean(sta_ny(useSTA & (treatment==t)',2)))
     plot(mpre,mpost,'pg','Markersize',10)
     title(titles{t},'FontSize',30); xlabel('Pre ny');ylabel('Post ny');
-    n_cells(t) = sum(useSTA &(treatment==t)')
-    text(.02 ,.65, ['n = ' num2str(n_cells(t))],'FontSize',18)
+   % n_cells(t) = sum(useSTA &(treatment==t)')
+    %text(.02 ,.65, ['n = ' num2str(n_cells(t))],'FontSize',18)
 end
 
 figure
@@ -793,12 +794,12 @@ end
 
 figure
 subplot(1,2,1)
-imagesc(mnPsth(data&treatment==ht,1)); %%% show full dataset (n x t)
+imagesc(mnPsth(data&treatment==doi,1)); %%% show full dataset (n x t)
 subplot(1,2,2)
-imagesc(mnPsth(data&treatment==ht,2))
+imagesc(mnPsth(data&treatment==doi,2))
 
 clear max c h g prefOri
-useN =data & treatment==ht
+useN =data & treatment==doi
 %for prepost=1:2
 
 %%% plot all unit responses
@@ -1718,66 +1719,66 @@ for mv = 1:2
     end
 end
 
-%LFP averaging over all sites...separate by layer
-
+% 
 % figure
 % for prepost=1:2
 % subplot(1,2,prepost)
 % imagesc(squeeze(find(LFPallCh(sessionTreatment==2,16,:,1,prepost))))
 % end
 
-% salineSessions = (sessionTreatment==1)
-% doiSessions = (sessionTreatment==2)
-% htSessions = sessionTreatment==3
-% 
+salineSessions = (sessionTreatment==1)
+doiSessions = (sessionTreatment==2)
+htSessions = sessionTreatment==3
+
 % doi4= layerTet(doiSessions,:)==4
 % saline4=layerTet(salineSessions,:)==4
-% 
+
 % figure
 % for s=1:length(salineSessions)
 % subplot(5,5,s)
-% imagesc(squeeze(LFPallCh(s,doi4(s,:),:,1,2)))
+% imagesc(squeeze(LFPallCh(salineSessions==s,LFPallCh,:,1,2)))
 % end
-% 
-% %%% is averaging across treatments for each layer
-% 
-%  layerTet = layerSites(:,2:4:64)
-figure
-imagesc(squeeze(LFPallChDark(1,:,:,1,1)))
 
+%%% is averaging across treatments for each layer
 
+ layerTet = layerSites(:,2:4:64)
+% figure
+% imagesc(squeeze(LFPallChDark(1,:,:,1,1)))
+
+use =find(doiSessions==1)
 for prepost=1:2
     figure
     if prepost==1, set(gcf,'Name','DOI LFP PRE');
     else set(gcf,'Name','DOI LFP POST'); end
     for s =1:sum(doiSessions)
         subplot(4,4,s)
-        imagesc(squeeze(LFPallCh(s,:,:,1,prepost)))
+        imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
     end
 end
 
+use =find(salineSessions==1)
 for prepost=1:2
     figure
     if prepost==1, set(gcf,'Name','Saline LFP PRE');
     else set(gcf,'Name','Saline LFP POST'); end
     for s =1:sum(salineSessions)
         subplot(4,4,s)
-        imagesc(squeeze(LFPallCh(s,:,:,1,prepost)))
+        imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
     end
 end
-
+use = find(htSessions==1)
 for prepost=1:2
     figure
     if prepost==1, set(gcf,'Name','5HT LFP PRE');
     else set(gcf,'Name','5HT LFP POST'); end
     for s =1:sum(htSessions)
         subplot(4,4,s)
-        imagesc(squeeze(LFPallCh(s,:,:,1,prepost)))
+        imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
     end
 end
 
-use = layerTet(doiSessions,:)==4
 clear s
+use = find(htSessions==1)
 for mv = 1:2
 figure
 if mv==1, set(gcf,'Name', 'moving');
@@ -1786,7 +1787,7 @@ end
     for prepost =1:2
         for s =  1:length(use)
             subplot(4,5,s)
-            plot(squeeze(nanmean(LFPallCh(doiSessions==1', layerTet(doiSessions==1,:),:,mv,prepost))));
+            plot(squeeze(LFPfreq(:,prepost)),squeeze(nanmean(LFPallCh(use(s), layerTet(s,:)==4,:,mv,prepost))));
             hold on
         end
     end
@@ -1820,8 +1821,8 @@ figure
 for prepost =1:2
 for tet=1:16
 subplot(4,4,tet)
-plot(squeeze(LFPallChDark(1,tet,:,1,prepost)),'Color',C{prepost});hold on; xlim([0 100]);
-plot(squeeze(LFPallChDark(1,tet,:,2,prepost)),'Color',D{prepost}); xlim([0 100]);
+plot(squeeze(LFPallChDark(9,tet,:,1,prepost)),'Color',C{prepost});hold on; xlim([0 100]);
+plot(squeeze(LFPallChDark(9,tet,:,2,prepost)),'Color',D{prepost}); xlim([0 100]);
 xlabel 'Frequency (Hz)'; ylabel 'normalized power'; %mv
 title(sprintf('layer %d',layerTet(tet)));
 end

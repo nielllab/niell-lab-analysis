@@ -2,6 +2,9 @@ close all; clear all;
 load 01_20_17_flash_pre_eye
 data = squeeze(data);
 
+rad = squeeze(mean(mean(ddata,2),1));
+figure
+plot
 thresh = 0.95; %pupil threshold for binarization
         puprange = [10 100]; %set range of pupil radius
         pupercent = 0.75; %set range pupil radius window
@@ -38,13 +41,6 @@ thresh = 0.95; %pupil threshold for binarization
         rad = nan(size(data,3),1);
         centroid(1,:) = [horiz vert];
         rad(1,1) = puprad;
-        
-
-        rad = squeeze(mean(mean(ddata,2),1));
-figure
-plot(rad)
-
-
         for n = 2:size(data,3)
             [center,radii,metric] = imfindcircles(bindata(:,:,n),puprange,'Sensitivity',0.995,'ObjectPolarity','dark');
             if(isempty(center))

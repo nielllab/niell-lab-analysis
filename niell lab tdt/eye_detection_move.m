@@ -17,7 +17,7 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         data = squeeze(data);
         warning off;
         
-        flags = struct('mouseOn',0,'cameraOn',1,'visStim',1);
+        flags = struct('mouseOn',1,'cameraOn',1,'visStim',1);
         tdtData= getTDTdata(Tank_Name, Block_Name, 1, flags);
         tsamp = tdtData.mouseT;
         vsmooth = tdtData.mouseV;
@@ -35,7 +35,7 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         xlabel('frame #'); ylabel('secs');
         ylim([ 0 0.2])
         
-        thresh = 0.65; %pupil threshold for binarization
+        thresh = 0.92; %pupil threshold for binarization
         puprange = [8 55]; %set range of pupil radius
         pupercent = 0.30; %set range pupil radius window
         pupchange = 0.3; %acceptable percent change in radius per framerange
@@ -51,7 +51,7 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         horiz = (cent(4,1) - xc); %1/2 x search range
         vert = (yc - cent(3,2)); %1/2 y search range
         puprad = yc - cent(2,2); %initial pupil radius
-        puprange = [round(puprad - puprad*pupercent) round(puprad + puprad*pupercent)]; %range of pupil sizes to search over
+       % puprange = [round(puprad - puprad*pupercent) round(puprad + puprad*pupercent)]; %range of pupil sizes to search over
         ddata = double(data);
         binmaxx = cent(5,1);
         binmaxy = cent(5,2);
@@ -62,13 +62,20 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         for i = 1:size(ddata,3)
             bindata(:,:,i) = (ddata(yc-vert:yc+vert,xc-horiz:xc+horiz,i)/binmax(i) > thresh);
         end
-        
+        clear rad
         %convert from uint8 into doubles and threshold, then binarize       
         tic
         centroid = nan(size(data,3),2);
         rad = nan(size(data,3),1);
         centroid(1,:) = [horiz vert];
         rad(1,1) = puprad;
+%%%% to test timing of stim trials%%%%
+        dbstop
+        rad = squeeze(mean(mean(ddata,2),1));
+        figure
+        plot(rad)
+%         
+        
         for n = 2:size(data,3)
             [center,radii,metric] = imfindcircles(bindata(:,:,n),puprange,'Sensitivity',0.995,'ObjectPolarity','dark');
             if(isempty(center))
@@ -81,18 +88,18 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
             end
         end
         
-%         if n>framerange && (isnan(rad(n-1)) | isnan(rad(n))) %if it's a nan or preceeded by all nans don't change puprange
-%             puprange = puprange;
-%         elseif n>framerange && (abs(1 - rad(n)/nanmean(rad(n-framerange:n-1))) > pupchange) %if % change is bigger than specified don't change puprange
-%             puprange = puprange;
-%         elseif n>framerange && (rad(n)>nanmean(rad(n-framerange:n-1))) %if radius goes up, shift range up
-%             puprange = puprange + round(rad(n) - nanmean(rad(n-1)));
-%         elseif n>framerange && (rad(n)<nanmean(rad(n-framerange:n-1))) %if radius goes down, shift range down
-%             puprange = puprange - round(nanmean(rad(n-1)) - rad(n));
-%         else
-%             puprange = puprange;
-%         end
-%         toc
+        if n>framerange && (isnan(rad(n-1)) | isnan(rad(n))) %if it's a nan or preceeded by all nans don't change puprange
+            puprange = puprange;
+        elseif n>framerange && (abs(1 - rad(n)/nanmean(rad(n-framerange:n-1))) > pupchange) %if % change is bigger than specified don't change puprange
+            puprange = puprange;
+        elseif n>framerange && (rad(n)>nanmean(rad(n-framerange:n-1))) %if radius goes up, shift range up
+            puprange = puprange + round(rad(n) - nanmean(rad(n-1)));
+        elseif n>framerange && (rad(n)<nanmean(rad(n-framerange:n-1))) %if radius goes down, shift range down
+            puprange = puprange - round(nanmean(rad(n-1)) - rad(n));
+        else
+            puprange = puprange;
+        end
+        toc
         
         %%% plot results
         figure
@@ -150,7 +157,7 @@ plot(frameTime(1:1000),fInterpR(1:1000))
 
 clear R
 for tr = 1:floor(max(frameNum)/75)
-    for t = 1:75
+    for t = 1:90
         R(tr,t) = nanmean(fInterpR(frameNum == (tr-1)*75 + t));%
     end
     R(tr,:) = R(tr,:) - R(tr,1);
@@ -243,7 +250,12 @@ end
 h4 = figure
 
 % dbstop
-vidObj = VideoWriter('thisbetterbegood.avi');
+if block==1
+vidObj = VideoWriter('pre_detection.avi');
+else 
+vidObj = VideoWriter('post_detection.avi');
+
+end
 %vidObj.FrameRate = 60;
 open(vidObj);
 
