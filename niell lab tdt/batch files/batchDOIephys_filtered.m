@@ -2206,7 +2206,7 @@ files(n).expt = '081215';
 files(n).dir = '08_12_15';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_08_12_15_cluster_081215';
-files(n).analysisfile = 'analysis_081215b';
+files(n).analysisfile = 'analysis_081215c';
 files(n).predark = 'dark_pre_saline1';
 files(n).postdark = 'dark_post_saline1';
 files(n).prewn = 'wn_pre_saline1';
@@ -2222,7 +2222,7 @@ files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'good data';%re-did select-units
 files(n).misc = '';
-files(n).badsites = [8 14 17 19 23 24]; 
+files(n).badsites = []; 
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 40;  %%% example
 
 
@@ -2231,7 +2231,7 @@ files(n).expt = '080715';
 files(n).dir = '08_07_15';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_08_07_15_cluster_080715';
-files(n).analysisfile = 'analysis_080715b';
+files(n).analysisfile = 'analysis_080715c';
 files(n).predark = 'dark_pre_doi1';
 files(n).postdark = 'dark_post_doi1';
 files(n).prewn = 'wn_pre_doi1';

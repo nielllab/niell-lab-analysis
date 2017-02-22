@@ -1,9 +1,9 @@
 close all; clear all;
-load 01_20_17_flash_pre_eye
+load 01_27_17_G62RR2-TT_detection_1contrast_eye
 data = squeeze(data);
 
-thresh = 0.95; %pupil threshold for binarization
-        puprange = [10 100]; %set range of pupil radius
+thresh = 0.9; %pupil threshold for binarization
+        puprange = [8 100]; %set range of pupil radius
         pupercent = 0.75; %set range pupil radius window
         pupchange = .2; %acceptable percent change in radius per framerange
         framerange = 10; %number of frames to smooth over
@@ -18,7 +18,7 @@ thresh = 0.95; %pupil threshold for binarization
         horiz = (cent(4,1) - xc); %1/2 x search range
         vert = (yc - cent(3,2)); %1/2 y search range
         puprad = yc - cent(2,2); %initial pupil radius
-        puprange = [round(puprad - puprad*pupercent) round(puprad + puprad*pupercent)]; %range of pupil sizes to search over
+      %  puprange = [round(puprad - puprad*pupercent) round(puprad + puprad*pupercent)]; %range of pupil sizes to search over
         ddata = double(data);
         binmaxx = cent(5,1);
         binmaxy = cent(5,2);
@@ -69,34 +69,34 @@ plot(rad)
 %             puprange = puprange;
 %                 end
 
-figure
-plot(rad)
-
-h4 = figure
-
-vidObj = VideoWriter('flash_pre_012017a.avi');
-%vidObj.FrameRate = 60;
-open(vidObj);
-
-for i = 1:size(data,3)
-    
-    subplot(1,2,1)
-    imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off
-    
-    subplot(1,2,2)
-    imshow(bindata(:,:,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off
-    
-    currFrame = getframe(gcf);
-    writeVideo(vidObj,currFrame);
+% figure
+% plot(rad)
+% 
+% h4 = figure
+% 
+% vidObj = VideoWriter('detection_widefield_012617.avi');
+% %vidObj.FrameRate = 60;
+% open(vidObj);
+% 
+% for i = 1:size(data,3)
+%     
+%     subplot(1,2,1)
+%     imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off
+%     
+%     subplot(1,2,2)
+%     imshow(bindata(:,:,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off
+%     
+%     currFrame = getframe(gcf);
+%     writeVideo(vidObj,currFrame);
 end
 close(vidObj);

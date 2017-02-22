@@ -9,10 +9,11 @@ set(groot,'defaultFigureVisible','on')
 
 %%% select the session you want based on filters
 %use =  find(strcmp({files.notes},'good data'))
-use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'011317'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'012617'))
 sprintf('%d selected session',length(use))
 
-movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\DetectionStim3contrast10min.mat';
+movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\DetectionStim1contrast_7_25min.mat';
+% movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\DetectionStim3contrast10min.mat';
 %movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\flashStim.mat';
 load(movieFile);
 
@@ -20,6 +21,7 @@ saline=1; doi=2; ht=3;
 
 for i = 1:length(use)
     
+%cfile = {[pathname '\' files(use(i)).dir '\' files(use(i)).predetection_camera '.mat']};
     cfile = [{[pathname '\' files(use(i)).dir '\' files(use(i)).predetection_camera '.mat']};
         {[pathname '\' files(use(i)).dir '\' files(use(i)).postdetection_camera '.mat']}]';
 
@@ -44,11 +46,19 @@ if ~isempty(files(use(i)).blockDetect{1}) & ~isempty(files(use(i)).blockDetect{2
         frameT{i,:,prepost} = eyes.frameT;
         fInterpR{i,:,prepost} = eyes.fInterpR ;
         fInterpX{i,:,prepost} = eyes.fInterpX ;
-        fInterpY{i,:,prepost} = eyes.fInterpY ;
+        fInterpY{i,:,prepost} = eyes.fInterpY ; 
+        fInterpV{i,:,prepost} = eyes.fInterpV ;
         trials{i,:,:,prepost} = eyes.trials;
+        trialV{i,:,prepost} = eyes.trialV;
         trialSamp{i,:,prepost} = eyes.trialSamp;
     end
 end   
+
+end
+   
+% t = length(vInterp{1})./(length(trials{1}))
+% vTrials = interp1(vInterp{1}, trials{1},t)
+
 
 % if ~isempty(files(use(i)).blockHigh{1}) & ~isempty(files(use(i)).blockHigh{2})
 %     
@@ -72,7 +82,7 @@ end
 %         tLow{:,prepost} = eyes.t
 %    end
 % end
-end
+%end
 
 
 
@@ -93,90 +103,144 @@ end
 % % hold on
 % % plot([0 0],[0 1],'g-')
 % end
-
-trialSampPre = [trialSamp{1}];% trialSampPre = trialSampPre(1:length(contrast))
-trialSampPost = [trialSamp{2}]; %trialSampPost = trialSampPost(1:length(contrast))
-try
-trialContPre = [trialSampPre;contrast(1:length(trialSampPre))]'
-catch
-trialContPre = [trialSampPre(1:length(contrast));contrast;]'
-end
-try
-trialContPost = [trialSampPost;contrast(1:length(trialSampPost))]'
-catch
-trialContPost = [trialSampPost(1:length(contrast));contrast]'
-end
-
-use = unique(contrast)
-figure
-for i=1:length(use)
-%     subplot(2,2,1)
-%     plot(trialContPre(contrast==0)); hold on;plot(trialContPost(contrast==0))
-    subplot(2,2,i)
-    plot(trialContPre(contrast(1:length(trialContPre))==use(i))); hold on; plot(trialContPost(contrast(1:length(trialContPre))==use(i)))
-end
-
-figure
-Labels = {'0', '0.01', '0.04', '1.0'};
-for i=1:length(use)
-    subplot(1,4,i)
-    premean = nanmean(trialContPre(contrast(1:length(trialContPre))==use(i))); postmean = nanmean(trialContPost(contrast(1:length(trialContPre))==use(i)))
-    preEr = nanstd(trialContPre(contrast(1:length(trialContPre))==use(i)))/sqrt(length(trialContPre(contrast(1:length(trialContPre))==use(i))))
-    postEr = nanstd(trialContPost(contrast(1:length(trialContPre))==use(i)))/sqrt(length(trialContPost(contrast(1:length(trialContPre))==use(i))))
-    mn = [premean postmean]; err = [preEr postEr];
-    barweb(mn,err);axis square
-    set(gca, 'XTick', 1:4, 'XTickLabel', Labels(i));
-end
-legend('pre', 'post')
-
-
+% 
+% trialSampPre = [trialSamp{1}];% trialSampPre = trialSampPre(1:length(contrast))
+% trialSampPost = [trialSamp{2}]; %trialSampPost = trialSampPost(1:length(contrast))
+% try
+% trialContPre = [trialSampPre;contrast(1:length(trialSampPre))]'
+% catch
+% trialContPre = [trialSampPre(1:length(contrast));contrast;]'
+% end
+% try
+% trialContPost = [trialSampPost;contrast(1:length(trialSampPost))]'
+% catch
+% trialContPost = [trialSampPost(1:length(contrast));contrast]'
+% end
+% 
+ use = unique(contrast)
+ useX = unique(xpos)
+% figure
+% for i=1:length(use)
+% %     subplot(2,2,1)
+% %     plot(trialContPre(contrast==0)); hold on;plot(trialContPost(contrast==0))
+%     subplot(2,2,i)
+%     plot(trialContPre(contrast(1:length(trialContPre))==use(i))); hold on; plot(trialContPost(contrast(1:length(trialContPre))==use(i)))
+% end
+% 
+% figure
+% Labels = {'0', '0.01', '0.04', '1.0'};
+% for i=1:length(use)
+%     subplot(1,4,i)
+%     premean = nanmean(trialContPre(contrast(1:length(trialContPre))==use(i))); postmean = nanmean(trialContPost(contrast(1:length(trialContPre))==use(i)))
+%     preEr = nanstd(trialContPre(contrast(1:length(trialContPre))==use(i)))/sqrt(length(trialContPre(contrast(1:length(trialContPre))==use(i))))
+%     postEr = nanstd(trialContPost(contrast(1:length(trialContPre))==use(i)))/sqrt(length(trialContPost(contrast(1:length(trialContPre))==use(i))))
+%     mn = [premean postmean]; err = [preEr postEr];
+%     barweb(mn,err);axis square
+%     set(gca, 'XTick', 1:4, 'XTickLabel', Labels(i));
+% end
+% legend('pre', 'post')
+% 
+% 
 trials =squeeze(trials)'
 preTrials = [trials{1}]
 postTrials = [trials{2}]
+preV = [trialV{1}]
+postV = [trialV{2}]
 figure; subplot(1,2,1)
-imagesc(preTrials); subplot(1,2,2); imagesc(postTrials)
+imagesc(preTrials); 
+subplot(1,2,2); 
+imagesc(postTrials)
+figure
+subplot(1,2,1)
+imagesc(preV);
+subplot(1,2,2)
+imagesc(postV)
 
-%need to normalize
-titles = {'0', '0.01', '0.04', '1.0'};
+figure
+plot(fInterpR{1});hold on;plot(fInterpV{1})
+
+% %need to normalize
+titles = {'0',' 1'}%{'0', '0.01', '0.04', '1.0'};
 figure
 for i= 1:length(use)
-subplot(2,4,i);imagesc(preTrials(contrast(1:length(preTrials))==use(i),:));axis square
+subplot(2,1,i);
+imagesc(preTrials(contrast(1:length(preTrials))==use(i),:));axis square
 title(titles{i});
-subplot(2,4,i+4)
-imagesc(postTrials(contrast==use(i),:));axis square
+% subplot(2,2,i+2)
+% imagesc(postTrials(contrast==use(i),:));axis square
+end
+% 
+titles = {'x pos L','x pos R'};
+figure
+for i= 1:length(useX)
+subplot(1,2,i);
+plot(nanmean(preTrials(xpos(1:length(preTrials))==useX(i)& contrast(1:length(preTrials))==1,:)));
+% xlim([0 120]); ylim([-1.5 2]); 
+axis square;hold on;
+plot([60 60],[-10 60],'g');
+title(titles{i})
 end
 
-titles = {'0', '0.01', '0.04', '1.0'};
 figure
 for i= 1:length(use)
-subplot(1,4,i);
+subplot(1,2,i);
 plot(nanmean(preTrials(contrast(1:length(preTrials))==use(i),:)));
-xlim([0 80]);axis square; hold on
-%ylim([-.6 1])
+xlim([0 120]);
+axis square; hold on
+ylim([-.6 1])
 title(titles{i});
 subplot(1,4,i)
-plot(nanmean(postTrials(contrast==use(i),:)));
+%plot(nanmean(postTrials(contrast==use(i),:)));
 line([60 0],'g')
-%xlim([0 80]);
+xlim([0 80]);
 ylim([-1 3]);
 axis square
 end
 
 figure
-subplot(1,2,1)
-plot(nanmean(preTrials(contrast(1:length(preTrials))==0,:)));
-hold on; plot(nanmean(preTrials(contrast(1:length(preTrials))==.01,:)));
-plot(nanmean(preTrials(contrast(1:length(preTrials))==.04,:)));
-plot(nanmean(preTrials(contrast(1:length(preTrials))==1,:)));
-xlim([0 80]);%ylim([-.6 1]);
-axis square;legend('0','0.01','0.04','1.0')
-subplot(1,2,2)
-plot(nanmean(postTrials(contrast(1:length(postTrials))==0,:)));
-hold on; plot(nanmean(postTrials(contrast(1:length(postTrials))==.01,:)));
-plot(nanmean(postTrials(contrast(1:length(postTrials))==.04,:)));
-plot(nanmean(postTrials(contrast(1:length(postTrials))==1,:)));
-xlim([0 80]);
-% ylim([-.6 1]);
-axis square;legend('0','0.01','0.04','1.0')
+c=find(contrast==1)
+for d=1:16
+subplot(4,4,d)
+plot(preTrials(c(d),:));
+hold on
+plot(preV(c(d),:),'r')
+xlim([0 130]);axis square;
+%ylim([-4 7])
+%title(titles{i});
+% subplot(1,4,i)
+% plot(nanmean(postTrials(contrast==use(i),:)));
+ylim([-2 40])
+plot([60 60],[-2 40],'g');
+plot ([75 75],[-2 40],'g');
+axis square
+end
 
+clear c
+for i =1:2
+    c=find(contrast==1 & xpos==useX(i))
+    figure
+    if i ==1
+        set(gcf,'Name','trials L position')
+    else
+        set(gcf,'Name','trials R position')
+    end
+    for d=1:8
+        subplot(2,4,d);
+        plot(preTrials(c(d),:)); hold on;
+        plot(preV(c(d),:));
+        xlim([0 130]);axis square;
+        ylim([-2 50])
+        plot([60 60],[-2 50],'g');
+        plot ([75 75],[-2 50],'g');
+       % legend('radius','velocity')
+    end
+end
+
+figure
+%subplot(1,2,1)
+plot(nanmean(preTrials(contrast(1:length(preTrials))==0,:)));
+hold on; plot(nanmean(preTrials(contrast(1:length(preTrials))==1,:)));
+plot(nanmean(preV(contrast(1:length(preTrials))==1,:)));
+plot([60 60],[0 30],'g');  plot ([75 75],[0 30],'g');
+legend('0 contrast', '1 contrast','velocity');
 

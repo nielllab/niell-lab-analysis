@@ -1,7 +1,44 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
+n=n+1;
+files(n).expt = '020117a';
+files(n).dir = '02_01_17a';
+files(n).Tank_Name = '02_01_17a';
+files(n).predetection = 'detection1';
+files(n).postdetection = 'detection1';
+files(n).flash = ''
+files(n).predetection_camera='02_01_17_detection_g62gg10lt_eye';
+files(n).postdetection_camera='02_01_17_detection_g62gg10lt_eye';
+files(n).treatment = 'Saline'; 
+files(n).notes = 'good data'; 
+files(n).misc = 'g62gg10lt' 
 
+n=n+1;
+files(n).expt = '020117b';
+files(n).dir = '02_01_17b';
+files(n).Tank_Name = '02_01_17b_eye';
+files(n).predetection = 'detection1';
+files(n).postdetection = 'detection1';
+files(n).flash = ''
+files(n).predetection_camera='02_01_17b_detection_g62bb10lt_eye';
+files(n).postdetection_camera='02_01_17b_detection_g62bb10lt_eye';
+files(n).treatment = 'Saline'; 
+files(n).notes = 'good data'; 
+files(n).misc = 'g62bb10lt' 
+
+n=n+1;
+files(n).expt = '012617';
+files(n).dir = '01_26_17_eye';
+files(n).Tank_Name = '01_26_17_eye';
+files(n).predetection = 'detection_1contrast';
+files(n).postdetection = 'detection_1contrast';
+files(n).flash = ''
+files(n).predetection_camera='01_26_17_detection1contrast_g62kk12-RT_eye';
+files(n).postdetection_camera='01_26_17_detection1contrast_g62kk12-RT_eye';
+files(n).treatment = 'Saline'; 
+files(n).notes = 'good data'; 
+files(n).misc = 'G62KK12_RT' 
 
 n=n+1;
 files(n).expt = '012317a';

@@ -12,7 +12,7 @@ set(groot,'defaultFigureVisible','on')
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'072915'))
+use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'081215'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -202,6 +202,22 @@ for i = 1:length(use)
             end
         end
     end
+
+for prepost = 1:2
+    try
+        getSpikes(clustfile,afile,files(use(i)).blockWn{prepost},0);
+        getLFPraw(clustfile,afile,files(use(i)).blockWn{prepost},0);
+    catch
+        display('cant get wn')
+    end
+    try
+        getSpikes(clustfile,afile,files(use(i)).blockDark{prepost},0);
+        getLFPraw(clustfile,afile,files(use(i)).blockDark{prepost},0);
+    catch
+        display('cant get dark')
+    end
+end
+
         
         
 %         for prepost=1:2
@@ -555,25 +571,25 @@ xlabel('pre ny');ylabel('post ny')
 
 
 
-useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.6
+useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.4
 useSTA = useSTA & data_wn'% &(layerAll==4)'
 figure
 titles={'Saline', 'DOI'};%,'5HT'}
 for t=1:2
 subplot(2,3,t)
 set(gcf,'Name', 'layer 2/3 prepost nx and ny')
-mdl_nxny_pre = fitlm(sta_nx(useSTA & (treatment==t)' &(layerAll==2|3)',1),sta_ny(useSTA&(treatment==t)'&(layerAll==2|3)',1))
-rsquared_nxny_pre(t) = mdl_nxny_pre.Rsquared.Ordinary
-mdl_nxny_post = fitlm(sta_nx(useSTA & (treatment==t)' &(layerAll==2|3)',2),sta_ny(useSTA&(treatment==t)'&(layerAll==2|3)',2))
-rsquared_nxny_post(t) = mdl_nxny_post.Rsquared.Ordinary
+%mdl_nxny_pre = fitlm(sta_nx(useSTA & (treatment==t)' &(layerAll==2|3)',1),sta_ny(useSTA&(treatment==t)'&(layerAll==2|3)',1))
+%rsquared_nxny_pre(t) = mdl_nxny_pre.Rsquared.Ordinary
+%mdl_nxny_post = fitlm(sta_nx(useSTA & (treatment==t)' &(layerAll==2|3)',2),sta_ny(useSTA&(treatment==t)'&(layerAll==2|3)',2))
+%rsquared_nxny_post(t) = mdl_nxny_post.Rsquared.Ordinary
 plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)' & (layerAll==2|3)',1),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' & (layerAll==2|3)',1),'.','Markersize',10);
 hold on;plot([0 1],[0 1]); axis square;xlim([0 1])
-text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
+%text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
 subplot(2,3,t+3)
 plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)' & (layerAll==2|3)',2),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' & (layerAll==2|3)',2),'.','Markersize',10);
 hold on;plot([0 1],[0 1]);axis square;xlim([0 1])
 title(titles{t});
-text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_post(t))],'FontSize',18)
+%text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_post(t))],'FontSize',18)
 end
 
 figure

@@ -11,7 +11,7 @@ sfrange = 0.1067;
 tfrange =[ 0 ];
 %phaserange = [0 0 0 0 0];
 phaserange = linspace(0, 2*pi,9);
-phaserange=phaserange(1:8);
+phaserange=phaserange(1:4); %half length of original stim == 7.25 min
 
 ntheta =2;
 nx = 2; ny =1;
@@ -21,7 +21,7 @@ randomTheta=0;
 binarize=0;
 blank=0;
 
-contrasts = [0 0 0 0 0 0 0 0 0 0 1]
+contrasts = [0 0 0 0 0 0 0 0 0 0.01 0.04]
 
 totalduration = (duration+isi)*length(sfrange)*length(tfrange)*length(phaserange)*ntheta*nx*ny*length(contrasts)
 totalduration/60
@@ -144,7 +144,7 @@ moviedata = moviedata(1:xsz,1:ysz,:);
 % imshow(moviedata(:,:,i));
 % drawnow
 % end
-save DetectionStim3contrast10min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny sigma contrast
+save DetectionStim2contrast_LOW_7_25min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny sigma contrast
 size(moviedata)
 length(moviedata)/(60)
 figure

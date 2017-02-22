@@ -1,6 +1,5 @@
 
 function eyes = eye_detection_move(cfile,block,Block_Name, Tank_Name,redo)
-
 close all
 dbstop if error
 
@@ -70,7 +69,7 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         centroid(1,:) = [horiz vert];
         rad(1,1) = puprad;
 %%%% to test timing of stim trials%%%%
-        dbstop
+       % dbstop
         rad = squeeze(mean(mean(ddata,2),1));
         figure
         plot(rad)
@@ -116,11 +115,11 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         pts = startT:dt:endT;
         
         vInterp = interp1(tsamp,vsmooth,pts);
-     try
-        rInterp = interp1(cameraTTL(1:length(rad')),rad,pts); %if cameraTTL is longer than rad (due to blinks?)
-   catch
-        rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts); %if rad is longer
-     end
+        try
+            rInterp = interp1(cameraTTL(1:length(rad')),rad,pts); %if cameraTTL is longer than rad (acquisition stopped first)
+        catch
+            rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts); %if rad is longer
+        end
 
     
      frameTime = frames(2,:);
@@ -130,13 +129,10 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
      % % try
      fInterpR = interp1(cameraTTL,rad,frameTime); %if cameraTTL is longer than rad (if acquisition stopped before tdt stopped)
      fInterpX = interp1(cameraTTL,centroid(:,1),frameTime); 
-     fInterpY = interp1(cameraTTL,centroid(:,2),frameTime); 
+     fInterpY = interp1(cameraTTL,centroid(:,2),frameTime);
+     fInterpV = interp1(tsamp,vsmooth,frameTime);
 
-% catch
-%     fInterp = interp1(realFrame,rad(1:length(realFrame)),ptsMovie);
-% end
-
-% 
+%      dbstop
 figure
 plot(frameTime,fInterpR); xlabel('secs');
 set(gcf,'Name', 'frame time & rad')
@@ -150,26 +146,35 @@ for f = 1:75
 end
 
 figure
-plot(rAvg);title('cyc avg');
+plot(rAvg);title('cyc avg pre rise');
 
 figure
 plot(frameTime(1:1000),fInterpR(1:1000))
 
 clear R
 for tr = 1:floor(max(frameNum)/75)
-    for t = 1:90
+    for t = 1:120
         R(tr,t) = nanmean(fInterpR(frameNum == (tr-1)*75 + t));%
     end
-    R(tr,:) = R(tr,:) - R(tr,1);
+%     R(tr,:) = R(tr,:) - R(tr,1);
 end
 %dbstop
 
 figure
 imagesc(R)
 
+clear tr t
+for tr = 1:floor(max(frameNum)/75)
+    for t = 1:120
+        V(tr,t) = nanmean(fInterpV(frameNum == (tr-1)*75 + t));%
+    end
+%     V(tr,:) = V(tr,:) - V(tr,1);
+end
+figure
+imagesc(V)
 
-% 
-% dbstop
+
+%dbstop
 trialSamp = fInterpR(frameNum(1:75:length(frameNum)));
 figure
 plot(trialSamp)
@@ -197,7 +202,9 @@ legend('velocity','radius')
         eyes(block).fInterpX = fInterpX;
         eyes(block).fInterpY = fInterpY;
         eyes(block).fInterpR = fInterpR;
+        eyes(block).fInterpV = fInterpV;
         eyes(block).trials = R;
+        eyes(block).trialV = V;
         eyes(block).trialSamp = trialSamp;
 %     catch
 %         
@@ -234,53 +241,41 @@ end
 % tempfreq = 0;    %%% temporal frequency of stimulus
 % %blank_stim = 1; %%% is there an extra stimulus to measure spontaneous
 % %full_field = 1;  %%% is there a full-field flicker?
-% 
-% 
-% % set number of conditions and display setup (generally rows = orientation, columns = frequency)
-% n_rows=12;
-% n_col=6;
-% phase =  [0 0.7854 1.5708 2.3562 3.1416 3.9270 4.7124 5.4978];
-% theta = [0 1.57079632679490];
-% sigma = 0.015;
-% contrast =[0 0.01 0.04];
-% orients = 0:30:330;
-% spatfreqs = [0.0375117187500000];
 
 % dbstop
-h4 = figure
 
-% dbstop
-if block==1
-vidObj = VideoWriter('pre_detection.avi');
-else 
-vidObj = VideoWriter('post_detection.avi');
-
-end
-%vidObj.FrameRate = 60;
-open(vidObj);
-
-for i = 1:size(data,3)
-    
-    subplot(1,2,1)
-    imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off
-    
-    subplot(1,2,2)
-    imshow(bindata(:,:,i));
-    colormap gray
-    hold on
-    circle(centroid(i,1),centroid(i,2),rad(i))
-    drawnow
-    hold off
-    
-    currFrame = getframe(gcf);;
-    writeVideo(vidObj,currFrame);
-end
-close(vidObj);
+% h4 = figure
+% if block==1
+% vidObj = VideoWriter('pre_detection.avi');
+% else 
+% vidObj = VideoWriter('post_detection.avi');
+% 
+% end
+% %vidObj.FrameRate = 60;
+% open(vidObj);
+% 
+% for i = 1:size(data,3)
+%     
+%     subplot(1,2,1)
+%     imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off
+%     
+%     subplot(1,2,2)
+%     imshow(bindata(:,:,i));
+%     colormap gray
+%     hold on
+%     circle(centroid(i,1),centroid(i,2),rad(i))
+%     drawnow
+%     hold off
+%     
+%     currFrame = getframe(gcf);
+%     writeVideo(vidObj,currFrame);
+% end
+% close(vidObj);
 % dbstop
 
 
