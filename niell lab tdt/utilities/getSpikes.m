@@ -5,6 +5,9 @@ function spikes = getSpikes(clustfile,afile, block,redo)
 
 load(clustfile,'Block_Name','Tank_Name');
 blocknum = find(strcmp(block,Block_Name));
+if isempty(blocknum)
+    display('couldnt find block')
+end
 Block_Name = Block_Name{blocknum}
 
 load(afile,'spikes');
