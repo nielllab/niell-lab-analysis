@@ -4,15 +4,15 @@ close all
 dbstop if error
 
 batchDOIephys_filtered; %%% load batch file
-% set(groot,'defaultFigureVisible','off') %disable figure plotting
-set(groot,'defaultFigureVisible','on')
+set(groot,'defaultFigureVisible','off') %disable figure plotting
+%set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-%use =  find(strcmp({files.notes},'good data')& ~cellfun(@isempty,{files.postdark}) )%useSess = use;
+use =  find(strcmp({files.notes},'good data'))%useSess = use;
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data')  & ~cellfun(@isempty,{files.predark})& ~cellfun(@isempty,{files.postdark})& strcmp({files.expt},'081215'))
+%use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'022417'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -146,6 +146,19 @@ for i = 1:length(use)
             end
             
         end
+        
+         for prepost=1:2
+            lfpMoveDrift = getLfpMovement(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+            LFPallDrift(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDrift.meanSpect, 1));
+            if size(lfpMoveDrift.meanSpect,1)==16
+                LFPallChDrift(i,:,:,:,prepost) = lfpMoveDrift.meanSpect;
+                LFPfreqDrift(:,:) = lfpMoveDrift.freq;
+                display('good lfp');
+                lfpMoveDrift
+            else
+                display('lfp wrong size')
+            end
+         end  
     end
     
     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
@@ -187,10 +200,10 @@ for i = 1:length(use)
         %         set(gcf,'Name',sprintf('%s %s',files(use(i)).expt, files(use(i)).treatment));
         %         drawnow
         
-        %%% lfp power
+        %% lfp power
         %     %%%(right now averages over all sites, should use layer info)
         for prepost=1:2
-            lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},1);
+            lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
             LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect, 1));
             if size(lfpMove.meanSpect,1)==16
                 LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
@@ -201,7 +214,7 @@ for i = 1:length(use)
                 display('lfp wrong size')
             end
         end
-    end
+     end
 
 for prepost = 1:2
     try
@@ -211,30 +224,40 @@ for prepost = 1:2
         display('cant get wn')
     end
     try
+        getSpikes(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+        getLFPraw(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+    catch
+        display('cant get drift')
+    end
+    try
         getSpikes(clustfile,afile,files(use(i)).blockDark{prepost},0);
         getLFPraw(clustfile,afile,files(use(i)).blockDark{prepost},0);
     catch
         display('cant get dark')
     end
+    
+    
 end
 
+      if ~isempty(files(use(i)).blockDark{1}) & ~isempty(files(use(i)).blockDark{2})
+      
         
-        
-%         for prepost=1:2
-%             lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},1);
-%             LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDark.meanSpect, 1))/nanmedian(lfpMoveDark.meanSpect(:));
-%             if size(lfpMoveDark.meanSpect,1)==16
-%                 LFPallChDark(i,:,:,:,prepost) = lfpMoveDark.meanSpect;
-%                   display('good lfp');
-%               %  lfpMove
-%             else
-%                 display('lfp wrong size')
-%             end 
-%        
-%     end
-     
-    getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
-    drawnow    
+        for prepost=1:2
+            lfpMoveDark = getLfpMovement(clustfile,afile,files(use(i)).blockDark{prepost},0);
+            LFPallDark(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDark.meanSpect, 1))/nanmedian(lfpMoveDark.meanSpect(:));
+            if size(lfpMoveDark.meanSpect,1)==16
+                LFPallChDark(i,:,:,:,prepost) = lfpMoveDark.meanSpect;
+                  display('good lfp');
+              %  lfpMove
+            else
+                display('lfp wrong size')
+            end 
+       
+        end
+      end
+   
+%     getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
+%     drawnow    
     
     %% darkness / correlation analysis
     
@@ -255,13 +278,15 @@ end
     end
     
     %%%% prepost correlation in darkness
+        if ~isempty(files(use(i)).blockDark{1}) & ~isempty(files(use(i)).blockDark{2})
+
     dt = 1;
     [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,0);
     darkCorr(corrRange,1) = preCorr(:); darkCorr(corrRange,2)=postCorr(:);
     
     cv2Dark(cellrange,:) = cv2;
     meanRdark(cellrange,:) = mean(R,2);
-    
+        end
     %%% keep track of cell type for correlations
     corrType1 = zeros(size(preCorr)); corrType2 = corrType1;
     for j= 1:length(inh);
@@ -597,19 +622,19 @@ titles={'Saline', 'DOI','5HT'}
 for t=1:2
 subplot(2,3,t)
 set(gcf,'Name', 'all layers prepost nx and ny')
-mdl_nxny_pre = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',1))
-rsquared_nxny_pre(t) = mdl_nxny_pre.Rsquared.Ordinary
+%mdl_nxny_pre = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',1))
+%rsquared_nxny_pre(t) = mdl_nxny_pre.Rsquared.Ordinary
 plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)',1),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' ,1),'.','Markersize',10);
 hold on;plot([0 1],[0 1]); axis square; xlabel('pre nx');ylabel('pre ny');
-text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
+%text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
 plot(sta_nx(useSTA & (inhAll==1)' & (treatment==t)',1),sta_ny(useSTA&(inhAll==1)'&(treatment==t)' ,1),'r.','Markersize',10);
 subplot(2,3,t+3)
-mdl_nxny_post = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',2))
-rsquared_nxny_post(t) = mdl_nxny_post.Rsquared.Ordinary
+%mdl_nxny_post = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',2))
+%rsquared_nxny_post(t) = mdl_nxny_post.Rsquared.Ordinary
 plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)' ,2),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' ,2),'.','Markersize',10);
 hold on;plot([0 1],[0 1]);xlim([0 1]);axis square; xlabel('post nx');ylabel('post ny');
 plot(sta_nx(useSTA & (inhAll==1)' & (treatment==t)' ,2),sta_ny(useSTA&(inhAll==1)'&(treatment==t)' ,2),'r.','Markersize',10);
-text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_post(t))],'FontSize',18)
+%text(.02, .55, ['r^2 = ' num2str(rsquared_nxny_post(t))],'FontSize',18)
 title(titles{t});
 end
 
@@ -627,7 +652,7 @@ end
 %     end
 % end
 
-useSTA = find((sta_exp_var(:,1) & sta_exp_var(:,2)>.6) &(treatment==doi)')% &(layerAll==4)');
+useSTA = find((sta_exp_var(:,1) & sta_exp_var(:,2)>.4) &(treatment==saline)')% &(layerAll==4)');
 for prepost=1:2
     figure
     if prepost==1
@@ -656,7 +681,7 @@ for t=1:3
 end
 
 %ketanserin & ketan doi  more stable than saline????
-titles = {'layer 1','layer 2','layer 3','layer 4','layer 5','layer 6'};
+    titles = {'layer 1','layer 2','layer 3','layer 4','layer 5','layer 6'};
 C = {[1 0 0],[.5 0 0]} %bright = pre
 D = {[0 1 0],[0 .5 0]}
 for t=1:3
@@ -676,11 +701,11 @@ for t=1:3
             plot(mn_wn,'Color',C{prepost}) ;hold on;
             plot(mn_wn_mv,'Color', D{prepost});
             title(titles{l});
-        end
+
     end
 end
-
-useN= data_wn & treatment==ht
+end
+useN= data_wn & treatment==saline
 MI_crf = (wn_crf(useN,:,:,2)-wn_crf(useN,:,:,1))./(wn_crf(useN,:,:,2)+wn_crf(useN,:,:,1));
 
 CRFsuppress = find(MI_crf <-.5)
@@ -1583,15 +1608,15 @@ end
 
 
 
-% titles = {'saline','doi','ht','ketanserin', 'ketanserin + DOI', 'MGlur2', 'MGlur2 + DOI', 'Lisuride'};
-% figure
-% for i = 1:7
-%     subplot(2,4,i);
-%     wnCorrHist= myHist2(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),-.5:.1:1.5,-.5:.1:1.5);
-%     %wnCorrHist_pre= myHist2(wnCorr(corrTreatment==i,1),-.5:.1:1.5,-.5:.1:1.5)
-%     plot(wnCorrHist);hold on; axis square;title(titles{i})
-%     set(gcf,'Name','Wn Corr'); ylim([0 6000])
-% end
+titles = {'saline','doi','ht','ketanserin', 'ketanserin + DOI', 'MGlur2', 'MGlur2 + DOI', 'Lisuride'};
+figure
+for i = 1:7
+    subplot(2,4,i);
+    wnCorrHist= myHist2(wnCorr(corrTreatment==i,1),wnCorr(corrTreatment==i,2),-.5:.1:1.5,-.5:.1:1.5);
+    %wnCorrHist_pre= myHist2(wnCorr(corrTreatment==i,1),-.5:.1:1.5,-.5:.1:1.5)
+    plot(wnCorrHist);hold on; axis square;title(titles{i})
+    set(gcf,'Name','Wn Corr'); %ylim([0 6000])
+end
 
 
 %%% plot correlation for darkness
@@ -1782,6 +1807,7 @@ for prepost=1:2
         imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
     end
 end
+
 use = find(htSessions==1)
 for prepost=1:2
     figure
@@ -1793,8 +1819,8 @@ for prepost=1:2
     end
 end
 
-clear s
-use = find(htSessions==1)
+clear s use
+use = find(salineSessions==1)
 for mv = 1:2
 figure
 if mv==1, set(gcf,'Name', 'moving');
@@ -1809,7 +1835,7 @@ end
     end
 end
 
-squeeze(nanmean(LFPallCh(sessionTreatment==2',layerTet(sessionTreatment==2,:)==4,:,1,1)))
+squeeze(nanmean(LFPallCh(sessionTreatment==1',layerTet(sessionTreatment==1,:)==4,:,1,1)))
 
 %%evoked LFP all
 figure

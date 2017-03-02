@@ -1,6 +1,29 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
+n=n+1;
+files(n).expt = '022417';
+files(n).dir = '02_24_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_02_24_17_cluster_022417_wn';
+files(n).analysisfile = 'analysis_022417_wn';
+files(n).predark = '';
+files(n).postdark = '';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = '';
+files(n).postdrift = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
+files(n).badsites = [];
+
 
 n=n+1;
 files(n).expt = '011817';
@@ -8,8 +31,8 @@ files(n).dir = '01_18_17';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_01_18_17_cluster_011817';
 files(n).analysisfile = 'analysis_011817';
-files(n).predark = 'dark_pre1';
-files(n).postdark = 'dar_post1';
+files(n).predark = ''%'dark_pre1';
+files(n).postdark = ''%'dar_post1';
 files(n).prewn = '';
 files(n).postwn = '';  
 files(n).predrift = 'drift_pre3';

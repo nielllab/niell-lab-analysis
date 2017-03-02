@@ -34,15 +34,15 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         xlabel('frame #'); ylabel('secs');
         ylim([ 0 0.2])
         
-        thresh = 0.92; %pupil threshold for binarization
+        thresh = 0.85; %pupil threshold for binarization
         puprange = [8 55]; %set range of pupil radius
-        pupercent = 0.30; %set range pupil radius window
+        pupercent = 0.80; %set range pupil radius window
         pupchange = 0.3; %acceptable percent change in radius per framerange
-        framerange = 1; %number of frames to smooth over
+        framerange = 10; %number of frames to smooth over
        % user input to select center and right points
         sprintf('Please select pupil center and top, eyeball top and right points, darkest part of eyeball')
         h1 = figure('units','normalized','outerposition',[0 0 1 1])
-        imshow(data(:,:,100))
+        imshow(data(:,:,1000))
         [cent] = ginput(5);
         close(h1);
         yc = cent(1,2); %pupil center y val
@@ -153,7 +153,7 @@ plot(frameTime(1:1000),fInterpR(1:1000))
 
 clear R
 for tr = 1:floor(max(frameNum)/75)
-    for t = 1:120
+    for t = 1:180
         R(tr,t) = nanmean(fInterpR(frameNum == (tr-1)*75 + t));%
     end
 %     R(tr,:) = R(tr,:) - R(tr,1);
@@ -165,7 +165,7 @@ imagesc(R)
 
 clear tr t
 for tr = 1:floor(max(frameNum)/75)
-    for t = 1:120
+    for t = 1:180
         V(tr,t) = nanmean(fInterpV(frameNum == (tr-1)*75 + t));%
     end
 %     V(tr,:) = V(tr,:) - V(tr,1);
