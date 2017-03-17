@@ -1,5 +1,6 @@
 clear all
 
+% xsz = 128;
 xsz = 128;
 ysz = xsz*9/16;
 dist = 20;
@@ -10,33 +11,36 @@ degperpix = widthdeg/xsz
 duration = 0.5;
 framerate = 60;
 isi = 0.5;
-nreps = 12; %number of movie repetitions
+nreps = 1; %number of movie repetitions
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
-% sfrange = [0.04 0.16];
-sfrange = [0.01 0.04 0.16];
-tfrange =[1 4];
+sfrange = [0.04 0.16];
+tfrange = [2];
+% sfrange = [0.01 0.04 0.16];
+% tfrange =[1 4];
 % radiusRange = [0 1 2 4 8 1000];
 % sizeVals = [0 5 10 20 30 40 50 60];
-sizeVals = [30];
-radiusRange = sizeVals/(8*degperpix);
-% phaserange = linspace(0,2*pi,9); phaserange =phaserange(1:6);  %%%cmn
-phaserange = [0];
+% sizeVals = [30];
+% sizeVals = [0 10 20 30 40 50];
+% radiusRange = sizeVals/(8*degperpix);
+radiusRange = [0 2.5 5 10 15 20 25];
+phaserange = linspace(0,2*pi,25); phaserange =phaserange(1:24);  %%%cmn
+% phaserange = [0];
 % contrastRange = [0.125 0.25 0.5 1];
 contrastRange = [1];
 
 
-ntheta = 12; %cmn
+ntheta = 4; %cmn
 nx = 1; ny =1;
 
 randomOrder=1;
 randomTheta=0;
-randomPhase=1;
-binarize=0;
+randomPhase=0;
+binarize=1;
 blank=0;
 
 totalduration = length(sfrange)*length(contrastRange)*length(tfrange)*length(radiusRange)*length(phaserange)*ntheta*nx*(isi+duration);
-totalduration/60
+sprintf('total duration %0.2f min',totalduration/60)
 
 blockwidth = ysz;
 % xposrange = [1 xsz - blockwidth];
@@ -44,17 +48,27 @@ xposrange = xsz/4;
 yposrange = 1;
 
 [x y] =meshgrid(1:blockwidth,1:blockwidth);
-xgrid=(x-mean(x(:)));; ygrid=(y-mean(y(:)));
+xgrid=(x-mean(x(:))); ygrid=(y-mean(y(:)));
 x = xgrid*degperpix; y=ygrid*degperpix;
 
 for r=1:length(radiusRange)
-g = (exp(-0.5*(x.^2 +y.^2)/radiusRange(r)^2));
-g(g<1/128)=0;
-%%% option for disk rather than gaussian envelope
-%%% g = sqrt(x.^2 + y.^2)<radiusRange(r);
-gaussian{r}=g;
-figure
-imagesc(gaussian{r},[0 1]);
+    %%%for use if sizes are in pixels
+    % g = (exp(-0.5*(x.^2 +y.^2)/radiusRange(r)^2));
+    % g(g<1/128)=0;
+    %%%for use if sizes are in degrees
+%     g = (exp(-0.5*(x.^2 +y.^2)/(radiusRange(r))^2));
+%     g(g<1/2)=0;
+
+
+%     %alternative for disk
+    g = zeros(size(x));
+    g(x.^2+y.^2<radiusRange(r).^2) = 1;
+
+    %%% option for disk rather than gaussian envelope
+    %%% g = sqrt(x.^2 + y.^2)<radiusRange(r);
+    gaussian{r}=g;
+    figure
+    imagesc(gaussian{r},[0 1]);
 end
 
 thetarange = linspace(0, 2*pi,ntheta+1);
@@ -109,17 +123,36 @@ for tr = 1:trial*nreps
 end
 
 if binarize
-moviedata(moviedata>=128)=255;
+moviedata(moviedata>128)=255;
 moviedata(moviedata<128)=0;
 end
 
 moviedata = moviedata(1:xsz,1:ysz,:);
-figure
-for i = 1:length(moviedata)/10
-    i
-imshow(moviedata(:,:,i));
-drawnow
-end
+
+% % %%%preview 1/10 of movie
+% figure
+% for i = 1:length(moviedata)/10
+%     i
+% imshow(moviedata(:,:,i));
+% drawnow
+% end
+% 
+% %%%play a single stimulus
+% figure
+% stim = 13;
+% for i = 31+60*(stim-1):60+60*(stim-1)
+%     imshow(moviedata(:,:,i))
+%     drawnow
+% end
+% 
+% %%%look at frame i - (i-1) to see change
+% i=i+1;
+% imshow(moviedata(:,:,i)-moviedata(:,:,i-1))
+% drawnow
+% 
+% %%%look at single frame
+% imshow(moviedata(:,:,i))
+% drawnow
 
 % save sizeSelect2sf8sz26min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
-save patchOrientations15min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
+save sizeselectBin22min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration -v7.3
