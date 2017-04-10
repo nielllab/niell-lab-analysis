@@ -233,7 +233,7 @@ end
 used = 1;
 for t = 1:2
     
-    meanLfpLayer = squeeze(nanmean(lfpLayer(used==1 & sessionTreatment==t,:,:,:,:),1));
+    meanLfpLayer = squeeze(nanmedian(lfpLayer(used==1 & sessionTreatment==t,:,:,:,:),1));
     figure; set(gcf,'Name',treat{t});
     for j = 1:4
         subplot(2,2,j);
@@ -249,27 +249,31 @@ for t = 1:2
         plot(d); ylim([0 5000])
         title(titles{j});
     end
+    
+    figure
+    plot(freqs(1:140),specdata([3 1],:),'Linewidth',2); ylim([0 6000])
+    xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
+    set(gca,'Fontsize',20); xlim([0 70]); legend('run','stop'); ylabel('power a.u.'); title(['pre ' treatLabel{t}])
+    
+    
+    figure
+    plot(freqs(1:140),specdata([4 2],:),'Linewidth',2); ylim([0 6000])
+    xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
+    set(gca,'Fontsize',20); xlim([0 70]); legend('run','stop'); ylabel('power a.u.');  title(['post ' treatLabel{t}])
+    
+    figure
+    plot(freqs(1:140),specdata([3 4],:),'Linewidth',2); ylim([0 6000])
+    xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
+    set(gca,'Fontsize',20); xlim([0 70]); legend('pre',['post ' treatLabel{t}]); ylabel('power a.u.'); title('running only')
+    
+    figure
+    plot(freqs(1:140),specdata([1 2],:),'Linewidth',2); ylim([0 6000])
+    xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
+    set(gca,'Fontsize',20); xlim([0 70]); legend('pre',['post ' treatLabel{t}]); ylabel('power a.u.'); title('stop only')
+    
+    
+    
 end
 
-figure
-plot(freqs(1:140),specdata([3 1],:),'Linewidth',2); ylim([0 6000])
-xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
-set(gca,'Fontsize',20); xlim([0 70]); legend('run','stop'); ylabel('power a.u.'); title('pre DOI')
-
-
-figure
-plot(freqs(1:140),specdata([4 2],:),'Linewidth',2); ylim([0 6000])
-xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
-set(gca,'Fontsize',20); xlim([0 70]); legend('run','stop'); ylabel('power a.u.'); title('post DOI')
-
-figure
-plot(freqs(1:140),specdata([3 4],:),'Linewidth',2); ylim([0 6000])
-xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
-set(gca,'Fontsize',20); xlim([0 70]); legend('pre','post'); ylabel('power a.u.'); title('running only')
-
-figure
-plot(freqs(1:140),specdata([1 2],:),'Linewidth',2); ylim([0 6000])
-xlabel('freq (hz)'); set(gca,'Ytick',0:1000:6000);set(gca,'YtickLabel',{'0','1','2','3','4','5','6'});
-set(gca,'Fontsize',20); xlim([0 70]); legend('pre','post'); ylabel('power a.u.'); title('stop only')
 
 
