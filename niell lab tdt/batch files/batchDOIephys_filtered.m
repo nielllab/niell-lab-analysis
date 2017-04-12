@@ -2,6 +2,170 @@ pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
 n=n+1;
+files(n).expt = '032717';
+files(n).dir = '03_27_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_27_17_cluster_032717';
+files(n).analysisfile = 'analysis_032717';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = ''; 
+files(n).postdrift = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = '';
+files(n).postpinpFile = '';
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+files(n).badsites = [];
+
+n=n+1;
+files(n).expt = '032617';
+files(n).dir = '03_26_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_26_17_cluster_032617';
+files(n).analysisfile = 'analysis_032617';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'drift_pre1';
+files(n).postwn = 'drift_post1';  
+files(n).predrift = ''; 
+files(n).postdrift = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = '';
+files(n).postpinpFile = '';
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'bad data'; %same animal used on 3/25/17, penetrated just slightly posterior in the center of V1 -- few spikes and noisy data- weird waveforms
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+files(n).badsites = [];
+
+n=n+1;
+files(n).expt = '032517';
+files(n).dir = '03_25_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_25_17_cluster_032517';
+files(n).analysisfile = 'analysis_032517';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = ''; 
+files(n).postdrift = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = '5HT'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration
+files(n).badsites = [];
+
+n=n+1;
+files(n).expt = '032417';
+files(n).dir = '03_24_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_24_17_cluster_032417';
+files(n).analysisfile = 'analysis_032417';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'drift_pre1'; 
+files(n).postdrift = 'drift_post1';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'DOI'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '032117';
+files(n).dir = '03_21_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_21_17_cluster_032117';
+files(n).analysisfile = 'analysis_032117';
+files(n).predark = 'dark_pre1';
+files(n).postdark = '';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'drift_post1'; %accidentally named post instead of pre
+files(n).postdrift = 'drift_post_post';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+files(n).badsites = [];
+
+n=n+1;
+files(n).expt = '030817';
+files(n).dir = '03_08_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_08_17_cluster_030817';
+files(n).analysisfile = 'analysis_030817';
+files(n).predark = '';
+files(n).postdark = '';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'wn_pre1';
+files(n).postdrift = 'wn_post1';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'bad data'; %huge drift after injection, pre injection was very good
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+files(n).badsites = [];
+
+
+n=n+1;
+files(n).expt = '030417';
+files(n).dir = '03_04_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_03_04_17_cluster_030417';
+files(n).analysisfile = 'analysis_030417';
+files(n).predark = '';
+files(n).postdark = '';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'drift_pre1';
+files(n).postdrift = 'drift_post1';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+% files(n).layers(1:10) = 2; (11:?
+files(n).notes = 'bad data'; %LFP pre/post is not the same
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration, 2nd penetration...first one was not responseive
+files(n).badsites = [];
+
+
+n=n+1;
 files(n).expt = '022417';
 files(n).dir = '02_24_17';
 files(n).tank = '';
