@@ -18,6 +18,8 @@ saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride
 savePDF=0;
 redo = 1;
 n=0; ncorr=0; %%% number of units loaded, ncorr= number of correlation pairs
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for i = 1:length(use)
     % close all
     %%% extract filenames
@@ -212,6 +214,8 @@ end
               %  lfpMove
             else
                 display('lfp wrong size')
+                LFPallDark(i,:,:,prepost) = NaN;
+
             end 
        
         end
@@ -247,7 +251,11 @@ end
     
     cv2Dark(cellrange,:) = cv2;
     meanRdark(cellrange,:) = mean(R,2);
-        else meanRdark(cellrange,:) = NaN;
+        else 
+            cv2Dark(cellrange,:) = NaN;
+            meanRdark(cellrange,:) = NaN;
+            darkCorr(corrRange,1) = NaN;
+            darkCorr(corrRange,2)= NaN;
         end
     %%% keep track of cell type for correlations
     corrType1 = zeros(size(preCorr)); corrType2 = corrType1;
@@ -259,14 +267,17 @@ end
     n= n+nc;
     ncorr= ncorr+nc^2;
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%% plot speed histogram
 titles = {'Saline','DOI','5HT';
 figure 
-for t=1:3
+for t = 1:3
 subplot(1,3,t)
 plot(0.5:1:25,squeeze(mean(speedHistWn(sessionTreatment==t,1:25,:),1))); title(titles{t}); xlabel('speed');
-axis square; hold on;
+axis square; 
 end
+
 legend('pre','post')
 
 %%%filter data before plotting%%%
@@ -307,14 +318,14 @@ for mv =1:2
         allPre = drift_orient(goodAll==1 & treatment==t,mv,1,1)
         allPost = drift_orient(goodAll==1 & treatment==t,mv,1,2)
         
-%         mdl_drift = fitlm(allPre,allPost)
-%         rsquared_drift(t) = mdl_drift.Rsquared.Ordinary   
+        mdl_drift = fitlm(allPre,allPost)
+        rsquared_drift(t) = mdl_drift.Rsquared.Ordinary   
         plot(mpre,mpost,'+k','Markersize',10,'Linewidth',2)
         plot([0 35], [0 35])
         plot(mean(drift_orient(goodAll==1 & inhAll==1  &treatment==t,:,mv,1),2),mean(drift_orient(goodAll==1 & inhAll==1 &treatment==t,:,mv,2),2),'r.','Markersize',10);
         n_cells(t) = sum(goodAll==1 &treatment==t)
         text(.5, 11.5, ['n = ' num2str(n_cells(t))],'FontSize',18)
-%          text(.5, 10.75, ['r^2 = ' num2str(rsquared_drift(t))],'FontSize',18)
+         text(.5, 10.75, ['r^2 = ' num2str(rsquared_drift(t))],'FontSize',18)
     end
 end
 %%MI for evoked drift, stationary %%
@@ -610,7 +621,7 @@ for i = 1:3
     plot(driftCorr(corrTreatment==i,1),driftCorr(corrTreatment==i,2),'.'); hold on; axis equal
     plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{i});
     xlabel('pre drift corr'); ylabel('post')
-%     text(-.25, .85, ['r^2 = ' num2str(rsquared(i))])
+    text(-.25, .85, ['r^2 = ' num2str(rsquared(i))])
     set(gcf,'Name','Drift Corr')
 end
 
@@ -662,7 +673,7 @@ end
 %% nx & ny prepost
 figure
 titles={'Saline','DOI','5HT'};
-useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.4
+useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.6
 useSTA = useSTA & data_wn'% &(layerAll==4)'
 for t=1:2 %5ht doesnt show up with exp var smaller than .4
     figure
@@ -778,7 +789,7 @@ plot(sta_ny(useSTA & (inhAll==0)' & (treatment==3)' & (layerAll==5)',1),sta_ny(u
 hold on;plot([0 1],[0 1]); plot(sta_ny(useSTA & (inhAll==1)' & (treatment==3)' & (layerAll==5)',1),sta_ny(useSTA&(inhAll==1)'&(treatment==3)' & (layerAll==5)',2),'r.','Markersize',10);
 xlabel('pre ny');ylabel('post ny')
 
-useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.4
+useSTA = sta_exp_var(:,1) & sta_exp_var(:,2)>.6
 useSTA = useSTA & data_wn'% &(layerAll==4)'
 figure
 titles={'Saline', 'DOI','5HT'}
@@ -833,7 +844,7 @@ for prepost=1:2
     else
          set(gcf,'Name','post');end
     for c=1:length(useSTA)
-        subplot(10,5,c)
+        subplot(10,7,c)
         imagesc(sta_all_img{useSTA(c),prepost});axis square;
         %imagesc(sta_all_fit{useSTA(c),prepost});axis square
         set(gca,'xticklabel',{[]},'yticklabel',{[]}) 
@@ -849,7 +860,7 @@ for prepost=1:2
     else
         set(gcf,'Name','post');end
     for c=1:length(useSTA)
-        subplot(10,5,c)
+        subplot(10,7,c)
         %imagesc(sta_all_img{useSTA(c),prepost});axis square
         imagesc(sta_all_fit{useSTA(c),prepost},[-40 40]);axis square; colormap jet
         set(gca,'xticklabel',{[]},'yticklabel',{[]}) 
@@ -887,15 +898,15 @@ for t=1:3
 end
 end
 
-titles={'Saline','DOI','5HT'};
-figure
-for t=1:3
-    useN= data_wn & treatment==t
-    MI_crf = (wn_crf(useN,:,:,2)-wn_crf(useN,:,:,1))./(wn_crf(useN,:,:,2)+wn_crf(useN,:,:,1));
-    subplot(1,3,t)
-    h= hist(MI_crf,-1:.1:1);
-    bar(Mbins,h/sum(useN));axis square; title(titles{t}); ylim([0 .5]);
-end
+% titles={'Saline','DOI','5HT'};
+% figure
+% for t=1:3
+%     useN= data_wn & treatment==t
+%     MI_crf = (wn_crf(useN,:,:,2)-wn_crf(useN,:,:,1))./(wn_crf(useN,:,:,2)+wn_crf(useN,:,:,1));
+%     subplot(1,3,t)
+%     h= hist(MI_crf,-1:.1:1);
+%     bar(Mbins,h/sum(useN));axis square; title(titles{t}); ylim([0 .5]);
+% end
 
 % titles={'Saline','DOI','5HT'};
 for t=1:3
@@ -1064,8 +1075,8 @@ end
 titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 figure
 for t=1:3
-    mnpre = squeeze(mean(mnPsth(data & layerAll==5 & treatment==t,1,:),1))';
-    mnpost = squeeze(mean(mnPsth(data & layerAll==5 &treatment==t,2,:),1))';
+    mnpre = squeeze(mean(mnPsth(data & layerAll==4 & treatment==t,1,:),1))';
+    mnpost = squeeze(mean(mnPsth(data & layerAll==4 &treatment==t,2,:),1))';
     %mnpre = mnpre - repmat(mnpre,[1 50]);
     mnpre = circshift(mnpre,10);
     %mnpost = mnpost - repmat(mnpost(1,:),[50 1]);
@@ -1078,58 +1089,6 @@ for t=1:3
     plot((1:length(mnpost_scale)-5)*dt -dt/2,mnpost_scale(:,1:45),'g')
     text(.02, .63, ['scale factor = ' num2str(scalefact(t))],'FontSize',12)
 
-end
-
-%%% plot orientation tuning curves for all units
-for t = 1:3
-    figure
-    if t==1, set(gcf,'Name','saline OT'),
-    elseif t==2, set(gcf,'Name','doi OT'),
-    elseif t==3, set(gcf,'Name','ht OT'),
-    elseif t==4, set(gcf,'Name','ketanserin OT')
-    elseif t==5, set(gcf,'Name','ketanserin + doi OT')
-    elseif t==6, set(gcf,'Name','MGlur2 OT')
-    elseif t==7, set(gcf,'Name','MGlur2+DOI OT')
-    else set(gcf,'Name','Lisuride'),end
-    useN = find(goodAll & treatment==t)
-    for i = 1:length(useN)
-        np = ceil(sqrt(length(useN)));
-        subplot(np,np,i);
-        hold on
-        plot(drift_orient(useN(i),:,1,1),'Color',[0.5 0 0]);  plot(drift_orient(useN(i),:,2,1),'Color',[0 0.5 0]); %pre sal & DOI mv & stat dark =pre
-        plot(drift_orient(useN(i),:,1,2),'Color',[1 0 0]);  plot(drift_orient(useN(i),:,2,2),'Color',[0 1 0]); %pre sal & DOI mv & stat
-        plot([1 12], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
-        plot([1 12], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
-        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
-        if inhAll(useN(i)) ==1 , xlabel('inh'); else  xlabel('exc');
-        end
-    end
-end
-
-%plot spatial frequency tuning curves for all units
-for t = 1:3
-    figure
-    if t==1, set(gcf,'Name','saline SF'),
-    elseif t==2, set(gcf,'Name','doi SF'),
-    elseif t==3, set(gcf,'Name','ht SF'),
-    elseif t==4, set(gcf,'Name','ketanserin SF')
-    elseif t==5, set(gcf,'Name','ketanserin + doi SF')
-    elseif t==6, set(gcf,'Name','mglur2 SF')
-    elseif t==7, set(gcf,'Name','mglur2 + DOI SF')
-    else set(gcf,'Name','lisuride SF'),end
-    useN = find(goodAll & treatment==t)
-    for i = 1:length(useN)
-        np = ceil(sqrt(length(useN)));
-        subplot(np,np,i);
-        hold on
-        plot(drift_sf(useN(i),:,1,1),'Color',[0.5 0 0]);  plot(drift_sf(useN(i),:,2,1),'Color',[0 0.5 0]); %pre, mv=2
-        plot(drift_sf(useN(i),:,1,2),'Color',[1 0 0]);plot(drift_sf(useN(i),:,2,2),'Color',[0 1 0]); %post
-        plot([1 7], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
-        plot([1 7], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
-        yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 8.5])
-        if inhAll(useN(i)) ==1 , xlabel('inh'); else  xlabel('exc');
-        end
-    end
 end
 
 useOsi_pre = drift_osi(:,1,1)>0
@@ -1148,18 +1107,37 @@ for t=1:3
     barweb(osi,osierr); ylim([0 1]); axis square
 end
 
+%osi all layers
 figure
 for t=1:3
-    osi(1,:) = nanmean(abs(drift_osi(data&treatment==t&layerAll==2|3,1,1)))
-    osierr(1,:) = squeeze(nanstd(drift_osi(data & treatment==t&layerAll==2|3,1,1)/sqrt(sum(drift_osi(data & treatment==t&layerAll==2|3,1,1),1))));
-    osi(2,:) = nanmean(abs(drift_osi(data&treatment==t&layerAll==2|3,1,2)))
-    osierr(2,:) = squeeze(nanstd(drift_osi(data & treatment==t&layerAll==2|3,1,2)/sqrt(sum(drift_osi(data & treatment==t&layerAll==2|3,1,2),1))));
+    osi(1,:) = nanmean(abs(drift_osi(data&treatment==t,1,1)))
+    osierr(1,:) = squeeze(nanstd(drift_osi(data & treatment==t,1,1)/sqrt(sum(drift_osi(data & treatment==t,1,1),1))));
+    osi(2,:) = nanmean(abs(drift_osi(data&treatment==t,1,2)))
+    osierr(2,:) = squeeze(nanstd(drift_osi(data & treatment==t,1,2)/sqrt(sum(drift_osi(data & treatment==t,1,2),1))));
     subplot(1,3,t)
     barweb(osi,osierr); ylim([0 1]); axis square
-%     [p h]=ranksum(drift_osi(data&treatment==t&layerAll==5,1,1),drift_osi(data&treatment==t&layerAll==5,1,2))
-%     text(.9, 1, ['p = ' num2str(p)],'FontSize',18)
+    [p h]=ranksum(drift_osi(data&treatment==t,1,1),drift_osi(data&treatment==t,1,2))
+    text(.9, 1, ['p = ' num2str(p)],'FontSize',18)
 end
 
+%osi specific layers
+figure
+for t=1:3
+    figure
+if t == 1, set(gcf,'Name','Saline')
+elseif t==2, set(gcf,'Name','DOI')
+else set(gcf,'Name','5HT'), end
+    for l=1:6
+    osi(1,:) = nanmean(abs(drift_osi(data&treatment==t&layerAll==l,1,1)))
+    osierr(1,:) = squeeze(nanstd(drift_osi(data & treatment==t&layerAll==l,1,1)/sqrt(sum(drift_osi(data & treatment==t&layerAll==l,1,1),1))));
+    osi(2,:) = nanmean(abs(drift_osi(data&treatment==t&layerAll==l,1,2)))
+    osierr(2,:) = squeeze(nanstd(drift_osi(data & treatment==t&layerAll==l,1,2)/sqrt(sum(drift_osi(data & treatment==t&layerAll==l,1,2),1))));
+    subplot(2,3,l)
+    barweb(osi,osierr); ylim([0 1]); axis square
+%     [p h]=ranksum(drift_osi(data&treatment==t&layerAll==l,1,1),drift_osi(data&treatment==t&layerAll==l,1,2))
+%     text(.9, 1, ['p = ' num2str(p)],'FontSize',18)
+    end
+end
 
 %%% plot orientation tuning curves for all units
 for t = 1:3

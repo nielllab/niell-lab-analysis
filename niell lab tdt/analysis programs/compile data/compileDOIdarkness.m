@@ -4,15 +4,15 @@ close all
 dbstop if error
 
 batchDOIephys_filtered; %%% load batch file
-%set(groot,'defaultFigureVisible','off') %disable figure plotting
-set(groot,'defaultFigureVisible','on')
+set(groot,'defaultFigureVisible','off') %disable figure plotting
+%set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-%use =  find(strcmp({files.notes},'good data'))%useSess = use;
+use =  find(strcmp({files.notes},'good data'))%useSess = use;
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'032717'))
+% use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'090815'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -165,7 +165,7 @@ for i = 1:length(use)
         
         %%% get wn response
         for prepost = 1:2
-            wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},1,300);
+            wn = getWn_mv(clustfile,afile,files(use(i)).blockWn{prepost},0,300);
             wn_crf(cellrange,:,:,prepost)=wn.crf;
             wn_spont(cellrange,:,prepost)=wn.spont;
             wn_evoked(cellrange,:,prepost)=wn.evoked;
@@ -177,7 +177,7 @@ for i = 1:length(use)
         
         for prepost=1:2
             try
-                sta = getSTA(clustfile,afile,files(use(i)).blockWn{prepost},1)
+                sta = getSTA(clustfile,afile,files(use(i)).blockWn{prepost},0)
                 sta_nx(cellrange,prepost) = sta.nx
                 sta_ny(cellrange,prepost)=sta.ny
                 sta_sigx(cellrange,prepost)=sta.sigx
@@ -251,13 +251,15 @@ end
               %  lfpMove
             else
                 display('lfp wrong size')
+                LFPallDark(i,:,:,prepost) = NaN;
             end 
        
         end
       end
-   
-%     getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
-%     drawnow    
+
+      figure
+      getSorting(clustfile,afile,sprintf('%s %s',files(use(i)).expt,files(use(i)).treatment));
+      drawnow
     
     %% darkness / correlation analysis
     
@@ -282,10 +284,17 @@ end
 
     dt = 1;
     [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,0);
-    darkCorr(corrRange,1) = preCorr(:); darkCorr(corrRange,2)=postCorr(:);
+    darkCorr(corrRange,1) = preCorr(:);
+    darkCorr(corrRange,2)=postCorr(:);
     
-    cv2Dark(cellrange,:) = cv2;
-    meanRdark(cellrange,:) = mean(R,2);
+
+      cv2Dark(cellrange,:) = cv2;
+      meanRdark(cellrange,:) = mean(R,2);
+        else
+            cv2Dark(cellrange,:) = NaN;
+            meanRdark(cellrange,:) = NaN;
+            darkCorr(corrRange,1) = NaN;
+            darkCorr(corrRange,2)= NaN;
         end
     %%% keep track of cell type for correlations
     corrType1 = zeros(size(preCorr)); corrType2 = corrType1;
@@ -612,7 +621,7 @@ plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)' & (layerAll==2|3)',1),sta_ny
 xlabel('nx pre');ylabel('ny pre')
 plot(sta_nx(useSTA & (inhAll==1)' & (treatment==t)' & (layerAll==2|3)',1),sta_ny(useSTA&(inhAll==1)'&(treatment==t)' & (layerAll==2|3)',1),'r.','Markersize',10);
 hold on;plot([0 1],[0 1]); axis square;xlim([0 1])
-text(.02, .8, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
+% text(.02, .8, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
 subplot(2,3,t+3)
 plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)' & (layerAll==2|3)',2),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' & (layerAll==2|3)',2),'.','Markersize',10); hold on;
 xlabel('nx post');ylabel('ny post')
@@ -627,19 +636,19 @@ titles={'Saline', 'DOI','5HT'}
 for t=1:3
 subplot(2,3,t)
 set(gcf,'Name', 'all layers prepost nx and ny')
-mdl_nxny_pre = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',1))
-rsquared_nxny_pre(t) = mdl_nxny_pre.Rsquared.Ordinary
-plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)',1),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' ,1),'.','Markersize',10);
+% mdl_nxny_pre = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',1))
+% rsquared_nxny_pre(t) = mdl_nxny_pre.Rsquared.Ordinary
+% plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)',1),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' ,1),'.','Markersize',10);
 hold on;plot([0 1],[0 1]); axis square; xlabel('pre nx');ylabel('pre ny');
-text(.02, .8, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
+% text(.02, .8, ['r^2 = ' num2str(rsquared_nxny_pre(t))],'FontSize',18)
 plot(sta_nx(useSTA & (inhAll==1)' & (treatment==t)',1),sta_ny(useSTA&(inhAll==1)'&(treatment==t)' ,1),'r.','Markersize',10);
 subplot(2,3,t+3)
-mdl_nxny_post = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',2))
-rsquared_nxny_post(t) = mdl_nxny_post.Rsquared.Ordinary
+% mdl_nxny_post = fitlm(sta_nx(useSTA & (treatment==t)',1),sta_ny(useSTA&(treatment==t)',2))
+% rsquared_nxny_post(t) = mdl_nxny_post.Rsquared.Ordinary
 plot(sta_nx(useSTA & (inhAll==0)' & (treatment==t)' ,2),sta_ny(useSTA&(inhAll==0)'&(treatment==t)' ,2),'.','Markersize',10);
 hold on;plot([0 1],[0 1]);xlim([0 1]);axis square; xlabel('post nx');ylabel('post ny');
 plot(sta_nx(useSTA & (inhAll==1)' & (treatment==t)' ,2),sta_ny(useSTA&(inhAll==1)'&(treatment==t)' ,2),'r.','Markersize',10);
-text(.02, .8, ['r^2 = ' num2str(rsquared_nxny_post(t))],'FontSize',18)
+% text(.02, .8, ['r^2 = ' num2str(rsquared_nxny_post(t))],'FontSize',18)
 title(titles{t});
 end
 
@@ -659,7 +668,7 @@ for prepost=1:2
 end
 
 clear useSTA
-useSTA = find((sta_exp_var(:,1) & sta_exp_var(:,2)>.5) &(treatment==saline)' &(layerAll==2|3)');
+useSTA = find((sta_exp_var(:,1) & sta_exp_var(:,2)>.5) &(treatment==doi)' &(layerAll==2|3)');
 for prepost=1:2
     figure
     if prepost==1
@@ -724,7 +733,7 @@ MI_crf = (wn_crf(useN,:,:,2)-wn_crf(useN,:,:,1))./(wn_crf(useN,:,:,2)+wn_crf(use
 subplot(1,3,t)
 h= hist(MI_crf,-1:.1:1);
 % subplot(2,2,1)
-% Mbins=-1:.1:1
+Mbins=-1:.1:1
   bar(Mbins,h/sum(useN));axis square; title(titles{t}); ylim([0 .5]);
 end
 
