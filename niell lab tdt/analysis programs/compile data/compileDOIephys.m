@@ -1194,7 +1194,15 @@ for t=1:3
 %     text(6, .0275, ['p = ' num2str(p)],'FontSize',18)
 end
 
-clear R
+useOsi_pre = drift_osi(:,1,1)>.5
+useOsi_post = drift_osi(:,1,2)>.5
+useOsi=(useOsi_pre & useOsi_post)'
+
+useResp = amp(:,1,1)>4 & amp(:,1,2)>4 |amp(:,2,1)>4& amp(:,2,2)>4;
+data = goodAll & useResp' & ~inhAll & hasDrift==1 ;%which cells to include
+dataInh =goodAll & useResp' & inhAll & hasDrift==1 ;
+dataAll =goodAll & useResp' & hasDrift==1 &useOsi==1;
+clear R rs_pf
 figure
 for t=1:3
  R = normrnd(0,.2,sum(dataAll&treatment==t),1)
@@ -1286,6 +1294,47 @@ for i= 1:5
 end
 
 mnPsth_mv = squeeze(nanmean(nanmean(drift_cond_tcourse,5),4))
+titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
+dt = 0.05;
+figure
+for i= 1:5
+    figure
+    for t=1:3
+        if i==1
+%             normA = mnPsth_mv(data & layerAll==5 & treatment==t,:,:) - min(mnPsth_mv(data & layerAll==5 & treatment==t,:,:),1)
+%             normA = normA ./ max(normA,1)  
+%             mn=squeeze(mean(normA))'  
+            set(gcf,'Name','grating lyr5');
+                        mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:),1))';
+        %    ylim([-1 1]); xlim([0 2.5]);
+                    elseif i==2
+            set(gcf,'Name','grating lyr 2/3');
+            mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,1,:,:),1))';
+          %  ylim([-.5 5]);xlim([0 2.5]);
+        elseif i ==3
+            set(gcf,'Name','grating lyr 4');
+            mn = squeeze(mean(mnPsth_mv(data &(hasDrift==1) & layerAll==4 & treatment==t,1,:,:),1))';
+          %  ylim([-.5 4]);xlim([0 2.5]);
+        elseif i==4
+            set(gcf,'Name','grating inh');
+            mn = squeeze(mean(mnPsth_mv(dataInh & (hasDrift==1) & treatment==t,1,:,:),1))';
+          %  ylim([-.5 12]);xlim([0 2.5]);
+        elseif i==5
+            set(gcf,'Name','grating lyr6');
+            mn = squeeze(mean(mnPsth_mv(data & layerAll==6 & (hasDrift==1) & treatment==t,1,:,:),1))';
+          %  ylim([-.5 12]);xlim([0 2.5]);
+        end
+%        mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont
+        mn = circshift(mn,10);
+        subplot(1,3,t)
+        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
+     
+        %title(titles{t}); 
+        xlabel('time (s)');
+     %   ylabel('spikes/sec');
+        %ylim([0 max(mn(:))+1])
+    end
+end
 
 
 % titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
