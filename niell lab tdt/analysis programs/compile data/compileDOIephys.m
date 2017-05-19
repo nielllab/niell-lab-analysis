@@ -335,7 +335,6 @@ end
         dt = 1;
         [preCorr postCorr cv2 R eigs] = prepostDOIdarkness(clustfile,afile,files(use(i)).blockDark,dt,0);
         darkCorr(corrRange,1) = preCorr(:); darkCorr(corrRange,2)=postCorr(:);
-        
         cv2Dark(cellrange,:) = cv2;
         meanRdark(cellrange,:) = mean(R,2);
     else
@@ -407,24 +406,24 @@ for mv =1:2
         plot(mean(drift_orient(~inhAll & goodAll==1 & treatment==t & hasDrift==1,:,mv,1),2),mean(drift_orient(~inhAll&goodAll==1&treatment==t& hasDrift==1,:,mv,2),2),'.','Markersize',10);
         hold on;
         set(gca,'FontSize',18);
-        axis square; 
-        xlim([0 18]);ylim([0 18]); %title(titles{t}); xlabel('Pre spikes/sec');ylabel('Post spikes/sec');      
+        axis square;
+        % xlim([0 18]);ylim([0 18]); %title(titles{t}); xlabel('Pre spikes/sec');ylabel('Post spikes/sec');
+        ylim ([0 35]);xlim([0 35]);
         mpre=nanmean(mean(drift_orient(goodAll==1 & treatment==t& hasDrift==1,:,mv,1),2))
-        mpost=nanmean(mean(drift_orient(goodAll==1 & treatment==t& hasDrift==1,:,mv,2),2))  
+        mpost=nanmean(mean(drift_orient(goodAll==1 & treatment==t& hasDrift==1,:,mv,2),2))
         %         allPre = drift_orient(goodAll==1 & treatment==t& hasDrift==1,mv,1,1)
         %         allPost = drift_orient(goodAll==1 & treatment==t& hasDrift==1,mv,1,2)
         allPre = drift_orient(goodAll==1 & treatment==t& hasDrift==1,mv,1,1)
-        allPost = drift_orient(goodAll==1 & treatment==t& hasDrift==1,mv,1,2)
-        
+        allPost = drift_orient(goodAll==1 & treatment==t& hasDrift==1,mv,1,2) 
         c = corrcoef(allPre,allPost)
-       mdl_drift = fitlm(allPre,allPost)
-       rsquared_drift(t) = mdl_drift.Rsquared.Adjusted   
+        mdl_drift = fitlm(allPre,allPost)
+        rsquared_drift(t) = mdl_drift.Rsquared.Ordinary
         plot(mpre,mpost,'+k','Markersize',18,'Linewidth',4)
         plot([0 35], [0 35])
         plot(mean(drift_orient(goodAll==1 & inhAll==1  &treatment==t& hasDrift==1,:,mv,1),2),mean(drift_orient(goodAll==1 & inhAll==1 & hasDrift==1&treatment==t,:,mv,2),2),'r.','Markersize',10);
         n_cells(t) = sum(goodAll==1 &treatment==t& hasDrift==1)
-        text(.5, 11.5, ['n = ' num2str(n_cells(t))],'FontSize',20)
-        text(.5, 10.75, ['r^2 = ' num2str(rsquared_drift(t))],'FontSize',20)
+        text(2, 32, ['n = ' num2str(n_cells(t))],'FontSize',20)
+        text(2, 30, ['r^2 = ' num2str(rsquared_drift(t))],'FontSize',20)
     end
 end
 
@@ -479,6 +478,7 @@ for t=1:3
         Mbins=-1:.2:1
         bar(Mbins,h/sum(useN&layerAll==i),'FaceColor',[0 .5 .5],'Linewidth',2);ylim([0 .4]);xlim([-1.5 1.5]); axis square
         title(layerz{i});
+        
     end
 end
 
@@ -493,17 +493,24 @@ for mv =1:2
     end
     for t=1:3
         subplot(1,3,t)
-        plot(drift_spont(goodAll==1 &treatment==t &inhAll==0,mv,1),drift_spont(goodAll==1&treatment==t&inhAll==0,mv,2),'.');
-        ylim([0 15]); xlim([0 15]); xlabel('Pre spikes/sec');ylabel('Post spikes/sec');
+        plot(drift_spont(goodAll==1 &treatment==t &inhAll==0 & hasDrift==1,mv,1),drift_spont(goodAll==1&treatment==t&inhAll==0& hasDrift==1,mv,2),'.','Markersize',10);
+        ylim([0 35]); xlim([0 35]);
+        xlabel('Pre spikes/sec');ylabel('Post spikes/sec');
         axis square
         hold on;
-        plot([0 20], [0 20])
-        plot(drift_spont(goodAll==1 & inhAll==1 &treatment==t,mv,1),drift_spont(goodAll==1& inhAll==1&treatment==t,mv,2),'r.');
+        plot([0 35], [0 35])
+        plot(drift_spont(goodAll==1 & inhAll==1 &treatment==t& hasDrift==1,mv,1),drift_spont(goodAll==1& inhAll==1&treatment==t& hasDrift==1,mv,2),'r.','Markersize',10);
+      %  mdl_dSpont= fitlm(drift_spont(goodAll&treatment==t,mv,1),drift_spont(goodAll&treatment==t,mv,2),2)
+       % rsquared_driftSpont(t) = mdl_dSpont.Rsquared.Ordinary
         title(titles{t})
+        n_cells(t) = sum(goodAll==1 &treatment==t& hasDrift==1)
+        text(2, 32, ['n = ' num2str(n_cells(t))],'FontSize',20)
+       % text(2, 30, ['n = ' num2str(rsquared_driftSpont(t))],'FontSize',20)
+
     end
 end
 
-%MI for drift spont
+%MI for drift spont mv
 layerz={'l1','l2','l3','layer 4','layer 5'};
 for t=1:3
     figure
@@ -542,33 +549,43 @@ evoked = squeeze(mean(cycR(:,9:11,:,:),2)) - spont;
 %wn evoked mv and stationary
 titles = {'Saline','DOI','5HT'}
 for mv=1:2
-if mv==1, set(gcf,'Name', 'stationary');
-else set(gcf,'Name', 'mv');end
+if mv==1, set(gcf,'Name', 'wn evoked stationary');
+else set(gcf,'Name', 'wn evoked mv');end
 figure
 for t=1:3
     subplot(1,3,t)
-    set(gcf,'Name','wn evoke prepost')
-    plot(wn_evoked(data_wn&treatment==t&~inhAll,mv,1),wn_evoked(data_wn&treatment==t&~inhAll,mv,2),'.');hold on;axis square;
+    plot(wn_evoked(goodAll==1&treatment==t&~inhAll & hasWn==1,mv,1),wn_evoked(goodAll==1&treatment==t&~inhAll& hasWn==1,mv,2),'.', 'Markersize',10);hold on;axis square;
     xlim([-10 30]); ylim([-10 30]);
     plot([-30 30],[-30 30]);
-    plot(wn_evoked(data_wn&treatment==t&inhAll==1,mv,1),wn_evoked(data_wn&treatment==t&inhAll==1,mv,2),'.r');
+    plot(wn_evoked(goodAll==1&treatment==t&inhAll==1& hasWn==1,mv,1),wn_evoked(goodAll==1&treatment==t&inhAll==1& hasWn==1,mv,2),'.r','Markersize',10);
     title(titles{t})
+    mdl_wnEv= fitlm(wn_evoked(goodAll&treatment==t,mv,1),wn_evoked(goodAll&treatment==t,mv,2),2)
+    rsquared_wnEv(t) = mdl_wnEv.Rsquared.Ordinary
+    n_cells(t) = sum(goodAll==1 &treatment==t& hasWn==1)
+    text(-7, 28, ['n = ' num2str(n_cells(t))],'FontSize',20)
+    text(-7, 26, ['r^2 = ' num2str(rsquared_wnEv(t))],'FontSize',20)
+
 end
 end
 
 titles = {'Saline','DOI','5HT'}
 for mv=1:2
-if mv==1, set(gcf,'Name', 'stationary');
-else set(gcf,'Name', 'mv');end
-figure
+   figure
+if mv==1, set(gcf,'Name', 'wn spont stationary');
+else set(gcf,'Name', 'wn spont mv');end
 for t=1:3
     subplot(1,3,t)
-    set(gcf,'Name','wn evoke prepost')
-    plot(wn_spont(data_wn&treatment==t&~inhAll,mv,1),wn_spont(data_wn&treatment==t&~inhAll,mv,2),'.');hold on;axis square;
-%     xlim([min(wn_spont(data_wn,mv,1))-.5 max(wn_spont(data_wn,mv,1))+.5]); ylim([min(wn_spont(data_wn,mv,1))-.5 max(wn_spont(data_wn,mv,1))+.5]);
+    plot(wn_spont(goodAll==1&treatment==t&~inhAll& hasWn==1,mv,1),wn_spont(goodAll==1&treatment==t&~inhAll& hasWn==1,mv,2),'.', 'Markersize', 10);hold on;axis square;
+    %     xlim([min(wn_spont(data_wn,mv,1))-.5 max(wn_spont(data_wn,mv,1))+.5]); ylim([min(wn_spont(data_wn,mv,1))-.5 max(wn_spont(data_wn,mv,1))+.5]);
     plot([-30 30],[-30 30]);
-    plot(wn_spont(data_wn&treatment==t&inhAll==1,mv,1),wn_spont(data_wn&treatment==t&inhAll==1,mv,2),'.r');
+    plot(wn_spont(goodAll==1&treatment==t&inhAll==1& hasWn==1,mv,1),wn_spont(goodAll==1&treatment==t&inhAll==1& hasWn==1,mv,2),'.r', 'Markersize', 10);
+    xlim([0 25]); ylim([0 25]);
     title(titles{t})
+%      mdl_wnSpont= fitlm(wn_spont(goodAll&treatment==t,mv,1),wn_spont(goodAll&treatment==t,mv,2),2)
+%     rsquared_wnSpont(t) = mdl_wnSpont.Rsquared.Ordinary
+    n_cells(t) = sum(goodAll==1 &treatment==t& hasWn==1)
+    text(2, 23, ['n = ' num2str(n_cells(t))],'FontSize',20)
+%     text(2, 21, ['r^2 = ' num2str(rsquared_wnSpont(t))],'FontSize',20)
 end
 end
 
@@ -576,37 +593,44 @@ end
 clear n_cells
 for mv = 1:2
     figure
-    if mv==1, set(gcf,'Name', 'evoked pre vs post stop')
+    if mv==1, set(gcf,'Name', 'evoked pre vs post stationary')
     else set(gcf,'Name', 'evoked pre vs post mv'), end
     for t=1:3
         subplot(1,3,t)
-        plot(evoked(find(goodAll& treatment==t),mv,1),evoked(find(goodAll& treatment==t),mv,2),'.','MarkerSize',20);
-       % title(titles{t}); 
+        plot(evoked(find(goodAll& treatment==t),mv,1),evoked(find(goodAll& treatment==t),mv,2),'.','MarkerSize',10);
+        title(titles{t}); 
         hold on; plot([-50 50],[-50 50]); axis xy
         %xlabel('pre'); ylabel('post');% xlim([min(evoked(data_wn,mv,1))-.5 max(evoked(data_wn,mv,1))+.5]); ylim([min(evoked(data_wn,mv,1))-.5 max(evoked(data_wn,mv,1))+.5]);
-        plot(evoked(find(goodAll==1&inhAll& treatment==t),mv,1),evoked(find(goodAll==1&inhAll& treatment==t),mv,2),'.r','MarkerSize',20); 
-        xlim([-10 10]);ylim([-10 10])
+        plot(evoked(find(goodAll==1&inhAll& treatment==t),mv,1),evoked(find(goodAll==1&inhAll& treatment==t),mv,2),'.r','MarkerSize',10); axis square;
+        xlim([-10 30]);ylim([-10 30])
         mdl_ev= fitlm(evoked(goodAll&treatment==t,mv,1),evoked(goodAll&treatment==t,mv,2),2)
         rs_ev(t) = mdl_ev.Rsquared.Ordinary
-        text(-9, 9, ['r^2 = ' num2str(rs_ev(t),'%.2f')],'FontSize',20)
+        text(-8, 28, ['r^2 = ' num2str(rs_ev(t),'%.2f')],'FontSize',20)
         n_cells(t) = sum(goodAll==1 &treatment==t& hasWn==1)
-        text(-9, 7, ['n = ' num2str(n_cells(t))],'FontSize',20)
+        text(-8, 25, ['n = ' num2str(n_cells(t))],'FontSize',20)
         set(gca,'FontSize',20)
     end
 end
 
 %spont calculcated from cyc avg
-titles = {'saline','doi','ht'};
-for mv = 1:2 
-figure 
-if mv==1, set(gcf,'Name', 'spont pre vs post stop')
-else set(gcf,'Name', 'spont pre vs post mv'), end
-for t=1:3
-    subplot(1,3,t)
-    plot(spont(find(data & treatment==t),mv,1),spont(find(data& treatment==t),mv,2),'.'); title(titles{t}); hold on; axis square; plot([0 50],[0 50]);
-    xlabel('pre'); ylabel('post');
-    plot(spont(find(dataInh&inhAll& treatment==t),mv,1),spont(find(dataInh & inhAll& treatment==t),mv,2),'.r'); hold on; plot([0 50],[0 50]); axis([0 10 0 10])
-end
+titles = {'Saline','DOI','5HT'};
+for mv = 1:2
+    figure
+    if mv==1, set(gcf,'Name', 'wn spont stationary')
+    else set(gcf,'Name', 'wn spont mv'), end
+    for t=1:3
+        subplot(1,3,t)
+        plot(spont(goodAll==1 & treatment==t& hasWn==1 & ~inhAll,mv,1),spont(goodAll==1& treatment==t& hasWn==1& ~inhAll,mv,2),'.', 'Markersize',10); title(titles{t});
+        hold on; axis square; plot([0 50],[0 50]);
+        xlabel('pre'); ylabel('post');
+        plot(spont(dataInh&inhAll& treatment==t& hasWn==1,mv,1),spont(dataInh & inhAll& treatment==t& hasWn==1,mv,2),'.r', 'Markersize',10); hold on; plot([0 50],[0 50]);
+        axis([0 35 0 35]);
+        mdl_spont= fitlm(spont(goodAll&treatment==t& hasWn==1,mv,1),spont(goodAll&treatment==t& hasWn==1,mv,2),2)
+        rs_spont(t) = mdl_spont.Rsquared.Ordinary
+        text(2, 33, ['r^2 = ' num2str(rs_spont(t),'%.2f')],'FontSize',20)
+        n_cells(t) = sum(goodAll==1 &treatment==t& hasWn==1)
+        text(2, 30, ['n = ' num2str(n_cells(t))],'FontSize',20)
+    end
 end
 
 
@@ -622,14 +646,14 @@ for t=1:3
    plot(meanRdark(inhAll  & treatment==t,1), meanRdark(inhAll &treatment==t,2),'r.','Markersize',12);hold on; axis square;
     mdl_dark= fitlm(meanRdark(treatment==t,1), meanRdark(treatment==t,2),2)
     rsquared_dark(t) = mdl_dark.Rsquared.Ordinary
-    xlim([0 20]);ylim([0 20]); %xlabel('Pre spikes/sec');ylabel('Post spikes/sec');
+    %xlim([0 20]);ylim([0 20]); %xlabel('Pre spikes/sec');ylabel('Post spikes/sec');
     mpre=nanmean(mean(meanRdark(goodAll==1 & treatment==t,1),2))
     mpost=nanmean(mean(meanRdark(goodAll==1 & treatment==t,2),2))
     plot(mpre,mpost,'+k','Markersize',12,'Linewidth',2)
     plot([0 30],[0 30],'Linewidth',2);
    n_cells(t) = sum(goodAll==1 &treatment==t)
-        text(.25, 24, ['n = ' num2str(n_cells(t))],'FontSize',18)
-        text(.25, 22, ['r^2 = ' num2str(rsquared_dark(t))],'FontSize',18)
+        text(2, 28, ['n = ' num2str(n_cells(t))],'FontSize',18)
+        text(2, 25, ['r^2 = ' num2str(rsquared_dark(t))],'FontSize',18)
     title(titles{t});
 end
 
@@ -825,6 +849,22 @@ for i = 1:3
     %xlim([-1 1]);
     title(titles{i});
     set(gcf,'Name','Drift Corr Hist')
+end
+
+%% sta exp var
+titles={'Saline','DOI','5HT'};
+figure
+for t=1:2
+subplot(1,2,t)
+mdl_expV = fitlm(sta_exp_var(data_wn &(treatment==t),1),sta_exp_var(data_wn&(treatment==t),2))
+rsquared_expV(t) = mdl_expV.Rsquared.Ordinary
+plot(sta_exp_var(data_wn & treatment==t,1),sta_exp_var(data_wn &treatment==t,2),'.')
+%plot(sta_exp_var(useSTA & (treatment==t)',1),sta_exp_var(useSTA &(treatment==t)',2),'.')
+hold on; plot([0 1],[0 1]); axis square
+title(titles{t}); xlabel('Pre exp var');ylabel('Post exp var');
+text(.02, .95, ['r^2 = ' num2str(rsquared_expV(t))],'FontSize',18)
+n_cells(t) = sum(data_wn & treatment==t)
+text(.02 ,.85, ['n = ' num2str(n_cells(t))],'FontSize',18)
 end
 
 %% nx & ny prepost
@@ -1145,89 +1185,92 @@ end
 
 data = goodAll & useResp' & ~inhAll ;%which cells to include
 dataInh =goodAll & useResp' & inhAll ;
-useN =data & hasDrift==1
-for c= 1:length(useN)
-    for prepost =1:2
-        [respmax oind] = max(drift_orient(c ,:,1,prepost)');
-        [g h]=(max(respmax(:)));
-        prefOri(prepost,c)=squeeze(oind(h));
-    end
-end
-% size(prefOri')
+dataAll =goodAll & useResp' & hasDrift==1 ;
 
-
-
-prefOri_pre = prefOri(1,:)'
-prefOri_post = prefOri(2,:)'
-
-figure
-for t=1:3
-    subplot(1,3,t)
-    R = normrnd(0,.2,1,sum(data&treatment==t))
-    plot(prefOri(1,data & treatment==t)+R,prefOri(2,data & treatment==t)+R,'.'); axis square; xlim([0 13]);ylim([0 13]);
-    hold on;  plot([0 13],[0 13])
-end
-%+ normrand same size as number of points w/mean 0 std .2
-%or heatmap
-
-meanOri = round(mean(prefOri(:,:),1))
-titles ={'Saline','DOI','5HT'};
-figure
-for t=1:3
-    useOri_pre= prefOri_pre(treatment==t)
-    useOri_post= prefOri_post(treatment==t)
-    %     useOri_post= find(prefOri_post & (treatment==t)')
-    subplot(2,3,t)
-    hist(useOri_pre);xlabel('pre orientation pref'); ylabel('proportion of cells')
-    xlim([0 12]); ylim([0 .03]);
-    Mbins= 0:1:12
-    hpre= hist(useOri_pre,0:1:12);
-    bar(Mbins,hpre/sum(useOri_pre)); xlim([0 13]);ylim([0 .035]);axis square;
-    title(titles{t});
-    subplot(2,3,t+3)
-    hpost=hist(useOri_post,0:1:12);
-    bar(Mbins,hpost/sum(useOri_post))
-    xlabel('post orientation preference');ylabel('proportion of cells')
-    axis square
-    xlim([0 13]);ylim([0 .035]);
-%     [p h]=ranksum(prefOri_pre(treatment==t),prefOri_post(treatment==t))
-%     text(6, .0275, ['p = ' num2str(p)],'FontSize',18)
-end
+% useN =dataAll
+% for c= 1:length(useN)
+%     for prepost =1:2
+%         [respmax oind] = max(drift_orient(c ,:,1,prepost)'); %stationary
+%         [g h]=(max(respmax(:)));
+%         prefOri(prepost,c)=squeeze(oind(h));
+%     end
+% end
+% 
+% prefOri_pre = prefOri(1,:)'
+% prefOri_post = prefOri(2,:)'
+% 
+% figure
+% for t=1:3
+%     subplot(1,3,t)
+%     R = normrnd(0,.2,1,sum(data&treatment==t))
+%     plot(prefOri(1,data & treatment==t)+R,prefOri(2,data & treatment==t)+R,'.'); axis square; xlim([0 13]);ylim([0 13]);
+%     hold on;  plot([0 13],[0 13])
+% end
+% %+ normrand same size as number of points w/mean 0 std .2
+% %or heatmap
+% 
+% meanOri = round(mean(prefOri(:,:),1))
+% titles ={'Saline','DOI','5HT'};
+% figure
+% for t=1:3
+%     useOri_pre= prefOri_pre(treatment==t)
+%     useOri_post= prefOri_post(treatment==t)
+%     %     useOri_post= find(prefOri_post & (treatment==t)')
+%     subplot(2,3,t)
+%     hist(useOri_pre);xlabel('pre orientation pref'); ylabel('proportion of cells')
+%     xlim([0 12]); ylim([0 .03]);
+%     Mbins= 0:1:12
+%     hpre= hist(useOri_pre,0:1:12);
+%     bar(Mbins,hpre/sum(useOri_pre)); xlim([0 13]);ylim([0 .035]);axis square;
+%     title(titles{t});
+%     subplot(2,3,t+3)
+%     hpost=hist(useOri_post,0:1:12);
+%     bar(Mbins,hpost/sum(useOri_post))
+%     xlabel('post orientation preference');ylabel('proportion of cells')
+%     axis square
+%     xlim([0 13]);ylim([0 .035]);
+% %     [p h]=ranksum(prefOri_pre(treatment==t),prefOri_post(treatment==t))
+% %     text(6, .0275, ['p = ' num2str(p)],'FontSize',18)
+% end
 
 useOsi_pre = drift_osi(:,1,1)>.5
 useOsi_post = drift_osi(:,1,2)>.5
 useOsi=(useOsi_pre & useOsi_post)'
 
-useResp = amp(:,1,1)>4 & amp(:,1,2)>4 |amp(:,2,1)>4& amp(:,2,2)>4;
-data = goodAll & useResp' & ~inhAll & hasDrift==1 ;%which cells to include
-dataInh =goodAll & useResp' & inhAll & hasDrift==1 ;
+useResp = amp(:,1,1)>2 & amp(:,1,2)>2 |amp(:,2,1)>2& amp(:,2,2)>2;
+data = goodAll & useResp' & ~inhAll & hasDrift==1 & useOsi==1  ;%which cells to include
+dataInh =goodAll & useResp' & inhAll & hasDrift==1 & useOsi==1;
 dataAll =goodAll & useResp' & hasDrift==1 &useOsi==1;
+for mv=1:2
 clear R rs_pf
 figure
+if mv==1, set(gcf,'Name', 'stationary');
+else
+set(gcf,'Name', 'mv');
+end
 for t=1:3
- R = normrnd(0,.2,sum(dataAll&treatment==t),1)
- R2 = normrnd(0,.2,sum(dataAll&treatment==t),1)
- 
+ R = normrnd(0,.2,sum(data&treatment==t),1)
+ R2 = normrnd(0,.2,sum(data&treatment==t),1)
  R3 = normrnd(0,.2,sum(dataInh&treatment==t),1)
  R4 = normrnd(0,.2,sum(dataInh&treatment==t),1)
- 
- mdl_pf= fitlm(drift_pref_theta(dataAll&treatment==t,1,1),drift_pref_theta(dataAll&treatment==t,1,2),2)
- rs_pf(t) = mdl_pf.Rsquared.Ordinary
+%  mdl_pf= fitlm(drift_pref_theta(dataAll&treatment==t,mv,1),drift_pref_theta(dataAll&treatment==t,mv,2),2)
+%  rs_pf(t) = mdl_pf.Rsquared.Ordinary
  subplot(1,3,t)
- plot(drift_pref_theta(dataAll&treatment==t,1,1)+R,drift_pref_theta(dataAll&treatment==t,1,2)+R2,'.','Markersize',18)
- hold on; axis square; plot([0 3.25], [0 3.25]);xlim([0 3.25]);ylim([0 3.25]);
-
- plot(drift_pref_theta(dataInh&treatment==t,1,1)+R3,drift_pref_theta(dataInh&treatment==t,1,2)+R4,'r.','Markersize',18)
- text(.2, 3, ['r^2 = ' num2str(rs_pf(t),'%.2f')],'FontSize',18)
- n_cells(t) = sum(dataAll &treatment==t& hasDrift==1)
-        text(.2, 2.7, ['n = ' num2str(n_cells(t))],'FontSize',20)
+ plot(drift_pref_theta(data&treatment==t,mv,1)+R,drift_pref_theta(data&treatment==t,mv,2)+R2,'.','Markersize',18)
+ hold on; axis square;plot([0 3.25], [0 3.25]);xlim([0 3.25]);ylim([0 3.25]);
+ plot(drift_pref_theta(dataInh&treatment==t,mv,1)+R3,drift_pref_theta(dataInh&treatment==t,mv,2)+R4,'r.','Markersize',18)
+%  text(.2, 3, ['r^2 = ' num2str(rs_pf(t),'%.2f')],'FontSize',18)
+%  n_cells(t) = sum(dataAll&treatment==t) %% not calculating
+%  correctly...showing fewer units on plot
+%  text(.2, 2.7, ['n = ' num2str(n_cells(t))],'FontSize',20)
  %set(gca,'xtick',0:pi/2:pi,'xticklabel',1:180,'Fontsize',14)
-set(gca,'xtick',([pi/4 pi/2 .75*pi pi]))
-% set(gca,'xticklabels',({'\pi/4','\pi/2','3/4\pi','\pi'}),'FontSize',20)
-set(gca,'xticklabels',({'45','90','134','180'}),'FontSize',20)
+ set(gca,'xtick',([pi/4 pi/2 .75*pi pi]))
+ % set(gca,'xticklabels',({'\pi/4','\pi/2','3/4\pi','\pi'}),'FontSize',20)
+ set(gca,'xticklabels',({'45','90','135','180'}),'FontSize',20)
  set(gca,'ytick',([0 pi/4 pi/2 .75*pi pi]))
  %set(gca,'yticklabels',({'0','\pi/4','\pi/2','3/4\pi','\pi'}),'FontSize',20)
  set(gca,'yticklabels',({'0','45','90','135','180'}),'FontSize',20)
+end
 end
 
 % figure
@@ -1247,14 +1290,13 @@ end
 %         %end
 %     end
 % end
+useResp = amp(:,1,1)>2 & amp(:,1,2)>2 |amp(:,2,1)>2& amp(:,2,2)>2;
 data = goodAll & useResp' & ~inhAll & hasDrift==1 ;%which cells to include
 dataInh =goodAll & useResp' & inhAll & hasDrift==1 ;
 dataAll =goodAll & useResp' & hasDrift==1 ;
 
-
 titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 dt = 0.05;
-figure
 for i= 1:5
     figure
     for t=1:3
@@ -1286,7 +1328,6 @@ for i= 1:5
         mn = circshift(mn,10);
         subplot(1,3,t)
         plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
-     
         title(titles{t}); xlabel('time (s)');
         ylabel('spikes/sec');
         %ylim([0 max(mn(:))+1])
@@ -1296,50 +1337,98 @@ end
 mnPsth_mv = squeeze(nanmean(nanmean(drift_cond_tcourse,5),4))
 titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 dt = 0.05;
-figure
 for i= 1:5
     figure
     for t=1:3
         if i==1
-%             normA = mnPsth_mv(data & layerAll==5 & treatment==t,:,:) - min(mnPsth_mv(data & layerAll==5 & treatment==t,:,:),1)
+%             normA = mnPsth_mv(data & layerAll==5 & treatment==t,:,1,:) - min(mnPsth_mv(data & layerAll==5 & treatment==t,:,1,:),1)
 %             normA = normA ./ max(normA,1)  
 %             mn=squeeze(mean(normA))'  
-            set(gcf,'Name','grating lyr5');
-                        mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:),1))';
-        %    ylim([-1 1]); xlim([0 2.5]);
-                    elseif i==2
-            set(gcf,'Name','grating lyr 2/3');
+            set(gcf,'Name','grating lyr5 stationary');
+             mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:),1))';
+            % ylim([-1 1]); xlim([0 2.5]);
+        elseif i==2
+            set(gcf,'Name','grating lyr 2/3 stationary');
             mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,1,:,:),1))';
           %  ylim([-.5 5]);xlim([0 2.5]);
         elseif i ==3
-            set(gcf,'Name','grating lyr 4');
+            set(gcf,'Name','grating lyr 4 stationary');
             mn = squeeze(mean(mnPsth_mv(data &(hasDrift==1) & layerAll==4 & treatment==t,1,:,:),1))';
           %  ylim([-.5 4]);xlim([0 2.5]);
         elseif i==4
-            set(gcf,'Name','grating inh');
+            set(gcf,'Name','grating inh stationary');
             mn = squeeze(mean(mnPsth_mv(dataInh & (hasDrift==1) & treatment==t,1,:,:),1))';
           %  ylim([-.5 12]);xlim([0 2.5]);
         elseif i==5
-            set(gcf,'Name','grating lyr6');
+            set(gcf,'Name','grating lyr6 stationary');
             mn = squeeze(mean(mnPsth_mv(data & layerAll==6 & (hasDrift==1) & treatment==t,1,:,:),1))';
           %  ylim([-.5 12]);xlim([0 2.5]);
         end
-%        mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont
+%        mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont from
+%        all time points
         mn = circshift(mn,10);
         subplot(1,3,t)
         plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
      
-        %title(titles{t}); 
+        title(titles{t}); 
         xlabel('time (s)');
      %   ylabel('spikes/sec');
         %ylim([0 max(mn(:))+1])
     end
 end
 
+mnPsth_mv = squeeze(nanmean(nanmean(drift_cond_tcourse,5),4))
+titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
+dt = 0.05;
+for i= 1:5
+    figure
+    for t=1:3
+        if i==1
+%             normA = mnPsth_mv(data & layerAll==5 & treatment==t,:,1,:) - min(mnPsth_mv(data & layerAll==5 & treatment==t,:,1,:),1)
+%             normA = normA ./ max(normA,1)  
+%             mn=squeeze(mean(normA))'  
+            set(gcf,'Name','grating lyr5 moving');
+             mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==5) & treatment==t,2,:,:),1))';
+            % ylim([-1 1]); xlim([0 2.5]);
+        elseif i==2
+            set(gcf,'Name','grating lyr 2/3 moving');
+            mn = squeeze(mean(mnPsth_mv(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,2,:,:),1))';
+          %  ylim([-.5 5]);xlim([0 2.5]);
+        elseif i ==3
+            set(gcf,'Name','grating lyr 4 moving');
+            mn = squeeze(mean(mnPsth_mv(data &(hasDrift==1) & layerAll==4 & treatment==t,2,:,:),1))';
+          %  ylim([-.5 4]);xlim([0 2.5]);
+        elseif i==4
+            set(gcf,'Name','grating inh moving');
+            mn = squeeze(mean(mnPsth_mv(dataInh & (hasDrift==1) & treatment==t,2,:,:),1))';
+          %  ylim([-.5 12]);xlim([0 2.5]);
+        elseif i==5
+            set(gcf,'Name','grating lyr6 moving');
+            mn = squeeze(mean(mnPsth_mv(data & layerAll==6 & (hasDrift==1) & treatment==t,2,:,:),1))';
+          %  ylim([-.5 12]);xlim([0 2.5]);
+        end
+%        mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont from
+%        all time points
+        mn = circshift(mn,10);
+        subplot(1,3,t)
+        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
+     
+        title(titles{t}); 
+        xlabel('time (s)');
+     %   ylabel('spikes/sec');
+        %ylim([0 max(mn(:))+1])
+    end
+end
+% 
+% x = linspace(0,1,20)';
+% y = sin(x);
+% dy = .1*(1+rand(size(y))).*y;  % made-up error values
+% fill([x;flipud(x)],[y-dy;flipud(y+dy)],[.9 .9 .9],'linestyle','none');
+% line(x,y)
+
 
 % titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 % dt = 0.05;
-% figure
 % for i= 1:5
 %     figure
 %     for t=1:3
@@ -1392,7 +1481,7 @@ end
 
 for l=1:6
 figure
-useN= find(data & hasDrift & treatment==saline &layerAll==l)
+useN= find(data & hasDrift & treatment==doi &layerAll==l)
 length(useN)
 for c=1:length(useN)/2
    % set (gcf,'Name','Lyr 2/3 psth/unit') % set up in loop
@@ -1454,10 +1543,8 @@ for t=1:3
     plot(drift_osi(data&treatment==t,1,1),drift_osi(data&treatment==t,1,2),'.')
     axis square;hold on; plot([0 1],[0 1]);
     n_cells(t) = sum(treatment==t& data)
-    
     text(.1, .9, ['r^2 = ' num2str(rs_osi(t))],'FontSize',18)
-    text(.1, .8, ['n = ' num2str(n_cells(t))],'FontSize',18)
-    
+    text(.1, .8, ['n = ' num2str(n_cells(t))],'FontSize',18)  
 end
 
 %osi specific layers
