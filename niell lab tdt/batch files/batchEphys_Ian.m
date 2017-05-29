@@ -1,5 +1,33 @@
-pathname = '\\niell-v2-w7\Ian_analysis\';
+pathname = '\\niell-v2-w7\Ian_analysis';
 n=0;
+
+n=n+1;
+files(n).expt = '081916';
+files(n).dir = '08_19_16';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_08_19_16_cluster_081916';
+files(n).analysisfile = 'analysis_081916';
+files(n).predark = 'darkness_pre01';
+files(n).postdark = 'darkness_post01';
+files(n).prewn = 'wn_pre01';
+files(n).postwn = 'wn_post01';  
+files(n).predrift = 'gratings_pre01';
+files(n).postdrift = 'gratings_post01';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection_bars';
+files(n).treatment = 'Saline'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).layers = [];
+files(n).notes = 'good data';
+files(n).misc = '10 mg/kg'; %dose
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_051216_eye';  
+% files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).badsites = [];
+
 
 n=n+1;
 files(n).expt = '081616';

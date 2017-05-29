@@ -5,8 +5,8 @@ global outputDir % this is where we will store the data, e.g. 'C:\\data' or ~/da
 global inputDir
 global info
 
-outputDir = 'E:\jennifer\Martin analysis\data_run_12_11_15';
-inputDir  = 'E:/jennifer/Martin analysis';
+outputDir = 'D:\Jen_analysis\analysis_martin\Data_12_11_15\New_data_12_11_15\analysis_files';
+inputDir  = 'D:\Jen_analysis\analysis_martin\Data_12_11_15\New_data_12_11_15';
 
 info      = [];
 

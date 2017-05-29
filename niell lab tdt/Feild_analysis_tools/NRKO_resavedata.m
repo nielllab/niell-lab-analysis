@@ -1,6 +1,6 @@
 % this just shows you how I resave it per session, have to change the directories.
 cd D:\Jen_analysis\analysis_martin\data_1_25_16
-outputDir = 'D:/Jen_analysis/analysis_martin/data_1_25_16/Hoy_bar_data';
+outputDir = 'D:/Jen_analysis/analysis_martin/data_1_25_16/Hoy_bar_dataB';
 mkdir(outputDir);
 load('JLH_NMDA_KO_bar_OS.mat')
 

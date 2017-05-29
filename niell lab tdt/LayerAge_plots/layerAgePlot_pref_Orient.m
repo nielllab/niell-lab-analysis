@@ -1,9 +1,9 @@
-function [meandata errdata N mediandata]=layerAgePlot(data,ageList,layer,inh,used,label,titlestr);
+function [meandata errdata N mediandata]=layerAgePlot(data,ageList,layer,inh,pinped,used,label,titlestr);
 ageList=ageList';
-for age=1:4
+for age=1:3
     for group = 1:1
         if group ==1
-            uselist = (ageList==age & (layer==4) & ~inh & used);
+            uselist = (ageList==age & pinped & used);
 %         elseif group ==2
 %             uselist = (ageList==age & (layer==4) & ~inh & used);
 %         elseif group==3
@@ -16,7 +16,6 @@ for age=1:4
 %            uselist = (ageList==age & (layer<=6)& ~inh & used);
         end
         clear HSF M V M1 V1 x f
-        
         
         figure
         hist(data(uselist),0:45:330)
@@ -43,10 +42,10 @@ for age=1:4
          errdata(group,age) = frac_card(group,age)-pci(1,1);
          sem(group,age)=errdata(group,age)/sqrt(N(group,age))
 
-        
-          
-       
-     
+figure 
+H1=bar(x,f/sum(f),'g');
+title 'WTOpref'
+hold on
 
 %               meandata(group,age) = nanmean(data(uselist));
 %               errdata(group,age)=nanstd(data(uselist))/sqrt(N(group,age));             
@@ -59,15 +58,22 @@ for age=1:4
 
    
 figure
-errorbar(1:4,frac_card(1,:),sem(1,:),'k');hold on
+errorbar(1:3,frac_card(1,:),sem(1,:),'k');hold on
 %errorbar(1:4,frac_card(2,:),prct_err_lin(2,:),'k');hold on
+
+figure
+barweb(fliplr(frac_card),fliplr(sem))
+ylabel(label);
+set(gca,'Xtick',1:3);
+%set(gca,'Xticklabel',{'4','4','5','6','inh','all'});
+legend('wt','N2A','N2B');
 
 figure
 barweb(frac_card,sem)
 ylabel(label);
-set(gca,'Xtick',1:6);
-set(gca,'Xticklabel',{'4','4','5','6','inh','all'});
-legend('wt','KO1','KO2');
+set(gca,'Xtick',1:3);
+%set(gca,'Xticklabel',{'4','4','5','6','inh','all'});
+legend('wt','N2A','N2B');
 % % 
 % figure
 % barweb(mediandata,errdataMed);

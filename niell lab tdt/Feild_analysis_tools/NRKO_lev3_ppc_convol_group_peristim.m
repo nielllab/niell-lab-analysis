@@ -46,10 +46,10 @@ for iDir = 1:nDirs
                 for iUnit = 1:nUnits
                     unitCnt =  totUnits + iUnit;                   
                     unitinfo(unitCnt,1) = inp2.unitdataSession{iUnit}.GT*0+info(iDir).genotype;
-                    unitinfo(unitCnt,2) = inp2.unitdataSession{iUnit}.pinp;
-                    unitinfo(unitCnt,3) = inp2.unitdataSession{iUnit}.responsive;
-                    unitinfo(unitCnt,4) = inp2.unitdataSession{iUnit}.layer;
-                    unitinfo(unitCnt,5) = inp2.unitdataSession{iUnit}.inhibitory;             
+                    %unitinfo(unitCnt,2) = inp2.unitdataSession{iUnit}.pinp;
+                    unitinfo(unitCnt,2) = inp2.unitdataSession{iUnit}.responsive;
+                    unitinfo(unitCnt,3) = inp2.unitdataSession{iUnit}.layer;
+                    unitinfo(unitCnt,4) = inp2.unitdataSession{iUnit}.inhibitory;             
                     try
                         if strcmp(info(iDir).stimtype,'drift')
                             unitinfo(unitCnt,6) = 1;  
@@ -195,7 +195,9 @@ G_stat.tapers = tapers;
 G_stat.latencies = latencies;
 G_stat.state = statelabels;
 G_stat.layers = layers;
-G_stat.unitinfo_dim = {'wt_N2B_N2A', 'pinp_nopinp', 'responsive', 'layer', 'inhibitory', 'drift1_bar2'};
+%G_stat.unitinfo_dim = {'wt_N2B_N2A', 'pinp_nopinp', 'responsive', 'layer', 'inhibitory', 'drift1_bar2'};
+G_stat.unitinfo_dim = {'stage', 'responsive', 'layer', 'inhibitory', 'stimulus type'};
+
 filename = fullfile(outputDir,output,output);
 mkdir(fullfile(outputDir,output))
 save(filename,'G_stat');

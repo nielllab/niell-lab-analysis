@@ -3,16 +3,17 @@ close all
 
 dbstop if error
 
-batchDOIephys_filtered; %%% load batch file
-set(groot,'defaultFigureVisible','off') %disable figure plotting
+batchEphysTai
+%batchDOIephys_filtered; %%% load batch file
+%set(groot,'defaultFigureVisible','off') %disable figure plotting
 %set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-use =  find(strcmp({files.notes},'good data'))%useSess = use;
+%use =  find(strcmp({files.notes},'good data'))%useSess = use;
 %use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data') & ~cellfun(@isempty,{files.predark}) & ~cellfun(@isempty,{files.postdark}) )
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'022417'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'041117'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -26,7 +27,7 @@ for i = 1:length(use)
     %%% extract filenames
     afile = [pathname '\' files(use(i)).dir '\' files(use(i)).analysisfile '.mat'];
     clustfile = [pathname '\' files(use(i)).dir '\' files(use(i)).clusterfile '.mat'] ;
-    cfile = [{[pathname '\' files(use(i)).dir '\' files(use(i)).predark_camera '.mat']}; {[pathname '\' files(use(i)).dir '\' files(use(i)).postdark_camera '.mat']}]';
+   % cfile = [{[pathname '\' files(use(i)).dir '\' files(use(i)).predark_camera '.mat']}; {[pathname '\' files(use(i)).dir '\' files(use(i)).postdark_camera '.mat']}]';
     
     %%% get cell type based on waveform
     [inh mid] = getWaveform(clustfile,afile,1);

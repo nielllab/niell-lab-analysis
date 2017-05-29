@@ -121,7 +121,7 @@ for iDir = 1:length(info)
                             sl2 = lay==5;
                         end
                         if iLayer==jLayer, continue,end
-                        keyboard
+%                         keyboard
                         
                         powAllCat(iState,iLatency,iLayer,jLayer).powAll(iDir,:) = nanmean(nanmean(abs(struc.fourierspctrm(cfg.trials,lay==4,:)),1),2);
                     end                                                                

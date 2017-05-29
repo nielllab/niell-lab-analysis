@@ -242,10 +242,10 @@ postRunV = postRunV(postRunT<dur);postRunT= postRunT(postRunT<dur);
 %     print('-dpsc',psfilename,'-append');
 % end
 
-meanR = squeeze(mean(R,2));
-figure
-plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);axis equal
-xlabel('pre rate'); ylabel('post rate');
+ meanR = squeeze(mean(R,2));
+% figure
+% plot(meanR(:,1),meanR(:,2),'o');hold on; plot([0 20],[0 20]);axis equal
+% xlabel('pre rate'); ylabel('post rate');
 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');

@@ -14,7 +14,7 @@ NRKO_lev0_readdata_peristim %converts to field trip format and filters out line 
 
 %% produce peristimulus spike times
 NRKO_global
-NRKO_lev1_sdf_peristim%last run 3-19-16 on 1-26-16 data xtraction
+NRKO_lev1_sdf_peristim%last run 3-19-16 on 1-26-16 data xtraction 
 % added in tuning as calculated by Cris's programs instead, mesh with
 % martin's analysis below?
 NRKO_lev2_tuningstats_peristim
@@ -37,7 +37,7 @@ NRKO_global
 NRKO_lev1_lfp_spectrum_peristim %last run 1-26-16
 NRKO_lev2_lfp_spectrum_granger_peristim_group
 NRKO_lev2_lfp_spectrum_peristim_group
-NRKO_lev2_spec_peristim
+% NRKO_lev2_spec_peristim
 %% compute ERPs around stimulus onset
 % NRKO_global
 % NRKO_lev1_lfp_erp_peristim

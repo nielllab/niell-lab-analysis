@@ -69,7 +69,9 @@ psth=zeros(length(cell_range),length(hist(0,histbins)));
 longPsth = zeros(length(cell_range),length(hist(0,longBins)));
 
 nfig=0;
-for cell_n = cell_range;
+for cell_n=1:length(cell_range);
+%     ch= cell_n;
+    %cell_n = cell_range;
 % for c=2:2
   cell_n
 %      cell_n=cell_range(cell_n);

@@ -34,7 +34,7 @@ end
 for iDir = dirsel(:)'
   load(fullfile(outputDir, input, info(iDir).dataname, input));  
   load(fullfile(outputDir, input2, info(iDir).dataname, input2));
-  keyboard
+ % keyboard
   iDir
   
   % different ppc versions, angle, rayleigh test
@@ -47,7 +47,7 @@ for iDir = dirsel(:)'
   for iTaper = 1:2      
       for iState   = 1:length(statelabels)
           for iLatency = 1:3%length(latencies)
-              for iMethod = 1:nMethods
+             % for iMethod = 1:nMethods
                 nChans = length(fr(1,1).label);
                 unitCnt = 0;
                 for iChan = 1:nChans
@@ -66,7 +66,7 @@ for iDir = dirsel(:)'
                   end
                     
                   try
-                      keyboard
+                    %  keyboard
 %                       if iTaper==1
 %                           stat(iMethod,iState,iLatency,iTaper).static(unitCnt) = ft_spiketriggeredspectrum_stat(cfg, sts_long);
 %                       elseif iTaper==2
@@ -80,7 +80,7 @@ for iDir = dirsel(:)'
                       fprintf('not enough spikes in unit %d\n', iUnit);
                   end
                 end      
-              end
+             % end
           end
       end  
   end

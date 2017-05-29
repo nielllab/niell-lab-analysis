@@ -220,7 +220,7 @@ else
 end
 %cell_range=5;
 
-cell_range= [ 5 6 14 15]
+%cell_range= [ 5 6 14 15]
 
 for cell_n = cell_range
     tic
@@ -792,13 +792,13 @@ for cell_n = cell_range
             end
         end
         
-        %     if SU
-        %         if contrast_modulated
-        %             saveas(gcf,fullfile(noisepname,sprintf('sta_cmod_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        %         else
-        %             saveas(gcf,fullfile(noisepname,sprintf('sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
-        %         end
-        %     end
+            if SU
+                if contrast_modulated
+                    saveas(gcf,fullfile(noisepname,sprintf('sta_cmod_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+                else
+                    saveas(gcf,fullfile(noisepname,sprintf('sta_%s_%d_%d',Block_Name,channel_no,clust_no)),'fig');
+                end
+            end
         %     %%% get subfield centered on RF and perform fourier analysis
         %     t=3;
         %     subplot(3,3,t);
