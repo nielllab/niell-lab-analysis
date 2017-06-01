@@ -1198,105 +1198,30 @@ for c=1:length(useN)
     tcourse_pref(c,:,:,:) = squeeze(nanmean(drift_cond_tcourse(c,:,:,prefOri(c),:,:),5));
 end
 
-%PSTH for each cell's preferred orientation - stationary
-for i= 1:5
+
+
+prefOri_pre = prefOri(1,:)'
+prefOri_post = prefOri(2,:)'
+
+mn_pref = squeeze(nanmean(drift_cond_tcourse,5)); %average over all 6 SFs
+
+%ave PSTH for each orientation
+for t=1:3
     figure
-    for t=1:3
-        if i==1
-            set(gcf,'Name','grating lyr5 stationary');
-             mn = squeeze(mean(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:),1))';
-            % ylim([-1 1]); xlim([0 2.5]);
-        elseif i==2
-            set(gcf,'Name','grating lyr 2/3 stationary');
-            mn = squeeze(mean(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,1,:,:),1))';
-          %  ylim([-.5 5]);xlim([0 2.5]);
-        elseif i ==3
-            set(gcf,'Name','grating lyr 4 stationary');
-            mn = squeeze(mean(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,1,:,:),1))';
-          %  ylim([-.5 4]);xlim([0 2.5]);
-        elseif i==4
-            set(gcf,'Name','grating inh stationary');
-            mn = squeeze(mean(tcourse_pref(dataInh & (hasDrift==1) & treatment==t,1,:,:),1))';
-          %  ylim([-.5 12]);xlim([0 2.5]);
-        elseif i==5
-            set(gcf,'Name','grating lyr6 stationary');
-            mn = squeeze(mean(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,1,:,:),1))';
-          %  ylim([-.5 12]);xlim([0 2.5]);
-        end
-       mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont from
-%        all time points
-        mn = circshift(mn,10);
-        subplot(1,3,t)
-        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
-        title(titles{t}); 
-        xlabel('time (s)');
-     %   ylabel('spikes/sec');
-        %ylim([0 max(mn(:))+1])
+    clear mn_pref_psth
+    for ori=1:12
+        pref = prefOri_pre==ori;
+        mn_pref_psth = squeeze(nanmean(mn_pref(data & treatment==t & layerAll==5 &  (pref==1)',:,:,ori,:),1));
+%         mn_pref_psth = mn_pref_psth - repmat(mn_pref_psth(1,1,:),[50 1]);%subtract prestim activity
+        mn_pref_psth = circshift(mn_pref_psth,10);
+        subplot(3,4,ori)
+        plot((1:length(mn_pref_psth)-5)*dt-dt/2,squeeze(mn_pref_psth(1,:,1:45)),'LineWidth',2);axis square; set(gca,'fontsize', 18);
+        axis square; set(gca,'fontsize',18);
+        title(titles{t}); xlabel('time(s)')
+        ylabel('spikes/sec');
+        mn_pref_all(:,:,:,ori,t)= mn_pref_psth
     end
 end
-
-%PSTH for each cell's preferred orientation - moving
-
-for i= 1:5
-    figure
-    for t=1:3
-        if i==1
-            set(gcf,'Name','grating lyr5 mv');
-             mn = squeeze(nanmean(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,2,:,:),1))';
-            % ylim([-1 1]); xlim([0 2.5]);
-        elseif i==2
-            set(gcf,'Name','grating lyr 2/3 mv');
-            mn = squeeze(nanmean(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,2,:,:),1))';
-          %  ylim([-.5 5]);xlim([0 2.5]);
-        elseif i ==3
-            set(gcf,'Name','grating lyr 4 mv');
-            mn = squeeze(nanmean(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,2,:,:),1))';
-          %  ylim([-.5 4]);xlim([0 2.5]);
-        elseif i==4
-            set(gcf,'Name','grating inh mv');
-            mn = squeeze(nanmean(tcourse_pref(dataInh & (hasDrift==1) & treatment==t,2,:,:),1))';
-          %  ylim([-.5 12]);xlim([0 2.5]);
-        elseif i==5
-            set(gcf,'Name','grating lyr6 mv');
-            mn = squeeze(nanmean(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,2,:,:),1))';
-          %  ylim([-.5 12]);xlim([0 2.5]);
-        end
-       mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont from
-%        all time points
-        mn = circshift(mn,10);
-        subplot(1,3,t)
-        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
-        title(titles{t}); 
-        xlabel('time (s)');
-     %   ylabel('spikes/sec');
-        %ylim([0 max(mn(:))+1])
-    end
-end
-
-
-
-% prefOri_pre = prefOri(1,:)'
-% prefOri_post = prefOri(2,:)'
-% 
-% mn_pref = squeeze(nanmean(drift_cond_tcourse,5)); %average over all 6 SFs
-% 
-% %ave PSTH for each orientation
-% for t=1:3
-%     figure
-%     clear mn_pref_psth
-%     for ori=1:12
-%         pref = prefOri_pre==ori;
-%         mn_pref_psth = squeeze(nanmean(mn_pref(data & treatment==t & layerAll==5 &  (pref==1)',:,:,ori,:),1));
-% %         mn_pref_psth = mn_pref_psth - repmat(mn_pref_psth(1,1,:),[50 1]);%subtract prestim activity
-%         mn_pref_psth = circshift(mn_pref_psth,10);
-%         subplot(3,4,ori)
-%         plot((1:length(mn_pref_psth)-5)*dt-dt/2,squeeze(mn_pref_psth(1,:,1:45)),'LineWidth',2);axis square; set(gca,'fontsize', 18);
-%         axis square; set(gca,'fontsize',18);
-%         title(titles{t}); xlabel('time(s)')
-%         ylabel('spikes/sec');
-%         mn_pref_all(:,:,:,ori,t)= mn_pref_psth
-%     end
-% end
 
 
 % test2 =repmat(mn_pref_psth(1,1,:),[1 50]);
@@ -1335,11 +1260,11 @@ end
 % %     text(6, .0275, ['p = ' num2str(p)],'FontSize',18)
 % end
 
-useOsi_pre = drift_osi(:,1,1)>.3
-useOsi_post = drift_osi(:,1,2)>.3
+useOsi_pre = drift_osi(:,1,1)>.5
+useOsi_post = drift_osi(:,1,2)>.5
 useOsi=(useOsi_pre & useOsi_post)'
 
-useResp = amp(:,1,1)>2 | amp(:,1,2)>2 |amp(:,2,1)>2| amp(:,2,2)>2;
+useResp = amp(:,1,1)>2 & amp(:,1,2)>2 |amp(:,2,1)>2& amp(:,2,2)>2;
 data = goodAll & useResp' & ~inhAll & hasDrift==1 & useOsi==1  ;%which cells to include
 dataInh =goodAll & useResp' & inhAll & hasDrift==1 & useOsi==1;
 dataAll =goodAll & useResp' & hasDrift==1 &useOsi==1;
@@ -1702,63 +1627,6 @@ for t = 2
         if inhAll(useN(i)) ==1 , xlabel('inh'); else  xlabel('exc');
         end
     end
-end
-
-titlesInh = {'Saline Inh','DOI Inh','5HT Inh'};
-for mv=1:2
-figure
- if mv==1, set(gcf,'Name', 'mean SF stationary')
-    else set(gcf,'Name', 'mean SF mv'), end
-for t=1:3
-SFpre= nanmean(drift_sf(data & treatment==t & hasDrift==1,:,mv,1),1)
-SFpost = nanmean(drift_sf(data & treatment==t & hasDrift==1,:,mv,2),1)
-subplot(2,3,t)
-plot(lowSFpre,'LineWidth',2);hold on; plot(lowSFpost,'r','LineWidth',2);axis square
-title(titles{t}); xlabel('SF'); ylabel('sp/sec');xlim([0 7]);
-SFpreInh= nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,:,mv,1),1)
-SFpostInh = nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,:,mv,2),1)
-subplot(2,3,t+3)
-plot(lowSFpreInh,'LineWidth',2);hold on; plot(lowSFpostInh,'r','LineWidth',2);axis square
-title(titlesInh{t}); xlabel('SF'); ylabel('sp/sec');xlim([1 7]);
-end
-end
-
-titlesInh = {'Saline Inh','DOI Inh','5HT Inh'};
-for mv=1:2
-figure
- if mv==1, set(gcf,'Name', 'mean LOW SF stationary')
-    else set(gcf,'Name', 'mean LOW SF mv'), end
-for t=1:3
-lowSFpre= nanmean(drift_sf(data & treatment==t & hasDrift==1,1:3,mv,1),1)
-lowSFpost = nanmean(drift_sf(data & treatment==t & hasDrift==1,1:3,mv,2),1)
-subplot(2,3,t)
-plot(lowSFpre,'LineWidth',2);hold on; plot(lowSFpost,'r','LineWidth',2);axis square
-title(titles{t}); xlabel('SF'); ylabel('sp/sec');xlim([1 3]);
-lowSFpreInh= nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,1:3,mv,1),1)
-lowSFpostInh = nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,1:3,mv,2),1)
-subplot(2,3,t+3)
-plot(lowSFpreInh,'LineWidth',2);hold on; plot(lowSFpostInh,'r','LineWidth',2);axis square
-title(titlesInh{t}); xlabel('SF'); ylabel('sp/sec');xlim([1 3]);
-end
-end
-
-titlesInh = {'Saline Inh','DOI Inh','5HT Inh'};
-for mv=1:2
-figure
- if mv==1, set(gcf,'Name', 'mean High SF stationary')
-    else set(gcf,'Name', 'mean High SF mv'), end
-for t=1:3
-lowSFpre= nanmean(drift_sf(data & treatment==t & hasDrift==1,4:6,mv,1),1)
-lowSFpost = nanmean(drift_sf(data & treatment==t & hasDrift==1,1:3,mv,2),1)
-subplot(2,3,t)
-plot(lowSFpre,'LineWidth',2);hold on; plot(lowSFpost,'r','LineWidth',2);axis square
-title(titles{t}); xlabel('SF'); ylabel('sp/sec');xlim([1 3]);
-lowSFpreInh= nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,4:6,mv,1),1)
-lowSFpostInh = nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,4:6,mv,2),1)
-subplot(2,3,t+3)
-plot(lowSFpreInh,'LineWidth',2);hold on; plot(lowSFpostInh,'r','LineWidth',2);axis square
-title(titlesInh{t}); xlabel('SF'); ylabel('sp/sec');xlim([1 3]);
-end
 end
 
 %plot spatial frequency tuning curves for all units
