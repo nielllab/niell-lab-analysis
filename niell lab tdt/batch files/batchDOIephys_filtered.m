@@ -22,7 +22,6 @@ files(n).injection = 'injection_bars';
 files(n).treatment = 'DOI'; 
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
-% files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 

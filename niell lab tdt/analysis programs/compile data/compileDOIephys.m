@@ -376,17 +376,17 @@ legend('pre','post')
 
 
 %%%filter data before plotting%%%
-clear max
-low_wn = squeeze(min(wn_crf,[],2));
-max_wn = squeeze(max(wn_crf,[],2));
-amp_wn = wn_evoked  %max_wn-low_wn
+clear max_wn
+% low_wn = squeeze(min(wn_crf,[],2));
+max_wn = wn_evoked-wn_spont% squeeze(max(wn_evoked,[],2))-(squeeze(wn_spont))
+amp_wn = max_wn  %max_wn-low_wn
 useResp = amp_wn(:,1,1)>3 | amp_wn(:,1,2)>3| amp_wn(:,2,1)>3 | amp_wn(:,2,2)>3;
 data_wn = goodAll==1 & useResp';
 
 clear max amp low
-peakresp = squeeze(max(drift_orient,[],2));
-low = squeeze(min(drift_orient,[],2));
-amp = peakresp;
+peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont);%subtract driftspont
+% low = squeeze(min(drift_orient,[],2));
+amp = peakresp; 
 useResp = amp(:,1,1)>2 | amp(:,1,2)>2 |amp(:,2,1)>2 | amp(:,2,2)>2;
 data = goodAll & useResp' & ~inhAll & hasDrift==1 ;%which cells to include
 dataInh =goodAll & useResp' & inhAll & hasDrift==1 ;
@@ -537,6 +537,30 @@ for t=1:3
     end
 end
 
+figure
+for t=1:3
+    useN=goodAll==1 & hasDrift==1 &treatment==t
+    miDrift= (mean(drift_orient(useN,:,1,2),2)-mean(drift_orient(useN,:,1,1),2))./(mean(drift_orient(useN,:,1,2),2)+mean(drift_orient(useN,:,1,1),2));
+    suppressed = miDrift<-.3
+    fracSuppressed(t) = sum(suppressed)/sum(useN)
+    bar(fracSuppressed);ylabel('proportion of cells suppressed');
+    title ('suppression of evoked rate');
+    Labels = {'Saline', 'DOI', '5HT'};
+    set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
+end
+
+figure
+clear fracSuppressed
+for t=1:3
+    useN=goodAll==1 & hasDrift==1 &treatment==t
+    miDrift= (mean(drift_spont(useN,1,2),2)-mean(drift_spont(useN,1,1),2))./(mean(drift_spont(useN,1,2),2)+mean(drift_spont(useN,1,1),2));
+    suppressed = miDrift<-.3
+    fracSuppressed(t) = sum(suppressed)/sum(useN)
+    bar(fracSuppressed);ylabel('proportion of cells suppressed');
+    title ('suppression of spontaneous rate');
+    Labels = {'Saline', 'DOI', '5HT'};
+    set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
+end
 
 
 clear cycR
@@ -1194,9 +1218,23 @@ for c= 1:length(useN)
     end
 end
 
+useN =dataAll;
+for c= 1:length(useN)
+    for prepost =1:2
+        [respmax oind] = max(drift_sf(c ,:,1,prepost)'); %stationary
+       % [g h]=(max(respmax(:)));
+        prefSF(prepost,c)=oind;
+    end
+end
+
 for c=1:length(useN)
     tcourse_pref(c,:,:,:) = squeeze(nanmean(drift_cond_tcourse(c,:,:,prefOri(c),:,:),5));
 end
+
+
+% for c=1:length(useN)
+%     sf_pref_tcourse(c,:,:,:) = squeeze(nanmean(drift_cond_tcourse(c,:,:,:,prefSF(c),:),4));
+% end
 
 %PSTH for each cell's preferred orientation - stationary
 for i= 1:5
@@ -1713,12 +1751,12 @@ for t=1:3
 SFpre= nanmean(drift_sf(data & treatment==t & hasDrift==1,:,mv,1),1)
 SFpost = nanmean(drift_sf(data & treatment==t & hasDrift==1,:,mv,2),1)
 subplot(2,3,t)
-plot(lowSFpre,'LineWidth',2);hold on; plot(lowSFpost,'r','LineWidth',2);axis square
+plot(SFpre,'LineWidth',2);hold on; plot(SFpost,'r','LineWidth',2);axis square
 title(titles{t}); xlabel('SF'); ylabel('sp/sec');xlim([0 7]);
 SFpreInh= nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,:,mv,1),1)
 SFpostInh = nanmean(drift_sf(dataInh & treatment==t & hasDrift==1,:,mv,2),1)
 subplot(2,3,t+3)
-plot(lowSFpreInh,'LineWidth',2);hold on; plot(lowSFpostInh,'r','LineWidth',2);axis square
+plot(SFpreInh,'LineWidth',2);hold on; plot(SFpostInh,'r','LineWidth',2);axis square
 title(titlesInh{t}); xlabel('SF'); ylabel('sp/sec');xlim([1 7]);
 end
 end
@@ -1762,7 +1800,7 @@ end
 end
 
 %plot spatial frequency tuning curves for all units
-for t = 1:3
+for t = 2
     figure
     if t==1, set(gcf,'Name','saline SF'),
     elseif t==2, set(gcf,'Name','doi SF'),
@@ -1772,7 +1810,7 @@ for t = 1:3
     elseif t==6, set(gcf,'Name','mglur2 SF')
     elseif t==7, set(gcf,'Name','mglur2 + DOI SF')
     else set(gcf,'Name','lisuride SF'),end
-    useN = find(goodAll & treatment==t)
+    useN = find(data & treatment==t)
     for i = 1:length(useN)
         np = ceil(sqrt(length(useN)));
         subplot(np,np,i);
@@ -1782,8 +1820,8 @@ for t = 1:3
         plot([1 7], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
         plot([1 7], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 7], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
         yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 8.5])
-        if inhAll(useN(i)) ==1 , xlabel('inh'); else  xlabel('exc');
-        end
+%         if inhAll(useN(i)) ==1 , xlabel('inh'); else  xlabel('exc');
+%         end
     end
 end
 
