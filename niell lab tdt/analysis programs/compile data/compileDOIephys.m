@@ -387,6 +387,7 @@ clear max amp low
 peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont);%subtract driftspont
 % low = squeeze(min(drift_orient,[],2));
 amp = peakresp; 
+spontAmp = squeeze(max(drift_spont,[],2));
 useResp = amp(:,1,1)>2 | amp(:,1,2)>2 |amp(:,2,1)>2 | amp(:,2,2)>2;
 data = goodAll & useResp' & ~inhAll & hasDrift==1 ;%which cells to include
 dataInh =goodAll & useResp' & inhAll & hasDrift==1 ;
@@ -537,30 +538,88 @@ for t=1:3
     end
 end
 
+useDrift = (abs((amp(:,1,1)-amp(:,1,2)))>2 | abs((amp(:,2,1)-amp(:,2,2))>2))';
+useSpont = (abs(spontAmp(:,1)-spontAmp(:,2))>2)';
+% useN=goodAll==1 & hasDrift==1 &useDrift==1; 
+useC = goodAll==1 & hasDrift==1 & useDrift==0;
+useSpont = goodAll==1 & hasDrift==1 & useSpont ==1&(useResp==1)';;
+useSpontC = goodAll==1 & hasDrift==1 & useSpont ==0&(useResp==1)';;
+% allC = goodAll==1 & hasDrift==1;
+nullmiDrift= (mean(drift_orient(useC,:,1,2),2)-mean(drift_orient(useC,:,1,1),2))./(mean(drift_orient(useC,:,1,2),2)+mean(drift_orient(useC,:,1,1),2));
+%miDrift= (mean(drift_orient(useN,:,1,2),2)-mean(drift_orient(useN,:,1,1),2))./(mean(drift_orient(useN,:,1,2),2)+mean(drift_orient(useN,:,1,1),2));
 figure
+subplot(2,2,1)
 for t=1:3
-    useN=goodAll==1 & hasDrift==1 &treatment==t
+    useN=goodAll==1 & hasDrift==1 &treatment==t&useDrift==1&(useResp==1)';;
+    allC = goodAll==1 & hasDrift==1 & treatment==t&(useResp==1)';
     miDrift= (mean(drift_orient(useN,:,1,2),2)-mean(drift_orient(useN,:,1,1),2))./(mean(drift_orient(useN,:,1,2),2)+mean(drift_orient(useN,:,1,1),2));
-    suppressed = miDrift<-.3
-    fracSuppressed(t) = sum(suppressed)/sum(useN)
-    bar(fracSuppressed);ylabel('proportion of cells suppressed');
+    suppressedEv = miDrift<0
+    fracSuppressedEv(t) = sum(suppressedEv)/sum(allC)
+    bar(fracSuppressedEv);ylabel('proportion of cells suppressed');
     title ('suppression of evoked rate');
     Labels = {'Saline', 'DOI', '5HT'};
     set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
 end
-
-figure
-clear fracSuppressed
+subplot(2,2,2)
 for t=1:3
-    useN=goodAll==1 & hasDrift==1 &treatment==t
+    useN=goodAll==1 & hasDrift==1 &treatment==t &useSpont==1&(useResp==1)';
+    allC = goodAll==1 & hasDrift==1 & treatment==t&(useResp==1)';
     miDrift= (mean(drift_spont(useN,1,2),2)-mean(drift_spont(useN,1,1),2))./(mean(drift_spont(useN,1,2),2)+mean(drift_spont(useN,1,1),2));
-    suppressed = miDrift<-.3
-    fracSuppressed(t) = sum(suppressed)/sum(useN)
-    bar(fracSuppressed);ylabel('proportion of cells suppressed');
+    suppressedSpont = miDrift<0
+    fracSuppressedSpont(t) = sum(suppressedSpont)/sum(allC)
+    bar(fracSuppressedSpont);ylabel('proportion of cells suppressed');
     title ('suppression of spontaneous rate');
     Labels = {'Saline', 'DOI', '5HT'};
     set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
 end
+subplot(2,2,3)
+for t=1:3
+    useN=goodAll==1 & hasDrift==1 &treatment==t &useDrift==1&(useResp==1)';
+    allC = goodAll==1 & hasDrift==1 & treatment==t&(useResp==1)';
+    miDrift= (mean(drift_orient(useN,:,1,2),2)-mean(drift_orient(useN,:,1,1),2))./(mean(drift_orient(useN,:,1,2),2)+mean(drift_orient(useN,:,1,1),2));
+    incEv = miDrift>0
+    fracIncEv(t) = sum(incEv)/sum(allC)
+    bar(fracIncEv);ylabel('proportion of cells facilitated');
+    title ('facilitation of evoked rate');
+    Labels = {'Saline', 'DOI', '5HT'};
+    set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
+end
+subplot(2,2,4)
+clear fracInc
+for t=1:3
+    useN=goodAll==1 & hasDrift==1 &treatment==t &useSpont==1 & (useResp==1)';
+    allC = goodAll==1 & hasDrift==1 & treatment==t&(useResp==1)';
+    miDrift= (mean(drift_spont(useN,1,2),2)-mean(drift_spont(useN,1,1),2))./(mean(drift_spont(useN,1,2),2)+mean(drift_spont(useN,1,1),2));
+    incSpont = miDrift>0
+    fracIncSpont(t) = sum(incSpont)/(sum(allC))
+    bar(fracIncSpont);ylabel('proportion of cells facilitated');
+    title ('facilitation of spontaneous rate');
+    Labels = {'Saline', 'DOI', '5HT'};
+    set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
+end
+
+for t=1:3
+useC = goodAll==1 & hasDrift==1 & treatment==t & useDrift==0&(useResp==1)';;
+useSpontC = goodAll==1 & hasDrift==1 & useSpont ==0 & treatment==t&(useResp==1)';;
+allC = goodAll==1 & hasDrift==1 & treatment==t&(useResp==1)';;
+% nullmiDriftEv= (mean(drift_orient(useC,:,1,2),2)-mean(drift_orient(useC,:,1,1),2))./(mean(drift_orient(useC,:,1,2),2)+mean(drift_orient(useC,:,1,1),2));
+% nullmiDriftSpont= (mean(drift_spont(useSpontC,1,2),2)-mean(drift_spont(useSpontC,1,1),2))./(mean(drift_spont(useSpontC,1,2),2)+mean(drift_spont(useSpontC,1,1),2));
+nochangeEv(t) = (sum(useC)/sum(allC))
+nochangeSpont(t) = (sum(useSpontC)/sum(allC))
+end
+figure
+subplot(1,2,1)
+plot(fracSuppressedEv,'LineWidth', 2);hold on; plot(fracIncEv,'r','LineWidth', 2); plot(nochangeEv,'g','LineWidth', 2);
+axis square; ylabel('proportion of cells');ylim([0 .6]);
+Labels = {'Saline', 'DOI', '5HT'};set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',14);
+legend('Suppressed', 'Facilitated')%, 'No change');
+title ('Evoked rate');
+
+subplot(1,2,2)
+plot(fracSuppressedSpont,'LineWidth', 2); ylim([0 .2]);hold on;
+plot(fracIncSpont,'r','LineWidth', 2);%plot(nochangeSpont,'g','LineWidth', 2); 
+title ('Spontaneous rate'); axis square;ylabel('proportion of cells')
+set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',12);
 
 
 clear cycR
@@ -588,7 +647,6 @@ for t=1:3
     n_cells(t) = sum(goodAll==1 &treatment==t& hasWn==1)
     text(-7, 28, ['n = ' num2str(n_cells(t))],'FontSize',20)
     text(-7, 26, ['r^2 = ' num2str(rsquared_wnEv(t))],'FontSize',20)
-
 end
 end
 
@@ -1243,6 +1301,9 @@ for i= 1:5
         if i==1
             set(gcf,'Name','grating lyr5 stationary');
              mn = squeeze(mean(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:),1))';
+             sem = std(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:),1)...
+                           /sqrt(length(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:)))
+                       sem=squeeze(sem);sem=sem'
             % ylim([-1 1]); xlim([0 2.5]);
         elseif i==2
             set(gcf,'Name','grating lyr 2/3 stationary');
@@ -1255,20 +1316,22 @@ for i= 1:5
         elseif i==4
             set(gcf,'Name','grating inh stationary');
             mn = squeeze(mean(tcourse_pref(dataInh & (hasDrift==1) & treatment==t,1,:,:),1))';
-          %  ylim([-.5 12]);xlim([0 2.5]);
+            %  ylim([-.5 12]);xlim([0 2.5]);
         elseif i==5
             set(gcf,'Name','grating lyr6 stationary');
             mn = squeeze(mean(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,1,:,:),1))';
-          %  ylim([-.5 12]);xlim([0 2.5]);
+            %  ylim([-.5 12]);xlim([0 2.5]);
         end
-       mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont from
-%        all time points
+        mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont from
+        %        all time points
         mn = circshift(mn,10);
+        sem = circshift(sem,10);
         subplot(1,3,t)
-        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
-        title(titles{t}); 
+        plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18); hold on;
+       % tfw =shadedErrorBar(mn(1:45,:),sem(1:45,:),'k',1);
+        title(titles{t});
         xlabel('time (s)');
-     %   ylabel('spikes/sec');
+        %   ylabel('spikes/sec');
         %ylim([0 max(mn(:))+1])
     end
 end
@@ -1305,6 +1368,8 @@ for i= 1:5
         subplot(1,3,t)
         plot((1:length(mn)-5)*dt -dt/2,mn(1:45,:),'LineWidth',2);axis square; set(gca,'fontsize', 18);
         title(titles{t}); 
+         %ySEM = 
+       % shadedErrorBar(1:length(mn)-5)*dt -dt/2,mn(1:45,:),1:50,ySEM,'k',1)
         xlabel('time (s)');
      %   ylabel('spikes/sec');
         %ylim([0 max(mn(:))+1])
@@ -1559,12 +1624,7 @@ for i= 1:5
         %ylim([0 max(mn(:))+1])
     end
 end
-% 
-% x = linspace(0,1,20)';
-% y = sin(x);
-% dy = .1*(1+rand(size(y))).*y;  % made-up error values
-% fill([x;flipud(x)],[y-dy;flipud(y+dy)],[.9 .9 .9],'linestyle','none');
-% line(x,y)
+
 
 
 % titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
@@ -1674,8 +1734,8 @@ for t=1:3
     n_cells(t) = sum(treatment==t& dataAll)
     text(.55, .8, ['n = ' num2str(n_cells(t))],'FontSize',18)
     title(titles{t})
-    set(gca,'xtick',[])
-    set(gca,'xticklabel',[])
+    set(gca,'xtick',[1 2])
+    set(gca,'xticklabel',['Pre      Post'])
 end
 end
 
