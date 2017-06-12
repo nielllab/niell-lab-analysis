@@ -1,4 +1,4 @@
-function plotDevwtData(vals, age, agelist, ageBins, used, geno,label,splot)
+function [resp resperr] = plotDevwtData(vals, age, agelist, ageBins, used, geno,label,splot)
 
 col = 'gbk';
 if ~exist('splot','var') | ~splot

@@ -1,4 +1,4 @@
-function plotDevData(vals, age, agelist, ageBins, used, geno,label,splot)
+function [resp resperr] =plotDevData(vals, age, agelist, ageBins, used, geno,label,splot)
 
 col = 'gbk';
 
