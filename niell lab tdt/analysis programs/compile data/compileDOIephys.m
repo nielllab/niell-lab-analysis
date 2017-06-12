@@ -436,16 +436,19 @@ for mv = 1:2
         preR = mean(drift_orient(goodAll==1&treatment==t& hasDrift==1,:,mv,1),2);
         postR = mean(drift_orient(goodAll==1  &treatment==t& hasDrift==1,:,mv,2),2);
         deltaR = postR-preR;
+        stderror = nanstd(deltaR) / sqrt(length(deltaR));
         fracSupp(t) = sum(deltaR<-2)/length(deltaR);
+        stderrorSupp(t) = nanstd(fracSupp) / sqrt(length(fracSupp));
         fracInc(t) = sum(deltaR>2)/length(deltaR);
+        stderrorInc(t) = nanstd(fracInc) / sqrt(length(fracInc));
     end
     subplot(1,2,mv)
-        set(gcf,'Name','mean stat drift fraction, evoked')
-      if mv==1, title ('stationary'), else title('moving'); end
-%else set(gcf,'Name','mean mv drift fractions, evoked')    
+    set(gcf,'Name','mean drift fraction, evoked')
+    if mv==1, title ('stationary'), else title('moving'); end
+    %else set(gcf,'Name','mean mv drift fractions, evoked')
     %end
-    plot(fracSupp,'-o','LineWidth', 2); hold on; 
-    plot(fracInc,'-^','MarkerEdgeColor','r','Color','r','LineWidth', 2); % plot(1-fracInc-fracSupp);
+    hold on; errorbar(fracSupp,stderrorSupp, '-o','LineWidth',2);
+    errorbar(fracInc,stderrorInc,'-^','MarkerEdgeColor','r','Color','r','LineWidth', 2);
     legend('Suppressed','Facilitated');
     axis square; ylabel('Proportion of cells','FontSize',18); ylim([0 0.2]);
     Labels = {'Saline','DOI', '5HT'};set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',18);
@@ -460,16 +463,19 @@ for mv = 1:2
         deltaR = postR-preR;
         fracSupp(t) = sum(deltaR<-2)/length(deltaR);
         fracInc(t) = sum(deltaR>2)/length(deltaR);
+        stderrorSupp(t) = nanstd(fracSupp) / sqrt(length(fracSupp));
+        fracInc(t) = sum(deltaR>2)/length(deltaR);
+        stderrorInc(t) = nanstd(fracInc) / sqrt(length(fracInc));
     end
     
     subplot(1,2,mv)
-    set(gcf,'Name','mean stat drift fractions, spont')
+    set(gcf,'Name','mean drift fractions, spont')
 %     if mv==1
 %         set(gcf,'Name','mean stat drift fractions, spont')
 %     else set(gcf,'Name','mean mv drift fractions, spont')
 %     end
-    plot(fracSupp,'-o','LineWidth', 2); hold on;
-    plot(fracInc,'-^','MarkerEdgeColor','r','Color','r','LineWidth', 2); % plot(1-fracInc-fracSupp);
+    errorbar(fracSupp, stderrorSupp,'-o','LineWidth', 2); hold on;
+    errorbar(fracInc,stderrorInc,'-^','MarkerEdgeColor','r','Color','r','LineWidth', 2); % plot(1-fracInc-fracSupp);
     legend('Suppressed','Facilitated');
     axis square; ylabel('Proportion of cells','FontSize',18); ylim([0 0.15]);
     Labels = {'Saline','DOI', '5HT'};set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',18);
@@ -478,16 +484,18 @@ for mv = 1:2
 end
 
 for t=1:3
-        preRdark= meanRdark(goodAll==1 &treatment==t,1)
-        postRdark = meanRdark(goodAll==1&treatment==t,2)
-        deltaRdark = postRdark-preRdark
-        fracSuppDark(t) = sum(deltaRdark<-2)/length(deltaRdark)
-        fracIncDark(t) = sum(deltaRdark>2)/length(deltaRdark)
+        preRdark= meanRdark(goodAll==1 &treatment==t,1);
+        postRdark = meanRdark(goodAll==1&treatment==t,2);
+        deltaRdark = postRdark-preRdark;
+        fracSuppDark(t) = sum(deltaRdark<-2)/length(deltaRdark);
+        fracIncDark(t) = sum(deltaRdark>2)/length(deltaRdark);
+        stderrorSuppDark(t) = nanstd(fracSuppDark) / sqrt(length(fracSuppDark));
+        stderrorIncDark(t) = nanstd(fracIncDark) / sqrt(length(fracIncDark));
     end
     figure
-    plot(fracSuppDark,'-o','LineWidth', 2); hold on; 
-    plot(fracIncDark,'-^','MarkerEdgeColor','r','Color','r','LineWidth', 2); % plot(1-fracInc-fracSupp);
-    legend('Suppressed','Facilitated'); title('Spontanous(dark)')
+    errorbar(fracSuppDark, stderrorSuppDark,'-o','LineWidth', 2); hold on; 
+    errorbar(fracIncDark,stderrorIncDark,'-^','MarkerEdgeColor','r','Color','r','LineWidth', 2); % plot(1-fracInc-fracSupp);
+    legend('Suppressed','Facilitated'); title('Spontanous(dark)');
     axis square; ylabel('Proportion of cells','FontSize',18); ylim([0 0.15]);
     Labels = {'Saline','DOI', '5HT'};set(gca, 'XTick', 1:3, 'XTickLabel', Labels,'FontSize',18);
 
@@ -1375,6 +1383,7 @@ end
 %     sf_pref_tcourse(c,:,:,:) = squeeze(nanmean(drift_cond_tcourse(c,:,:,:,prefSF(c),:),4));
 % end
 
+
 %PSTH for each cell's preferred orientation - stationary
 for i= 1:5
     figure
@@ -1386,7 +1395,7 @@ for i= 1:5
                 /sqrt(length(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,1,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==5) & treatment==t);xlim([0 2.5]);
-            %  ylim([min(min(mn))-1 max(max(mn))+.5]); xlim([0 2.5]);
+              ylim([0 6]); xlim([0 2.5]);
         elseif i==2
             set(gcf,'Name','grating lyr 2/3 stationary');
             mn = squeeze(mean(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,1,:,:),1))';
@@ -1394,7 +1403,7 @@ for i= 1:5
                 /sqrt(length(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,1,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==2| layerAll==3) & treatment==t);xlim([0 2.5]);
-            % ylim([min(min(mn))-1 max(max(mn))+.5]); xlim([0 2.5]);
+             ylim([0 7]); xlim([0 2.5]);
         elseif i ==3
             set(gcf,'Name','grating lyr 4 stationary');
             mn = squeeze(mean(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,1,:,:),1))';
@@ -1410,7 +1419,7 @@ for i= 1:5
                 /sqrt(length(tcourse_pref(dataInh &(hasDrift==1) & treatment==t,1,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(dataInh & (hasDrift==1) & treatment==t);xlim([0 2.5]);
-            %  ylim([min(min(mn))-1 max(max(mn))+.5]); xlim([0 2.5]);
+              ylim([0 16]); xlim([0 2.5]);
         elseif i==5
             set(gcf,'Name','grating lyr6 stationary');
             mn = squeeze(mean(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,1,:,:),1))';
@@ -1430,7 +1439,7 @@ for i= 1:5
         plot(x,mn(1:45,2),'LineWidth',2);axis square; set(gca,'fontsize', 18); 
         preerr=shadedErrorBar(x,mn(1:45,1),sem(1:45,1)','b',1); axis square; set(gca,'fontsize', 18); hold on;
         posterr=shadedErrorBar(x,mn(1:45,2),sem(1:45,2)','r',1);%axis square; set(gca,'fontsize', 18)
-        text(1.75,max(max((mn))-.5), ['n = ' num2str(ncells)],'FontSize',20)
+        text(1.75,max(max((mn))+.75), ['n = ' num2str(ncells)],'FontSize',20)
         title(titles{t});
         xlabel('time (s)');
         %   ylabel('spikes/sec');
@@ -1445,23 +1454,23 @@ for i= 1:5
         if i==1
             set(gcf,'Name','grating lyr5 mv');
             mn = squeeze(nanmean(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,2,:,:),1))';
-            sem = std(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,2,:,:),1)...
+            sem = nanstd(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,2,:,:),1)...
                 /sqrt(length(tcourse_pref(data & (hasDrift==1) & (layerAll==5) & treatment==t,2,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==5) & treatment==t); xlim([0 2.5]);
-            % ylim([-1 1]);
+             ylim([-2 7]);
         elseif i==2
             set(gcf,'Name','grating lyr 2/3 mv');
             mn = squeeze(nanmean(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,2,:,:),1))';
-            sem = std(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,2,:,:),1)...
+            sem = nanstd(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,2,:,:),1)...
                 /sqrt(length(tcourse_pref(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,2,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==2| layerAll==3) & treatment==t);xlim([0 2.5]);
-            %  ylim([-.5 5]);xlim([0 2.5]);
+              ylim([-2 10]);xlim([0 2.5]);
         elseif i ==3
             set(gcf,'Name','grating lyr 4 mv');
             mn = squeeze(nanmean(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,2,:,:),1))';
-            sem = std(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,2,:,:),1)...
+            sem = nanstd(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,2,:,:),1)...
                 /sqrt(length(tcourse_pref(data &(hasDrift==1) & layerAll==4 & treatment==t,2,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==4) & treatment==t);xlim([0 2.5]);
@@ -1469,15 +1478,15 @@ for i= 1:5
         elseif i==4
             set(gcf,'Name','grating inh mv');
             mn = squeeze(nanmean(tcourse_pref(dataInh & (hasDrift==1) & treatment==t,2,:,:),1))';
-             sem = std(tcourse_pref(dataInh &(hasDrift==1) & treatment==t,2,:,:),1)...
+             sem = nanstd(tcourse_pref(dataInh &(hasDrift==1) & treatment==t,2,:,:),1)...
                 /sqrt(length(tcourse_pref(dataInh &(hasDrift==1) & treatment==t,2,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(dataInh & (hasDrift==1) & treatment==t);xlim([0 2.5]);
-            %  ylim([-.5 12]);xlim([0 2.5]);
+              ylim([-.5 20]);xlim([0 2.5]);
         else i==5
             set(gcf,'Name','grating lyr6 mv');
             mn = squeeze(nanmean(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,2,:,:),1))';
-            sem = std(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,2,:,:),1)...
+            sem = nanstd(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,2,:,:),1)...
                 /sqrt(length(tcourse_pref(data & layerAll==6 & (hasDrift==1) & treatment==t,2,:,:)))
             sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==6) & treatment==t);xlim([0 2.5]);
@@ -1493,14 +1502,13 @@ for i= 1:5
         plot(x,mn(1:45,2),'LineWidth',2);axis square; set(gca,'fontsize', 18);
         preerr=shadedErrorBar(x,mn(1:45,1),(sem(1:45,1))','b',1); axis square; set(gca,'fontsize', 18); hold on;
         posterr=shadedErrorBar(x,mn(1:45,2),(sem(1:45,2))','r',1);%axis square; set(gca,'fontsize', 18)
-        text(1.75,max(max((mn))-.5), ['n = ' num2str(ncells)],'FontSize',20)
+        text(1.75,max(max((mn))+.75), ['n = ' num2str(ncells)],'FontSize',20)
         title(titles{t});
         xlabel('time (s)');
         %   ylabel('spikes/sec');
         %ylim([0 max(mn(:))+1])
     end
 end
-
 
 
 
