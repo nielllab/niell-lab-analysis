@@ -158,9 +158,9 @@ elseif SU && Pimp_session==1;
 elseif SU && Pimp_session==2; 
     psth_power3=psth;
 elseif SU && Pimp_session==3; 
-    psth_NBQX_power1=psth;
+    psth_power4=psth;
 else SU && Pimp_session==4; 
-    psth_NBQX_power2=psth;
+    psth_power4=psth;
 end
    
 

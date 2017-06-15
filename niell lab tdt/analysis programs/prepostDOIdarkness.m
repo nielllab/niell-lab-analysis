@@ -190,7 +190,7 @@ latents(:,2)=postlatent/sum(postlatent);
 preRunV = preRunV(preRunT<dur); preRunT= preRunT(preRunT<dur);
 postRunV = postRunV(postRunT<dur);postRunT= postRunT(postRunT<dur);
 
-dbstop
+%dbstop
 % figure
 % subplot(2,1,1);
 % plot(preRunT,preRunV); xlim([0 dur]); xlabel('secs'); ylabel('pre speed')

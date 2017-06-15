@@ -121,7 +121,7 @@ if ~exist('pinp','var') | length(pinp)<blocknum  | ~isfield(pinp(blocknum),'psth
     baseline = mean(psth(:,5:45),2);
     baseStd = std(psth(:,5:45),[],2);
     artifact = psth(:,50:52);
-    ev = max(psth(:,53:58),[],2);
+    ev = max(psth(:,53:62),[],2); %(:,53:58)
     evoked = ev- baseline;
     zscore =evoked./baseStd;
     zscore(zscore>20)=20;
