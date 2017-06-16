@@ -1,6 +1,4 @@
-% pathname = '\\niell-v2-w7\Ian_analysis\';
-pathname = '\\angie\Angie_analysis\DOI_experiments';
-
+pathname = '\\niell-v2-w7\Ian_analysis\';
 n=0;
 
 
@@ -9,22 +7,25 @@ files(n).expt = '061417';
 files(n).dir = '06_14_17';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_06_14_17_cluster_061417';
-files(n).analysisfile = 'analysis_061417';
-files(n).predark = 'dark_pre1';
-files(n).postdark = 'dark_post1';
-files(n).prewn = '';
-files(n).postwn = '';  
+files(n).analysisfile = 'analysis_06141';
+files(n).predark = 'darkness_pre02';
+files(n).postdark = 'darkness_post01';
+files(n).prewn = 'wn_pre01';
+files(n).postwn = 'wn_post01';  
 files(n).predrift = 'gratings_pre01';
-files(n).postdrift = 'gratings_post1';
+files(n).postdrift = 'gratings_post01';
 files(n).prebars = '';
 files(n).postbars = '';
 files(n).pretreatment = '';
-files(n).injection = 'injection';
-files(n).treatment = '5HT'; 
+files(n).injection = 'injection_bars';
+files(n).treatment = 'Lisuride'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
-files(n).misc = ''; 
-files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+files(n).misc = '4 mg/ml'; %dose (.09ul/g mouse)
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  %%% example
+% files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [];
 
