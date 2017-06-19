@@ -9,7 +9,7 @@ set(groot,'defaultFigureVisible','on')
 
 %%% select the session you want based on filters
 %use =  find(strcmp({files.notes},'good data'))
-use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'022417'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'012017b'))
 sprintf('%d selected session',length(use))
 
 movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\DetectionStim2contrast_LOW_7_25min.mat';
@@ -248,3 +248,18 @@ end
 % plot([60 60],[0 30],'g');  plot ([75 75],[0 30],'g');
 % legend('0 contrast', '1 contrast','velocity');
 % 
+
+
+figure
+plot(rad{1,1,1}); hold on; plot(rad{1,1,2}); ylim([8 30]);
+xlim([0 3000]);set(gca,'xtick',600:600:7.25*600,'xticklabel',1:5,'Fontsize',14)
+xlabel ('time (min)');
+
+prerad= rad{1}; postrad = rad{2};
+figure
+h1=hist(prerad(1:1500),1:1:max(prerad))
+h2 = hist(postrad(1:1500),1:1:max(prerad))
+plot(h1/1500,'Linewidth',2); hold on; plot(h2/1500,'r','Linewidth',2); xlim([10 25]);ylim([0 .5])
+
+
+

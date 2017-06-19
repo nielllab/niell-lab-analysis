@@ -93,6 +93,7 @@ for cell_n = cell_range;
    hold on
    plot(0:1:max(times),hist(times,0:1:max(times)));
    
+  tcourse(cell_n,:) = hist(times,0:1:1000);
    title(sprintf('unit %d %d',channel_no,clust_no))
    %title(sprintf('ch %d ',cell_n))
   
@@ -162,7 +163,7 @@ ylabel('sp/sec')
 
 
 if SU 
-    save(fullfile(apname,afname),'psth','histbins','-append');
+    save(fullfile(apname,afname),'psth','histbins','tcourse','-append');
 end
 
 

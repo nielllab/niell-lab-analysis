@@ -27,22 +27,22 @@ for iDir = 1:length(info)
 end
 %% STIM VS preSTIM; WILD TYPES
 % first figure: relative to different layers, with running and with sitting
-iType = 0;
-iMethod = 1; % phsae locking
+iStim = 2;
+iMethod = 1; 
 iTaper = 1;
  figure
 cnt = 0;
-for iStim = 1:2         
+for iType = 1:3         
     for iState = 1:2
          for iLayer = 1:3
 
             cors = {'g', 'k'};
             cnt=cnt+1;
-            subplot(4,3,cnt)
+            subplot(6,3,cnt)
             for iLatency= 1:2
                 hold on
                 try                                            
-                    sl =  unitinfo==iStim & G_stat.dirinfo==iType;
+                    sl =  unitinfo==iStim & G_stat.dirinfo==iType-1;%1=wt 0=N2B, 2=N2A
                     dat = log10(G_stat.powAllCat(iState,iLatency,iLayer).powAll(sl,:,:));
                     dat(dat==0) = NaN;
                     dat(~isfinite(dat)) = NaN;
@@ -53,11 +53,13 @@ for iStim = 1:2
                     errorbar(log10(freq), mn,sm,cors{iLatency})
                     hold on
                     latencies = {'stim', 'prestim'};
+                    Geno={'2B', 'wt', '2A'};
                     stims = {'drift', 'bar'};
                     layers = {'superficial', 'granular', 'deep'};
-                    nt = {'pyr', 'int'};
+                    %nt = {'pyr', 'int'};
                     xlim(log10([4 160]))
-                    H = title(sprintf('%s %s %s',  layers{iLayer}, G_stat.state{iState}, stims{iStim}, sum(sl)));
+                    ylim([0 2])
+                    H = title(sprintf('%s %s %s %s',  layers{iLayer}, G_stat.state{iState}, stims{iStim},Geno{iType}, sum(sl)));
                     set(H,'FontSize', 6);
                   
                 end         
@@ -67,7 +69,73 @@ for iStim = 1:2
 end
 
 %%
-iType = 1;
+iStim = 2; %iStim of 2 is bar stimulus
+iMethod = 1; 
+iTaper = 1;
+ figure
+cnt = 0;
+iLatency=1;%iLatency of 1 is with stimulus
+
+%for iType = 1:3         
+    for iState = 1:2
+         for iLayer = 1:2
+
+            cors = {'g', 'k','r'};%2b, wt, 2a
+            cnt=cnt+1;
+            subplot(2,2,cnt)
+            for iType= 1:3
+                hold on
+                try                                            
+%                     sl =  unitinfo==iStim & G_stat.dirinfo==iType-1;
+%                     dat = log10(G_stat.powAllCat(iState,1,iLayer).powAll(sl,:,:));
+%                     dat(dat==0) = NaN;
+%                     dat(~isfinite(dat)) = NaN;
+% 
+%                     mn = squeeze(nanmean(dat,1));
+%                     sm = squeeze(nanstd(dat,1))./sqrt(sum(sl));
+%                     freq = 4:4:160;
+%                     errorbar(log10(freq), mn,sm,cors{iType})
+%                     hold on
+%                     %latencies = {'stim', 'prestim'};
+%                     Geno={'2B', 'wt', '2A'};
+%                     stims = {'drift', 'bar'};
+%                     layers = {'superficial', 'granular', 'deep'};
+%                     %nt = {'pyr', 'int'};
+%                     xlim(log10([4 160]))
+%                     ylim([0 2])
+%                     H = title(sprintf('%s %s %s',  layers{iLayer}, G_stat.state{iState}, stims{iStim}, sum(sl)));
+%                     set(H,'FontSize', 6);
+%                     
+                    %for a linear scale
+                     sl =  unitinfo==iStim & G_stat.dirinfo==iType-1;
+                    dat = G_stat.powAllCat(iState,iLatency,iLayer).powAll(sl,:,:);
+                    dat(dat==0) = NaN;
+                    dat(~isfinite(dat)) = NaN;
+
+                    mn = squeeze(nanmean(dat,1));
+                    sm = squeeze(nanstd(dat,1))./sqrt(sum(sl));
+                    %mLowG(
+                    freq = 8:4:120;
+                    shadedErrorBar((freq), mn(2:30),sm(2:30),cors{iType})
+                    hold on
+                    %latencies = {'stim', 'prestim'};
+                    Geno={'2B', 'wt', '2A'};
+                    stims = {'drift', 'bar'};
+                    layers = {'superficial', 'granular', 'deep'};
+                    %nt = {'pyr', 'int'};
+                    xlim([15 75])
+                    ylim([0 30])
+                    H = title(sprintf('%s %s %s',  layers{iLayer}, G_stat.state{iState}, stims{iStim}, sum(sl)));
+                    set(H,'FontSize', 6);
+                 
+                end         
+            end
+        end
+    end
+%end
+
+%%
+iType = 2;
 iMethod = 1; % phsae locking
 iTaper = 1;
  figure

@@ -227,7 +227,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs. NR2A deleted NR
         cvOSI(cellrange,:)=NaN; 
         end
         
-        if exist('bars','var'); %#ok<EXIST>
+        if exist('bars','var'); 
 
         bar_spont(cellrange,:)=field2array(bars,'spont');
        

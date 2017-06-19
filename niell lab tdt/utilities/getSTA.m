@@ -11,7 +11,8 @@ Block_Name = Block_Name{blocknum}
 clear sta
 load(afile,'sta');
 
-movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
+% movieFile = 'C:\Users\Angie Michaiel\Desktop\movie files\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
+movieFile = 'C:\Users\lab\Desktop\movieFiles\cortex\wn_cortex_012alpha1_5hzLg30Hz.mat';
 
 if ~exist('sta','var') | length(sta)<blocknum   | redo
         

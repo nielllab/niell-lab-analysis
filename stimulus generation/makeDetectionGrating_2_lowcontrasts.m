@@ -4,6 +4,7 @@ close all
 duration = 0.5;
 framerate = 30;
 isi = 2;
+
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
 
@@ -139,11 +140,22 @@ if binarize
 end
 
 moviedata = moviedata(1:xsz,1:ysz,:);
+h4 = figure
+
+vidObj = VideoWriter('detectionstim_movieclip');
+% vidObj.FrameRate = 60;
+open(vidObj);
+
 % figure
-% for i = 1:length(moviedata)/40
-% imshow(moviedata(:,:,i));
-% drawnow
-% end
+for i = 1:length(moviedata)/20
+    imshow(moviedata(:,:,i));
+    drawnow
+    currFrame = getframe(gcf);
+    writeVideo(vidObj,currFrame);
+end
+close(vidObj);
+
+
 save DetectionStim2contrast_LOW_7_25min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny sigma contrast
 size(moviedata)
 length(moviedata)/(60)

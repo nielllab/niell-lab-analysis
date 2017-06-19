@@ -124,7 +124,7 @@ rate_stat.unitinfo(rate_stat.unitinfo(:,4)==2,4) = 3;
 iType = 1;
 iMethod = 1; % phsae locking
 iTaper = 1;
-for iStim = 1:2
+%for iStim = 1:2
     for iState = 1:2
             figure
             cnt = 0;
@@ -139,9 +139,9 @@ for iStim = 1:2
                             hold on
                             try    
                                 if k==0
-                                    sl =  rate_stat.stim_mod(:)>0.1 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                    sl =  rate_stat.stim_mod(:)>0.1 & G_stat.unitinfo(:,3)==iLayer & G_stat.unitinfo(:,6)==2 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 elseif k==1
-                                    sl =  rate_stat.stim_mod(:)<0 & G_stat.unitinfo(:,4)==iLayer & G_stat.unitinfo(:,6)==iStim & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
+                                    sl =  rate_stat.stim_mod(:)<0 & G_stat.unitinfo(:,3)==iLayer & G_stat.unitinfo(:,6)==2 & G_stat.unitinfo(:,5)==0 & G_stat.unitinfo(:,1)==iType & G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper).nSpikes(:)>50;
                                 end
                                 dat = G_stat.ppcAllCat(iMethod,iState,iLatency,iTaper,jLayer).ppcAll(sl,:,:);
                                 dat(dat==0) = NaN;
@@ -154,7 +154,7 @@ for iStim = 1:2
                                 hold on
                                 ylim([0 0.05])
                                 latencies = {'prestim', 'stim'};
-                                stims = {'drift', 'bar'};
+                                stims = {'bar', 'drift'};
                                 layers = {'nan', 'nan','superficial', 'granular', 'deep'};
                                 nt = {'stimmodulated', 'suppressed by stim'};
                                 H = title(sprintf('unit: %s LFP: %s %s %s %s df=%d',  layers{iLayer}, G_stat.layers{jLayer}, G_stat.state{iState}, stims{iStim}, nt{k+1},sum(sl)));
@@ -165,7 +165,7 @@ for iStim = 1:2
                 end
         end
     end
-end
+%end
 %%
 iType =1;
 iMethod = 1; % phsae locking

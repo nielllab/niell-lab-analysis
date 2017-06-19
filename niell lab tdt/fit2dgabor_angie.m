@@ -3,7 +3,8 @@ function [params all_fit all_img] = fit2dgabor_angie(wn)
 
 
 
-parfor w = 1:length(wn)
+%parfor w = 1:length(wn)
+for w = 1:length(wn)
 %close all
 
 %%%Load STA data for all cells
@@ -40,8 +41,8 @@ yi = yi - (width+1)/2;
 %img = 9*exp(-0.5*((xi+3).^2 + (yi-3).^2)/3.2.^2).*cos(pi/2+0.2 + 2*pi*(xi+3)/13);
 
 %img = 4 + 10 *exp(-0.5*((xi+4).^2 + (yi-4).^2)/8.^2) +5*rand(size(xi));
-figure
-imagesc(img,[-10 10])
+% figure
+% imagesc(img,[-10 10])
 
 base=min(min(img));
 base=0

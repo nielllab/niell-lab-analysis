@@ -34,8 +34,8 @@ if ~exist('eyes','var') | length(eyes)<block | isempty(eyes(block)) | redo
         xlabel('frame #'); ylabel('secs');
         ylim([ 0 0.2])
         
-        thresh = 0.85; %pupil threshold for binarization
-        puprange = [8 55]; %set range of pupil radius
+        thresh = 0.9; %pupil threshold for binarization
+        puprange = [10 40]; %set range of pupil radius
         pupercent = 0.80; %set range pupil radius window
         pupchange = 0.3; %acceptable percent change in radius per framerange
         framerange = 10; %number of frames to smooth over

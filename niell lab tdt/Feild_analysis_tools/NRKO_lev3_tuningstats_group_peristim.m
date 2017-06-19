@@ -35,14 +35,14 @@ for iDir = 1:nDirs
     for iUnit = 1:nUnits
         unitCnt =  totUnits + iUnit;                   
         unitinfo(unitCnt,1) = inp2.unitdataSession{iUnit}.GT*0+info(iDir).genotype;
-        unitinfo(unitCnt,2) = inp2.unitdataSession{iUnit}.pinp;
-        unitinfo(unitCnt,3) = inp2.unitdataSession{iUnit}.responsive;
-        unitinfo(unitCnt,4) = inp2.unitdataSession{iUnit}.layer;
-        unitinfo(unitCnt,5) = inp2.unitdataSession{iUnit}.inhibitory;             
+        %unitinfo(unitCnt,2) = inp2.unitdataSession{iUnit}.pinp;
+        unitinfo(unitCnt,2) = inp2.unitdataSession{iUnit}.responsive;
+        unitinfo(unitCnt,3) = inp2.unitdataSession{iUnit}.layer;
+        unitinfo(unitCnt,4) = inp2.unitdataSession{iUnit}.inhibitory;             
         if strcmp(info(iDir).stimType,'drift')
-            unitinfo(unitCnt,6) = 1;  
+            unitinfo(unitCnt,5) = 1;  
         else
-            unitinfo(unitCnt,6) = 2;
+            unitinfo(unitCnt,5) = 2;
         end
 
         osi_cat(unitCnt) = Stat.osi(iUnit);
@@ -64,7 +64,9 @@ rate_stat.osi = osi_cat;
 rate_stat.stim_mod = stim_cat;
 rate_stat.loco_mod = loco_cat;
 rate_stat.rate = rate_cat;
-rate_stat.unitinfo_dim = {'wt_N2B_N2A', 'pinp_nopinp', 'responsive', 'layer', 'inhibitory', 'drift1_bar2'};
+%rate_stat.unitinfo_dim = {'wt_N2B_N2A', 'pinp_nopinp', 'responsive', 'layer', 'inhibitory', 'drift1_bar2'};
+rate_stat.unitinfo_dim = {'stage', 'responsive', 'layer', 'inhibitory', 'drift1_bar2'};
+
 filename = fullfile(outputDir,output,output);
 mkdir(fullfile(outputDir,output))
 save(filename,'rate_stat');

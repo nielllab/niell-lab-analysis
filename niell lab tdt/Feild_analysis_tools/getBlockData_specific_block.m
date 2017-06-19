@@ -119,7 +119,7 @@ for fnum = 1:length(afile)
          
 %         for blocknum = 3:4
             Block_Name
-            B = strncmpi(Block_Name,'bar',3) ;
+            B = strncmpi(Block_Name,'drift',3) ;
             
                  if sum(B)>1 ;
             blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');

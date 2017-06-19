@@ -79,11 +79,11 @@ end
 
 Block_Name
 
-if ~useArgin
-    [fname pname] = uigetfile('*.mat','movie file','C:\Users\lab\Desktop\movie files\cortex\');
-    movieFile = fullfile(pname,fname);
-end
-load(movieFile);
+% if ~useArgin
+%     [fname pname] = uigetfile('*.mat','movie file','C:\Users\lab\Desktop\movieFiles\cortex\');
+%     movieFile = fullfile(pname,fname);
+% end
+ load(movieFile);
 
 %load wn012alpha1_5hz_contrast10sec5min021407   %%% the usual
 
