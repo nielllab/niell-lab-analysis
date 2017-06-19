@@ -75,45 +75,6 @@ for c = 1:length(preSpikes);
 end
 
 
-% layernums = unique(layer);
-% layerFR = zeros(length(layernums),2); %layerFR(layer,pre/post DOI) = mean FR per layer
-% layercellsFR = zeros(size(R,1),length(layernums),2); %layercellsFR(cell #, layer, pre/post DOI)
-% %figure
-% for m = 1:2
-%     for n=1:length(layernums)
-%         layerFR(n,m) = mean(mean(R(find(layer==layernums(n)),:,m),2));
-%         cellrates = mean(R(find(layer==layernums(n)),:,m),2);
-%         darkerr (n,m) = nanstd(layerFR(:,m)/sqrt(sum(layerFR(n,m))));
-%         for o = 1:length(find(layer==layernums(n)));
-%             %darkerr (n,m) = nanstd(layerFR(:,m)/sqrt(sum(layerFR(n,m))));
-%             layercellsFR(o,n,m) = cellrates(o);
-%         end
-%        % subplot(2,3,1)
-%         %barweb(mean(layerFR(:,:)),mean(darkerr(:,:)));
-%        % bar(mean(layerFR(:,:))); title 'all layers'; hold on
-%        % ax = gca;
-%         %ax.XTick = [1 2];
-%         %ax.XTickLabels = {'pre','post'}
-%         %title ('all layers')
-%         %subplot(2,3,n+1)
-%         %bar(layerFR(n,:))%, darkerr(n,:))
-%         %errorbar(layerFR(n,:),darkerr(n))
-%         %title(sprintf('layer %d',n+1))
-%        % ax = gca;
-%         %ax.XTick = [1 2];
-%         %ax.XTickLabels = {'pre','post'}
-%     end
-%     
-%     if savePDF
-%         set(gcf, 'PaperPositionMode', 'auto');
-%         print('-dpsc',psfilename,'-append');
-%     end
-%     
-% end
-%legend({'pre','post'})
-
-%note:layerFR(1 = layer 2)
-
 % bar
 % high CV = more variation in spiking pattern...less bursty
 %cv pre vs cv post
@@ -226,12 +187,11 @@ latents(:,2)=postlatent/sum(postlatent);
 % plot(latents);
 % ylabel('latents'); legend('pre','post');
 
-
-
 preRunV = preRunV(preRunT<dur); preRunT= preRunT(preRunT<dur);
 postRunV = postRunV(postRunT<dur);postRunT= postRunT(postRunT<dur);
 
-%figure
+%dbstop
+% figure
 % subplot(2,1,1);
 % plot(preRunT,preRunV); xlim([0 dur]); xlabel('secs'); ylabel('pre speed')
 % subplot(2,1,2);
@@ -287,6 +247,14 @@ plot([dur dur],[-5 size(allR,1)],'r','Linewidth',4); %colorbar;
 %dbstop
 allR = [squeeze(normR(:,:,1)) squeeze(normR(:,:,2))];
 % 
+% vthresh=1;
+% stat = find(allV(1:10:end-10)<vthresh)
+% mv = find(allV(1:10:end-10)<vthresh)
+% 
+% test = mean(allR(:,stat))
+% mean(allR(:,mv))
+
+ 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');
 %     print('-dpsc',psfilename,'-append');

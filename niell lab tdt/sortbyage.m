@@ -7,7 +7,7 @@ if size(agelist,1)==1
 else
     age_used = used & (age >=agelist(1,i) & age<=agelist(2,i));
 end
-    N(i) = sum(age_used);
+    N(i) = sum(age_used & ~isnan(vals(:,1)')); %%% added test for isnan 060217 cmn
     sortedVals(i,:) = nanmean(vals(age_used,:),1);
     sortedError(i,:) = nanstd(vals(age_used,:),[],1)/sqrt(N(i));
     

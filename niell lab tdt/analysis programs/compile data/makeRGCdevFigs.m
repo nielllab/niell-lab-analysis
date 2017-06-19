@@ -1,4 +1,5 @@
-
+clear all
+load('rgcdata04282015.mat')
 age(age>30)=31;
 % figure
 % hist(age,14:30)
@@ -110,4 +111,14 @@ xlim([ 13.5 33])
 set(gca,'Xtick',[14 18 22 26 31]);
 set(gca,'Xticklabel',{'14','18','22','26','adult'})
 
+[data group] = labelbyage(double(~isnan(wx)),age,ageBins,genotype==2 );
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
 
+[data group] = labelbyage(0.5*(wx+wy),age,ageBins,genotype==2 & ~isnan(wx'));
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
+
+[data group] = labelbyage(1-abs(sustVariation'),age,ageBins,genotype==2 & ~isnan(sustVariation));
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')

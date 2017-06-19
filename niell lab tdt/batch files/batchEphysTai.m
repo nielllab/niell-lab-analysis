@@ -16,7 +16,7 @@ files(n).postwn = '';
 files(n).predrift = 'drift_pre1';
 files(n).postdrift = 'drift_post1';
 files(n).injection = 'injection';
-files(n).treatment = 'DOI'; %1 mg/g
+files(n).treatment = 'DOI1'; %1 mg/g
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
@@ -36,7 +36,7 @@ files(n).postwn = 'wn_post1';
 files(n).predrift = '';
 files(n).postdrift = '';
 files(n).injection = 'injection';
-files(n).treatment = 'DOI'; %1 mg/g
+files(n).treatment = 'DOI1'; %1 mg/g
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 

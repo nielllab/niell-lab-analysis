@@ -1,3 +1,5 @@
+%load('developmentB3Nwt_all111015.mat')
+
 PostnatalAge = [17 17 16 18 18 22 16 17 17 17 22 22 60 60 16 16 18 18 19 19 60 14 14 14 19 19 20 20 18 23 25 25 17 17 18 18 19 19 60 60 60 60 60 60 60 60 25 22 24 24 27 28  29 25 26 26 27 29 60 ];
 
 for i = 1:length(wx)
@@ -355,7 +357,7 @@ end
 
 
 subplot(2,3,4)
-plotDevwtData(~isnan(wx),age,agelist, ageBins,genotype==2 , genotype,'fraction STA',1)
+[resp err] = plotDevGenoData(~isnan(wx),age,agelist, ageBins,genotype==2 , genotype,'fraction STA',1)
 ylim([0 0.75])
 set(gca,'Xtick',[14 18 22 28]);
 set(gca,'Xticklabel',{'14','18','22','adult'})
@@ -366,8 +368,19 @@ scatterDevGenoData(wx,age,agelist, ageBins,genotype==2, genotype,'RF radius (deg
 %plotDevGenoData(wy,age,agelist, ageBins,genotype==2, genotype,'RF radius',1)
 
 subplot(2,3,6);
-plotDevGenoData(wx,age,agelist, ageBins,genotype==2, genotype,'RF radius (deg)',1)
+[resp err] = plotDevGenoData(wx,age,agelist, ageBins,genotype==2, genotype,'RF radius (deg)',1)
 ylim([0 18])
+
+
+[data group] = labelbyage(double(~isnan(wx)),age,ageBins,genotype==2);
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
+
+
+[data group] = labelbyage(wx,age,ageBins,genotype==2 & ~isnan(wx'));
+[p tbl stats] = kruskalwallis(data,group)
+multcompare(stats,'Ctype','dunn-sidak')
+
 
 %%% Figure 2
 figure
@@ -407,18 +420,32 @@ box off
 % set(gca,'Xticklabel',{'1','2','4','8','16','full'});
 % box off
 
-
-subplot(2,3,5)
-plotDevwtData(1-fl_supp',age,agelist, ageBins,fl_amp>fl_thresh, genotype,'size suppression',1)
-ylim([0 0.75])
-
 subplot(2,3,4)
-plotDevwtData(fl_sz',age,agelist, ageBins,fl_amp>fl_thresh, genotype,'pref spot radius',1)
+[resp err] = plotDevwtData(fl_sz',age,agelist, ageBins,fl_amp>fl_thresh, genotype,'pref spot radius',1)
 set(gca,'Ytick',1:6); ylim([ 3 6])
 set(gca,'Yticklabel',{'1','2','4','8','16','full'});
 
+subplot(2,3,5)
+[resp err] = plotDevwtData(1-fl_supp',age,agelist, ageBins,fl_amp>fl_thresh, genotype,'size suppression',1)
+ylim([0 0.75])
+
+
 subplot(2,3,6)
-plotDevwtData(sfs(sf_inds)',age,agelist, ageBins,sf_amp>2 & genotype==2, genotype,'peak sf (cpd)',1)
+[resp err] = plotDevwtData(sfs(sf_inds)',age,agelist, ageBins,sf_amp>2 & genotype==2, genotype,'peak sf (cpd)',1)
+
+
+[data group] = labelbyage(fl_sz',age,ageBins,genotype==2 & fl_amp>fl_thresh);
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
+
+
+[data group] = labelbyage(1-fl_supp',age,ageBins,genotype==2 & fl_amp>fl_thresh);
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
+
+[data group] = labelbyage(sfs(sf_inds)',age,ageBins,genotype==2 & sf_amp>2);
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
 
 
 %%% figure 3
@@ -460,9 +487,19 @@ subplot(2,3,3)
 plotDevGenoData(abs(onoffoverlap'),age,agelist, ageBins,~isnan(onoffoverlap) & genotype==2, genotype,'onoff segregation',1)
 ylim([ 0 1])
 
+
+
 subplot(2,3,6)
 plotDevGenoData(1-abs(sustVariation'),age,agelist, ageBins,~isnan(sustVariation)& genotype==2, genotype,'sustain segregation',1)
 ylim([ 0 1])
+
+[data group] = labelbyage(abs(onoffoverlap'),age,ageBins,genotype==2 &~isnan(onoffoverlap));
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
+
+[data group] = labelbyage(1-abs(sustVariation'),age,ageBins,genotype==2 & ~isnan(sustVariation));
+[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+multcompare(stats,'Ctype','dunn-sidak')
 
 
 figure
