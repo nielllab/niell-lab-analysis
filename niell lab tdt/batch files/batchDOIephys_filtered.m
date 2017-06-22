@@ -1,7 +1,27 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
-
+n=n+1;
+files(n).expt = '062017';
+files(n).dir = '06_20_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_06_20_17_cluster_062017';
+files(n).analysisfile = 'analysis_062017';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = 'wn_pre1';
+files(n).postwn = 'wn_post1';  
+files(n).predrift = '';
+files(n).postdrift = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = '5HT'; 
+files(n).prepinpFile = ''
+files(n).postpinpFile = ''
+files(n).notes = 'good data'; 
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
+files(n).badsites = [];
 
 n=n+1;
 files(n).expt = '112116';
