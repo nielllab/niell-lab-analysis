@@ -1,6 +1,7 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
+
 % n=n+1;
 % files(n).expt = '102815';
 % files(n).dir = '10_28_15';
@@ -26,7 +27,7 @@ n=0;
 % files(n).notes = 'good data';%'no UDP';
 % files(n).misc = 'HTR2A_Pinp';
 
-%%lost units after pinping, put pre sessions to keep compile going
+%%lost units after pinping, put pre sessions to keep 
 n=n+1;
 files(n).expt = '042016';
 files(n).dir = '04_20_16';
@@ -50,6 +51,8 @@ files(n).notes = 'good data';
 files(n).misc = 'HTR2A_Pinp'% few units - lost from laser 
 files(n).tip1 = 550; files(n).tip2 = 500; files(n).angle = 45;  
 %files(n).wn_camera = {'eyefile1.mat','eyefile2.mat'};  
+
+
 
 n=n+1;
 files(n).expt = '040716';
@@ -77,6 +80,8 @@ files(n).predark_camera = 'bars_pre_040716_eye';
 files(n).postdark_camera = 'bars_post_040716_eye';% 
 files(n).badsites = [];
 
+
+
 n=n+1;
 files(n).expt = '010816';
 files(n).dir = '01_08_16';
@@ -99,6 +104,9 @@ files(n).layers = [];
 files(n).tip1 = 525; files(n).tip2 = 500; files(n).angle = 45; %not sure, need to check
 files(n).notes = 'good data'; % few units, most drifted after pre pinping
 files(n).misc = 'HTR2A_Pinp';
+
+
+
 
 for f = 1:length(files);
     files(f).blockWn = {files(f).prewn files(f).postwn};
