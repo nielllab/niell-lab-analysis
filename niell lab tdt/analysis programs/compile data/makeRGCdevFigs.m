@@ -1,3 +1,4 @@
+close all
 clear all
 load('rgcdata04282015.mat')
 age(age>30)=31;

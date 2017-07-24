@@ -409,20 +409,20 @@ box off
 % figure
 % kruskalwallis(fl_sztune(use & fl_amp>fl_thresh,:))
 
-subplot(2,3,3)
-use = age>=ageBins(1,2) & age<=ageBins(2,2) & genotype==2;
-m = max(mean(fl_sztune(use & fl_amp>fl_thresh,:)));
-errorbar(mean(fl_sztune(use & fl_amp>fl_thresh,:))/m,std(fl_sztune(use & fl_amp>fl_thresh,:))/(m*sqrt(sum(use & fl_amp>fl_thresh))));
-hold on
-use = age>=ageBins(1,1) & age<=ageBins(2,1) & genotype==2;
-m = max(mean(fl_sztune(use & fl_amp>fl_thresh,:)));
-errorbar(mean(fl_sztune(use & fl_amp>fl_thresh,:))/m,std(fl_sztune(use & fl_amp>fl_thresh,:))/(m*sqrt(sum(use & fl_amp>fl_thresh))));
-xlim([0.5 6.5]); ylim([0 1.2])
-ylabel('sp/sec'); xlabel('spot radius')
-title('p14-16');
-set(gca,'Xtick',1:6);
-set(gca,'Xticklabel',{'1','2','4','8','16','full'});
-box off
+% subplot(2,3,3)
+% use = age>=ageBins(1,2) & age<=ageBins(2,2) & genotype==2;
+% m = max(mean(fl_sztune(use & fl_amp>fl_thresh,:)));
+% errorbar(mean(fl_sztune(use & fl_amp>fl_thresh,:))/m,std(fl_sztune(use & fl_amp>fl_thresh,:))/(m*sqrt(sum(use & fl_amp>fl_thresh))));
+% hold on
+% use = age>=ageBins(1,1) & age<=ageBins(2,1) & genotype==2;
+% m = max(mean(fl_sztune(use & fl_amp>fl_thresh,:)));
+% errorbar(mean(fl_sztune(use & fl_amp>fl_thresh,:))/m,std(fl_sztune(use & fl_amp>fl_thresh,:))/(m*sqrt(sum(use & fl_amp>fl_thresh))));
+% xlim([0.5 6.5]); ylim([0 1.2])
+% ylabel('sp/sec'); xlabel('spot radius')
+% title('p14-16');
+% set(gca,'Xtick',1:6);
+% set(gca,'Xticklabel',{'1','2','4','8','16','full'});
+% box off
 
 subplot(2,3,4)
 [resp err] = plotDevwtData(fl_sz',age,agelist, ageBins,fl_amp>fl_thresh, genotype,'pref spot radius',1)
