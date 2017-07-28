@@ -93,7 +93,7 @@ for cell_n=1:length(cell_range);
    plot(laserT,tdtData.laserTTL,'g');
    hold on
    plot(0:1:max(times),hist(times,0:1:max(times)));
-   
+   keyboard
    title(sprintf('unit %d %d',channel_no,clust_no))
    %title(sprintf('ch %d ',cell_n))
   

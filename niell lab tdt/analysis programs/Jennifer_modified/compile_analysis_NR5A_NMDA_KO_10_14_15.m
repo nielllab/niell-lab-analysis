@@ -7,7 +7,8 @@ dbstop if error
 psfilename = 'c:/test.ps';   %%% default location
 if exist(psfilename,'file')==2;delete(psfilename);end %%% check for previous file
 
-apath = 'D:\Jen_analysis\' %'E:\Jennifer\Jennifer_analysis\'; 
+apath = 'D:\Jen_analysis\' %'E:\Jennifer\Jennifer_analysis\';
+%apath='D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_files'
 N =0; cells=0;  all_img_STA={};PINPed=0; STA_peak={};stopCRF={}; moveCRF={};
 sessionNum=0;
 

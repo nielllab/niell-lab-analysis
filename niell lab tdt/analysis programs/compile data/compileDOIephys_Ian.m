@@ -11,7 +11,7 @@ set(groot,'defaultFigureVisible','on')
 % use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data'))
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'061417'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'081616'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -363,13 +363,13 @@ end
 % end
 % legend('pre','post')
 
-figure 
-for t =1:3
-subplot(1,3,t)
-plot(0.5:1:25,squeeze(mean(speedHistDrift(sessionTreatment==t,1:25,:),1))); 
-title(titles{t}); xlabel('speed');axis square; 
-end
-legend('pre','post')
+% figure 
+% for t =1:3
+% subplot(1,3,t)
+% plot(0.5:1:25,squeeze(mean(speedHistDrift(sessionTreatment==t,1:25,:),1))); 
+% title(titles{t}); xlabel('speed');axis square; 
+% end
+% legend('pre','post')
 
 
 %%%filter data before plotting%%%
@@ -2185,7 +2185,7 @@ end
 % title(titlesInh{t}); xlabel('SF'); ylabel('sp/sec');set(gca, 'XTickLabels', [5 6 7]);
 % 
 % end
-end
+% end
 
 %plot spatial frequency tuning curves for all units
 for t = 2

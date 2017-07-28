@@ -3,28 +3,29 @@ clear all
 close all
 dbstop if error
 
+%cd 'D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_files\'
 apath = 'D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_files\'; %apath = 'D:\Jen_ephys_data\developmental_periods\';
 N =0; cells=0;PINPed=0; wvform_type=0; 
 sessionNum=0;
 
-for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A deleted NR5A1-cre
+for dataset = 1:1%3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A deleted NR5A1-cre
     
     if dataset ==1
         
         
-        afiles = { '1_13_15_analysis_pos_ctl.mat',...
-           '2_25_15_analysis_2.mat',...
-           '3_11_15_analysis_2.mat',...
-          '4_9_15_analysis_2.mat',...
-         '4_10_15_analysis_2.mat',...
-         '4_13_15_analysis_2.mat',...
-         '4_30_15_analysis_2.mat',...
-         '5_4_15_analysis_2.mat',...
-         '5_11_15_analysis_2.mat',...
-         '6_25_15_analysis_2',...
-         '6_29_15_analysis_2A',...
-         '8_17_15_analysis_2.mat',...
-         '1_18_16_analysis_2.mat'};
+        afiles = { '1_13_15_analysis_2.mat' };
+%         '1_18_16_analysis_2.mat',...   
+%         '2_25_15_analysis_2.mat',...
+%            '3_11_15_analysis_2.mat',...
+%           '4_9_15_analysis_2.mat',...
+%          '4_10_15_analysis_2.mat'1,...
+%          '4_13_15_analysis_2.mat',...
+%          '4_30_15_analysis_2.mat',...
+%          '5_4_15_analysis_2.mat',...
+%          '5_11_15_analysis_2.mat',...
+%          '6_25_15_analysis_2',...
+%          '6_29_15_analysis_2A',...
+%          '8_17_15_analysis_2.mat',...
  %'NR5A_Pinping\8_17_15\analysis_2.mat',... no pinped cell met criterion
  %'8_10_15_analysis_2.mat',...
  %'NR5A_Pinping\2_19_15\analysis.mat',...
@@ -83,20 +84,19 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
        
         afiles{i}
         
-        n_units = length(cells);
-       
+    end
         %%% determine waveform ID
-%         F1 = trough2peak;
-%         F2 = -trough_depth./peak_height;
-%         EI=[F1;F2]'
-%        
-%         opts = statset('display','final');
-%         [idx,ctrs] = kmeans(EI,2,'distance','city','Replicates',5,'options',opts);
-%         if sum(idx==1)<sum(idx==2)
-%             inh = (idx==1);
-%         else
-%             inh = (idx==2);
-%         end
+        F1 = trough2peak;
+        F2 = -trough_depth./peak_height;
+        EI=[F1;F2]'
+       
+        opts = statset('display','final');
+        [idx,ctrs] = kmeans(EI,2,'distance','city','Replicates',5,'options',opts);
+        if sum(idx==1)<sum(idx==2)
+            inh = (idx==1);
+        else
+            inh = (idx==2);
+        end
 
        
         trough2peak;
@@ -116,16 +116,18 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
         %determine whether unit is light responsive
         if  exist('drift', 'var'); 
         
-        dpeak=field2array(drift,'maxFR'); %determine whether unit is responisve to drifting gratings
-        driftA1= field2array(drift,'A1');
-        driftA2=field2array(drift,'A2');
-        driftB= field2array(drift,'B');
-        drift_theta_w=field2array(drift,'thetawidth');
-        drift_theta=field2array(drift,'theta');
-        driftwpref = field2array(drift,'wpref');
-        driftF1F0= field2array(drift,'F1')./field2array(drift,'F0');
-        cvDSI = field2array(drift,'cv_dsi'); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
-        cvOSI=field2array(drift,'cv_osi');
+        dpeak=cell2mat(field2array(drift,'maxFR')); %determine whether unit is responisve to drifting gratings
+        driftA1= cell2mat(field2array(drift,'A1'));
+        driftA2=cell2mat(field2array(drift,'A2'));
+        driftB= cell2mat(field2array(drift,'B'));
+        drift_theta_w=cell2mat(field2array(drift,'thetawidth'));
+        drift_theta=cell2mat(field2array(drift,'theta'));
+        driftwpref = cell2mat(field2array(drift,'wpref'));
+        driftF1=cell2mat(field2array(drift,'F1'));
+        driftF0=cell2mat(field2array(drift,'F0'));
+        DriftF1F0=driftF1./driftF0;
+        cvDSI = cell2mat(field2array(drift,'cv_dsi')); %%also circular variance measure change to "cv_dsi and cv_osi" in new compile programs
+        cvOSI=cell2mat(field2array(drift,'cv_osi'));
         else
             
         dpeak=NaN;
@@ -154,7 +156,7 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
             end
         end
         
-        resp = peak(:,1)>=1;
+        resp = peak(:,1)>=2;
         OS=OSI(:,1);
         cvOS=cvOSI(:,1);
         TW=width(:,1);
@@ -162,8 +164,8 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
         DS=DSI(:,1);
         cvDS=cvDSI(:,1);
         SF=driftwpref(:,1);
-      
-        %load in peri-light stim firing rates
+        
+       % load in peri-light stim firing rates
         psth_pinp=psth;
          %histbins = -50ms to + 50 in steps of 1 (msec) if you need to plot
          
@@ -180,10 +182,10 @@ for dataset = 1:3  %%% control ("wt") NR5A1-cre/CHR2 animals vs.NR2B vs. NR2A de
         zscore =evoked./baseStd;
         zscore(zscore>20)=20;
 
-        pinped = (zscore>5& evoked>15 & ~inh);
+        pinped = (zscore>8& evoked>25 & ~inh);
         
-        save (afile,'pinped','resp', 'OS','cvOS','TW','prefOrient','DS','cvDS','SF','inh','-append')
+       save (afile,'pinped','resp', 'OS','cvOS','TW','prefOrient','DS','cvDS','SF','inh','-append')
     
        
-    end %%% loop over adult vs EO
+  % end %%% loop over adult vs EO
 end
