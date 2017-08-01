@@ -25,17 +25,17 @@ peakChan = peakchan';
 
 % 375 lower depth of layer4
 D = zeros(size(peakChan));
-D(peakChan<33) = 375-((L4_end(1)-peakChan(peakChan<33))*25*sin(angle*pi/180));
-D(peakChan>32) = 375-((L4_end(2)-peakChan(peakChan>32))*25*sin(angle*pi/180));
-
+D(peakChan<33) = 500-((L4_end(1)-peakChan(peakChan<33))*25*sin(angle*pi/180));
+D(peakChan>32) = 500-((L4_end(2)-peakChan(peakChan>32))*25*sin(angle*pi/180));
+%350/375 is around the top of layer4
 
 if L5_end==0;
     
 L4_offset(1) = input('Num sites superficial to L4 bottom anterior shank '); %apply standard depth in uM for location of tip in top, middle or bottom third of any layer
 L4_offset(2) = input('Num sites superficial to L4 bottom posterior shank  ');
   
-D(peakChan<33) = 375-(((L4_end(1)+ L4_offset(1))-peakChan(peakChan<33))*25*sin(angle*pi/180));
-D(peakChan>32) = 375-(((L4_end(2)+ L4_offset(2))-peakChan(peakChan>32))*25*sin(angle*pi/180));
+D(peakChan<33) = 500-(((L4_end(1)+ L4_offset(1))-peakChan(peakChan<33))*25*sin(angle*pi/180));
+D(peakChan>32) = 500-(((L4_end(2)+ L4_offset(2))-peakChan(peakChan>32))*25*sin(angle*pi/180));
 
 end
 
