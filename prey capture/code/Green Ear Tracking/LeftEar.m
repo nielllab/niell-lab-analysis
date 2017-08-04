@@ -56,7 +56,7 @@ end
                Left(1,:)=[X(1),Y(1)];
                Right(1,:)=[X(2),Y(2)];
          
-           elseif i>1 & ~isnan(CE1_left(i))
+           elseif i>1 && ~isnan(CE1_left(i))
                if CE1_left(i)==1
                    Left(i,:)=Cear1(i,:);
                    Right(i,:)=Cear2(i,:);
@@ -64,7 +64,7 @@ end
                    Left(i,:)=Cear2(i,:);
                    Right(i,:)=Cear1(i,:);
                end
-           elseif i>1 & isnan(CE1_left(i));
+           elseif i>1 && isnan(CE1_left(i));
                imshow(img(:,:,:,i));
                sprintf 'click left ear then hold shift and click right ear'
                [X,Y]=getpts;
@@ -102,6 +102,14 @@ end
         [X,Y]=getpts;
         Left(i,:)=[X(1),Y(1)];
         Right(i,:)=[X(2),Y(2)];
+    elseif isnan(DistLL)
+        
+        sprintf 'click left ear then hold shift and click right ear'
+        imshow(img(:,:,:,i));
+        [X,Y]=getpts;
+        Left(i,:)=[X(1),Y(1)];
+        Right(i,:)=[X(2),Y(2)];
+        
     end
     
     end
@@ -142,7 +150,13 @@ else
     DistLL = sqrt((Left(i,1) - Left(i-1,1)).^2 + (Left(i,2) - Left(i-1,2)).^2);
     DistLR = sqrt((Left(i,1) - Right(i-1,1)).^2 + (Left(i,2) - Right(i-1,2)).^2);
    
-    if DistLL < DistLR-20 & Left(i,:)==Cear1(i,:); %stay
+    if isnan(DistLL)
+        imshow(img(:,:,:,i));
+        [X,Y]=getpts;
+        Left(i,:)=[X(1),Y(1)];
+        Right(i,:)=[X(2),Y(2)];
+        
+    elseif DistLL < DistLR-20 & Left(i,:)==Cear1(i,:); %stay
        Left(i,:)=Cear1(i,:);
        Right(i,:)=Cear2(i,:);
     elseif DistLL < DistLR-20 & Left(i,:)==Cear2(i,:);%stay

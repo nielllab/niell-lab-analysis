@@ -2,9 +2,7 @@
 % load up "movie" file one frame at a time, images saved as series of
     % .tif files
 %pathname = 'E:\Dropbox\mucsimol_V1\Trial videos for Tristans tracking\Iphone5\test_green_ears\30Hz_1080_SS75_ISO50_Tiff\'
-%pathname='X:\Tracks\BHDN'
 pathname = '/Users/jennifer/Desktop/green ear videos/controls/'
-%cd 'F:\GreenEarTracking\iPhone\5_25_17\'
 
 %pathname='F:\GreenEarTracking\iPhone\5_25_17\ALGSo101_PS\'
 files=dir(fullfile(pathname,'*.tif'));

@@ -1,9 +1,10 @@
 % Track_Green_mice.m Tristan Ursell/Jennifer Hoy/ Emily Galleta 4-21-17
 % load up "movie" file one frame at a time, images saved as series of
     % .tif files
-pathname = 'C:\Users\lab\Downloads\XKVV-20170711T180303Z-001\XKVV\'
+%pathname = 'C:\Users\lab\Downloads\XKVV-20170711T180303Z-001\XKVV\'
 %pathname='\\Jen-W10\F\GreenEarTracking\iPhone\Good_video_tracks\Ntsr1-cre\'
 %pathname = '/Users/jennifer/Desktop/green ear videos/GRP/TLNS'
+pathname = 'Y:\GreenEarTracking\iPhone\Good_video_tracks\Ntsr1-cre\GBJV';
 %cd 'F:\GreenEarTracking\iPhone\5_25_17\'
 
 %pathname='F:\GreenEarTracking\iPhone\5_25_17\ALGSo101_PS\'
@@ -77,18 +78,16 @@ mask5(:,:,k)=(img(:,:,1,k)<120).*(img(:,:,2,k)<120).*(img(:,:,3,k)<120).*(~mask3
 %mask7(:,:,k)=mask6(:,:,k).*mask4(:,:,k);%cricket mask
 end
 
-figure
-%imagesc(mask3(:,:,30));
-for i=1:length(files) ;
+% figure
+% imagesc(mask3(:,:,1));
+% for i=1:200%length(files) ;
+% 
+%     imagesc(mask3(:,:,i));
+%      drawnow   
+%     
+% end
 
-    imagesc(mask3(:,:,i));
-     drawnow   
-    
-end
 
-
-figure
-imshow(img(:,:,:,30));
 % t = bwlabel(mask4(:, :, k)); %mask for the ears
 % cum = regionprops(t, 'area', 'centroid','Eccentricity');
 % area_vector = [cum.Area];
@@ -179,13 +178,13 @@ end
    
 end
 
-% for i=1:numframes
-% imshow(img(:,:,:,i));hold on
-% plot(CentroidC(i,1),CentroidC(i,2),'c*');hold on
-% %plot(Right(i,1),Right(i,2),'r*');hold on
-% %plot(CentroidB(i,1),CentroidB(i,2),'y*');hold on
-% drawnow
-% 
+for i=1:numframes
+imshow(img(:,:,:,i));hold on
+plot(CentroidC(i,1),CentroidC(i,2),'c*');hold on
+%plot(Right(i,1),Right(i,2),'r*');hold on
+%plot(CentroidB(i,1),CentroidB(i,2),'y*');hold on
+drawnow
+end
 % %mov(i)=getframe(gcf);
 % end
 
@@ -200,12 +199,21 @@ plot(CentroidE2(:,1),CentroidE2(:,2),'g');hold on
 plot(CentroidB(:,1),CentroidB(:,2),'k');hold on
 plot(CentroidC(:,1),CentroidC(:,2),'r*');hold on
 
+
 %% assign each object to as either the left or right ear
 clear Left Right
 [Left, Right]=LeftEar(img,CentroidB,CentroidE1,CentroidE2,1); %1 in last entry position implies automatic assignment of Left ear vs. right, if "0" not auto 1st click is left ear, then Shift+ click the right ear center
 
-% Left = fill_nans(Left);
-% Right=fill_nans(Right);
+%% check IDs correctly assigned for specific frame
+% i=674;
+% figure
+% imshow(img(:,:,:,i)); hold on
+% plot(Left(i,1),Left(i,2),'m*');hold on
+% plot(Right(i,1),Right(i,2),'g*');hold on
+% plot(CentroidB(i,1),CentroidB(i,2),'ko');hold on
+% plot(CentroidC(i,1),CentroidC(i,2),'r*');hold on
+
+
 %check for correct assignment of ear ID should print out automatically when
 %you run LeftEar
 
@@ -219,6 +227,7 @@ clear Left Right
 %     plot(Left(end-1,1),Left(end-1,2),'g*');hold on
 %     plot(Right(end-1,1),Right(end-1,2),'m*');hold on
 
+%% test cricket ID is correct
 % for i=900:1000%numframes
 % imshow(img(:,:,:,i));hold on
 % %plot(Left(i,1),Left(i,2),'c*');hold on
@@ -232,14 +241,15 @@ clear Left Right
 %% find frames where mouse touch cricket
 
 for i=1:numframes
-    DistLE_C(i)=sqrt((Right(i,1) - CentroidC(i,1)).^2 + (Right(i,2) - CentroidC(i,2)).^2); 
+    DistRE_C(i)=sqrt((Right(i,1) - CentroidC(i,1)).^2 + (Right(i,2) - CentroidC(i,2)).^2); 
+    DistLE_C(i)=sqrt((Left(i,1) - CentroidC(i,1)).^2 + (Left(i,2) - CentroidC(i,2)).^2); 
     DistB_C(i)=sqrt((CentroidB(i,1) - CentroidC(i,1)).^2 + (CentroidB(i,2) - CentroidC(i,2)).^2); 
 end
 
 % touch= find(AreaC<150);
 
-touch= find(DistLE_C<50 |DistB_C<50 );
-j=2
+touch= find(DistRE_C<50 |DistB_C<50|DistLE_C<50 );
+j=200
 figure
 imagesc(img(:,:,:,j)); hold on
 plot(CentroidC(j,1),CentroidC(j,2),'c*');hold on
@@ -247,27 +257,27 @@ plot(CentroidC(j,1),CentroidC(j,2),'c*');hold on
 %omit cricket from frames where mouse is touching it
 CentroidCNT(:,:)=CentroidC(:,:);
 CentroidCNT(touch,:)= NaN;
+Left(touch,:)=NaN;
+Right(touch,:)=NaN;
 
+%% fill in blank cricket data with previous location of cricket
+
+CentroidCNT = fill_nans(CentroidCNT);
+Left=fill_nans(Left);
+Right=fill_nans(Right);
+CentroidB=fill_nans(CentroidB);
+% Replaces the nans in each column with 
+% previous non-nan values.
+
+ %% check final ID assignment before saving tracks
 figure
 plot(Left(:,1),Left(:,2),'r');hold on
 plot(Right(:,1),Right(:,2),'g');hold on
 plot(CentroidB(:,1),CentroidB(:,2),'c'); hold on
-plot(CentroidC(:,1),CentroidC(:,2),'ko');
-
-%fill in blank cricket data with previous location of cricket
-
-CentroidCNT = fill_nans(CentroidCNT);
-% Replaces the nans in each column with 
-% previous non-nan values.
-
-% figure
-% plot(Left(:,1),Left(:,2),'r');hold on
-% plot(Right(:,1),Right(:,2),'g');hold on
-% plot(CentroidB(:,1),CentroidB(:,2),'c'); hold on
-% plot(CentroidC(:,1),CentroidC(:,2),'k');
+plot(CentroidCNT(:,1),CentroidCNT(:,2),'ko');
 %% generate movie of tracked points
 
-for i=1:numframes
+for i=550:660%numframes
 imshow(img(:,:,:,i));hold on
 plot(Left(i,1),Left(i,2),'g*');hold on
 plot(Right(i,1),Right(i,2),'y*');hold on
@@ -275,7 +285,7 @@ plot(CentroidB(i,1),CentroidB(i,2),'r*');hold on
 plot(CentroidCNT(i,1),CentroidCNT(i,2),'c*');hold on
 
 drawnow
-mov(i)=getframe(gcf);
+%mov(i)=getframe(gcf);
 end
 
 vidObj = VideoWriter('tracked.avi');

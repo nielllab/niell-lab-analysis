@@ -102,7 +102,7 @@ for tr = 1:length(head);
     
     
     if group(tr)~=0 %%% to exclude bad data
-       dur = max(find(~isnan(r{tr})));
+       dur = length(r{tr});
        TrackEndT(tr) = dur/files(tr).fps;%time in seconds of track
        %captureT(tr)=files(tr).CapTime; %time in seconds 
       
@@ -154,9 +154,9 @@ for tr = 1:length(head);
         %
         thetahist(:,tr) = hist(thetaSC(1:dur),thetabins)/dur;
         
-        thetahist_mid(:,tr)=hist(thetaSC(rangeS>4),thetabins)/length(thetaSC(rangeS>4));
-        thetahist_midMove(:,tr) = hist(thetaSC(rangeMid>4 & speed>4),thetabins)/length(thetaSC( rangeMid>4 & speed>4)); 
-        tdhist_mv(:,:,tr) = myHist2(r{tr}(rangeMid>4 & speed>4),th(rangeMid>4& speed>4),dbinsMid,thetabins)/sum(rangeMid>4& speed>4);
+        thetahist_mid(:,tr)=hist(thetaSC(rangeS>2),thetabins)/length(thetaSC(rangeS>2));
+        thetahist_midMove(:,tr) = hist(thetaSC(rangeMid>2 & speed>2),thetabins)/length(thetaSC( rangeMid>2 & speed>2)); 
+        tdhist_mv(:,:,tr) = myHist2(r{tr}(rangeMid>2 & speed>2),th(rangeMid>2& speed>2),dbinsMid,thetabins)/sum(rangeMid>2& speed>2);
         %tdhist_mv_mid(:,:,tr) = myHist2(r{tr}(rangeMid),th(rangeMid),dbinsMid,thetabins)/length(rangeMid);
         %[tdhist_mv(:,:,tr),avg_T(tr,:)] = myHist2Avg(r{tr}(rangeMid>5 & speed>5),thetaS(rangeMid>5 & speed>5),dbins,thetabins);
         spdist(:,:,tr) = myHist2(rangeS(1:dur-1),speed,dbins,spdbins)/(dur-1);
@@ -172,7 +172,7 @@ for tr = 1:length(head);
     end
     
     
-    contact = range<3;
+    contact = range<3.5;
     contact = medfilt2(contact,[10 1]);
     contact(1)=0; contact(end)=0;
     
@@ -219,14 +219,16 @@ for tr = 1:length(head);
     
     nContacts(tr) = length(contactStart);
    % captureProb(tr)=1/length(contactStart);
+   captureProb(tr)=1/length(contactStart)  
    
-   %if files(tr).CapTime>70;%cap time took longer than video and tracking
-       %numIntercepts=(length(contactStart)/TrackEndT(tr))*(files(tr).CapTime)
-       %captureProb(tr)=1/numIntercepts;
-   %else
+   if captureProb(tr)==0;%cap time took longer than video and tracking
+       numIntercepts=(length(contactStart)/TrackEndT(tr))
+       if numIntercepts==0
+           numIntercepts=1/TrackEndT(tr);
+       end
+       captureProb(tr)=1/numIntercepts;
        
-       captureProb(tr)=1/length(contactStart)    
-   %end
+   end
    
    if length(contactStart)>1
        interContact(tr) = mean(contactStart(2:end) - contactEnd(1:end-1));
@@ -288,6 +290,7 @@ for tr = 1:length(head);
             approach(starts(i):ends(i)+1)=0;
         end
     end   
+   
     
     starts = find(diff(approach)>0);ends = find(diff(approach)<0);
     %% calc number of approaches & frequency
@@ -298,6 +301,12 @@ for tr = 1:length(head);
         freqApproach(tr) = NaN;
     end
     
+    %% interapproach Interval
+     IAI(tr)=nanmean(diff(starts))/files(tr).fps;
+     
+     if isnan(IAI(tr));
+         IAI(tr)=starts(1)/files(tr).fps;
+     end
     
     %% calc approach succes
     clear endDist
@@ -374,15 +383,15 @@ for tr = 1:length(head);
     
   %if lighting(tr)==0 & (group(tr)==2 | group(tr)==5);
       figure
-        hold on; plot((1:length(deltaR))/60,deltaR,'g'); hold on; plot((1:length(rangeS))/60,rangeS,'k')
+        hold on; plot((1:length(deltaR))/30,deltaR,'g'); hold on; plot((1:length(rangeS))/30,rangeS,'k')
     
         hold on
-        plot(starts(outcome==0)/60,ones(1,sum(outcome==0))*40,'r*')
+        plot(starts(outcome==0)/30,ones(1,sum(outcome==0))*40,'r*')
         hold on
-        plot(starts(outcome==1)/60,ones(1,sum(outcome==1))*40,'g*')
-        plot((1:length(approachRange))/60,approachRange,'r');
-        xrange = max(60,length(approach)/60);
-        xlim([0 30]); ylim([-10 50])
+        plot(starts(outcome==1)/30,ones(1,sum(outcome==1))*40,'g*')
+        plot((1:length(approachRange))/30,approachRange,'r');
+        xrange = max(30,length(approach)/30);
+        xlim([0 xrange]); ylim([-10 60])
         title(sprintf('trial %d group %d light %d n %d freq %0.2f success %0.2f',tr,group(tr),lighting(tr),nApproach(tr),freqApproach(tr),approachSuccess(tr)));
   %end 
         
@@ -415,6 +424,14 @@ for cond = 1:4
     Msp{cond}=vertcat(mSpeedS{trials});
     
 %%
+CapTime{cond}=TrackEndT(trials);
+medianCapTime(cond)=nanmedian(TrackEndT(trials)');
+errCT(cond)=semedian(TrackEndT(trials)');
+
+IntAppI{cond}=IAI(trials);
+medianIAI(cond)=nanmedian(IAI(trials)');
+errIAI(cond)=semedian(IAI(trials)');
+
 data_appFreq{cond}=freqApproach(trials);
 dataMu(cond,1) = nanmedian(freqApproach(trials)');
 err(cond,1) = semedian(freqApproach(trials)');
@@ -587,56 +604,34 @@ figure; hold on
 %% outcome bar graphs figure generation
 
 %% capture times
+
 figure
-bar(timeToCapMu(1,1:4)); hold on; errorbar(1:4,timeToCapMu(1,1:4),errTime(1,1:4),'o')
-ylabel('time to capture')
-set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','deaf','dark + deaf'});
+bar(medianCapTime(1:4)); hold on; errorbar(1:4,medianCapTime(1:4),errCT(1:4),'o')
+ylabel('CaptureTime')
+set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'NTSR1_C','GRP_C','PV_C','control'});
+
+
+%% Interapproach Interval
+figure
+bar(medianIAI(1:4)); hold on; errorbar(1:4,medianIAI(1:4),errIAI(1:4),'o')
+ylabel('Interapproach interval')
+set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'NTSR1_C','GRP_C','PV_C','control'});
 
 hold on
 for ii=1:4
-    tmp=timeToCap{ii}; %temporarily store data in variable "tmp"
+    tmp=IntAppI{ii}; %temporarily store data in variable "tmp"
     x = repmat(ii,1,length(tmp)); %the x axis location
     x = (x+(rand(size(x))-0.6)*0.1-.1); %add a little random "jitter" to aid visibility
 
     plot(x,tmp,'ok')
 end
+
 hold off
-
-TC_light=horzcat(timeToCap{1}',repmat(1,length(timeToCap{1}),1));
-TC_dark=horzcat(timeToCap{2}',repmat(2,length(timeToCap{2}),1));
-TC_EPL=horzcat(timeToCap{3}',repmat(3,length(timeToCap{3}),1));
-TC_EPD=horzcat(timeToCap{4}',repmat(4,length(timeToCap{4}),1));
-TC_ESL=horzcat(timeToCap{5}',repmat(5,length(timeToCap{5}),1));
-%TC_ESD=horzcat(timeToCap{6}',repmat(6,length(timeToCap{6}),1));
-
-TimeToCapDat=vertcat(TC_light,TC_dark,TC_EPL,TC_EPD,TC_ESL,TC_ESD);
-
-[p,tbl,stats] = kruskalwallis(TimeToCapDat(:,1),TimeToCapDat(:,2))
-c=multcompare(stats);
-
-%% Capture times blind controls
-
-% figure
-% bar(timeToCapMu(1,[1 2 5 6])); hold on; errorbar(1:4,timeToCapMu(1,[1 2 5 6]),errTime(1,[1 2 5 6]),'o')
-% ylabel('time_toCap_blindcontrols')
-% set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','ES light','ES dark'});
-% 
-% hold on
-% trial=[1 2 5 6];
-% for ii=1:4
-%     tmp=timeToCap{trial(ii)}; %temporarily store data in variable "tmp"
-%     x = repmat(ii,1,length(tmp)); %the x axis location
-%     x = (x+(rand(size(x))-0.5)*0.1-.1); %add a little random "jitter" to aid visibility
-% 
-%     plot(x,tmp,'ok')
-% end
-% hold off
-
 
 %%  approach Frequency plots
 figure
 bar(dataMu(1:4,1)); hold on; errorbar(1:4,dataMu(1:4,1),err(1:4,1),'o')
-ylabel('approach success')
+ylabel('approach Frequency')
 set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'NTSR1_C','GRP_C','PV_C','control'});
 
 hold on
@@ -649,25 +644,25 @@ for ii=1:4
 end
 hold off
 
-AF_light=horzcat(data_appFreq{1}',repmat(1,length(data_appFreq{1}),1));
-AF_dark=horzcat(data_appFreq{2}',repmat(2,length(data_appFreq{2}),1));
-AF_EPL=horzcat(data_appFreq{3}',repmat(3,length(data_appFreq{3}),1));
-AF_EPD=horzcat(data_appFreq{4}',repmat(4,length(data_appFreq{4}),1));
-AF_ESL=horzcat(data_appFreq{5}',repmat(5,length(data_appFreq{5}),1));
-%AF_ESD=horzcat(data_appFreq{6}',repmat(6,length(data_appFreq{6}),1));
-
-AppFreq=vertcat(AF_light,AF_dark,AF_EPL,AF_EPD,AF_ESL,AF_ESD);
-
-[p,tbl,stats] = kruskalwallis(AppFreq(:,1),AppFreq(:,2))
-c=multcompare(stats);
+% AF_light=horzcat(data_appFreq{1}',repmat(1,length(data_appFreq{1}),1));
+% AF_dark=horzcat(data_appFreq{2}',repmat(2,length(data_appFreq{2}),1));
+% AF_EPL=horzcat(data_appFreq{3}',repmat(3,length(data_appFreq{3}),1));
+% AF_EPD=horzcat(data_appFreq{4}',repmat(4,length(data_appFreq{4}),1));
+% AF_ESL=horzcat(data_appFreq{5}',repmat(5,length(data_appFreq{5}),1));
+% %AF_ESD=horzcat(data_appFreq{6}',repmat(6,length(data_appFreq{6}),1));
+% 
+% AppFreq=vertcat(AF_light,AF_dark,AF_EPL,AF_EPD,AF_ESL,AF_ESD);
+% 
+% [p,tbl,stats] = kruskalwallis(AppFreq(:,1),AppFreq(:,2))
+% c=multcompare(stats);
 
 
 
 %% prey interception rates
 figure
 bar(dataMu(1:4,2)); hold on; errorbar(1:4,dataMu(1:4,2),err(1:4,2),'o')
-ylabel('prey intercept')
-set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','deaf','dark + deaf'});
+ylabel('prey intercept Success')
+set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'NTSR1','GRP','PV','ctl'});
 title('figure 3D bottom')
 
  hold on
@@ -680,20 +675,20 @@ for ii=1:4
 end
 hold off
 
-PI_light=horzcat(data_Int{1}',repmat(1,length(data_Int{1}),1));
-PI_dark=horzcat(data_Int{2}',repmat(2,length(data_Int{2}),1));
-PI_EPL=horzcat(data_Int{3}',repmat(3,length(data_Int{3}),1));
-PI_EPD=horzcat(data_Int{4}',repmat(4,length(data_Int{4}),1));
-preyInt=vertcat(PI_light,PI_dark,PI_EPL,PI_EPD);
-
-[p,tbl,stats] = kruskalwallis(preyInt(:,1),preyInt(:,2))
-c=multcompare(stats);
+% PI_light=horzcat(data_Int{1}',repmat(1,length(data_Int{1}),1));
+% PI_dark=horzcat(data_Int{2}',repmat(2,length(data_Int{2}),1));
+% PI_EPL=horzcat(data_Int{3}',repmat(3,length(data_Int{3}),1));
+% PI_EPD=horzcat(data_Int{4}',repmat(4,length(data_Int{4}),1));
+% preyInt=vertcat(PI_light,PI_dark,PI_EPL,PI_EPD);
+% 
+% [p,tbl,stats] = kruskalwallis(preyInt(:,1),preyInt(:,2))
+% c=multcompare(stats);
 
 %% capture Probability   
 figure
 bar(ContactDataMu(1:4,2)); hold on; errorbar(1:4,ContactDataMu(1:4,2),Contacterr(1:4,2),'o')
 ylabel('Cap Probability')
-set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','deaf','dark + deaf'});
+set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'NTSR1','GRP','PV','ctl'});
 hold on
 for ii=1:4
     
@@ -704,45 +699,45 @@ for ii=1:4
     plot(x,tmp,'ok')
 end
 hold off
-CP_light=horzcat(data_CapProb{1}',repmat(1,length(data_CapProb{1}),1));
-CP_dark=horzcat(data_CapProb{2}',repmat(2,length(data_CapProb{2}),1));
-CP_EPL=horzcat(data_CapProb{3}',repmat(3,length(data_CapProb{3}),1));
-CP_EPD=horzcat(data_CapProb{4}',repmat(4,length(data_CapProb{4}),1));
-CapP=vertcat(CP_light,CP_dark,CP_EPL,CP_EPD);
-
-[p,tbl,stats] = kruskalwallis(CapP(:,1),CapP(:,2))
-c=multcompare(stats);
+% CP_light=horzcat(data_CapProb{1}',repmat(1,length(data_CapProb{1}),1));
+% CP_dark=horzcat(data_CapProb{2}',repmat(2,length(data_CapProb{2}),1));
+% CP_EPL=horzcat(data_CapProb{3}',repmat(3,length(data_CapProb{3}),1));
+% CP_EPD=horzcat(data_CapProb{4}',repmat(4,length(data_CapProb{4}),1));
+% CapP=vertcat(CP_light,CP_dark,CP_EPL,CP_EPD);
+% 
+% [p,tbl,stats] = kruskalwallis(CapP(:,1),CapP(:,2))
+% c=multcompare(stats);
 
 %% contact duration
   
-figure
-bar(ContactDataMu(1:4,1)); hold on; errorbar(1:4,ContactDataMu(1:4,1),Contacterr(1:4,1),'o')
-ylabel('Contact Duration')
-set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','deaf','dark + deaf'});
-hold on
-for ii=1:4
-    
-    tmp=(data_ContDur{ii}+(rand(size(data_ContDur{ii}))+0.1)*0.05)
-    x = repmat(ii,1,length(tmp)); %the x axis location
-    x = (x+(rand(size(x))-0.5)*0.1-.1); %add a little random "jitter" to aid visibility
-
-    plot(x,tmp,'ok')
-end
-hold off
-CP_light=horzcat(data_ContDur{1}',repmat(1,length(data_ContDur{1}),1));
-CP_dark=horzcat(data_ContDur{2}',repmat(2,length(data_ContDur{2}),1));
-CP_EPL=horzcat(data_ContDur{3}',repmat(3,length(data_ContDur{3}),1));
-CP_EPD=horzcat(data_ContDur{4}',repmat(4,length(data_ContDur{4}),1));
-ContD=vertcat(CP_light,CP_dark,CP_EPL,CP_EPD);
-
-[p,tbl,stats] = kruskalwallis(ContD(:,1),ContD(:,2))
-c=multcompare(stats);
+% figure
+% bar(ContactDataMu(1:4,1)); hold on; errorbar(1:4,ContactDataMu(1:4,1),Contacterr(1:4,1),'o')
+% ylabel('Contact Duration')
+% set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','deaf','dark + deaf'});
+% hold on
+% for ii=1:4
+%     
+%     tmp=(data_ContDur{ii}+(rand(size(data_ContDur{ii}))+0.1)*0.05)
+%     x = repmat(ii,1,length(tmp)); %the x axis location
+%     x = (x+(rand(size(x))-0.5)*0.1-.1); %add a little random "jitter" to aid visibility
+% 
+%     plot(x,tmp,'ok')
+% end
+% hold off
+% CP_light=horzcat(data_ContDur{1}',repmat(1,length(data_ContDur{1}),1));
+% CP_dark=horzcat(data_ContDur{2}',repmat(2,length(data_ContDur{2}),1));
+% CP_EPL=horzcat(data_ContDur{3}',repmat(3,length(data_ContDur{3}),1));
+% CP_EPD=horzcat(data_ContDur{4}',repmat(4,length(data_ContDur{4}),1));
+% ContD=vertcat(CP_light,CP_dark,CP_EPL,CP_EPD);
+% 
+% [p,tbl,stats] = kruskalwallis(ContD(:,1),ContD(:,2))
+% c=multcompare(stats);
 
 %% Pre Contact approach error
 figure
 bar(preContT_mu(1:4,1)); hold on; errorbar(1:4,preContT_mu(1:4,1),preContErr(1:4,1),'o')
 ylabel('Pre Contact prey azimuth')
-set(gca,'Xtick',1:5); set(gca,'XtickLabel',{'preCtl','DyeInj','MuscInj','+DRD+CNO','-DRD+CNO'});
+set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'NTSR1','GRP','PV','ctl'});
 
 hold on
 for ii=1:4
@@ -754,84 +749,58 @@ for ii=1:4
 end
 hold off
 
-PA_light=horzcat(preContT{1}',repmat(1,length(preContT{1}),1));
-PA_dark=horzcat(preContT{2}',repmat(2,length(preContT{2}),1));
-PA_EPL=horzcat(preContT{3}',repmat(3,length(preContT{3}),1));
-PA_EPD=horzcat(preContT{4}',repmat(4,length(preContT{4}),1));
-PA_ESL=horzcat(preContT{5}',repmat(5,length(preContT{5}),1));
-PA_ESD=horzcat(preContT{6}',repmat(6,length(preContT{6}),1));
+% PA_light=horzcat(preContT{1}',repmat(1,length(preContT{1}),1));
+% PA_dark=horzcat(preContT{2}',repmat(2,length(preContT{2}),1));
+% PA_EPL=horzcat(preContT{3}',repmat(3,length(preContT{3}),1));
+% PA_EPD=horzcat(preContT{4}',repmat(4,length(preContT{4}),1));
+% PA_ESL=horzcat(preContT{5}',repmat(5,length(preContT{5}),1));
+% PA_ESD=horzcat(preContT{6}',repmat(6,length(preContT{6}),1));
+% 
+% PAmain=vertcat(PA_light,PA_dark,PA_EPL,PA_EPD, PA_ESL,PA_ESD);
+% 
+% [P,T,STATS,TERMS]=anovan(PAmain(:,1),PAmain(:,2)) ;%test whether there are differences by factor/groups
+%  results=multcompare(STATS)
 
-PAmain=vertcat(PA_light,PA_dark,PA_EPL,PA_EPD, PA_ESL,PA_ESD);
 
-[P,T,STATS,TERMS]=anovan(PAmain(:,1),PAmain(:,2)) ;%test whether there are differences by factor/groups
- results=multcompare(STATS)
-
-
-
-%% Pre approach error blind
-figure
-bar(preContT_mu([1 2 5 6],1)); hold on; errorbar(1:4,preContT_mu([1 2 5 6],1),preContErr([1 2 5 6],1),'o')
-ylabel('Pre Contact prey azimuth eye suture controls')
-set(gca,'Xtick',1:4); set(gca,'XtickLabel',{'light','dark','sutured','dark + sutured'});
-
-hold on
-trial=[1 2 5 6];
-for ii=1:4
-    tmp=(preContT{trial(ii)}+(rand(size(preContT{trial(ii)}))+0.2)*0.05); %temporarily store data in variable "tmp"
-    x = repmat(ii,1,length(tmp)); %the x axis location
-    x = (x+(rand(size(x))-0.5)*0.1-.1); %add a little random "jitter" to aid visibility
-
-    plot(x,tmp,'ok')
-end
-hold off
 
 %% hist theta, range and speed
 
 figure
-plot(thetabins,nanmedian(PreyE_mid{2},2),'b','LineWidth',3); hold on
-plot(thetabins,nanmedian(PreyE_mid{3},2),'k','LineWidth',3);
+plot(thetabins,nanmedian(PreyE_mid{1},2),'b','LineWidth',3); hold on
+plot(thetabins,nanmedian(PreyE_mid{4},2),'k','LineWidth',3);
 figure
-plot(thetabins,nanmedian(PreyE_mid{4},2),'b','LineWidth',3);hold on
-plot(thetabins,nanmedian(PreyE_mid{5},2),'k','LineWidth',3);
+plot(thetabins,nanmedian(PreyE_mid{2},2),'g','LineWidth',3);hold on
+plot(thetabins,nanmedian(PreyE_mid{4},2),'k','LineWidth',3);
+
+figure
+plot(thetabins,nanmedian(PreyE_mid{3},2),'r','LineWidth',3);hold on
+plot(thetabins,nanmedian(PreyE_mid{4},2),'k','LineWidth',3);
 
 title 'Prey eccentricity all conditions >5cm mouse moving'
 
 figure
-plot(thetabins,nanmedian(PreyE_mid{1},2),'b','LineWidth',3); hold on%eye suture light
-plot(thetabins,nanmedian(PreyE_mid{2},2),'k','LineWidth',3);%eye suture light
-plot(thetabins,nanmedian(PreyE_mid{5},2),'c','LineWidth',3); %eye suture light
-plot(thetabins,nanmedian(PreyE_mid{6},2),'m','LineWidth',3); %eye suture
+plot(thetabins,nanmedian(PreyE_mid{1},2),'b','LineWidth',3); hold on
+plot(thetabins,nanmedian(PreyE_mid{2},2),'g','LineWidth',3);
+plot(thetabins,nanmedian(PreyE_mid{3},2),'r','LineWidth',3);
+plot(thetabins,nanmedian(PreyE_mid{4},2),'k','LineWidth',3); 
 
 
 % PLOT ALL CONDITIONS range over trial
 figure
-plot(nanmedian(Rsession{2},2),'k','LineWidth',3);hold on
-plot(nanmedian(Rsession{3},2),'b','LineWidth',3);hold on
-figure
-plot(nanmedian(Rsession{4},2),'b','LineWidth',3);hold on
-plot(nanmedian(Rsession{5},2),'k','LineWidth',3);
+plot(nanmedian(Rsession{1},2),'b','LineWidth',3);hold on
+plot(nanmedian(Rsession{2},2),'g','LineWidth',3);hold on
+plot(nanmedian(Rsession{3},2),'r','LineWidth',3);hold on
+plot(nanmedian(Rsession{4},2),'k','LineWidth',3);
+ylabel('RangeOverall')
 
 % speed plots
 figure
-plot(nanmedian(Spsession{2},2),'k','LineWidth',3);hold on
-plot(nanmedian(Spsession{3},2),'b','LineWidth',3);hold on
-plot(nanmedian(Spsession{4},2),'g','LineWidth',3);hold on
-plot(nanmedian(Spsession{5},2),'r','LineWidth',3);
-title 
-ylabel('Contact Duration')
+plot(nanmedian(Spsession{1},2),'b','LineWidth',3);hold on
+plot(nanmedian(Spsession{2},2),'g','LineWidth',3);hold on
+plot(nanmedian(Spsession{3},2),'r','LineWidth',3);hold on
+plot(nanmedian(Spsession{4},2),'k','LineWidth',3);
 
-for i=1:5
-moving=Msp{i}>2;
-ag(i)=nanmean(Msp{i}(moving));
-end
+ylabel('speed')
 
-for i=1:5
-moving=Msp{i}>2;
-spMed(i)=nanstd(Msp{i}(moving))/sqrt(20);
-end
-
-figure
-bar(ag(1:5)); hold on; errorbar(1:5,ag(1:5),spMed(1:5),'o')
-ylabel('Avg Speed per  session')
 
 

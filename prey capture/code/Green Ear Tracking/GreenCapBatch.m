@@ -2,7 +2,9 @@ ON=1; OFF=0;
 %pathname = 'X:\Preycapture\';%miyazaki path to prey capture folder stored on Eyre 
 %pathname = '/Users/jennifer/Dropbox/mucsimol_V1/Trial videos for Tristans tracking/Iphone5/'
 %pathname = '/Users/jennifer/Desktop/green ear videos'
-pathname='F:\GreenEarTracking\iPhone\Good_video_tracks\Tracks\'
+%pathname='F:\GreenEarTracking\iPhone\Good_video_tracks\Tracks\';%on Jen-W10
+pathname='Y:\GreenEarTracking\iPhone\Good_video_tracks\Tracks\';%on Niell-V2
+
 n=0;
 
 
@@ -31,6 +33,18 @@ files(n).scale=21;%pixels/cm on video tracking
 files(n).group=1;
 files(n).Moviefile='';
 % 
+n=n+1;
+files(n).subj = '7587';%video ALGS010....
+files(n).sex = 'F';
+files(n).type=1;
+files(n).lighting = ON;
+files(n).Tfiles = 'Ntsr1_cre_CNO\Tracks_NXGU.mat';
+files(n).contrast = 100;
+files(n).notes = '';
+files(n).fps=30;
+files(n).scale=21;%pixels/cm on video tracking
+files(n).group=1;
+files(n).Moviefile='';
 % n=n+1;
 % files(n).subj = '7543';%video BMQM....
 % files(n).sex = 'F';
@@ -58,6 +72,19 @@ files(n).group=1;
 files(n).Moviefile='';
 
 n=n+1;
+files(n).subj = 'NCH-1.6_LT';
+files(n).sex = 'F';
+files(n).type=1;
+files(n).lighting = ON;
+files(n).Tfiles = 'Ntsr1_cre_CNO\Tracks_GBJV.mat';
+files(n).contrast = 100;
+files(n).notes = '';
+files(n).fps=30;
+files(n).scale=21;%pixels/cm on video tracking
+files(n).group=1;
+files(n).Moviefile='';
+
+n=n+1;
 files(n).subj = 'GRP_1.2_LT';
 files(n).sex = 'F';
 files(n).type=1;
@@ -71,7 +98,7 @@ files(n).group=2;
 files(n).Moviefile='';
 
 n=n+1;
-files(n).subj = 'GRP_1.2_RT';
+files(n).subj = 'GRP_1.2_LT';
 files(n).sex = 'F';
 files(n).type=1;
 files(n).lighting = ON;
@@ -82,6 +109,33 @@ files(n).fps=30;
 files(n).scale=21;%pixels/cm on video tracking
 files(n).group=2;
 files(n).Moviefile='';
+
+n=n+1;
+files(n).subj = 'GAi-RT';
+files(n).sex = 'F';
+files(n).type=1;
+files(n).lighting = ON;
+files(n).Tfiles = 'GRP_cre_CNO\Tracks_HSTI.mat';
+files(n).contrast = 100;
+files(n).notes = '';
+files(n).fps=30;
+files(n).scale=21;%pixels/cm on video tracking
+files(n).group=2;
+files(n).Moviefile='';
+
+n=n+1;
+files(n).subj = 'GAi-RT';
+files(n).sex = 'F';
+files(n).type=1;
+files(n).lighting = ON;
+files(n).Tfiles = 'GRP_cre_CNO\Tracks_TLNS.mat';
+files(n).contrast = 100;
+files(n).notes = '';
+files(n).fps=30;
+files(n).scale=21;%pixels/cm on video tracking
+files(n).group=2;
+files(n).Moviefile='';
+
 
 n=n+1;
 files(n).subj = 'PV_1.2_TT';%CEXS.
@@ -97,7 +151,7 @@ files(n).group=3;
 files(n).Moviefile='';
 
 n=n+1;
-files(n).subj = 'PV_1.3_LT';
+files(n).subj = 'PV_1.3_RT';%
 files(n).sex = 'F';
 files(n).type=1;
 files(n).lighting = ON;
@@ -108,6 +162,7 @@ files(n).fps=30;
 files(n).scale=21;%pixels/cm on video tracking
 files(n).group=3;
 files(n).Moviefile='';
+
 
 n=n+1;
 files(n).subj = 'PV_1.3_LT';
@@ -123,7 +178,7 @@ files(n).group=3;
 files(n).Moviefile='';
 
 n=n+1;
-files(n).subj = 'PV_1.2_TT';
+files(n).subj = 'PV_1.3_LT';
 files(n).sex = 'F';
 files(n).type=1;
 files(n).lighting = ON;
@@ -154,6 +209,32 @@ files(n).sex = 'F';
 files(n).type=1;
 files(n).lighting = ON;
 files(n).Tfiles = 'Control\Tracks_XKVV.mat';
+files(n).contrast = 100;
+files(n).notes = '';
+files(n).fps=30;
+files(n).scale=21;%pixels/cm on video tracking
+files(n).group=4;
+files(n).Moviefile='';
+
+n=n+1;
+files(n).subj = 'GRP-RT_noExp';
+files(n).sex = 'F';
+files(n).type=1;
+files(n).lighting = ON;
+files(n).Tfiles = 'Control\Tracks_ENUW.mat';
+files(n).contrast = 100;
+files(n).notes = '';
+files(n).fps=30;
+files(n).scale=21;%pixels/cm on video tracking
+files(n).group=4;
+files(n).Moviefile='';
+
+n=n+1;
+files(n).subj = 'GRP-RT_noExp';
+files(n).sex = 'F';
+files(n).type=1;
+files(n).lighting = ON;
+files(n).Tfiles = 'Control\Tracks_EURG.mat';
 files(n).contrast = 100;
 files(n).notes = '';
 files(n).fps=30;
