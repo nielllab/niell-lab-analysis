@@ -311,9 +311,9 @@ end
 % end
 % 
 % %timeponts
-% figure
-% imagesc(corrcoef(allR)); axis square; xlabel('secs'); ylabel('secs'); colorbar; title('correlation')
-% colormap jet;
+figure
+imagesc(corrcoef(allR)); axis square; xlabel('secs'); ylabel('secs'); colorbar; title('correlation')
+colormap jet;
 % 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');

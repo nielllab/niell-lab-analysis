@@ -13,7 +13,8 @@ for w = 1:length(wn)
 % clust_no = cells(w,2);
 
 STA = wn(w).sta;
-
+if ~isempty(STA)
+    
 %%%Dtermine time point with maximial response
 [m ind] = max(abs(STA(:)-127));
 [x y t_lag] = ind2sub(size(STA),ind);
@@ -64,7 +65,7 @@ xguess=-4*dx:dx:4*dx;
 yguess=xguess;
 xsig_guess =dsig:dsig:dsig*5;
 ysig_guess=xsig_guess;
-Aguess= [amp*0.5:dA:amp*1.5];
+Aguess= [amp*0.5:dA:amp*1.5]; %amp =0?
 Aguess = [Aguess -Aguess]
 %Bguess =( -dB:dB:dB) +base;
 Bguess=0;
@@ -162,6 +163,6 @@ title(sprintf('Gabor fit'));
  end
 end
 
-            
+end
 
 close all

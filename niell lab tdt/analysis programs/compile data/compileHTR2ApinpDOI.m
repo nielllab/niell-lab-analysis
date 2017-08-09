@@ -38,7 +38,7 @@ for i = 1:length(use)
     
  
         if ~isempty(files(use(i)).prepinpFile)
-            pinp =getPinpHTR2A(clustfile,afile, files(use(i)).prepinpFile,3,5,0,0,1)
+            pinp =getPinpHTR2A(clustfile,afile, files(use(i)).prepinpFile,3,5,0,0,0)
             pinpAll(cellrange,1) = pinp.pinped;
     %         pinpPsth(cellrange,:,1)=pinp.psth;
         else
@@ -47,7 +47,7 @@ for i = 1:length(use)
         end
     
         if ~isempty(files(use(i)).postpinpFile)
-            pinp =getPinpHTR2A(clustfile,afile, files(use(i)).postpinpFile,3,5,0,0,1)
+            pinp =getPinpHTR2A(clustfile,afile, files(use(i)).postpinpFile,3,5,0,0,0)
             pinpAll(cellrange,2) = pinp.pinped;
              pinpPsth(cellrange,:,2)=pinp.psth;
         else
@@ -117,9 +117,10 @@ end
       %  try
      hasDrift(cellrange)=1;
         for prepost = 1:2
-            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
             drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
             drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
+            drift_tuning_err(cellrange,:,:,:,prepost) = drift.tuning_err
             drift_spont(cellrange,:,prepost) = drift.interSpont;
             drift_fl_spont(cellrange,:,prepost) = drift.spont;
             drift_osi(cellrange,:,prepost) = drift.cv_osi;
@@ -142,6 +143,7 @@ end
                     drift_tcourse(cellrange,cond,mv,prepost,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
                     sf = mod(cond-1,6)+1; ori = ceil(cond/6);
                     drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
+%                     drift_tuning_err(cellrange,ori,sf,mv,prepost) = drift.tuning_err
                 end
             end
 %             
@@ -1812,42 +1814,42 @@ for i= 1:4
 %             used =goodAll & useResp' & (hasDrift==1) & (pinpAll(:,1)==1)';
 
             mn = squeeze(mean(mnPsth(data & (hasDrift==1) & (layerAll==5) & ((pinpAll(:,1)==1)'),:,:),1))';
-%             sem = std(mnPsth(data & (hasDrift==1) & (layerAll==5) & treatment==t,:,:),1)...
-%                 /sqrt(sum(data & (hasDrift==1) & (layerAll==5) & treatment==t));
-%             sem=squeeze(sem);sem=sem';
+            sem = std(mnPsth(data & (hasDrift==1) & (layerAll==5) & (pinpAll(:,1)==1)',:,:),1)...
+                /sqrt(sum(data & (hasDrift==1) & (layerAll==5) & (pinpAll(:,1)==1)'));
+            sem=squeeze(sem);sem=sem';
             ncells = sum(data & (hasDrift==1) & (layerAll==5) & (pinpAll(:,1)==1)');xlim([0 2.5]);
             %    ylim([-1 1]); xlim([0 2.5]);
         elseif i==2
             set(gcf,'Name','grating lyr 2/3');
-            mn = squeeze(mean(mnPsth(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,:,:),1))';
-            sem = std(mnPsth(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t,:,:),1)...
-                /sqrt(sum(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & treatment==t));
+            mn = squeeze(mean(mnPsth(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & (pinpAll(:,1)==1)',:,:),1))';
+            sem = std(mnPsth(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & (pinpAll(:,1)==1)',:,:),1)...
+                /sqrt(sum(data & (hasDrift==1) & (layerAll==2 |layerAll==3) & (pinpAll(:,1)==1)'));
             sem=squeeze(sem);sem=sem';
-            ncells = sum(data & (hasDrift==1) & (layerAll==2| layerAll==3) & treatment==t);xlim([0 2.5]);
+            ncells = sum(data & (hasDrift==1) & (layerAll==2| layerAll==3) & (pinpAll(:,1)==1)');xlim([0 2.5]);
             %  ylim([-.5 5]);xlim([0 2.5]);
         elseif i ==3
             set(gcf,'Name','grating lyr 4');
-            mn = squeeze(mean(mnPsth(data &(hasDrift==1) & layerAll==4 & treatment==t,:,:),1))';
-            sem = std(mnPsth(data &(hasDrift==1) & layerAll==4 & treatment==t,:,:),1)...
-                /sqrt(sum(data &(hasDrift==1) & layerAll==4 & treatment==t));
+            mn = squeeze(mean(mnPsth(data &(hasDrift==1) & layerAll==4 & (pinpAll(:,1)==1)',:,:),1))';
+            sem = std(mnPsth(data &(hasDrift==1) & layerAll==4 & (pinpAll(:,1)==1)',:,:),1)...
+                /sqrt(sum(data &(hasDrift==1) & layerAll==4 & (pinpAll(:,1)==1)'));
             sem=squeeze(sem);sem=sem';
-            ncells = sum(data & (hasDrift==1) & (layerAll==4) & treatment==t);xlim([0 2.5]);
+            ncells = sum(data & (hasDrift==1) & (layerAll==4) & (pinpAll(:,1)==1)');xlim([0 2.5]);
             %  ylim([-.5 4]);xlim([0 2.5]);
         elseif i==4
             set(gcf,'Name','grating inh');
-            mn = squeeze(mean(mnPsth(dataInh & (hasDrift==1) & treatment==t,:,:),1))';
-            sem = std(mnPsth(dataInh &(hasDrift==1) & treatment==t,:,:),1)...
-                /sqrt(sum(dataInh &(hasDrift==1) & treatment==t));
-            sem=squeeze(sem);sem=sem';
-            ncells = sum(dataInh & (hasDrift==1) & treatment==t);xlim([0 2.5]);
-            %  ylim([-.5 12]);xlim([0 2.5]);
+            mn = squeeze(mean(mnPsth(dataInh & (hasDrift==1) & (pinpAll(:,1)==1)',:,:),1))';
+%             sem = std(mnPsth(dataInh &(hasDrift==1) & (pinpAll(:,1)==1)',:,:),1)...
+%                 /sqrt(sum(dataInh &(hasDrift==1) & (pinpAll(:,1)==1)'));
+%             sem=squeeze(sem);sem=sem';
+            ncells = sum(dataInh & (hasDrift==1) & (pinpAll(:,1)==1)');xlim([0 2.5]);
+            %  ylim([-.5 12]);xlim([0 2.5]);       
         elseif i==5
             set(gcf,'Name','grating lyr6');
-            mn = squeeze(mean(mnPsth(data & layerAll==6 & (hasDrift==1) & treatment==t,:,:),1))';
-            sem = std(mnPsth(data & layerAll==6 & (hasDrift==1) & treatment==t,:,:),1)...
-                /sqrt(sum(data & layerAll==6 & (hasDrift==1) & treatment==t));
+            mn = squeeze(mean(mnPsth(data & layerAll==6 & (hasDrift==1) & (pinpAll(:,1)==1)',:,:),1))';
+            sem = std(mnPsth(data & layerAll==6 & (hasDrift==1) & (pinpAll(:,1)==1)',:,:),1)...
+                /sqrt(sum(data & layerAll==6 & (hasDrift==1) & (pinpAll(:,1)==1)'));
             sem=squeeze(sem);sem=sem';
-            ncells = sum(data & (hasDrift==1) & (layerAll==6) & treatment==t);xlim([0 2.5]);
+            ncells = sum(data & (hasDrift==1) & (layerAll==6) & (pinpAll(:,1)==1)');xlim([0 2.5]);
           %  ylim([-.5 12]);xlim([0 2.5]);
         end
     %   mn = mn - repmat(mn(1,:),[50 1]); %%% subtracts prestim spont
@@ -2139,29 +2141,49 @@ else set(gcf,'Name','5HT'), end
 end
 
 %%% plot orientation tuning curves for all units
+orientErr = squeeze(nanmean(drift_tuning_err,3));
+
 for t = 2
-    figure
+   % figure
     if t==1, set(gcf,'Name','saline OT'),
     else t==2, set(gcf,'Name','doi OT'),end
     useN=find(goodAll & useResp' &(hasDrift==1) & (pinpAll(:,1)==1)');
-     angles = 30:60:330
+     histrange =0:30:330
     %useN = find(goodAll & treatment==t)
-    for i = 1:length(useN)
-%         subplot(1,2,i)
+    for i = 1:length(useN)       
+        figure
+%         subplot(1,3,i)
         hold on
-        plot(drift_orient(useN(i),:,1,1),'LineWidth',2);set(gca,'xticklabels',({angles}),'FontSize',20); xlabel('angle');% 'Color',[0.5 0 0]); % plot(drift_orient(useN(i),:,2,1),'Color',[0 0.5 0]); %pre sal & DOI stationary and mv dark =pre
-        plot(drift_orient(useN(i),:,1,2),'LineWidth',2)%,'Color',[1 0 0]);  %plot(drift_orient(useN(i),:,2,2),'Color',[0 1 0]); %pre sal & DOI stat and mv
-        %         plot([1 12], [1 1]*drift_spont(useN(i),1,1),':','Color',[0.5 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,1),':','Color',[0 0.5 0]);
-        %         plot([1 12], [1 1]*drift_spont(useN(i),1,2),':','Color',[1 0 0]);  plot([1 12], [1 1]*drift_spont(useN(i),2,2),':','Color',[0 1 0]);
+        y1=drift_orient(useN(i),:,1,1)
+        plot(y1,'LineWidth',2);set(gca,'xticklabels',({histrange}),'FontSize',20);
+        xlabel('angle');% 'Color',[0.5 0 0]); % plot(drift_orient(useN(i),:,2,1),'Color',[0 0.5 0]); %pre sal & DOI stationary and mv dark =pre
+        y2=drift_orient(useN(i),:,1,2)
+        plot(y2,'LineWidth',2)%,'Color',[1 0 0]);  %plot(drift_orient(useN(i),:,2,2),'Color',[0 1 0]); %pre sal & DOI stat and mv
+        preerr=shadedErrorBar(1:12,y1,orientErr(useN(i),:,1,1)','b',1); axis square; set(gca,'fontsize', 18);
+        preerr=shadedErrorBar(1:12,y2,orientErr(useN(i),:,1,2)','r',1); 
+% histrange =0:30:360
+% h=drift_orient(useN(i),:,1,1)
+% hfix= h;
+% hfix(end+1) = hfix(1)
+% subplot(1,2,1)
+% polar(histrange*pi/180,hfix,'b')
+% hold on
+% h=drift_orient(useN(i),:,1,2)
+% hfix= h;
+% hfix(end+1) = hfix(1)
+% polar(histrange*pi/180,hfix,'r')
+
         % yl = get(gca,'Ylim'); ylim([0 max(yl(2),10)]); xlim([0.5 12.5])
         axis square; xlim([1 12]);
-        if inhAll(useN(i)) ==1 , title('inh'); else  title('exc layer 5');
+        if inhAll(useN(i)) ==1 , title('inh'); else  title('exc');
         end
     end
  
     legend('pre','post');
     ylabel('spikes/sec')
 end
+
+
 histrange =0:30:360
 h=drift_orient(useN(i),:,1,1)
 figure

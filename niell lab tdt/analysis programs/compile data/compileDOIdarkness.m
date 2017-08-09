@@ -3,8 +3,7 @@ close all
 
 dbstop if error
 
-batchEphysTai
-%batchDOIephys_filtered; %%% load batch file
+batchDOIephys_filtered; %%% load batch file
 %set(groot,'defaultFigureVisible','off') %disable figure plotting
 %set(groot,'defaultFigureVisible','on')
 
@@ -122,6 +121,7 @@ for i = 1:length(use)
             drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
             drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
             drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
+            drift_tuning_err(cellrange,:,:,:,prepost) = drift.tuning_err;
             drift_spont(cellrange,:,prepost) = drift.interSpont;
             drift_osi(cellrange,:,prepost) = drift.cv_osi;
             drift_F1F0(:,cellrange,prepost)= drift.F1F0;
