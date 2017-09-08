@@ -21,7 +21,7 @@ if SU
         sprintf('%d : %s ',i,Block_Name{i})
     end
     block = input('which block to analyze ? ');
-    Block_Name = Block_Name{block}
+    Block_Name = Block_Name{block};
     [afname, apname] = uigetfile('*.mat','analysis data');
     noisepname = apname;
     afile = fullfile(apname,afname);
@@ -165,7 +165,7 @@ else SU && Pimp_session==4;
     psth_NBQX_power2=psth;
 end
    
-
+% 
 % if SU && Pimp_session==0;
 %     save(fullfile(apname,afname),'psth','histbins','-append');
 % elseif SU && Pimp_session==1; 

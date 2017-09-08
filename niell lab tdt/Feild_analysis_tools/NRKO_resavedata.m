@@ -1,11 +1,11 @@
 % this just shows you how I resave it per session, have to change the directories.
 %cd D:\Jen_analysis\analysis_martin\data_1_25_16
 cd F:\New_extraction
-outputDir = 'F:/New_extraction/wn';%
+outputDir = 'F:/New_extraction/unitdata_waveform_8_11_17';%
 %outputDir = 'D:/Jen_analysis/analysis_martin/data_1_25_16/Hoy_bar_dataB';
 
 mkdir(outputDir);%
-load('JLH_NMDA_1_13_15_extract_wn')
+load('JLH_NMDA_8_11_17_extract_drift_waveform')
 
 for k = 1:size(exptdata,1)
   for j = 1:size(exptdata,2)
@@ -19,6 +19,6 @@ for k = 1:size(exptdata,1)
     
     % save the data
     filename = fullfile(outputDir, exptdata{k,j}.analysis_file);
-    save(filename, 'unitdataSession', 'data');
+    save(filename,'exptdata', 'unitdataSession', 'data');
   end
 end
