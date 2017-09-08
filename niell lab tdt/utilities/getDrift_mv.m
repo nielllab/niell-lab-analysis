@@ -113,11 +113,12 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
 %         end
 %     end
     
-        for i = 1:size(drift_mv(blocknum).orient_tune,1)
-        for mv = 1:2
-            [drift_mv(blocknum).cv_osi(i,mv) drift_mv(blocknum).pref_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
-        end
+for i = 1:size(drift_mv(blocknum).orient_tune,1)
+    for mv = 1:2
+        [drift_mv(blocknum).cv_osi(i,mv) drift_mv(blocknum).pref_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
+        [drift_mv(blocknum).dsi(i,mv) drift_mv(blocknum).dsi_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',1);
     end
+end
     
     %     for c = 1:length(spikes.sp);
     %         figure
