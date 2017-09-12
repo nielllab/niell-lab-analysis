@@ -9,21 +9,22 @@ analysisPath = 'D:\Jen_analysis\NR5A_Pinping\Jen_NR5A_analysis_files\analysis_fi
 for dataset =1:3
    
     if dataset==1
-    afile = {'1_13_15_analysis_pos_ctl.mat',...
-   '2_25_15_analysis_2.mat',... 
-   '3_11_15_analysis_2.mat',...
-   '4_9_15_analysis_2.mat',...
-   '4_10_15_analysis_2.mat',...
-   '4_13_15_analysis_2.mat',...
-   '4_30_15_analysis_2.mat',...
-   '5_4_15_analysis_2.mat',...
-   '5_11_15_analysis_2.mat',...
-   '6_25_15_analysis_2.mat',...
-   '6_29_15_analysis_2A.mat',...
-   '8_17_15_analysis_2.mat',...
-   '1_18_16_analysis_2.mat'}
+    afile = { '1_13_15_analysis_2.mat',...
+        '2_25_15_analysis_2.mat',... 
+   '3_11_15_analysis_2.mat',...%
+   '4_9_15_analysis_2.mat',...%
+   '4_10_15_analysis_2.mat',...%
+   '4_13_15_analysis_2.mat',...%
+   '4_30_15_analysis_2.mat',...%
+   '5_4_15_analysis_2.mat',...%
+   '5_11_15_analysis_2.mat',...%
+   '6_25_15_analysis_2.mat',...%
+   '6_29_15_analysis_2A.mat',...%
+   '8_17_15_analysis_2.mat',...%
+   '1_18_16_analysis_2.mat'}%
 
-% '2_25_15_analysis_2.mat',... 
+%'1_13_15_analysis_pos_ctl.mat',...
+%'2_25_15_analysis_2.mat',... 
 %     '3_11_15_analysis_2.mat',...
 %   '4_9_15_analysis_2.mat',...
 %     '4_10_15_analysis_2.mat',...
@@ -57,6 +58,9 @@ for dataset =1:3
     '8_19_15_rec2_analysis_2.mat',...
     '2_2_15_analysis_2.mat',...
     'analysis_12_16_15.mat'};
+%'6_18_15_analysis_2A.mat',...
+ %'8_11_15_rec2_analysis_2.mat',...
+  %'8_13_15_rec2_analysis_2A.mat',...
 %'2_24_15_analysis_2.mat',...bars corrupt?
 %'3_25_15_analysis_3_25_15.mat',...
 %  '3_26_15_analysis_2.mat',...
@@ -116,10 +120,11 @@ for fnum = 1:length(afile)
         afile(fnum)
         clusterFile;
         load(clusterFile);
-         
+        
+        
 %         for blocknum = 3:4
             Block_Name
-            B = strncmpi(Block_Name,'bar',3) ;
+            B = strncmpi(Block_Name,'pi',2) ;
             
                  if sum(B)>1 ;
             blocknum = listdlg('ListString',Block_Name,'SelectionMode','single');
@@ -143,14 +148,19 @@ for fnum = 1:length(afile)
 %                 return
             end
   
-            exptdata{fnum,dataset}.mouseT{1} = data.mouseT;
-            exptdata{fnum,dataset}.mouseV{1} = data.mouseV;
-            exptdata{fnum,dataset}.block{1} = Block_Name{blocknum};
-            exptdata{fnum,dataset}.tank = Tank_Name;
-            exptdata{fnum,dataset}.analysis_file = afile{fnum};
-            exptdata{fnum,dataset}.cluster_file = clusterFile;
-            exptdata{fnum,dataset}.stimEpocs{1}=data.stimEpocs;
-            exptdata{fnum,dataset}.frameEpocs{1} = data.frameEpocs;
+          exptdata{fnum,dataset}.mouseT{1} = data.mouseT;
+          exptdata{fnum,dataset}.mouseV{1} = data.mouseV;
+           exptdata{fnum,dataset}.block{1} = Block_Name{blocknum};
+           exptdata{fnum,dataset}.tank = Tank_Name;
+           exptdata{fnum,dataset}.analysis_file = afile{fnum};
+           exptdata{fnum,dataset}.cluster_file = clusterFile;
+           exptdata{fnum,dataset}.stimEpocs{1}=data.stimEpocs;
+           exptdata{fnum,dataset}.frameEpocs{1} = data.frameEpocs;
+           exptdata{fnum,dataset}.laser = data.laserT;
+           exptdata{fnum,dataset}.laserTTL = data.laserTTL;
+
+           
+            
             g=(useCells(:,1));
             depth=[g layer];
             exptdata{fnum,dataset}.layer{1}=depth;
@@ -164,7 +174,7 @@ for fnum = 1:length(afile)
             end
             
             exptdata{fnum,dataset}.lfpChans = i;
-            
+%             
             
                 for cell_n = 1:size(useCells,1);
                
@@ -175,9 +185,12 @@ for fnum = 1:length(afile)
                     
                     unitdata{cell_n+n}.spikes{1} =spikeT{matchCell}(spikeT{matchCell}>(blocknum-1)*10^5 & spikeT{matchCell}<(blocknum-1 + 0.5)*10^5) - (blocknum-1)*10^5;
                     unitdata{cell_n+n}.expnum = fnum;
+                    unitdata{cell_n+n}.peakCh =peakchan(cell_n);
                     unitdata{cell_n+n}.GT = dataset;
                     unitdata{cell_n+n}.block = Block_Name{blocknum};
                     unitdata{cell_n+n}.pinp = pinped(cell_n);
+                    unitdataPinp{cell_n+n}.pinpR = psth(cell_n,:);
+                    unitdata{cell_n+n}.pinpR = psth(cell_n,:);
                     unitdata{cell_n+n}.responsive = resp(cell_n);
                     unitdata{cell_n+n}.layer=layer(cell_n);
                     unitdata{cell_n+n}.inhibitory = inh(cell_n);
@@ -208,4 +221,4 @@ end
 end
 
 
-save('JLH_NMDA_KO_bar_OS','exptdata','unitdata','-v7.3');
+save('JLH_NMDA_1_13_15_extract_wn','exptdata','unitdata','-v7.3');

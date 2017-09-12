@@ -1,5 +1,29 @@
-pathname = '\\niell-v2-w7\Ian_analysis';
+pathname = '\Ian_analysis';
 n=0;
+
+n=n+1;
+files(n).expt = '062217';
+files(n).dir = '06_22_17';
+files(n).tank = '';
+files(n).clusterfile = 'cluster_data_06_22_17_cluster_062217';
+files(n).analysisfile = 'analysis_062217';
+files(n).predark = 'dark_pre1';
+files(n).postdark = 'dark_post1';
+files(n).prewn = '';
+files(n).postwn = '';  
+files(n).predrift = 'gratings_pre1';
+files(n).postdrift = 'gratings_post1';
+files(n).prebars = '';
+files(n).postbars = '';
+files(n).pretreatment = '';
+files(n).injection = 'injection';
+files(n).treatment = '5HT'; 
+files(n).layers = [];
+files(n).notes = 'bad data';
+files(n).misc = ''; 
+files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
+% files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).badsites = [];
 
 
 n=n+1;

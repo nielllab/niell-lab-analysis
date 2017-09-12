@@ -460,8 +460,8 @@ legend({'all','lyr 3','lyr4','lyr5','inh'})
 %% choose pinped
 resp = peak(:,1)>=2;
 
-pinped = (zscore>8& evoked>25 & ~inh  ); 
-pinped_resp_grat = (zscore>8& evoked>26  & ~inh  & resp); 
+pinped = (zscore>10& evoked>25 & ~inh  ); 
+pinped_resp_grat = (zscore>10& evoked>26  & ~inh  & resp); 
 
 sum(pinped)
 sum(pinped_resp_grat)

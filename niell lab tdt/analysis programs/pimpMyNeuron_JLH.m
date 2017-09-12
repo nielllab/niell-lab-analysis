@@ -1,18 +1,18 @@
 clear all
 close all
 
-pname = uigetdir('C:\data\TDT tanks','block data')
+pname = uigetdir('D:\Jen_tanks','block data')
 delims = strfind(pname,'\');
 selected_path = pname(1 :delims(length(delims))-1)
 Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
 Block_Name = pname(delims(length(delims))+1 :length(pname))
 
 
-nchan = input('# chans : ');
+nchan =64;% input('# chans : ');
 uselaser = 1
 % chans = 1:4:nchan;
-SU = input('multiunit (0) or single-unit (1) : ');
-Pimp_session=input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
+SU = 1%input('multiunit (0) or single-unit (1) : ');
+Pimp_session=0;%input('power1 (0) or power2 (1) or power3 (2) or afterNBQX1 (3) or afterNBQX2 (4): ');
 
 if SU
     [fname, pname] = uigetfile('*.mat','cluster data');
@@ -61,7 +61,7 @@ else
 end
 
 
-dt=0.001;
+dt=0.00025;
 histbins = -0.05:dt:0.05;
 longdt=2;
 longBins=-17:longdt:34;
@@ -152,8 +152,7 @@ ylabel('sp/sec')
 
 
 if SU && Pimp_session==0;
-    psth_power1=psth;
-    save(fullfile(apname,afname),'psth_power1','histbins','-append');
+    save(fullfile(apname,afname),'psth','histbins','-append');
 elseif SU && Pimp_session==1; 
     psth_power2=psth;
     save(fullfile(apname,afname),'psth_power2','histbins','-append');
@@ -167,19 +166,19 @@ else SU && Pimp_session==4;
 end
    
 
-if SU && Pimp_session==0;
-    save(fullfile(apname,afname),'psth_power1','histbins','-append');
-elseif SU && Pimp_session==1; 
-       save(fullfile(apname,afname),'psth_power2','histbins','-append');
-elseif SU && Pimp_session==2; 
-       save(fullfile(apname,afname),'psth_power3','histbins','-append');
-elseif SU && Pimp_session==3; 
-       save(fullfile(apname,afname),'psth_NBQX_power1','histbins','-append');
-
-else SU && Pimp_session==4; 
-       save(fullfile(apname,afname),'psth_NBQX_power2','histbins','-append'); 
-    
-end
+% if SU && Pimp_session==0;
+%     save(fullfile(apname,afname),'psth','histbins','-append');
+% elseif SU && Pimp_session==1; 
+%        save(fullfile(apname,afname),'psth_power2','histbins','-append');
+% elseif SU && Pimp_session==2; 
+%        save(fullfile(apname,afname),'psth_power3','histbins','-append');
+% elseif SU && Pimp_session==3; 
+%        save(fullfile(apname,afname),'psth_NBQX_power1','histbins','-append');
+% 
+% else SU && Pimp_session==4; 
+%        save(fullfile(apname,afname),'psth_NBQX_power2','histbins','-append'); 
+%     
+% end
 
 
 [fname pname] =uiputfile('*.ps'); psfname=fullfile(pname,fname);

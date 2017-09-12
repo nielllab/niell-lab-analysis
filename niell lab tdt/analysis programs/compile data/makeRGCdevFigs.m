@@ -1,3 +1,4 @@
+close all
 clear all
 load('rgcdata04282015.mat')
 age(age>30)=31;
@@ -105,7 +106,7 @@ set(gca,'Xtick',[14 18 22 26 31]);
 set(gca,'Xticklabel',{'14','18','22','26','adult'})
 
 subplot(2,3,6);
-plotDevGenoData(0.5*(wx+wy),age,agelist, ageBins,genotype==2, genotype,'RF radius (deg)',1)
+[resp err]= plotDevGenoData(0.5*(wx+wy),age,agelist, ageBins,genotype==2, genotype,'RF radius (deg)',1)
 ylim([0 18])
 xlim([ 13.5 33])
 set(gca,'Xtick',[14 18 22 26 31]);
@@ -119,6 +120,3 @@ multcompare(stats,'Ctype','dunn-sidak')
 [p tbl stats] = kruskalwallis(data(group>0),group(group>0))
 multcompare(stats,'Ctype','dunn-sidak')
 
-[data group] = labelbyage(1-abs(sustVariation'),age,ageBins,genotype==2 & ~isnan(sustVariation));
-[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
-multcompare(stats,'Ctype','dunn-sidak')

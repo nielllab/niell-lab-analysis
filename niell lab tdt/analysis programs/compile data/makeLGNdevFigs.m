@@ -1,4 +1,4 @@
-%load('developmentB3Nwt_all111015.mat')
+load('developmentB3Nwt_all111015.mat')
 
 PostnatalAge = [17 17 16 18 18 22 16 17 17 17 22 22 60 60 16 16 18 18 19 19 60 14 14 14 19 19 20 20 18 23 25 25 17 17 18 18 19 19 60 60 60 60 60 60 60 60 25 22 24 24 27 28  29 25 26 26 27 29 60 ];
 
@@ -25,7 +25,8 @@ xlabel('age')
 
 
 ageBins = [14 16; 17 21; 22 24; 27.5 28.5]';
-
+%ageBins = [14 16; 17 18; 19 21; 22 24; 27.5 28.5]';
+%ageBins = [14 16; 17 19; 20 22; 23 25; 27.5 28.5]';
 
 load('c:\wn016alpha1_10hzLg60Hz.mat');
 
@@ -393,9 +394,11 @@ title('p14-16');
 set(gca,'Xtick',1:6);
 set(gca,'Xticklabel',{'1','2','4','8','16','full'});
 box off
+% figure
+% kruskalwallis(fl_sztune(use & fl_amp>fl_thresh,:))
 
 subplot(2,3,2);
-use = age>=ageBins(1,4) & age<=ageBins(2,4) & genotype==2;
+use = age>=ageBins(1,end) & age<=ageBins(2,end) & genotype==2;
 errorbar(mean(fl_sztune(use & fl_amp>fl_thresh,:)),std(fl_sztune(use & fl_amp>fl_thresh,:))/sqrt(sum(use & fl_amp>fl_thresh)),'k');
 axis([0.5 6.5 0 5.5])
 ylabel('sp/sec'); xlabel('spot radius (deg)')
@@ -403,7 +406,8 @@ title('adult')
 set(gca,'Xtick',1:6);
 set(gca,'Xticklabel',{'1','2','4','8','16','full'});
 box off
-
+% figure
+% kruskalwallis(fl_sztune(use & fl_amp>fl_thresh,:))
 
 % subplot(2,3,3)
 % use = age>=ageBins(1,2) & age<=ageBins(2,2) & genotype==2;
@@ -484,17 +488,17 @@ for i= 1:length(all)
 end
 
 subplot(2,3,3)
-plotDevGenoData(abs(onoffoverlap'),age,agelist, ageBins,~isnan(onoffoverlap) & genotype==2, genotype,'onoff segregation',1)
+[resp err]=plotDevGenoData(abs(onoffoverlap'),age,agelist, ageBins,~isnan(onoffoverlap) & genotype==2, genotype,'onoff segregation',1)
 ylim([ 0 1])
 
 
 
 subplot(2,3,6)
-plotDevGenoData(1-abs(sustVariation'),age,agelist, ageBins,~isnan(sustVariation)& genotype==2, genotype,'sustain segregation',1)
+[resp err]= plotDevGenoData(1-abs(sustVariation'),age,agelist, ageBins,~isnan(sustVariation)& genotype==2, genotype,'sustain segregation',1)
 ylim([ 0 1])
 
 [data group] = labelbyage(abs(onoffoverlap'),age,ageBins,genotype==2 &~isnan(onoffoverlap));
-[p tbl stats] = kruskalwallis(data(group>0),group(group>0))
+[p tbl, stats] = kruskalwallis(data(group>0),group(group>0))
 multcompare(stats,'Ctype','dunn-sidak')
 
 [data group] = labelbyage(1-abs(sustVariation'),age,ageBins,genotype==2 & ~isnan(sustVariation));
