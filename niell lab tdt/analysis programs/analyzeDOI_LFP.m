@@ -2,8 +2,12 @@
 
 close all
 clear all
+set(groot,'defaultFigureVisible','off') %disable figure plotting
+
 
 batchDOIephys_filtered; %%% load batch file
+%use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'080917'))
+
 
 %%% select the sessions you want based on filters
 use =  find(strcmp({files.notes},'good data'))%useSess = use;
@@ -148,6 +152,7 @@ for i = 1:length(use)-1
     ntotal= ntotal+nc;
     close all
 end
+
 figure
 imagesc(squeeze(stLFPall(:,:,1,2)),[-20 20])
 

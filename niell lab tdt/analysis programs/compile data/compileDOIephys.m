@@ -2,16 +2,16 @@ clear all
 close all
 dbstop if error
 
-batchEphys_Ian; %%% load batch file
-% set(groot,'defaultFigureVisible','off') %disable figure plotting
-set(groot,'defaultFigureVisible','on')
+batchDOIephys_filtered; %%% load batch file
+ set(groot,'defaultFigureVisible','off') %disable figure plotting
+%set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
 % use =  find(strcmp({files.notes},'good data'))%useSess = use;
 % use =  find( strcmp({files.treatment},'5HT') & strcmp({files.notes},'good data'))
 
 %for specific experiment:
-use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'081616'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'080917'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -124,12 +124,14 @@ for i = 1:length(use)
         end
    
          for prepost=1:2
-            lfpMoveDrift = getLfpMovement(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+            lfpMoveDrift = getLfpMovement(clustfile,afile,files(use(i)).blockDrift{prepost},1);
             LFPallDrift(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDrift.meanSpect,1));
             if size(lfpMoveDrift.meanSpect,1)==16
                 LFPallChDrift(i,:,:,:,prepost) = lfpMoveDrift.meanSpect;
                 LFPfreqDrift(:,:) = lfpMoveDrift.freq;
+               % LFPt(i,:,prepost) = lfpMoveDrift.t;
                 display('good lfp');
+                
             else
                 display('lfp wrong size')
             end
@@ -165,7 +167,7 @@ for i = 1:length(use)
                     drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:) = NaN;
                 end
             end
-          
+%           
 
 lfpMoveDrift = NaN;
 LFPallDrift(i,200,1:2,prepost) =NaN;
@@ -1330,7 +1332,7 @@ for t=1:2
     cc(t) = cc;
 
     subplot(2,2,t);
-    plot(wnCorr(corrTreatment==t,1),wnCorr(corrTreatment==t,2),'.'); hold on; axis equal
+    plot(wnCorr(corrTreatment==t,1),wnCorr(corrTreatment==t,2),'.','Markersize',12); hold on; axis equal
     plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{t});
     xlabel('pre wn corr'); ylabel('post')
     set(gcf,'Name','Wn Corr')
@@ -1342,7 +1344,7 @@ for t=1:2
     plot(h,'-b');hold on; axis square;
     plot(h2,'-r')
     %xlim([-1 1]);
-    title(titles{i});
+    %title(titles{i});
 end
 %% corr for drift
 figure
@@ -1355,7 +1357,7 @@ for t=1:2
     cc(t) = cc;
 
     subplot(2,2,t);
-    plot(driftCorr(corrTreatment==t,1),driftCorr(corrTreatment==t,2),'.'); hold on; axis equal
+    plot(driftCorr(corrTreatment==t,1),driftCorr(corrTreatment==t,2),'.','Markersize',12); hold on; axis equal
     plot([-0.5 1],[-0.5 1]); axis([-0.5 1 -0.5 1]); title(titles{t});
     xlabel('pre wn corr'); ylabel('post')
     set(gcf,'Name','Wn Corr')
@@ -1367,7 +1369,7 @@ for t=1:2
     plot(h,'-b');hold on; axis square;
     plot(h2,'-r')
     %xlim([-1 1]);
-    title(titles{t});
+    %title(titles{t});
 end
 
 %% corr for dark
@@ -1990,7 +1992,6 @@ for i= 1:4
     end
 end
 
-%%
 %%
 
 amp=peakresp;
@@ -2678,48 +2679,50 @@ end
 
 %%
 
-salineSessions = (sessionTreatment==1)
+salineSessions = find(sessionTreatment==1)
 doiSessions = (sessionTreatment==2)
 htSessions = sessionTreatment==3
 
-% doi4= layerTet(doiSessions,:)==4
-% saline4=layerTet(salineSessions,:)==4
+doi4= layerTet(doiSessions,:)==4
+saline4=layerTet(salineSessions,:)==4
 
-% figure
-% for s=1:length(salineSessions)
-% subplot(5,5,s)
-% imagesc(squeeze(LFPallCh(salineSessions==s,LFPallCh,:,1,2)))
-% end
+figure
+for s=1:length(salineSessions)
+subplot(5,5,s)
+imagesc(squeeze(LFPallCh(salineSessions(s),LFPallCh,:,1,2)))
+end
+
+
 
 %%% is averaging across treatments for each layer
 
-%  layerTet = layerSites(:,2:4:64)
-% % figure
-% % imagesc(squeeze(LFPallChDark(1,:,:,1,1)))
+layerTet = layerSites(:,2:4:64)
+figure
+imagesc(squeeze(LFPallChDark(1,:,:,1,2)))
 % 
-% use =find(doiSessions==1)
-% for prepost=1:2
-%     figure
-%     if prepost==1, set(gcf,'Name','DOI LFP PRE');
-%     else set(gcf,'Name','DOI LFP POST'); end
-%     for s =1:sum(doiSessions)
-%         subplot(5,4,s)
-%         imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
-%         xlabel('frequency (Hz)');ylabel('tetrode #')
-%     end
-% end
-% 
-% use =find(salineSessions==1)
-% for prepost=1:2
-%     figure
-%     if prepost==1, set(gcf,'Name','Saline LFP PRE');
-%     else set(gcf,'Name','Saline LFP POST'); end
-%     for s =1:sum(salineSessions)
-%         subplot(5,4,s)
-%         imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
-%         xlabel('frequency (Hz)');ylabel('tetrode #')
-%     end
-% end
+use =find(doiSessions==1)
+for prepost=1:2
+    figure
+    if prepost==1, set(gcf,'Name','DOI LFP PRE');
+    else set(gcf,'Name','DOI LFP POST'); end
+    for s =1:sum(doiSessions)
+        subplot(5,4,s)
+        imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
+        xlabel('frequency (Hz)');ylabel('tetrode #')
+    end
+end
+
+use =find(salineSessions==1)
+for prepost=1:2
+    figure
+    if prepost==1, set(gcf,'Name','Saline LFP PRE');
+    else set(gcf,'Name','Saline LFP POST'); end
+    for s =1:sum(salineSessions)
+        subplot(5,4,s)
+        imagesc(squeeze(LFPallCh(use(s),:,:,1,prepost)))
+        xlabel('frequency (Hz)');ylabel('tetrode #')
+    end
+end
 % 
 % use = find(htSessions==1)
 % for prepost=1:2
@@ -2734,20 +2737,22 @@ htSessions = sessionTreatment==3
 % end
 % 
 % clear s use
-% use = find(salineSessions==1)
-% for mv = 1:2
-% figure
-% if mv==1, set(gcf,'Name', 'moving');
-% else set(gcf,'Name', 'stationary')
-% end
-%     for prepost =1:2
-%         for s =  1:length(use)
-%             subplot(4,5,s)
-%             plot(squeeze(LFPfreq(:,prepost)),squeeze(nanmean(LFPallCh(use(s), layerTet(s,:)==4,:,mv,prepost))));
-%             hold on
-%         end
-%     end
-% end
+%use = find(salineSessions==1)
+use = find(sessionTreatment==1)
+
+for mv = 1:2
+figure
+if mv==1, set(gcf,'Name', 'moving');
+else set(gcf,'Name', 'stationary')
+end
+    for prepost =1:2
+        for s =  1:length(use)
+            subplot(4,5,s)
+            plot(squeeze(LFPfreq(:,prepost)),squeeze(nanmean(LFPallChDrift(use(s), :,:,mv,prepost))));
+            hold on
+        end
+    end
+end
 % 
 % squeeze(nanmean(LFPallCh(sessionTreatment==1',layerTet(sessionTreatment==1,:)==4,:,1,1)))
 % 
@@ -2764,35 +2769,35 @@ htSessions = sessionTreatment==3
 % use = layerTet(:,:)==4
 % 
 % 
-% use =find(salineSessions==1)
-% for prepost=1:2
-%     figure
-%     if prepost==1, set(gcf,'Name','DOI LFP PRE');
-%     else set(gcf,'Name','DOI LFP POST'); end
-%     for s =1:sum(salineSessions)
-%         %subplot(4,4,s)
-%         imagesc(squeeze(LFPallChDrift(use(s),:,:,1,prepost)))
-%     end
-% end
-% 
-% clear s use
-% use = find(doiSessions==1)
-% for mv = 1:2
-%     figure
-%     if mv==1, set(gcf,'Name', 'moving');
-%     else set(gcf,'Name', 'stationary')
-%     end
-%     for prepost =1:2
-%         for s =  1:length(use)
-%             subplot(4,5,s)
-%          %   plot(squeeze(LFPfreqDrift(:,prepost)),
-%             plot(squeeze(nanmean(LFPallChDrift(use(s), layerTet(s,:)==4,:,mv,prepost))));
-%             hold on
-%         end
-%     end
-% end
-% 
-% 
+use =find(salineSessions==1)
+for prepost=1:2
+    figure
+    if prepost==1, set(gcf,'Name','DOI LFP PRE');
+    else set(gcf,'Name','DOI LFP POST'); end
+    for s =1:sum(salineSessions)
+        %subplot(4,4,s)
+        imagesc(squeeze(LFPallChDrift(use(s),:,:,1,prepost)))
+    end
+end
+
+clear s use
+use = find(doiSessions==1)
+for mv = 1:2
+    figure
+    if mv==1, set(gcf,'Name', 'moving');
+    else set(gcf,'Name', 'stationary')
+    end
+    for prepost =1:2
+        for s =  1:length(use)
+            subplot(4,5,s)
+         %   plot(squeeze(LFPfreqDrift(:,prepost)),
+            plot(squeeze(nanmean(LFPallChDrift(use(s), layerTet(s,:)==4,6:13,mv,prepost))));
+            hold on
+        end
+    end
+end
+
+
 % figure
 % set(gcf, 'Name', 'all ch darkness LFP')
 % for t=1:3
@@ -2802,18 +2807,26 @@ htSessions = sessionTreatment==3
 % title(titles{t}); axis square
 % end
 % 
-% C = {[1 0 0],[.5 0 0]}; %red = mv=1, light =pre, dark =post
-% D = {[0 1 0],[0 .5 0]}; %green = mv=2
-% figure
-% for prepost =1:2
-% for tet=1:16
-% %subplot(4,4,tet)
-% plot(squeeze(LFPallChDark(9,tet,:,1,prepost)),'Color',C{prepost});hold on; xlim([0 100]);
-% plot(squeeze(LFPallChDark(9,tet,:,2,prepost)),'Color',D{prepost}); xlim([0 100]);
-% xlabel 'Frequency (Hz)'; ylabel 'normalized power'; %mv
-% % title(sprintf('layer %d',layerTet(tet)));
-% end
-% end
+C = {[0 0 .9],[.8 0 0]}; %red = mv=1, light =pre, dark =post
+D = {[0 1 0],[0 .5 0]}; %green = mv=2
+
+%%
+%use = find(doiSessions==1)
+use = find(sessionTreatment==2)
+
+figure
+for s=1:length(use)
+for prepost =1:2
+%for tet=1:16
+subplot(4,4,s)
+plot(squeeze(LFPallChDark(use(s),:,:,2,prepost))','Color',C{prepost});hold on; xlim([0 120]);
+%plot(squeeze(LFPallChDark(9,tet,:,2,prepost)),'Color',D{prepost}); xlim([0 100]);
+xlabel 'Frequency (Hz)'; ylabel 'normalized power'; %mv
+% title(sprintf('layer %d',layerTet(tet)));
+end
+end
+%end
+
 % 
 % figure
 % subplot(1,2,1)
@@ -2821,5 +2834,58 @@ htSessions = sessionTreatment==3
 % subplot(1,2,2)
 % imagesc(squeeze(LFPallChDark(1,layerTet==3,:,1,2))); xlabel 'Frequency (Hz)'; ylabel 'normalized power';
 % 
+%%
 
+mnTetDark = squeeze(nanmean(LFPallChDark,2))
+mnTetDrift = squeeze(nanmean(LFPallChDrift,2))
 
+C = {[0 0 .9],[.8 0 0]}; %red = mv=1, light =pre, dark =post
+D = {[0 1 0],[0 .5 0]}; %green = mv=2
+for mv=1:2
+    clear prenorm postnorm normrange mnpre mnpost
+figure; hold on;
+for t=1:2
+if t ==1  
+ 
+use = find(sessionTreatment==1);% use = use([1:3 6:13 15]);
+else
+use = find(sessionTreatment==2);% use = use([1:2 4:6 8:12 14:15]);
+end
+
+for s= 1: length(use)
+    
+            %normalize response of all cells used, then average
+            prerange = squeeze(mnTetDark(use(s),:,mv,1))
+            normrange(s,:)= max(prerange)%-min(prerange)
+            prenorm(s,:) =(mnTetDark(use(s),:,mv,1)-min(mnTetDark(use(s),:,mv,1)))... %
+                ./normrange(s,1);
+
+           postnorm(s,:) =(mnTetDark(use(s),:,mv,2)-min(mnTetDark(use(s),:,mv,2)))...
+               ./normrange(s,1);
+      
+            prenorm(isinf(prenorm))=nan; postnorm(isinf(postnorm)) = nan ;
+
+            mnpre= nanmean(prenorm,1);
+            mnpost = nanmean(postnorm,1);
+            
+            nsessions = length(use);
+            sempre = nanstd(prenorm)/sqrt(nsessions);
+            sempost = nanstd(postnorm)/sqrt(nsessions);
+%             subplot(2,2,t)
+%             plot(prenorm','Color',C{1},'Linewidth',2); hold on;xlim([0 115]);
+%            plot(mnpre,'Linewidth',4,'Color',C{1});  axis square;% ylim([ 0 3.3e+04]); 
+%            plot(postnorm','Color',C{2},'Linewidth',2);
+%            plot(mnpost,'Linewidth',4,'Color',C{2});
+
+end
+      subplot(1,2,t)
+      preerr=shadedErrorBar(1:length(mnpre),mnpre,sempre,'b',1); hold on; axis square
+      posterr=shadedErrorBar(1:length(mnpost),mnpost,sempost,'r',1); xlim([ 0 115]);
+      set(gca,'FontSize',24);
+
+      %       subplot(4,2,t+4)
+%       imagesc(mnpre(1:50)');colormap jet;
+%       subplot(4,2,t+6)
+%       imagesc(mnpost(1:50)');colormap jet;
+end
+end

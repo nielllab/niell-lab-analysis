@@ -36,6 +36,7 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
    catch ME
         lfpMove(blocknum).meanSpect=[];
         lfpMove(blocknum).freq=[];
+
         display('couldnt get lfp movement')
        % getReport(ME)
     end

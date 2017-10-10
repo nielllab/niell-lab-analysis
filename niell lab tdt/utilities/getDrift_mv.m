@@ -39,7 +39,7 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
         
         trials = find(cond==i);
         trials= trials(trials<=size(trialPsth,2));
-        tcourse = squeeze(mean(trialPsth(:,trials,2:31),2));
+        tcourse = squeeze(mean(trialPsth(:,trials,2:end),2));
         
         
         if i<=72
