@@ -489,7 +489,7 @@ Screen('DrawText',window,sprintf('Finished stimuli'),10,40);
 Screen('Flip',window);
 
 %% gamma correction
-Screen_gamma=2;
+Screen_gamma=1;
 flat_clut = [(0:1/255:1)' (0:1/255:1)' (0:1/255:1)'];
 gamma_clut = flat_clut.^(1/Screen_gamma);
 Screen('LoadNormalizedGammaTable',window,gamma_clut);
@@ -535,23 +535,23 @@ if sync == ktdtSync
     %%% for now, we are using this workaround to access the 64bit parallel port
     %%% through 32bit matlab
     
-    %%%  http://people.usd.edu/~schieber/psyc770/IO32on64.html
+    %%%  http://apps.usd.edu/coglab/psyc770/IO64.html
     addr='0378';
-    ioObj = io32;
-    status = io32(ioObj);
+    ioObj = io64;
+    status = io64(ioObj);
     if status~=0
         status
         error('driver installation not successful')
     end
     condNum = hex2dec(addr);
     bitLine =hex2dec(addr)+2;
-    bitdefault = io32(ioObj,bitLine)
+    bitdefault = io64(ioObj,bitLine)
     stimoff_frameoff = bitset(bitset(bitdefault,1,1),2,1);
     stimon_frameoff = bitset(bitset(bitdefault,1,0),2,1);
     stimon_frameon =bitset(bitset(bitdefault,1,0),2,0);
     
-    io32(ioObj,bitLine,stimoff_frameoff);
-    io32(ioObj,condNum,0);
+    io64(ioObj,bitLine,stimoff_frameoff);
+    io64(ioObj,condNum,0);
     
 elseif sync == ktdsUDP
     syncTDSUdp=pnet('udpsocket',1111);
@@ -704,7 +704,7 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
         %% send condition out--must go before StimSync so that it is already there at beginning of stim
         if sync == ktdtSync
             %putvalue(parentuddobj,c,condNum);
-            io32(ioObj,condNum,c);
+            io64(ioObj,condNum,c);
         elseif sync == ktdsUDP
             pnet(syncTDSUdp,'write',sprintf('B%c',c));
             pnet(syncTDSUdp,'writepacket',shutterHost,shutterPort);
@@ -801,10 +801,10 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
                 pnet(syncUdp,'writepacket',syncHost,syncPort);
             elseif sync == ktdtSync
                 %putvalue(parentuddobj,[bitOn bitOn],bitLine);
-                io32(ioObj,bitLine,stimon_frameon);
+                io64(ioObj,bitLine,stimon_frameon);
                 WaitSecs(0.001);
                 %putvalue(parentuddobj,[bitOn bitOff],bitLine);
-                io32(ioObj,bitLine,stimon_frameoff);
+                io64(ioObj,bitLine,stimon_frameoff);
             elseif sync == ktdtUDP
                 pnet(syncUdp,'write',tdtUDPstring);
                 pnet(syncUdp,'writepacket',syncHost,syncPort);
@@ -841,7 +841,8 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
         end
         
         Screen('FillRect',window,grey);
-        
+       [vbl onsetTime flipDone] = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+ 
         %         % done with stimulus
         %         clearBkgrnd
         %         if clearBkgrnd
@@ -863,7 +864,7 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
         frameNum=frameNum+1;
         stimRec.ts(frameNum)=flipDone;
         stimRec.f(frameNum)=f;
-        stimRec.cond(frameNum)=c;
+        stimRec.cond(frameNum)=0;
         [stimRec.pos(frameNum,1) stimRec.pos(frameNum,2)] = GetMouse;
         SetMouse(900,500);
         if sync==kWidefield
@@ -883,7 +884,7 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
         % Reset StimSynch
         if sync == ktdtSync
             % putvalue(parentuddobj,[bitOff bitOff],bitLine);
-            io32(ioObj,bitLine,stimoff_frameoff);
+            io64(ioObj,bitLine,stimoff_frameoff);
         elseif sync == ktdsUDP
             pnet(syncTDSUdp,'write',sprintf('C%c',0+0));
             pnet(syncTDSUdp,'writepacket',shutterHost,shutterPort);
@@ -895,19 +896,24 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
         
         Priority(0);
         
-        startWait=GetSecs;
+        startWait=GetSecs
+        WaitInt
+        FrameWait
+        FrameInt
+        waitDetails = (FrameWait - 0.5) * FrameInt
         while GetSecs<startWait+WaitInt
-            [vbl onsetTime flipDone] = Screen('Flip',window, vbl + (FrameWait - 0.5) * FrameInt);
+            [vbl onsetTime flipDone] = Screen('Flip',window, vbl);
             frameNum=frameNum+1;
             stimRec.ts(frameNum)=flipDone;
             stimRec.f(frameNum)=f;
-            stimRec.cond(frameNum)=c;
+            stimRec.cond(frameNum)=0;
             [stimRec.pos(frameNum,1) stimRec.pos(frameNum,2)] = GetMouse;
             SetMouse(900,500);
             if sync==kWidefield
                 p = exec(p);
             end
         end
+        endWait = GetSecs-startWait
         
         
         
@@ -962,8 +968,10 @@ try %% put this is a try/catch, so that any crash won't leave Screen hung
     end
     
     [fname pname] = uiputfile;
-    if ~isempty(fname);
-        save(fullfile(pname,fname),'stimRec')
+      if fname~=0
+          SaveParams(handles,fullfile(pname,fname));
+  
+        save(fullfile(pname,fname),'stimRec','-append')
         
         if sync==kWidefield
             save(fullfile(pname,fname),'p','-append')
@@ -1147,6 +1155,7 @@ set(handles.Start3,'String',num2str(Start3));
 set(handles.Stop3,'String',num2str(Stop3));
 set(handles.nSteps3,'String',num2str(nSteps3));
 set(handles.LinLog3,'Value',LinLog3);
+
 
 set(handles.MovieName,'String',MovieName);
 set(handles.MovieMag,'String',num2str(MovieMag));
