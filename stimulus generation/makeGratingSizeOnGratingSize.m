@@ -10,16 +10,19 @@ degperpix = widthdeg/xsz
 
 duration = 1;
 framerate = 60;
-isi = 1.5;
+isi = 1;
 
-sfrange = [0.08];
+sfrange = [0.16];
 tfrange = [0];
 % radiusRangeCent = [0 5 10];
 % radiusRangeSurr = [0  25 25 25];
-totalRangeCS = [0 5 10 5 10 5 10;0 0 0 25 25 25 25];
-CenterOn = [0 5 10 5 10 0 0];
-SurroundOn = [0 0 0 25 25 25 25];
-phaserange = linspace(0,2*pi,25); phaserange=phaserange(1:12);  %%%cmn
+% totalRangeCS = [0 10 15 10 15 10 15;0 0 0 25 25 25 25];
+% CenterOn = [0 10 15 10 15 0 0];
+% SurroundOn = [0 0 0 25 25 25 25];
+totalRangeCS = [0 15 15 15;0 0 25 25];
+CenterOn = [0 15 15 0];
+SurroundOn = [0 0 25 25];
+phaserange = linspace(0,2*pi,30); phaserange=phaserange(1:30);  %%%cmn
 contrastRange = [1];
 nthetaCent = 2;
 nthetaSurr = 2;
@@ -204,7 +207,7 @@ moviedata = moviedata(1:xsz,1:ysz,:);
 % drawnow
 
 % save sizeSelect2sf8sz26min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
-save patchonpatch14min moviedata xpos ypos tf sf phase framerate duration isi nx ny thetaCent thetaSurr radiusCent radiusSurr CenterOn SurroundOn totalRangeCS trialID contrasts order totalduration -v7.3
+save patchonpatch16min moviedata xpos ypos tf sf phase framerate duration isi nx ny thetaCent thetaSurr radiusCent radiusSurr CenterOn SurroundOn totalRangeCS trialID contrasts order totalduration -v7.3
 %%
 for ii=1:size(totalRangeCS,2)
 %     temp1(ii,1) = sum(trialID(1,:) == 1 & trialID(2,:) == 1 & trialID(3,:)==1);
