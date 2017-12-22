@@ -93,9 +93,9 @@ endT = min(tsampBar(end),cameraTTL(end))
 dt = 0.5;
 pts = startT:dt:endT;
 vInterp = interp1(tsampBar,vsmoothBar,pts);
-rInterp = interp1(cameraTTL(1:length(rad')),rad,pts); %if cameraTTL is
+%rInterp = interp1(cameraTTL(1:length(rad')),rad,pts); %if cameraTTL is
 %longer than radius...in case triggering is not exact
-%rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts); %if rad is longer
+rInterp = interp1(cameraTTL,rad(1:length(cameraTTL)),pts); %if rad is longer
 figure
 plot(vInterp,'g'); hold on; plot(rInterp)
 legend('velocity','radius')
@@ -141,4 +141,8 @@ for i = 1:size(data,3)
     writeVideo(vidObj,currFrame);
 end
 close(vidObj);
+
+% median filter for radius
+r = medfilt1(rad,7);
+figure;plot(r)
 

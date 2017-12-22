@@ -52,9 +52,9 @@ for ch = 1:nChan;
     
     if movement
         hold on
-        tsamp = tdtData.mouseT;
-        vsmooth = tdtData.mouseV;
-        
+         tsamp = tdtData.mouseT;
+       vsmooth = tdtData.mouseV;
+         vsmooth=0;
         %plot(tsamp,(vsmooth/1.3-40),'g');
         plot(tsamp,(vsmooth/1-40),'g');
         axis([0 max(tsamp) -40 80/df])
@@ -67,7 +67,6 @@ for ch = 1:nChan;
     
     theta = mean(lfpnorm(:,ceil(7/df):ceil(10/df)),2);
     gamma = mean(lfpnorm(:,ceil(55/df):ceil(65/df)),2);
-    
     v_interp = interp1(tsamp,vsmooth,tdtData.spectT{ch});
     
     %     figure
@@ -80,9 +79,11 @@ for ch = 1:nChan;
     
     figure
     plot(mean(lfpnorm(stationary,:),1),'LineWidth',4);
+    plot(mean(lfpnorm),1)
     hold on
-   % plot(mean(lfpnorm(moving,:),1),'g');
+    plot(mean(lfpnorm(moving,:),1),'g');
     axis([0 70/df 0 1.2*max(mean(lfpnorm(moving,:)))]);
+
     set(gca,'XTick',(10:10:80)/df); 
     set(gca,'XTickLabel',{'10','20','30','40','50','60','70','80'});
     ylim([0 7500])

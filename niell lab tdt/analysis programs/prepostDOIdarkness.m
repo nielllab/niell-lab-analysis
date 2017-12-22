@@ -94,6 +94,8 @@ for c= 1:length(preSpikes);
     normR(c,:,:) = cellspikes/max(cellspikes(:));
 end
 
+normTest = normR;
+%dbstop
 
 rmax = 25;
 figure
@@ -270,9 +272,8 @@ allR = [squeeze(normR(:,:,1)) squeeze(normR(:,:,2))];
 % end
 
 figure
-subplot(2,1,1)
 imagesc(coeff); axis square
-subplot(2,1,2)
+%subplot(2,1,2)
 
 %hist of PCA loadings
 % hist(coeff); axis square
@@ -314,6 +315,7 @@ end
 figure
 imagesc(corrcoef(allR)); axis square; xlabel('secs'); ylabel('secs'); colorbar; title('correlation')
 colormap jet;
+%dbstop
 % 
 % if savePDF
 %     set(gcf, 'PaperPositionMode', 'auto');

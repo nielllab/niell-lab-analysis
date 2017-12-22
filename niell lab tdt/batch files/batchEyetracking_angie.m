@@ -1,6 +1,9 @@
 pathname = '\\angie\Angie_analysis\DOI_experiments';
 n=0;
 
+
+%experiments run on ephys rig -- data is acquired using tdt system (not
+%widefield!)
 n=n+1;
 files(n).expt = '022417';
 files(n).dir = '02_24_17_eye';

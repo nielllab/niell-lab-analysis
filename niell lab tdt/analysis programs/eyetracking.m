@@ -3,8 +3,7 @@ close all
 
 dir = 'D:\Angie_analysis\DOI_experiments\12_05_16_eye';
 % name = '120516_driftlowcontrast_eye'; %data file
-name = {'120516_driftlowcontrast_eye.mat',
-         '120516_drift_highscontrast_eye.mat' };      
+name = {'120516_driftlowcontrast_eye.mat'}; %camera file exported from matlab     
 thresh = 0.80; %pupil threshold for binarization
 puprange = [15 55]; %set
 
@@ -12,10 +11,9 @@ puprange = [15 55]; %set
 % pupercent = 0.15; %set range pupil radius window
 % pupchange = 0.25; %acceptable percent change in radius per framerange
 % framerange = 1; %number of frames to smooth over
-%for i= 1:length(name)
-%load(name{i})
-load(name{2})
-data = squeeze(data);
+
+load(name)
+data = squeeze(data); %x&y pixels, color, frame -- squeeze because color is set to grayscale
 warning off;
 
 %user input to select center and right points
@@ -43,9 +41,6 @@ for d = 1:size(ddata,3)
     bindata(:,:,d) = (ddata(yc-vert:yc+vert,xc-horiz:xc+horiz,d)/binmax(d) > thresh);
 end
 
-
-% figure
-% imshow(bindata(:,:,1400))
 
 %convert from uint8 into doubles and threshold, then binarize
 
@@ -80,12 +75,11 @@ end
 toc
 
 %plot x and y position and radius across experiment
-% h2 = figure
-% hold on
+h2 = figure
+hold on
 plot(0.1:0.1:size(data,3)/10,rad,'r-')
-% plot(0.1:0.1:size(data,3)/10,centroid(:,1),'.b')
-% plot(0.1:0.1:size(data,3)/10,centroid(:,2),'.m')
-% %hold off
+% plot(0.1:0.1:size(data,3)/10,centroid(:,1),'.b') %x centroid value
+% plot(0.1:0.1:size(data,3)/10,centroid(:,2),'.m') % y centroid value
 legend('radius','x pos','ypos')
 %ylim([5 55])
 

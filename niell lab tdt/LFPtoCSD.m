@@ -13,7 +13,7 @@ clear all;  % something in matlab memory management requires 2 clears ...???
     Tank_Name = pname(delims(length(delims)-1)+1 :delims(length(delims))-1)
     Block_Name = pname(delims(length(delims))+1 :length(pname))
 TTX = openTTX(Tank_Name,Block_Name); % to initialize
-Event_Name_LFP = 'Lfpx'
+Event_Name_LFP = 'pLFP'
 Sample_Interval=10^-3 * 0.04096 *32 % 24414.0625Hz
 Sample_Number_Snip=64
 Dec_Factor=32; 
@@ -30,20 +30,71 @@ end
 
 %%% read in waveforms
 invoke(TTX,'CreateEpocIndexing');
-MyEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0, 1000);
+
 invoke(TTX,'ResetFilters');
-for ph = 1:2    %%% read in both phases
-    ecode= invoke(TTX, 'StringToEvCode', 'xTrg'); % to convert string xTrig to code
-    invoke(TTX,'SetFilter', ecode, 69, ph, 0); 
-                             % 69 means equal to: 'xTrg=orientation', the last parameter not used for '69'
-end
-invoke(TTX,'GetValidTimeRangesV')
-invoke(TTX,'GetEpocsExV','xTrg',0)    
-for ch = 1:16
-    allsweeps = invoke(TTX, 'ReadWavesOnTimeRangeV',  Event_Name_LFP,ch_map(ch));
-    phi(ch,:) = mean(allsweeps(:,:),2);
+invoke(TTX,'SetFilterWithDesc','xTrg>0');
+% for ph = 1:2    %%% read in both phases
+%     ecode= invoke(TTX, 'StringToEvCode', 'xTrg'); % to convert string xTrig to code
+%     invoke(TTX,'SetFilter', ecode, 69, ph,0); 
+%                              % 69 means equal to: 'xTrg=orientation', the last parameter not used for '69'
+% end
+
+%dbstop
+times = invoke(TTX,'GetValidTimeRangesV')
+MyEpocs = invoke(TTX, 'GetEpocsV', 'xTrg', 0,0, 1000);   
+
+clear allsweeps
+for ch = 1:64
+    allsweeps(ch,:) = invoke(TTX, 'ReadWavesOnTimeRangeV',  Event_Name_LFP,ch_map(ch));
 end
 
+%%
+%trialPts = interp1(allsweeps,MyEpocs(2,:));
+%trialPts = interp1(MyEpocs(2,:),allsweeps)
+startT = times(1); endT=times(2);
+%dt = 0.5;
+%pts = startT:dt:endT;
+
+
+clear alldata
+t = startT:Sample_Interval:endT;
+for epoc = 1:size(MyEpocs,2)-1;
+    start = min(find(t>MyEpocs(2,epoc)));
+    alldata(:,:,epoc) = allsweeps(:,start:start+1000);
+end
+
+cond = MyEpocs(1,:);
+phi = median(alldata(:,:,cond==1),3);
+phi = median(alldata(:,:,test(1:84)),3);
+
+
+
+figure
+imagesc(phi(:,1:800),[-5 5]);
+
+test = cond==2;
+figure
+imagesc(squeeze(alldata(5,1:800,test(1:84)))',[-10 10]);
+title('channel 5')
+
+figure
+for c = 1:4
+    hold on
+    plot((1:size(alldata,2))*Sample_Interval, median(median(alldata(:,:,cond==c),3),1))
+end
+
+for ch=1:64
+trials(ch,:) = interp1(phi(ch,:),MyEpocs(2,:));
+
+end
+cleanCh = [2:21 23:31 33:64]
+%figure; imagesc(trials(cleanCh,MyEpocs(1,:)==2))
+%figure; imagesc(trials(cleanCh,MyEpocs(1,:)==1))
+figure; imagesc(trials(cleanCh,:))
+ylabel('Channel #'); xlabel('Trial');
+
+
+%%
 
 %%% temporal filtering of LFP (done in frequency domain)
 maxFreq = 200;
@@ -57,7 +108,7 @@ plot(abs(freq(1:200,:)));
 phi = real(ifft(freq)');
 
 figure
-plot((phi(1:16,1:200)'));
+plot((phi(1:64,1:2000)'));
 
 figure
 plot((phi([1:14 16],1:100)'));

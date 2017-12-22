@@ -20,6 +20,7 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
    spd = getSpeed(clustfile,afile,block,0);
    s = lfp.normspect;
    v = interp1(spd.t,spd.v,lfp.t);
+   t = lfp.t;
    for ch = 1:size(s,1);
        for i = 1:2
            if i==1
@@ -27,15 +28,17 @@ if ~exist('lfpMove','var') | length(lfpMove)<blocknum  | isempty(lfpMove(blocknu
            else
                meanS =  squeeze(mean(s(ch,v>1,:),2));
            end
-       meanSpect(ch,:,i) = interp1(lfp.freq,meanS,0.5:0.5:100);
+       meanSpect(ch,:,i) = interp1(lfp.freq,meanS,0.5:0.5:150);
        end
    end
    lfpMove(blocknum).meanSpect = meanSpect;
-   lfpMove(blocknum).freq = 0.5:0.5:100;
+   lfpMove(blocknum).freq = 0.5:0.5:150;
+   lfpMove(blocknum).t = t;
 
    catch ME
         lfpMove(blocknum).meanSpect=[];
         lfpMove(blocknum).freq=[];
+        lfpMove(blocknum).t=[];
 
         display('couldnt get lfp movement')
        % getReport(ME)

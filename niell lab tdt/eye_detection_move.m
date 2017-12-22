@@ -1,4 +1,4 @@
-
+%% for eyetracking acquired on ephys rigs using tdt system
 function eyes = eye_detection_move(cfile,block,Block_Name, Tank_Name,redo)
 close all
 dbstop if error
