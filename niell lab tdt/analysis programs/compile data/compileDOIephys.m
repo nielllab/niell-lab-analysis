@@ -64,77 +64,98 @@ for i = 1:length(use)
     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
         % get pre/post running speed
         for prepost = 1:2
-            spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},0);
+            spd = getSpeed(clustfile,afile,files(use(i)).blockWn{prepost},1);
             speedHistWn(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
-            speedTrace{i,prepost}=spd.v;
+            speedTraceWn{i,prepost}=spd.v;
         end
     else
-        for prepost = 1:2
-            spd = getSpeed(clustfile,afile,files(use(i)).blockDrift{prepost},0);
-            speedHistDrift(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
-            speedTrace{i,prepost}=spd.v;
-        end
-        
-    end
-    
-    figure
-    for prepost = 1:2
-        subplot(2,1,prepost);
-        plot(speedTrace{i,prepost}); hold on
-        plot([1 length(speedTrace{i,prepost})] , [ 0.5 0.5], ':'); ylabel('speed'); ylim([0 10])
-        if prepost==2,  title(sprintf('%s post %s',files(use(i)).expt, files(use(i)).treatment)); end
+        speedHistWn(i,:,1:2) = nan;
+    %    speedTraceWn{i, 1:2} = nan;
     end
     
     if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
+        for prepost = 1:2
+            spd = getSpeed(clustfile,afile,files(use(i)).blockDrift{prepost},1);
+            speedHistDrift(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
+            speedTraceDrift{i,prepost}=spd.v;
+        end
+    else
+        speedHistDrift(i,:,1:2) = nan;
+      %  speedTraceDrift{i, 1:2} = nan;
+        
+        
+    end
+    if ~isempty(files(use(i)).blockDark{1}) & ~isempty(files(use(i)).blockDark{2})
+      %  hasDarkSess(sessionTreatment) = 1;
+        for prepost = 1:2
+            spd = getSpeed(clustfile,afile,files(use(i)).blockDark{prepost},1);
+            speedHistDark(i,:,prepost) = hist(spd.v,0.5:1:100)/length(spd.v);
+            speedTraceDark{i,prepost}=spd.v;
+        end
+    else
+     % hasDarkSess(i) = treatment(cellrange(1))==1;
+        speedHistDark(i,:,1:2) = nan;
+       % speedTraceDark{i, 1:2} = nan;
+    end
+    
+    figure
+%     for prepost = 1:2
+%         subplot(2,1,prepost);
+%         plot(speedTraceDark{i,prepost}); hold on
+%         plot([1 length(speedTraceDark{i,prepost})] , [ 0.5 0.5], ':'); ylabel('speed'); ylim([0 10])
+%         if prepost==2,  title(sprintf('%s post %s',files(use(i)).expt, files(use(i)).treatment)); end
+%     end
+    
+    if ~isempty(files(use(i)).blockDrift{1}) & ~isempty(files(use(i)).blockDrift{2})
         %%% get grating responses
-       % try
-            hasDrift(cellrange)=1;
-            for prepost = 1:2
-                drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
-                drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
-                drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
-                drift_spont(cellrange,:,prepost) = drift.interSpont;
-                drift_fl_spont(cellrange,:,prepost) = drift.spont;
-                drift_osi(cellrange,:,prepost) = drift.cv_osi;
-                drift_F1F0(:,cellrange,prepost)= drift.F1F0;
-                drift_ot_tune(cellrange,:,:,prepost)=drift.orient_tune;
-                drift_sf_trial{prepost} = drift.trialSF;
-                drift_orient_trial{prepost} = drift.trialOrient;
-                drift_pref_theta(cellrange,:,prepost) = drift.pref_theta;
-                drift_dsi_theta(cellrange,:,prepost) = drift.dsi_theta;
-                drift_dsi(cellrange,:,prepost) = drift.dsi;
-                for c = 1:length(cellrange)
-                    drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
-                    mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
-                end
-                for cond = 1:72
-                    for mv = 1:2
-                        if mv ==1
-                            tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd<1);
-                        else
-                            tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
-                        end
-                        drift_tcourse(cellrange,cond,mv,prepost,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
-                        sf = mod(cond-1,6)+1; ori = ceil(cond/6);
-                        drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
-                    end
-                end
-                %
+        % try
+        hasDrift(cellrange)=1;
+        for prepost = 1:2
+            drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+            drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
+            drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
+            drift_spont(cellrange,:,prepost) = drift.interSpont;
+            drift_fl_spont(cellrange,:,prepost) = drift.spont;
+            drift_osi(cellrange,:,prepost) = drift.cv_osi;
+            drift_F1F0(:,cellrange,prepost)= drift.F1F0;
+            drift_ot_tune(cellrange,:,:,prepost)=drift.orient_tune;
+            drift_sf_trial{prepost} = drift.trialSF;
+            drift_orient_trial{prepost} = drift.trialOrient;
+            drift_pref_theta(cellrange,:,prepost) = drift.pref_theta;
+            drift_dsi_theta(cellrange,:,prepost) = drift.dsi_theta;
+            drift_dsi(cellrange,:,prepost) = drift.dsi;
+            for c = 1:length(cellrange)
+                drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
+                mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
             end
-            
-%             for prepost=1:2
-%                 lfpMoveDrift = getLfpMovement(clustfile,afile,files(use(i)).blockDrift{prepost},0);
-%                 LFPallDrift(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDrift.meanSpect,1));
-%                 if size(lfpMoveDrift.meanSpect,1)==16
-%                     LFPallChDrift(i,:,:,:,prepost) = lfpMoveDrift.meanSpect;
-%                     LFPfreqDrift(:,:) = lfpMoveDrift.freq;
-%                      %LFPtDrift(i,:,prepost) = lfpMoveDrift.t;
-%                     display('good lfp');
-%                     
-%                 else
-%                     display('lfp wrong size')
-%                 end
-%             end
+            for cond = 1:72
+                for mv = 1:2
+                    if mv ==1
+                        tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd<1);
+                    else
+                        tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
+                    end
+                    drift_tcourse(cellrange,cond,mv,prepost,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
+                    sf = mod(cond-1,6)+1; ori = ceil(cond/6);
+                    drift_cond_tcourse(cellrange,mv,prepost,ori,sf,:) = squeeze(nanmean(drift.trialPsth(:,tr,:),2));
+                end
+            end
+            %
+        end
+        
+        %             for prepost=1:2
+        %                 lfpMoveDrift = getLfpMovement(clustfile,afile,files(use(i)).blockDrift{prepost},0);
+        %                 LFPallDrift(i,:,:,prepost) =squeeze(nanmedian(lfpMoveDrift.meanSpect,1));
+        %                 if size(lfpMoveDrift.meanSpect,1)==16
+        %                     LFPallChDrift(i,:,:,:,prepost) = lfpMoveDrift.meanSpect;
+        %                     LFPfreqDrift(:,:) = lfpMoveDrift.freq;
+        %                      %LFPtDrift(i,:,prepost) = lfpMoveDrift.t;
+        %                     display('good lfp');
+        %
+        %                 else
+        %                     display('lfp wrong size')
+        %                 end
+        %             end
         %catch end
     else
         hasDrift(cellrange)=0;
@@ -236,30 +257,30 @@ for i = 1:length(use)
     % end
     %    end
     
-%     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
-%         %% lfp power
-%         %     %%%(right now averages over all sites, should use layer info)
-%         %  try
-%         for prepost=1:2
-%             lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
-%             LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect,1));
-%             if size(lfpMove.meanSpect,1)==16
-%                 LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
-%                 LFPfreq(:,:) = lfpMove.freq;
-%                 %LFPt(i,:,prepost) = lfpMove.t
-%                 display('good lfp');
-%                 lfpMove
-%             else
-%                 display('lfp wrong size')
-%             end
-%         end
-%         %   catch end
-%     else
-%         lfpMove = NaN;
-%         LFPall(i,300,1:2,prepost) =NaN;
-%         LFPallCh(i,16,300,1:2,prepost) = NaN;
-%         LFPfreq(1,300) = NaN;
-%     end
+    %     if ~isempty(files(use(i)).blockWn{1}) & ~isempty(files(use(i)).blockWn{2})
+    %         %% lfp power
+    %         %     %%%(right now averages over all sites, should use layer info)
+    %         %  try
+    %         for prepost=1:2
+    %             lfpMove = getLfpMovement(clustfile,afile,files(use(i)).blockWn{prepost},0);
+    %             LFPall(i,:,:,prepost) =squeeze(nanmedian(lfpMove.meanSpect,1));
+    %             if size(lfpMove.meanSpect,1)==16
+    %                 LFPallCh(i,:,:,:,prepost) = lfpMove.meanSpect;
+    %                 LFPfreq(:,:) = lfpMove.freq;
+    %                 %LFPt(i,:,prepost) = lfpMove.t
+    %                 display('good lfp');
+    %                 lfpMove
+    %             else
+    %                 display('lfp wrong size')
+    %             end
+    %         end
+    %         %   catch end
+    %     else
+    %         lfpMove = NaN;
+    %         LFPall(i,300,1:2,prepost) =NaN;
+    %         LFPallCh(i,16,300,1:2,prepost) = NaN;
+    %         LFPfreq(1,300) = NaN;
+    %     end
     
     for prepost = 1:2
         try
@@ -395,22 +416,44 @@ end
 %%% plot speed histogram
 titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 figure
-for t =1:8
-    subplot(2,4,t)
+for t =1:2
+    subplot(1,2,t)
+    spdMn = squeeze(nanmean(speedHistWn(sessionTreatment==t,1:10,:),1));
+    spdErr = squeeze(nanstd(speedHistWn(sessionTreatment==t,1:10,:) / sqrt(length(speedHistWn(sessionTreatment==t)))));
+    prop = shadedErrorBar(.5:1:10,spdMn(:,1)',spdErr(:,1)','k',1); hold on
+    proppost = shadedErrorBar(.5:1:10,spdMn(:,2)',spdErr(:,2)','r',1)
     
-    plot(0.5:1:15,squeeze(mean(speedHistWn(sessionTreatment==t,1:15,:),1)));
-    title(titles{t}); xlabel('speed');axis square;
+    title(titles{t}); xlabel('speed (cm/sec)');axis square; ylim ([0 1]);
 end
 legend('pre','post')
-
+%%
+titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
 figure
 for t =1:2
     subplot(1,2,t)
-    plot(0.5:1:25,squeeze(mean(speedHistDrift(sessionTreatment==t,1:25,:),1)));
-    title(titles{t}); xlabel('speed');axis square;
+    spdMn = squeeze(nanmean(speedHistDrift(sessionTreatment==t,1:10,:),1));
+    spdErr = squeeze(nanstd(speedHistDrift(sessionTreatment==t,1:10,:) / sqrt(length(speedHistDrift(sessionTreatment==t)))));
+    prop = shadedErrorBar(.5:1:10,spdMn(:,1)',spdErr(:,1)','k',1); hold on
+    proppost = shadedErrorBar(.5:1:10,spdMn(:,2)',spdErr(:,2)','r',1)
+    
+    title(titles{t}); xlabel('speed (cm/sec)');axis square; ylim ([0 1]); xlim([0 6])
 end
 legend('pre','post')
 
+
+%%
+titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
+figure
+for t =1:2
+    subplot(1,2,t)
+    spdMn = squeeze(nanmean(speedHistDark(sessionTreatment==t,1:10,:),1));
+    spdErr = squeeze(nanstd(speedHistDark(sessionTreatment==t,1:10,:)/sqrt(length(speedHistDark(sessionTreatment==t)))));
+    prop = shadedErrorBar(.5:1:10,spdMn(:,1)',spdErr(:,1)','k',1); hold on
+    proppost = shadedErrorBar(.5:1:10,spdMn(:,2)',spdErr(:,2)','r',1)
+    
+    title(titles{t}); xlabel('speed (cm/sec)');axis square; ylim ([0 1]);
+end
+legend('pre','post')
 %% filter data before plotting%%%
 clear max_wn
 % low_wn = squeeze(min(wn_crf,[],2));
@@ -435,7 +478,7 @@ titles ={'Saline', 'DOI','5HT'};
 
 for mv =1:2
     figure
-        if mv==1
+    if mv==1
         set(gcf,'Name','mean stat drift FR')
     else
         set(gcf,'Name','mean mv drift FR')
@@ -444,14 +487,14 @@ for mv =1:2
         subplot(1,2,t)
         used = goodAll==1 & treatment==t & hasDrift==1;
         plot(peakresp(inhAll==0 & used,mv,1),...
-            peakresp(inhAll==0 & used,mv,2),'ko','Markersize',15,'linewidth',2,'MarkerFaceColor',[.2 0.5 .8]); 
-          hold on;
+            peakresp(inhAll==0 & used,mv,2),'ko','Markersize',15,'linewidth',2,'MarkerFaceColor',[.2 0.5 .8]);
+        hold on;
         set(gca,'FontSize',25,'linewidth',2);
         xlabel('Pre (spikes/sec)');ylabel('Post (spikes/sec)');
         title(titles{t})
         axis square; %xlim([0 20]);ylim([0 20]);
         %title(titles{t}); xlabel('Pre spikes/sec');ylabel('Post spikes/sec');
-       % ylim ([-5 20]);xlim([-5 20]);
+        % ylim ([-5 20]);xlim([-5 20]);
         % ylim ([-8.5 24]);xlim([-8.5 24]);
         % ylim ([-5 5]);xlim([-5 5]);
         mpre=nanmean(peakresp(used,mv,1))
@@ -2625,34 +2668,34 @@ warning off
 
 figure
 for t = 1:2
-clear data sfBar
-for g = 1:length(sfs)
-data = useResp' & hasDrift==1 & treatment==t% & (sfs{1},1)';
-sfBar(:,1) = hist(SFpref(data,1),[1 2:2:7]);sfBar(:,2) = hist(SFpref(data,2),[1 2:2:7]);
-
-SFpref(data,1)==sfs{g}(data,1)
-
-%sferr(g,1) = squeeze(nanstd(SFpref(data,1)==(sfs{g},1)))/sqrt(sum(sfs{g}(data,1)))
-%sferr(g,2) = squeeze(nanstd(SFpref(data,2)==sfs{g}(data,2)))/sqrt(sum(sfs{g}(data,2)))
-
-%sferr(g,2) = squeeze(nanstd(sfBar(g,2)))/sqrt(sum(sfBar(g,2)))
-
-%sferr(g,1) = squeeze(nanstd(SFpref(sfs{g}(data,1))))/sqrt(sum(SFpref(sfs{g}(data,1))))
-%sferr(g,2) = squeeze(nanstd(SFpref(sfs{g}(data,2))))/sqrt(sum(SFpref(sfs{g}(data,2))));
-
-%[p h] = ranksum(SFpref(data,1),SFpref(data,2))
-[p(g) h(g)] = ranksum(sfs{g}(data,1),sfs{g}(data,2))
-subplot(2,1,t)
-bar(sfBar/sum(data))
-%barweb(sfBar/sum(data),sferr);
-ylim([0 .45]); axis xy
-xlim([.5 4.5]); ylabel('proportion of cells'); xlabel('preferred SF'); 
-set(gca, 'XTickLabels', {'FF' 'low' 'medium' 'high'},'FontSize',22);
-%text(.9, 1, ['p = ' num2str(p(g),'%.2f')],'FontSize',18)
-
-if t==1, title('Saline');else title('DOI') 
-end
-end
+    clear data sfBar
+    for g = 1:length(sfs)
+        data = useResp' & hasDrift==1 & treatment==t% & (sfs{1},1)';
+        sfBar(:,1) = hist(SFpref(data,1),[1 2:2:7]);sfBar(:,2) = hist(SFpref(data,2),[1 2:2:7]);
+        
+        SFpref(data,1)==sfs{g}(data,1)
+        
+        %sferr(g,1) = squeeze(nanstd(SFpref(data,1)==(sfs{g},1)))/sqrt(sum(sfs{g}(data,1)))
+        %sferr(g,2) = squeeze(nanstd(SFpref(data,2)==sfs{g}(data,2)))/sqrt(sum(sfs{g}(data,2)))
+        
+        %sferr(g,2) = squeeze(nanstd(sfBar(g,2)))/sqrt(sum(sfBar(g,2)))
+        
+        %sferr(g,1) = squeeze(nanstd(SFpref(sfs{g}(data,1))))/sqrt(sum(SFpref(sfs{g}(data,1))))
+        %sferr(g,2) = squeeze(nanstd(SFpref(sfs{g}(data,2))))/sqrt(sum(SFpref(sfs{g}(data,2))));
+        
+        %[p h] = ranksum(SFpref(data,1),SFpref(data,2))
+        [p(g) h(g)] = ranksum(sfs{g}(data,1),sfs{g}(data,2))
+        subplot(2,1,t)
+        bar(sfBar/sum(data))
+        %barweb(sfBar/sum(data),sferr);
+        ylim([0 .45]); axis xy
+        xlim([.5 4.5]); ylabel('proportion of cells'); xlabel('preferred SF');
+        set(gca, 'XTickLabels', {'FF' 'low' 'medium' 'high'},'FontSize',22);
+        %text(.9, 1, ['p = ' num2str(p(g),'%.2f')],'FontSize',18)
+        
+        if t==1, title('Saline');else title('DOI')
+        end
+    end
 end
 
 
@@ -2958,13 +3001,13 @@ D = {[0 1 0],[0 .5 0]}; %green = mv=2
 for mv=1:2
     clear prenorm postnorm normrange mnpre mnpost
     figure; hold on;
-if mv==1
-  set(gcf,'Name','stationary');
-else 
-      set(gcf,'Name','mv');
-end
+    if mv==1
+        set(gcf,'Name','stationary');
+    else
+        set(gcf,'Name','mv');
+    end
     for t=1:2
-        if t ==1 
+        if t ==1
             use = find(sessionTreatment==1);
             use = use([1:3 6:13 15]);
         else
@@ -3006,17 +3049,17 @@ end
         
         %frequencies are doubled
         
-           delta = [nanmean(prenorm(:,1:4),2) nanmean(postnorm(:,1:4),2)]
-           theta = [nanmean(prenorm(:,5:8),2) nanmean(postnorm(:,5:8),2)]
-           alpha = [nanmean(prenorm(:,9:13),2) nanmean(postnorm(:,9:13),2)]
-           gamma = [nanmean(prenorm(:,60:70),2) nanmean(postnorm(:,60:70),2)]
-           
-%            delta = [nanmean(prenorm(1:8,1)) nanmean(postnorm(1:8,1))]
-%            theta = [nanmean(prenorm(9:16,1)) nanmean(postnorm(9:16,1))]
-%            alpha = [nanmean(prenorm(17:26,1)) nanmean(postnorm(17:26,1))]
-%            gamma = [nanmean(prenorm(120:140,1)) nanmean(postnorm(120:140,1))]
-
-
+        delta = [nanmean(prenorm(:,1:4),2) nanmean(postnorm(:,1:4),2)]
+        theta = [nanmean(prenorm(:,5:8),2) nanmean(postnorm(:,5:8),2)]
+        alpha = [nanmean(prenorm(:,9:13),2) nanmean(postnorm(:,9:13),2)]
+        gamma = [nanmean(prenorm(:,60:70),2) nanmean(postnorm(:,60:70),2)]
+        
+        %            delta = [nanmean(prenorm(1:8,1)) nanmean(postnorm(1:8,1))]
+        %            theta = [nanmean(prenorm(9:16,1)) nanmean(postnorm(9:16,1))]
+        %            alpha = [nanmean(prenorm(17:26,1)) nanmean(postnorm(17:26,1))]
+        %            gamma = [nanmean(prenorm(120:140,1)) nanmean(postnorm(120:140,1))]
+        
+        
     end
 end
 
@@ -3026,13 +3069,13 @@ D = {[0 1 0],[0 .5 0]}; %green = mv=2
 for mv=1:2
     clear prenorm postnorm normrange mnpre mnpost
     figure; hold on;
-if mv==1
-  set(gcf,'Name','stationary');
-else 
-  set(gcf,'Name','mv');
-end
+    if mv==1
+        set(gcf,'Name','stationary');
+    else
+        set(gcf,'Name','mv');
+    end
     for t=1:2
-        if t ==1 
+        if t ==1
             use = find(sessionTreatment==1);
             use = use([1:3 6:13 15]);
         else
@@ -3073,17 +3116,17 @@ end
         set(gca,'FontSize',24);set(gca, 'linewidth', 2)
         
         %frequencies are doubled
-%         
-%            delta = [nanmean(prenorm(:,1:4),2) nanmean(postnorm(:,1:4),2)]
-%            theta = [nanmean(prenorm(:,5:8),2) nanmean(postnorm(:,5:8),2)]
-%            alpha = [nanmean(prenorm(:,9:13),2) nanmean(postnorm(:,9:13),2)]
-%            gamma = [nanmean(prenorm(:,60:70),2) nanmean(postnorm(:,60:70),2)]
-           
-%            delta = [nanmean(prenorm(1:8,1)) nanmean(postnorm(1:8,1))]
-%            theta = [nanmean(prenorm(9:16,1)) nanmean(postnorm(9:16,1))]
-%            alpha = [nanmean(prenorm(17:26,1)) nanmean(postnorm(17:26,1))]
-%            gamma = [nanmean(prenorm(120:140,1)) nanmean(postnorm(120:140,1))]
-
-
+        %
+        %            delta = [nanmean(prenorm(:,1:4),2) nanmean(postnorm(:,1:4),2)]
+        %            theta = [nanmean(prenorm(:,5:8),2) nanmean(postnorm(:,5:8),2)]
+        %            alpha = [nanmean(prenorm(:,9:13),2) nanmean(postnorm(:,9:13),2)]
+        %            gamma = [nanmean(prenorm(:,60:70),2) nanmean(postnorm(:,60:70),2)]
+        
+        %            delta = [nanmean(prenorm(1:8,1)) nanmean(postnorm(1:8,1))]
+        %            theta = [nanmean(prenorm(9:16,1)) nanmean(postnorm(9:16,1))]
+        %            alpha = [nanmean(prenorm(17:26,1)) nanmean(postnorm(17:26,1))]
+        %            gamma = [nanmean(prenorm(120:140,1)) nanmean(postnorm(120:140,1))]
+        
+        
     end
 end
