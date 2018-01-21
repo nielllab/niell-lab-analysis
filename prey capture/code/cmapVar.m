@@ -1,4 +1,7 @@
 function cm=cmapVar(val,mn,mx,cmap)
+%%% map values into a colormap
+%%%cm=cmapVar(val,mn,mx,cmap)
+%%% val = values; mn = minimum of range; mx = max of range; cmap = colormap to use (should have 64 entries, matlab default)
 if ~exist('cmap','var')
 cmap = jet;
 end
