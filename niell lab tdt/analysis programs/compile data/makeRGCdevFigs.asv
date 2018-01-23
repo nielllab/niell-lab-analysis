@@ -75,9 +75,9 @@ for i= 1:length(all)
     subplot(1 ,4 ,i);
            sta = squeeze(wn_all(all(i)).svd_xy(1,:,:));
             sta_fix = ifft2(fft2(sta).*mean_spectrum);
-            if i==4, range = [-0.04 0.04], elseif i ==2, range = [-0.04 0.04],else range = [-0.04 0.04], end
+            if i==3, range = [-0.04 0.04], elseif i ==2, range = [-0.04 0.04],else range = [-0.04 0.04], end
             imagesc(sta_fix,range); axis equal; colormap gray
-            if i==4, title('adult'), elseif i==1, title('P16'), elseif i ==2 title('P18'), else title('P21'), end
+            if i==3, title('adult'), elseif i==1, title('P16'), else title('P18'), end
             if i ==2, axis xy, end
             hold on
             if i ==1, plot([ 25 38],[68 68],'w','LineWidth',4), end %%% 10 deg scale bar

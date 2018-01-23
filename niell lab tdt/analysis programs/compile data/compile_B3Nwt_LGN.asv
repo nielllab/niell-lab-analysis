@@ -901,7 +901,7 @@ figure
 errorbar(agelist,resp,resperr);
 ylabel('% responsive gratings (>1sp/sec)');
 
-[resp resperr] = sortbyage(sf_amp'>2,age,ageBins,1);
+[resp resperr] = sortbyage(sf_amp'>1,age,ageBins,1);
 figure
 errorbar(mean(ageBins,1),resp,resperr);
 ylabel('% responsive gratings (>1sp/sec)');
