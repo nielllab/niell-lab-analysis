@@ -16,22 +16,40 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
     spikes=getSpikes(clustfile,afile,block,0);
     display('getting speed')
     spd = getSpeed(clustfile,afile,block,0);
-    cond = stimEpocs{blocknum}(1,:);
+    cond = stimEpocs{blocknum}(1,:); 
     condT = stimEpocs{blocknum}(2,:);
     
     frameSpd = interp1(spd.t,spd.v,condT+0.5,'nearest');
     dt= 0.05;
     display('doing hist')
     for c =1 :length(spikes.sp);
-        
         for i= 1:length(cond)-1;
-            s = find(spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5);
-            trialPsth(c,i,:) = hist(spikes.sp{c}(s)-condT(i),dt/2:dt:2.5)/dt;
+           s = find(spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5);
+           trialPsth(c,i,:) = hist(spikes.sp{c}(s)-condT(i),dt/2:dt:2.5)/dt;
+         %  trialSpT{c,i} = spikes.sp{c}(s)-condT(i),dt/2:dt:2.5./dt;
+          % t(i) = cond(condT(i)+2.5)
         end
         %  cellFigs(c)=figure;
     end
     
+
+%     for c =1 :length(spikes.sp);
+%         for i= 1:length(cond)-1;
+%             s = find(spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5);
+%           %  o(i,:) = spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5;
+%             trialSpT{c,i} = spikes.sp{c}(s)-condT(i),dt/2:dt:2.5/dt;
+%             %  spikeT(c,i,:) = spikes.sp{c}(condT(i))
+%             % t(i) = cond(condT(i)+2.5)
+%         end
+%         %  cellFigs(c)=figure;
+%     end
     
+
+% %separate into bins: dt/2:dt:2.5
+%    g=round(spikes.sp{1}/2.5)
+%     d = spikes.sp{1}
+%     figure;plot(d,2,'.')
+%      z=find(d(condT(354):condT(355)))
     
     for i = 1:74;
         i
@@ -44,7 +62,7 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
         
         if i<=72
             for c = 1:size(tcourse,1);
-                F1(c,i) = 2*abs(sum(tcourse(c,:).*exp(2*pi*sqrt(-1)*(1:30)/10)))/size(tcourse,2);
+             %   F1(c,i) = 2*abs(sum(tcourse(c,:).*exp(2*pi*sqrt(-1)*(1:30)/10)))/size(tcourse,2);
                 F0(c,i) = mean(tcourse(c,:));
                 %             figure(cellFigs(c));
                 %             subplot(12,6,i);
@@ -86,13 +104,14 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
         end
     end
     
-    for c = 1:size(F1,1);
-        m = max(F0(c,:));
-        tr = find(F0(c,:)>0.7*max(F0(c,:)));
-        drift_mv(blocknum).F1F0(c) = mean(F1(c,tr)./F0(c,tr));
-        %         figure(cellFigs(c));
-        %         set(gcf,'Name',sprintf('F1 F0 = %0.2f',drift_mv(blocknum).F1F0(c)));
-    end
+  %  dbstop
+%     for c = 1:size(F1,1);
+%         m = max(F0(c,:));
+%         tr = find(F0(c,:)>0.7*max(F0(c,:)));
+%         drift_mv(blocknum).F1F0(c) = mean(F1(c,tr)./F0(c,tr));
+%         %         figure(cellFigs(c));
+%         %         set(gcf,'Name',sprintf('F1 F0 = %0.2f',drift_mv(blocknum).F1F0(c)));
+%     end
     
     
     
@@ -102,21 +121,26 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
     drift_mv(blocknum).interSpont_err(:,2) =std(mean(trialPsth(:,frameSpd(1:end-1)>vthresh,end-10:end),3),[],2)/sqrt(sum(frameSpd(1:end-1)>1));
     
     drift_mv(blocknum).orient_tune(:,:,:) =squeeze(nanmean(drift_mv(blocknum).tuning,3));
-    %     drift_mv(blocknum).osi(:,:,:) =squeeze(nanmean(drift_mv(blocknum).osi,1));
+    %     drift_mv(blocknum).osi(:,:,:) =squeeze(nanmean(drift_mv(blocknum).osi,1)) ;
     %     drift_mv(blocknum).pref_theta(:,:,:) =squeeze(nanmean(drift_mv(blocknum).osi,2));
     drift_mv(blocknum).sf_tune(:,2:7,:) = squeeze(nanmean(drift_mv(blocknum).tuning,2));
 
     drift_mv(blocknum).sf_tune(:,1,:) = drift_mv(blocknum).flicker;
 %     for i = 1:size(drift_mv(blocknum).orient_tune,1)
 %         for mv = 1:2
-%             drift_mv(blocknum).cv_osi(i,mv) = calcCVosi(squeeze(drift_mv(blocknum).orient_tune(i,:,mv)) - drift_mv(blocknum).interSpont(i,mv));
+%            % drift_mv(blocknum).cv_osi2(i,mv) = calcCVosi(squeeze(drift_mv(blocknum).orient_tune(i,:,mv)) - drift_mv(blocknum).interSpont(i,mv));
+%            %[drift_mv(blocknum).cv_osi2(i,mv) drift_mv(blocknum).pref_theta(i,mv)] = calcCvOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
+%          [drift_mv(blocknum).cv_osi2(i,mv) drift_mv(blocknum).pref_theta2(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
+% 
 %         end
-%     end
+%      end
     
 for i = 1:size(drift_mv(blocknum).orient_tune,1)
     for mv = 1:2
-        [drift_mv(blocknum).cv_osi(i,mv) drift_mv(blocknum).pref_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
-        [drift_mv(blocknum).dsi(i,mv) drift_mv(blocknum).dsi_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',1);
+       drift_mv(blocknum).cv_osi(i,mv) = calcCVosi(squeeze(drift_mv(blocknum).orient_tune(i,:,mv)) - drift_mv(blocknum).interSpont(i,mv));
+       [drift_mv(blocknum).cv_osi2(i,mv) drift_mv(blocknum).pref_thetaCV(i,mv)] = calcCVOSI_new(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
+       [drift_mv(blocknum).osi(i,mv) drift_mv(blocknum).pref_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',0);
+       [drift_mv(blocknum).dsi(i,mv) drift_mv(blocknum).dsi_theta(i,mv)] = calcOSI(squeeze(drift_mv(blocknum).orient_tune(i,:,mv))' - drift_mv(blocknum).interSpont(i,mv)',1);
     end
 end
     
@@ -156,6 +180,7 @@ end
     
     drift_mv(blocknum).frameSpd = frameSpd(1:end-1);
     drift_mv(blocknum).trialPsth = trialPsth;
+   % drift_mv(blocknum).drift_spikeT = trialSpT;
     
     %     catch
     %         drift_mv(blocknum).tuning = [];

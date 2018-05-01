@@ -11,7 +11,7 @@ use =  find(strcmp({files.notes},'good data'))%useSess = use;
 %use =  find( strcmp({files.treatment},'Saline') & strcmp({files.notes},'good data'))
 
 %for specific experiment:
-%use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'080715'))
+use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'080715'))
 sprintf('%d selected sessions',length(use))
 
 saline=1; doi=2; ht=3; ketanserin=4; ketandoi=5; mglur2=6; mglur2doi=7; lisuride=8;
@@ -153,16 +153,15 @@ for i = 1:length(use)
             
             for c = 1:length(cellrange)
                 for cond = 1:72
-                    for mv=1:2
-                        if mv ==1
-                            tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd<1);
-                        else
-                            tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
-                        end
-                        drift_spikeCounts{cellrange(c),cond,mv,prepost,:} = drift.trialPsth(c,tr,:);
+                    if mv ==1
+                        tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd<1);
+                    else
+                        tr = find(drift.trialOrient(1:end-1) == ceil(cond/6) & drift.trialSF(1:end-1)==mod(cond-1,6)+1 & drift.frameSpd>1);
                     end
+                   drift_spikeCounts{cellrange(c),cond,mv,prepost,:} = drift.trialPsth(c,tr,:); 
                 end
             end
+            
         end
         
         %             for prepost=1:2
@@ -761,7 +760,7 @@ for mv = 1:2
 end
 
 %% Modulation indices for drift, stationary
-useResp = peakresp(:,1,1)>2| peakresp(:,1,2)>2
+useResp = peakresp(:,1,1)>1| peakresp(:,1,2)>1
 layerz={'l1','l2','l3','layer 4','layer 5','L6'};
 clear p23 pInh p4 p5
 for t=1:2
