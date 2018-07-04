@@ -133,8 +133,7 @@ for i = 1:length(use)
             for c = 1:length(cellrange)
                 drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
                 mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
-                %drift_spikeTrial{cellrange(c),:,prepost} = drift.drift_spikeT;
-                
+                %drift_spikeTrial{cellrange(c),:,prepost} = drift.drift_spikeT;               
             end
             
             for cond = 1:72
@@ -499,7 +498,7 @@ clear max amp low
 peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont);%subtract driftspont
 %peakresp = squeeze(median(drift_orient,2))-squeeze(drift_spont);%subtract driftspont
 
-%peakresp = squeeze(mean(drift_orient,2))-squeeze(drift_spont);%subtract driftspont
+peakresp = squeeze(mean(drift_orient,2))-squeeze(drift_spont);%subtract driftspont
 %
 % max_wn = wn_evoked-wn_spont% squeeze(max(wn_evoked,[],2))-(squeeze(wn_spont))
 % amp_wn = max_wn  %max_wn-low_wn
@@ -510,8 +509,6 @@ peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont);%subtract drifts
 
 %evoked FR from drift
 titles ={'Saline', 'DOI'};
-
-
 %find proportions between -1:9
 for mv =1
     figure
@@ -581,45 +578,45 @@ for mv =1
 end
 
 %%
-% for mv =1
-%     figure
-%     if mv==1
-%         set(gcf,'Name','mean stat drift FR')
-%     else
-%         set(gcf,'Name','mean mv drift FR')
-%     end
-%     for t=1:2
-%         usedAll = goodAll==1 & treatment==t & hasDrift==1;
-%         subplot(1,2,t)
-%          sn = (unique(sessionNum(treatment==t)))
-%        for sess= 1:length(unique(sessionNum(treatment==t)))      
-%            used = goodAll==1 & treatment==t & hasDrift==1 &sessionNum==sn(sess);
-%            plot(peakresp(inhAll==0 & used,mv,1),...
-%                peakresp(inhAll==0 & used,mv,2),'bo','Markersize',6,'linewidth',1)%,'MarkerFaceColor',[.2 0.5 .8]);
-%            hold on;
-%            premn(sess) = nanmean(peakresp(used,mv,1));  postmn(sess) = nanmean(peakresp(used,mv,2));
-%            plot(premn(sess),postmn(sess),'r+','Markersize',12,'linewidth',2)
-%            set(gca,'FontSize',25,'linewidth',2);
-%            xlabel('Pre (spikes/sec)');ylabel('Post (spikes/sec)');
-%            title(titles{t})
-%            axis square; xlim([-1 10]);ylim([-1 10]);
-%           % animean(sess) = [premn postmn]
-%        % p(t) = ranksum(peakresp(used,mv,1),(peakresp(used,mv,2)))    
-%         plot([-10 37], [-10 37])
-%         plot(peakresp(inhAll==1  &used,mv,1),...
-%             peakresp(inhAll==1 & used,mv,2),'ro','Markersize',6,'linewidth',1)%,'MarkerFaceColor',[.9 .2 .5]);
-%        % plot(mpre,mpost,'k+','Markersize',20,'Linewidth',4)
-%         preP = peakresp(used,mv,1); postP = peakresp(used,mv,2);
-%         propCropped(t) =(sum(preP>10 | preP<-1 |postP>10 | postP<-1)/length(preP)) 
-%         n_cells(t) = sum(used)
-%        end
-%         mnpre = nanmean(premn);mnpost=nanmean(postmn)
-% %         mpre=nanmean(peakresp(usedAll,mv,1))
-% %         mpost=nanmean(peakresp(usedAll,mv,2))  
-%         plot(mnpre,mnpost,'+k','Markersize',15,'Linewidth',4)
-%         [h p(t)] = ttest(premn,postmn)
-%     end
-% end
+for mv =1
+    figure
+    if mv==1
+        set(gcf,'Name','mean stat drift FR')
+    else
+        set(gcf,'Name','mean mv drift FR')
+    end
+    for t=1:2
+        usedAll = goodAll==1 & treatment==t & hasDrift==1;
+        subplot(1,2,t)
+         sn = (unique(sessionNum(treatment==t)))
+       for sess= 1:length(unique(sessionNum(treatment==t)))      
+           used = goodAll==1 & treatment==t & hasDrift==1 &sessionNum==sn(sess);
+           plot(peakresp(inhAll==0 & used,mv,1),...
+               peakresp(inhAll==0 & used,mv,2),'bo','Markersize',6,'linewidth',1)%,'MarkerFaceColor',[.2 0.5 .8]);
+           hold on;
+           premn(sess) = nanmean(peakresp(used,mv,1));  postmn(sess) = nanmean(peakresp(used,mv,2));
+           plot(premn(sess),postmn(sess),'r+','Markersize',12,'linewidth',2)
+           set(gca,'FontSize',25,'linewidth',2);
+           xlabel('Pre (spikes/sec)');ylabel('Post (spikes/sec)');
+           title(titles{t})
+           axis square; xlim([-1 10]);ylim([-1 10]);
+          % animean(sess) = [premn postmn]
+       % p(t) = ranksum(peakresp(used,mv,1),(peakresp(used,mv,2)))    
+        plot([-10 37], [-10 37])
+        plot(peakresp(inhAll==1  &used,mv,1),...
+            peakresp(inhAll==1 & used,mv,2),'ro','Markersize',6,'linewidth',1)%,'MarkerFaceColor',[.9 .2 .5]);
+       % plot(mpre,mpost,'k+','Markersize',20,'Linewidth',4)
+        preP = peakresp(used,mv,1); postP = peakresp(used,mv,2);
+        propCropped(t) =(sum(preP>10 | preP<-1 |postP>10 | postP<-1)/length(preP)) 
+        n_cells(t) = sum(used)
+       end
+        mnpre = nanmean(premn);mnpost=nanmean(postmn)
+%         mpre=nanmean(peakresp(usedAll,mv,1))
+%         mpost=nanmean(peakresp(usedAll,mv,2))  
+        plot(mnpre,mnpost,'+k','Markersize',15,'Linewidth',4)
+        [h p(t)] = ttest(premn,postmn)
+    end
+end
 
 %%
 % normalized FR
@@ -1451,7 +1448,7 @@ figure
 set(gcf,'Name','mean dark FR')
 
 for t=1:2
-    used = hasDark & goodAll==1 & treatment==t;
+    used =  goodAll==1 & treatment==t;
     subplot(1,2,t)
     plot(meanRdark(inhAll==0 & used,1), meanRdark(inhAll==0 & used,2),'.','Markersize',20);hold on; axis square;
     set(gca,'FontSize',18)
@@ -1554,15 +1551,22 @@ end
 figure
 set(gcf,'Name','cv2 dark');
 for t=1:2
-    subplot(1,2,t)
+    subplot(2,2,t)
     mdl_cv2dark= fitlm(cv2Dark(treatment==t&goodAll==1,1), cv2Dark(treatment==t&goodAll==1,2),2)
     rs_cv2dark(t) = mdl_cv2dark.Rsquared.Ordinary
-    plot(cv2Dark(treatment==t,1),cv2Dark(treatment==t,2),'.','Markersize',18);axis square;hold on
-    plot([0 2], [0 2]);ylim([.5 2]);xlim([.5 2]);
+  %  plot(cv2Dark(treatment==t,1),cv2Dark(treatment==t,2),'.','Markersize',18);axis square;hold on
+
+  hist(cv2Dark(treatment==t,1));xlim([0 2]);
+ subplot(2,2,t+2)
+  hist(cv2Dark(treatment==t,2))
+
+   % plot([0 2], [0 2]);
+ %ylim([.5 2]);
+xlim([0 2]);
     title(titles{t});
     n_cells(t) = sum(treatment==t& goodAll==1)
-    text(.55, 1.85, ['r^2 = ' num2str(rs_cv2dark(t))],'FontSize',18)
-    text(.55, 1.65, ['n = ' num2str(n_cells(t))],'FontSize',18)
+   % text(.55, 1.85, ['r^2 = ' num2str(rs_cv2dark(t))],'FontSize',18)
+   % text(.55, 1.65, ['n = ' num2str(n_cells(t))],'FontSize',18)
 end
 
 %%
@@ -1958,12 +1962,17 @@ for prepost=1:2
 end
 
 %%
+
+amp_wn = wn_evoked-wn_spont;%
+useResp_wn = amp_wn(:,2,1)>1 | amp_wn(:,2,2)>1; %| amp_wn(:,2,1)>3 | amp_wn(:,2,2)>3;
+data_wn = goodAll==1 &hasWn==1& useResp_wn';
+
 clear useSTA
 thing = {'saline','doi'};
 mycol = {'k','r'};
 grpRF = {}
 figure;
-for t=1:2
+for t=1
 %useSTA = find((sta_exp_var(:,1)>.6 & sta_exp_var(:,2)>.6) &(treatment==doi)' )%&(layerAll==2|3)');
 useSTA = find(treatment==t &data_wn)%&(layerAll==2|layerAll==3));
 % useSTA = find(treatment==saline &data_wn& layerAll==1);
@@ -1979,8 +1988,8 @@ axis square
 end
 legend(thing)
 
-[h0,p,kstat] = kstest2(h(1,:),h(2,:))
-[h0,p] = ttest2(grpRF{1},grpRF{2})
+[h0,p,kstat] = kstest2(h(1,:),h(2,:)) %saline vs doi
+[h0,p] = ttest2(grpRF{1},grpRF{2})% ttest
 %% plot white noise response functions for all units
 
 titles = {'layer 1','layer 2','layer 3','layer 4','layer 5','layer 6'};
@@ -2565,34 +2574,33 @@ for t=1:2
 end
 
 %% CV OSI
-
+%%% for paper
 drift_osiCV_abs=abs(drift_osiCV);
+
+
 useOsi_pre = drift_osiCV_abs(:,1,1)>.3;
 useOsi_post = drift_osiCV_abs(:,1,2)>.3;
 useOsi=(useOsi_pre & useOsi_post)'
 useOsi_mn = squeeze(mean(drift_osiCV_abs,2));
 peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont);%subtract driftspont
-% peakresp = squeeze(mean(drift_orient,2))-squeeze(drift_spont);%subtract driftspont
-useResp = peakresp(:,2,1)>2| peakresp(:,2,2)>2;
-ampmean = squeeze(nanmean(peakresp,2));
-% useResp = ampmean(:,1)>2 |ampmean(:,2)>2;
 
 data = goodAll & useResp' & ~inhAll & hasDrift==1 &useOsi==1 ;%which cells to include
 dataInh =goodAll & useResp' & inhAll & hasDrift==1 & useOsi==1;
 dataAll =goodAll & useResp' & hasDrift==1 &useOsi==1;
 titles={'Saline', 'DOI'};
-for mv= 1:2
+figure; hold on;
+for mv= 1
     clear R rs_pf
-    figure
+   % figure
     if mv==1, set(gcf,'Name', 'stationary');
-        useResp = peakresp(:,1,1)>2 | peakresp(:,1,2)>2; set(gcf,'Name','stationary pref ori');
+        useResp = peakresp(:,1,1)>1 | peakresp(:,1,2)>1; set(gcf,'Name','stationary pref ori');
         
     else
         set(gcf,'Name', 'mv');
-        useResp = peakresp(:,2,1)>2 | peakresp(:,2,2)>2; set(gcf,'Name','mv pre ori')
+        useResp = peakresp(:,2,1)>1 | peakresp(:,2,2)>1; set(gcf,'Name','mv pre ori')
         
     end
-    for t=1:2
+    for t=1
         data = goodAll & useResp' & ~inhAll & hasDrift==1 &useOsi==1&treatment==t ;%which cells to include
         dataInh =goodAll & useResp' & inhAll & hasDrift==1 & useOsi==1&treatment==t;
         dataAll =goodAll & useResp' & hasDrift==1 &useOsi==1&treatment==t;
@@ -2602,22 +2610,25 @@ for mv= 1:2
         mdl_pf= fitlm(pre,post)
         c=corrcoef(pre,post,'rows','pairwise'); c = c(2,1)
         rs_pf(t) = mdl_pf.Rsquared.Ordinary
-        subplot(1,2,t)
-         pre=drift_pref_thetaCV(dataInh,mv,1); post= drift_pref_thetaCV(dataInh,mv,2)
-        post(pre-post > pi/2) = post(pre-post>pi/2)+pi;
-        pre(post-pre > pi/2) = pre(post-pre>pi/2)+pi;
+        %subplot(1,2,t)
+%          pre=drift_pref_thetaCV(dataInh,mv,1); post= drift_pref_thetaCV(dataInh,mv,2)
+%         post(pre-post > pi/2) = post(pre-post>pi/2)+pi;
+%         pre(post-pre > pi/2) = pre(post-pre>pi/2)+pi;
        
-        plot(pre,post,'ko','Markersize',10,'linewidth',2,'MarkerFaceColor',[.9 .2 .5]);title(titles{t});hold on;
+        plot(pre,post,'bo','Markersize',10,'linewidth',2)%,'MarkerFaceColor',[.9 .2 .5]);
+        title(titles{t});hold on;
         pre=drift_pref_thetaCV(data,mv,1); post= drift_pref_thetaCV(data,mv,2)
         post(pre-post > pi/2) = post(pre-post>pi/2)+pi;
         pre(post-pre > pi/2) = pre(post-pre>pi/2)+pi;
         
-        plot(pre,post,'ko','Markersize',10,'linewidth',2,'MarkerFaceColor',[.2 0.5 .8])
+        plot(pre,post,'bo','Markersize',10,'linewidth',2)%,'MarkerFaceColor',[.2 0.5 .8])
         [h stat(t)] = ttest(pre,post);
         axis square;plot([0 3.25], [0 3.25]);xlim([0 3.25]);ylim([0 3.25]);
         text(.2, 2.8, ['r^2 = ' num2str(rs_pf(t),'%.2f')],'FontSize',18)
         text(.2, 2.4, ['p = ' num2str(stat(t))],'FontSize',18)
-
+        
+       
+        
         set(gca,'xtick',([pi/4 pi/2 .75*pi pi]))
         set(gca,'xticklabels',({'45','90','135','180'}),'FontSize',20)
         set(gca,'ytick',([0 pi/4 pi/2 .75*pi pi]))
@@ -2848,7 +2859,7 @@ peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont); %subtract drift
 % % data = goodAll & useResp' &  usedsi==1 ;%which cells to include
 % dataAll = goodAll & useResp' & hasDrift==1 & usedsi ==1 ;
 
-for mv=1:2
+for mv=2
     figure
     if mv ==1
         useResp = peakresp(:,1,1)>2 | peakresp(:,1,2)>2; set(gcf,'Name','stationary dsi');
@@ -2864,6 +2875,8 @@ for mv=1:2
         rs_dsi(t) = mdl_dsi.Rsquared.Ordinary
         c = corrcoef(drift_dsi(dataAll,mv,1),drift_dsi(dataAll,mv,2),'rows','pairwise');
         c = c(2,1);
+       [p(t) h]=ranksum(drift_dsi(dataAll&treatment==t,mv,1),drift_dsi(dataAll&treatment==t,mv,2))
+
         plot(drift_dsi(dataAll & ~inhAll,mv,1),drift_dsi(dataAll & ~inhAll,mv,2),'.','Markersize',20);hold on;
         plot(drift_dsi(dataAll & inhAll==1,mv,1),drift_dsi(dataAll & inhAll==1,mv,2),'r.','Markersize',20);
         axis square;hold on; plot([0 1],[0 1]);
@@ -2886,18 +2899,18 @@ dataAll =goodAll & useResp' & hasDrift==1 ;
 %     figure
 % pre = drift_dsi(dataAll&treatment==t,mv,1);
 % post = drift_dsi(dataAll&treatment==t,mv,2);
-%
+% 
 % miDrift = (mean(peakresp(dataAll&treatment==t,1,2),3)-mean(peakresp(dataAll&treatment==t,mv,1),3))./...
 %     (mean(peakresp(dataAll&treatment==t,mv,2),3)+mean(peakresp(dataAll&treatment==t,mv,1),3));
 % h = hist(miDrift,-1:.2:1);
-%
+% 
 % subplot(121)
 % plot(miDrift,pre,'.','Markersize',20); xlabel('MI'); ylabel('DSI Pre'); axis square
 % xlim([-1.5 1.5]);
 % subplot(122);
 % plot(miDrift,post,'.','Markersize',20); xlabel('MI'); ylabel('DSI Post');axis square
 % xlim([-1.5 1.5]);
-%
+% 
 % end
 
 mv=1
@@ -2946,6 +2959,7 @@ for mv=1:2
     %dataAll = goodAll & useResp' & hasDrift==1 & useOsi ==1 ;
     %figure
     for t=1:2
+        clear p
         osi(1,:) = nanmean(abs(drift_osi(dataAll&treatment==t,mv,1)))
         osierr(1,:) = squeeze(nanstd(drift_osi(dataAll & treatment==t,mv,1)/sqrt(sum(drift_osi(dataAll & treatment==t,mv,1),1))));
         osi(2,:) = nanmean(abs(drift_osi(dataAll&treatment==t,mv,2)))
@@ -2972,25 +2986,25 @@ useOsi_pre = drift_osi_mn(:,1)>0
 useOsi_post = drift_osi_mn(:,2)>0
 useOsi=(useOsi_pre | useOsi_post)'
 peakresp_mn = squeeze(nanmean(peakresp,2));
-useResp = peakresp_mn(:,1)>2 | peakresp_mn(:,2)>2;
+useResp = peakresp_mn(:,1)>1 | peakresp_mn(:,2)>1;
 % data = goodAll & useResp' &  useOsi==1 ;%which cells to include
-dataAll = goodAll & useResp' & hasDrift==1 & useOsi ==1 ;
+dataAll = goodAll & useResp' & hasDrift==1 %& useOsi ==1 ;
 
 titles = {'Saline','DOI','5HT'};
 %osi all layers
-clear n_cells
+clear n_cells p
 clear osierr osi
 figure
 for t=1:2
-    %     dataAll = goodAll & useResp' & hasDrift==1 & (useOsi ==1)' &treatment==t;
-    osi(1,:) = nanmean(drift_osi_mn(dataAll&treatment==t,1))
+    % dataAll = goodAll & useResp' & hasDrift==1 & (useOsi ==1)' &treatment==t;
+    osi(1,:) = nanmean(abs(drift_osi_mn(dataAll&treatment==t,1)))
     osierr(1,:) = squeeze(nanstd(drift_osi_mn(dataAll&treatment==t,1))./sqrt(sum(dataAll&treatment==t)));
-    osi(2,:) = nanmean(drift_osi_mn(dataAll&treatment==t,2))
+    osi(2,:) = nanmean(abs(drift_osi_mn(dataAll&treatment==t,2)))
     osierr(2,:) = squeeze(nanstd(drift_osi_mn(dataAll&treatment==t,2))./sqrt(sum(dataAll&treatment==t)));
     subplot(1,2,t)
     barweb(osi,osierr); ylim([0 1]); axis square
-    [p h]=ranksum(drift_osi_mn(dataAll&treatment==t,1),drift_osi_mn(dataAll&treatment==t,2))
-    text(.55, .9, ['p = ' num2str(p,'%.2f')],'FontSize',18)
+    [p,h]=ranksum(drift_osi_mn(dataAll&treatment==t,1),drift_osi_mn(dataAll&treatment==t,2))
+   text(.55, .9, ['p = ' num2str(p)],'FontSize',18)
     n_cells(t) = sum(dataAll&treatment==t)
     text(.55, .8, ['n = ' num2str(n_cells(t))],'FontSize',18)
     title(titles{t})
@@ -3116,28 +3130,39 @@ end
 
 
 %%
-for t = 1
+peakresp = squeeze(max(drift_orient,[],2))-squeeze(drift_spont);%subtract driftspont
+useResp = peakresp(:,1,1)>0 & peakresp(:,1,2)>0;
+
+for t = 1:2
     figure
-    clear data% barsf mn  prepost ff low medium high
+    clear data barsf mn  prepost ff low medium high
         sess=find(sessionTreatment==t);
         data = useResp' & hasDrift==1 & treatment==t;
     for s=1:length(sess)
 clear aniCell 
 for prepost=1:2
-    for g = 1:4
-        aniCell=find(data&sessionNum==sess(s));
-         ff(s) = (sum(SFpref(aniCell,prepost)==1))/length(aniCell);
-         low(s) = (sum(SFpref(aniCell,prepost)==2|SFpref(aniCell,prepost)==3))/length(aniCell); 
-         medium(s) = (sum(SFpref(aniCell,prepost)==4|SFpref(aniCell,prepost)==5))/length(aniCell); 
-         high(s) = (sum(SFpref(aniCell,prepost)==6|SFpref(aniCell,prepost)==7))/length(aniCell);
-         barsf(s,:)= [ff(s) low(s) medium(s) high(s)];
-         bartest(s,:,prepost) =  [ff(s) low(s) medium(s) high(s)];
-         mn(prepost,:) = nanmean(barsf,1); err(prepost,:) = (nanstd(barsf,1)/sqrt(length(sess)));  
-    end
-        %    mn(prepost,:) = nanmean(barsf,1); err(prepost,:) = (nanstd(barsf)/sqrt(length(sess)));  
+    %for g = 1:4
+         aniCell=(data&sessionNum==sess(s));
+         ff(s) = (sum(SFpref(aniCell,prepost)==1))./length(aniCell);
+         low(s) = ((SFpref(aniCell,prepost)==2|SFpref(aniCell,prepost)==3))/length(aniCell); 
+         medium(s) = ((SFpref(aniCell,prepost)==4|SFpref(aniCell,prepost)==5))/length(aniCell); 
+         high(s) = ((SFpref(aniCell,prepost)==6|SFpref(aniCell,prepost)==7))/length(aniCell);
+       
 
-end
-        barweb(mn',err');% hold on;
+%          ff(s) = (sum(SFpref(aniCell,prepost)==1))/sum(aniCell);
+%          low(s) = (sum(SFpref(aniCell,prepost)==2|SFpref(aniCell,prepost)==3))/sum(aniCell); 
+%          medium(s) = (sum(SFpref(aniCell,prepost)==4|SFpref(aniCell,prepost)==5))/sum(aniCell); 
+%          high(s) = (sum(SFpref(aniCell,prepost)==6|SFpref(aniCell,prepost)==7))/sum(aniCell);
+
+          barsf(s,:)= [ff(s) low(s) medium(s) high(s)];
+          bartest(s,:,prepost) =  [ff(s) low(s) medium(s) high(s)];
+          mn(:,prepost) = nanmean(barsf,1); 
+          err(:,prepost) = (nanstd(barsf,1)/sqrt(length(barsf)));  
+   % end
+            %mn(prepost,:) = nanmean(barsf,1); err(prepost,:) = (nanstd(barsf)/sqrt(length(sess)));  
+
+
+%         barweb(mn,err);% hold on;
         %plot([0 8],[1/4 1/4],':','color',[0.8 0.8 0.8])
 
          ylim([0 .5]); axis square
@@ -3148,8 +3173,8 @@ end
 %         if t==1, title('Saline');else title('DOI')
 %         end
     end
-           [h p]= ttest(bartest(:,:,1),bartest(:,:,2))
-
+          % [h p]= ttest(bartest(:,:,1),bartest(:,:,2))
+end
     end
 
 
@@ -3169,19 +3194,19 @@ for t = 1:2
         
         SFpref(data,1)==sfs{g}(data,1)
         
-      %  sferr(g,1) = squeeze(nanstd(SFpref(data,1)==(sfs{g},1)))/sqrt(sum(sfs{g}(data,1)))
-        %sferr(g,2) = squeeze(nanstd(SFpref(data,2)==sfs{g}(data,2)))/sqrt(sum(sfs{g}(data,2)))
+     %  sferr(g,1) = squeeze(nanstd(SFpref(data,1)==(sfs{g},1)))/sqrt(sum(sfs{g}(data,1)))
+       % sferr(g,2) = squeeze(nanstd(SFpref(data,2)==sfs{g}(data,2)))/sqrt(sum(sfs{g}(data,2)))
         
-        %sferr(g,2) = squeeze(nanstd(sfBar(g,2)))/sqrt(sum(sfBar(g,2)))
+     %   sferr(g,2) = squeeze(nanstd(sfBar(g,2)))/sqrt(sum(sfBar(g,2)))
         
-        %sferr(g,1) = squeeze(nanstd(SFpref(sfs{g}(data,1))))/sqrt(sum(SFpref(sfs{g}(data,1))))
-        %sferr(g,2) = squeeze(nanstd(SFpref(sfs{g}(data,2))))/sqrt(sum(SFpref(sfs{g}(data,2))));
+     %   sferr(g,1) = squeeze(nanstd(SFpref(sfs{g}(data,1))))/sqrt(sum(SFpref(sfs{g}(data,1))))
+      %  sferr(g,2) = squeeze(nanstd(SFpref(sfs{g}(data,2))))/sqrt(sum(SFpref(sfs{g}(data,2))));
         
         %[p h] = ranksum(SFpref(data,1),SFpref(data,2))
         [p(g) h(g)] = ranksum(sfs{g}(data,1),sfs{g}(data,2))
         subplot(2,1,t)
-        bar(sfBar/sum(data))
-        %barweb(sfBar/sum(data),sferr);
+      %  bar(sfBar/sum(data))
+    %    barweb(sfBar/sum(data),sferr);
         ylim([0 .5]); axis square
         xlim([.5 4.5]); ylabel('proportion of cells'); xlabel('preferred SF');
         set(gca, 'XTickLabels', {'FF' 'low' 'medium' 'high'},'FontSize',22);
@@ -3573,10 +3598,17 @@ for mv=1:2
 end
 
 %%
+
+salineSessions = find(sessionTreatment==1);
+doiSessions = (sessionTreatment==2);
+htSessions = sessionTreatment==3;
+
+mnTetDark = squeeze(nanmean(LFPallChDark(:,:,1:end-1,:,:),2));
+mnTetDrift = squeeze(nanmean(LFPallChDrift(:,:,1:end-1,:,:),2));
 C = {[0 0 .9],[.8 0 0]}; %red = mv=1, light =pre, dark =post
 D = {[0 1 0],[0 .5 0]}; %green = mv=2
-for mv=1:2
-    clear prenorm postnorm normrange mnpre mnpost
+for mv=1
+    clear prenorm postnorm normrange mnpre mnpost delta theta alpha beta gamma
     figure; hold on;
     if mv==1
         set(gcf,'Name','stationary');
@@ -3592,8 +3624,7 @@ for mv=1:2
             use = use([1:2 4:6 8:12 14:15]);
         end
         
-        for s= 1: length(use) 
-            
+        for s= 1: length(use)  
             %normalize response of all cells used, then average
             prerange = (mnTetDrift(use(s),1:90,mv,1));postrange = (mnTetDrift(use(s),1:90,mv,2))
             normrange(s,:)= max(prerange)%-min(prerange)
@@ -3612,22 +3643,20 @@ for mv=1:2
             nsessions = length(use);
             sempre = nanstd(prenorm)/sqrt(nsessions);
             sempost = nanstd(postnorm)/sqrt(nsessions);
-            %             subplot(2,2,t)
-            %             plot(prenorm','Color',C{1},'Linewidth',2); hold on;xlim([0 115]);
+            %            subplot(2,2,t)
+            %            plot(prenorm','Color',C{1},'Linewidth',2); hold on;xlim([0 115]);
             %            plot(mnpre,'Linewidth',4,'Color',C{1});  axis square;% ylim([ 0 3.3e+04]);
             %            plot(postnorm','Color',C{2},'Linewidth',2);
-            %            plot(mnpost,'Linewidth',4,'Color',C{2});
-            
+            %            plot(mnpost,'Linewidth',4,'Color',C{2});    
         end
-        [h(t),p(t)] = kstest2(mnpre, mnpost)
-        subplot(1,2,t)
-     %   preerr= mseb(1:length(mnpre),mnpre,sempre,'k',1);hold on; axis square
-        preerr=shadedErrorBar(1:length(mnpre),mnpre,sempre,'k',1); hold on; axis square
-        %posterr= mseb(1:length(mnpost),mnpost,sempost,'r',1);
-       posterr=shadedErrorBar(1:length(mnpost),mnpost,sempost,'r',1);
-        text(.1 ,.85, ['p = ' num2str(p(t))],'FontSize',20);
-        xlim([0 90]);
-        ylim([0 1.0]);
+        [h(t),pks(t)] = kstest2(mnpre, mnpost)
+%         subplot(1,2,t)
+%        preerr=shadedErrorBar(1:length(mnpre),mnpre,sempre,'k',1); hold on; axis square      
+%        posterr=shadedErrorBar(1:length(mnpost),mnpost,sempost,'r',1);
+       
+%         text(.1 ,.85, ['p = ' num2str(pks(t))],'FontSize',20);
+%         xlim([0 90]);
+%         ylim([0 1.0]);
         set(gca,'FontSize',24);set(gca, 'linewidth',2)
         %frequencies are doubled
         
@@ -3636,16 +3665,61 @@ for mv=1:2
 %                    alpha = [nanmean(prenorm(:,9:13),2) nanmean(postnorm(:,9:13),2)]
 %                    gamma = [nanmean(prenorm(:,60:70),2) nanmean(postnorm(:,60:70),2)]
         
-%                    delta = [nanmean(prenorm(1,1:8),1) nanmean(postnorm(1:8,1))]
-%                    theta = [nanmean(prenorm(12:16,1)) nanmean(postnorm(12:16,1))]
-%                    alpha = [nanmean(prenorm(17:30,1)) nanmean(postnorm(17:30,1))]
-%                    gamma = [nanmean(prenorm(60:70,1)) nanmean(postnorm(60:70,1))]
-%         
-[hD(t,mv) pDelta(t,mv)]=ttest(prenorm(~isnan(prenorm(:,1:8))),postnorm(~isnan(postnorm(:,1:8))))
-[hT(t,mv) pTheta(t,mv)]=ttest(prenorm(~isnan(prenorm(:,12:16))),postnorm(~isnan(postnorm(:,12:16))))
-[hA(t,mv) pAlpha(t,mv)]=ttest(prenorm(~isnan(prenorm(:,17:25))),postnorm(~isnan(postnorm(:,17:25))))
-[hB(t,mv) pBeta(t,mv)]=ttest(prenorm(~isnan(prenorm(:,26:59))),postnorm(~isnan(postnorm(:,26:59))))
-[hG(t,mv) pGamma(t,mv)]=ttest(prenorm(~isnan(prenorm(:,60:70))),postnorm(~isnan(postnorm(:,60:70))))
+                   %delta = [nanmean(prenorm(:,1:7),2) nanmean(postnorm(:,1:7),2)]
+                   delta = [nanmean(prenorm(:,2:8),2) nanmean(postnorm(:,2:8),2)] %test lfo
 
+                  % theta = [nanmean(prenorm(:,10:16),2) nanmean(postnorm(:,10:16),2)]
+                   theta = [nanmean(prenorm(:,12:18),2) nanmean(postnorm(:,12:18),2)]
+
+                   %alpha = [nanmean(prenorm(:,16:26),2) nanmean(postnorm(:,16:26),2)]
+                   alpha = [nanmean(prenorm(:,18:26),2) nanmean(postnorm(:,18:26),2)]
+                   
+                   beta =  [nanmean(prenorm(:,26:56),2) nanmean(postnorm(:,26:56),2)]
+                   gamma = [nanmean(prenorm(:,56:70),2) nanmean(postnorm(:,56:70),2)]
+        
+                %ttests for diff frequencies, avg across all animals pre vs
+                %post
+                    [o pdelta(t)]=ttest(delta(:,1),delta(:,2))
+                    [o ptheta(t)]=ttest(theta(:,1),theta(:,2))
+                    [o palpha(t)]=ttest(alpha(:,1),alpha(:,2))
+                    [o pbeta(t)]=ttest(beta(:,1),beta(:,2))
+                    [o pgamma(t)]=ttest(gamma(:,1),gamma(:,2))
+                   
+                  % delta = nanmean(delta); theta = nanmean(theta); alpha = nanmean(alpha);beta = nanmean(beta);gamma=nanmean(gamma);
+                  %  freqs = [delta' theta' alpha' gamma'];
+                  %  freqs = [delta' theta' alpha' beta' gamma'];
+                  %  [h freqp(t)]= kstest2(freqs(1,:),freqs(2,:));
+
+                    
+%                     [o pdelta(t)]=ttest(delta(1),delta(2))
+%                     [o ptheta(t)]=ttest(theta(1),theta(2))
+%                     [o palpha(t)]=ttest(alpha(1),alpha(2))
+%                     [o pbeta(t)]=ttest(beta(1),beta(2))
+%                     [o pgamma(t)]=ttest(gamma(1),gamma(2))
+
+%%% avg pts within each bin for each animal, to get 12x5 pts, then ttest
+% [hD(t,mv) pDelta(t,mv)]=ttest(prenorm(~isnan(prenorm(:,1:8))),postnorm(~isnan(postnorm(:,1:8))))
+% [hT(t,mv) pTheta(t,mv)]=ttest(prenorm(~isnan(prenorm(:,12:16))),postnorm(~isnan(postnorm(:,12:16))))
+% [hA(t,mv) pAlpha(t,mv)]=ttest(prenorm(~isnan(prenorm(:,17:25))),postnorm(~isnan(postnorm(:,17:25))))
+% [hB(t,mv) pBeta(t,mv)]=ttest(prenorm(~isnan(prenorm(:,26:59))),postnorm(~isnan(postnorm(:,26:59))))
+% [hG(t,mv) pGamma(t,mv)]=ttest(prenorm(~isnan(prenorm(:,60:70))),postnorm(~isnan(postnorm(:,60:70))))
+
+% subplot(1,2,t)
+% hold on;
+% plot(1,delta(:,1),'o')
+% plot(2,delta(:,2),'o')
+% 
+% plot(4,theta(:,1),'o')
+% plot(5,theta(:,2),'o')
+% 
+% plot(7,alpha(:,1),'o')
+% plot(8,alpha(:,2),'o')
+% 
+% plot(10,beta(:,1),'o')
+% plot(11,beta(:,2),'o')
+% 
+% plot(13,gamma(:,1),'o')
+% plot(14,gamma(:,2),'o')
      end
 end
+

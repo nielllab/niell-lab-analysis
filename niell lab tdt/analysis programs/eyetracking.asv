@@ -6,7 +6,7 @@ close all
 % name = {'120516_driftlowcontrast_eye.mat'}; %camera file exported from matlab     
 %%
 thresh = .99%0.99; %pupil threshold for binarization
-puprange = [25 40]; %set
+puprange = [30 45]; %set
 
 %%closed loop parameters
 % pupercent = 0.15; %set range pupil radius window
@@ -83,8 +83,8 @@ toc
 h2 = figure
 hold on
 plot(0.1:0.1:size(data,3)/10,rad,'r-')
- plot(0.1:0.1:size(data,3)/10,centroid(:,1)/5,'.b') %x centroid value
- plot(0.1:0.1:size(data,3)/10,centroid(:,2)/5,'.m') % y centroid value
+ plot(0.1:0.1:size(data,3)/10,centroid(:,1)/10,'.b') %x centroid value
+ plot(0.1:0.1:size(data,3)/10,centroid(:,2)/10,'.m') % y centroid value
 legend('radius','x pos','ypos')
 %ylim([5 55])
 
@@ -126,34 +126,21 @@ legend('radius','x pos','ypos')
 h4 = figure
 for i = 1:size(data,3)
  
-    subplot(3,2,1)
+    subplot(1,2,1)
     imshow(data(yc-vert:yc+vert,xc-horiz:xc+horiz,i));
     colormap gray
     hold on
     circle(centroid(i,1),centroid(i,2),rad(i))
     drawnow
-    hold off    
-    subplot(3,2,2)
+    hold off
+    
+    subplot(1,2,2)
     imshow(bindata(:,:,i));
     colormap gray
     hold on
     circle(centroid(i,1),centroid(i,2),rad(i))
     drawnow
     hold off 
-    subplot(3,2,[3 4])
-hold on;
-xlim([0 601]);ylim([25 45]);
-    plot(rad,'k','linewidth',.75);
-    plot(i,45,'ro','markersize',2,'linewidth',2)
-%drawnow
-hold off
-% subplot(3,2,[5,6])
-% axis square;
-% hold on
-% plot(centroid(i,1),centroid(i,2))
-% hold off
-
-
 %     mov(i) = getframe(gcf)
 %     vid = VideoWriter('predoi_tracking.avi')
 %     open(vid); writeVideo(vid,mov); close(vid)
