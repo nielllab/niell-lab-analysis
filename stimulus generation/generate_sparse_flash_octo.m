@@ -15,7 +15,7 @@ sz = [ 2 4 8 ];
 p_flash=0.01;  %%% prob of full-field flash
 density = 0.1;
 
-flash_duration = 1;
+flash_duration = 0.5;
 MovieRate = 1/flash_duration
 frame_duration = 1/MovieRate;
 total_duration = 600;
