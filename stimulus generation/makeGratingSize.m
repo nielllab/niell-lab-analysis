@@ -14,7 +14,7 @@ isi = 0.5;
 nreps = 1; %number of movie repetitions
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
-sfrange = [0.04 0.16];
+sfrange = [0.08];
 tfrange = [2];
 % sfrange = [0.01 0.04 0.16];
 % tfrange =[1 4];
@@ -23,11 +23,12 @@ tfrange = [2];
 % sizeVals = [30];
 % sizeVals = [0 10 20 30 40 50];
 % radiusRange = sizeVals/(8*degperpix);
-radiusRange = [0 2.5 5 10 15 20 25];
-phaserange = linspace(0,2*pi,25); phaserange =phaserange(1:24);  %%%cmn
+% radiusRange = [0 2.5 5 10 15 20 25];
+radiusRange = [0 2.5 5 15 25];
+phaserange = linspace(0,2*pi,19); phaserange =phaserange(1:18);  %%%cmn
 % phaserange = [0];
-% contrastRange = [0.125 0.25 0.5 1];
-contrastRange = [1];
+contrastRange = [0.125 0.25 0.5 1];
+% contrastRange = [1];
 
 
 ntheta = 4; %cmn
@@ -36,7 +37,7 @@ nx = 1; ny =1;
 randomOrder=1;
 randomTheta=0;
 randomPhase=0;
-binarize=1;
+binarize=0;
 blank=0;
 
 totalduration = length(sfrange)*length(contrastRange)*length(tfrange)*length(radiusRange)*length(phaserange)*ntheta*nx*(isi+duration);
@@ -155,4 +156,4 @@ moviedata = moviedata(1:xsz,1:ysz,:);
 % drawnow
 
 % save sizeSelect2sf8sz26min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration sizeVals
-save sizeselectBin22min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration -v7.3
+save sizeselect4Ctrst24min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny radius radiusRange contrasts order totalduration -v7.3
