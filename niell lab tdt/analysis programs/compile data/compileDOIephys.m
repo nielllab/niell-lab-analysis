@@ -7,8 +7,10 @@ set(groot,'defaultFigureVisible','off') %disable figure plotting
 % set(groot,'defaultFigureVisible','on')
 
 %%% select the sessions you want based on filters
-use =  find(strcmp({files.notes},'good data'))%useSess = use;
-%use =  find( strcmp({files.treatment},'Saline') & strcmp({files.notes},'good data'))
+%use =  find(strcmp({files.notes},'good data'))%useSess = use;
+use =  find( strcmp({files.treatment},'Saline') & strcmp({files.notes},'good data'))
+%use =  find( strcmp({files.treatment},'Saline')|strcmp({files.treatment},'DOI') & strcmp({files.notes},'good data'))
+
 
 %for specific experiment:
 %use =  find(strcmp({files.notes},'good data') & strcmp({files.expt},'080715'))
@@ -112,9 +114,7 @@ for i = 1:length(use)
         hasDrift(cellrange)=1;
         for prepost = 1:2
             drift = getDrift_mv(clustfile,afile,files(use(i)).blockDrift{prepost},1);
-            % drift_spikeT{cellrange,:,prepost} = drift.drift_spikeT;
-            % drift_spikeT{prepost} = drift.drift_spikeT;
-            % drift_spikeT(cellrange,:,prepost) = drift.drift_spikeT
+            drift_spikeT{i,:,prepost} = drift.drift_spikeT;
             drift_orient(cellrange,:,:,prepost)=drift.orient_tune;
             drift_sf(cellrange,:,:,prepost) = drift.sf_tune;
             drift_spont(cellrange,:,prepost) = drift.interSpont;
@@ -122,10 +122,10 @@ for i = 1:length(use)
             drift_osi(cellrange,:,prepost) = drift.osi;
             drift_osiCV(cellrange,:,prepost) = drift.cv_osi;
             drift_osiCV2(cellrange,:,prepost) = drift.cv_osi2; %weird values
-            drift_F1F0(:,cellrange,prepost)= drift.F1F0;
+            %drift_F1F0(:,cellrange,prepost)= drift.F1F0;
             drift_ot_tune(cellrange,:,:,prepost)=drift.orient_tune;
             drift_sf_trial{i,prepost} = drift.trialSF;
-            drift_orient_trial{prepost} = drift.trialOrient;
+            drift_orient_trial{i,prepost} = drift.trialOrient;
             drift_pref_theta(cellrange,:,prepost) = drift.pref_theta;
             drift_pref_thetaCV(cellrange,:,prepost) = drift.pref_thetaCV;
             drift_dsi_theta(cellrange,:,prepost) = drift.dsi_theta;
@@ -133,7 +133,7 @@ for i = 1:length(use)
             for c = 1:length(cellrange)
                 drift_trial_psth{cellrange(c),:,prepost} = squeeze(drift.trialPsth(c,:,:));
                 mnPsth(cellrange(c),prepost,:) = squeeze(mean(drift.trialPsth(c,:,:),2));
-                %drift_spikeTrial{cellrange(c),:,prepost} = drift.drift_spikeT;               
+                drift_spikeTrial{cellrange(c),:,prepost} = drift.drift_spikeT;               
             end
             
             for cond = 1:72
@@ -433,6 +433,9 @@ for i = 1:length(use)
     ncorr= ncorr+nc^2;
 end
 %%
+
+%for theoretical people:
+ save('compileSalineEphys_101118','layerAll','drift_spikeT','drift_sf_trial','drift_orient_trial', 'drift_trial_psth', 'drift_cond_tcourse', 'speedTraceDrift', 'treatment', 'drift', 'drift_spikeCounts','inhAll')
 
 %%% plot speed histogram
 titles = {'Saline','DOI','5HT','ketanserin', 'ketanserin + DOI', 'MGluR2','MGluR2 + DOI','Lisuride'};
@@ -2676,7 +2679,7 @@ for mv= 1:2
         c=corrcoef(pre,post,'rows','pairwise'); c = c(2,1)
         rs_pf(t) = mdl_pf.Rsquared.Ordinary
         subplot(1,2,t)
-         pre=drift_pref_theta(dataInh,mv,1); post= drift_pref_theta(dataInh,mv,2)
+        pre=drift_pref_theta(dataInh,mv,1); post= drift_pref_theta(dataInh,mv,2)
         post(pre-post > pi/2) = post(pre-post>pi/2)+pi;
         pre(post-pre > pi/2) = pre(post-pre>pi/2)+pi;
        

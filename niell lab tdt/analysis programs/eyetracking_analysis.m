@@ -210,9 +210,10 @@ end
 %     circle(centroid(i,1),centroid(i,2),rad(i))
 %     drawnow
 %     hold off 
-% %     mov(i) = getframe(gcf)
-% %     vid = VideoWriter('predoi_tracking.avi')
-% %     open(vid); writeVideo(vid,mov); close(vid)
+% 
+%     mov(i) = getframe(gcf)
+%     vid = VideoWriter('predoi_tracking.avi')
+%     open(vid); writeVideo(vid,mov); close(vid)
 % end
 
 

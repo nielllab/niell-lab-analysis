@@ -22,6 +22,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
 files(n).badsites = [1 4 5 11 12 18];
 
@@ -46,6 +48,8 @@ files(n).treatment = 'Saline';
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 650; files(n).tip2 = 650; files(n).angle = 90;%vertical penetration 
 files(n).badsites = [];
@@ -74,6 +78,8 @@ files(n).postpinpFile = ''
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 
@@ -119,6 +125,8 @@ files(n).treatment = '5HT';
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
 files(n).badsites = [];
@@ -142,6 +150,8 @@ files(n).treatment = '5HT';
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).notes = 'good data'; %one small drop of injection didn't make it in
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
 files(n).badsites = [];
@@ -191,6 +201,8 @@ files(n).postpinpFile = '';
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
 files(n).badsites = [];
 
@@ -213,6 +225,8 @@ files(n).prepinpFile = '';
 files(n).postpinpFile = '';
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
 files(n).badsites = [];
@@ -234,6 +248,8 @@ files(n).injection = 'injection';
 files(n).treatment = 'Saline'; 
 files(n).prepinpFile = '';
 files(n).postpinpFile = '';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'bad data'; %same animal used on 3/25/17, penetrated just slightly posterior in the center of V1 -- few spikes and noisy data- weird waveforms
 files(n).misc = ''; 
@@ -259,6 +275,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration
 files(n).badsites = [];
@@ -282,6 +300,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
 files(n).badsites = [];
@@ -306,6 +326,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;
 files(n).badsites = [];
@@ -377,6 +399,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
 files(n).badsites = [];
@@ -402,6 +426,8 @@ files(n).postpinpFile = ''
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 90;%vertical penetration 
 files(n).badsites = [];
 
@@ -456,6 +482,8 @@ files(n).postpinpFile = ''
 % files(n).layers(1:10) = 2; (11:?
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45;
 files(n).badsites = [3 8 10 20];
 
@@ -507,6 +535,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data'; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 575; files(n).tip2 = 575; files(n).angle = 45;  
 files(n).badsites = [];
@@ -537,6 +567,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 
@@ -564,6 +596,8 @@ files(n).layers = [];
 files(n).notes = 'good data'; %only a few units
 files(n).misc = ''; 
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [];
@@ -593,6 +627,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 n=n+1;
@@ -620,6 +656,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = []; %[8 13 14];
 
 n=n+1;
@@ -647,6 +685,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 n=n+1;
@@ -674,6 +714,8 @@ files(n).misc = '';
 files(n).tip1 = 540; files(n).tip2 = 500; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 n=n+1;
@@ -701,6 +743,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 475; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 
@@ -727,6 +771,8 @@ files(n).layers = [];
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [];
@@ -754,6 +800,8 @@ files(n).layers = [];
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [];
@@ -783,6 +831,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 475; files(n).angle = 35;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 n=n+1;
@@ -810,6 +860,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 
@@ -836,6 +888,8 @@ files(n).layers = [];
 files(n).notes = 'bad data'; 
 files(n).misc = ''; 
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [];
@@ -865,6 +919,8 @@ files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45; 
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 
@@ -892,6 +948,8 @@ files(n).layers = [];
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 550; files(n).tip2 = 580; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = '';  
 % files(n).postdark_camera = '';
 files(n).badsites = [];
@@ -920,6 +978,8 @@ files(n).layers = [];
 files(n).notes = 'bad data'; 
 files(n).misc = ''; 
 files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [];
@@ -948,6 +1008,8 @@ files(n).layers = [];
 files(n).notes = 'good data'; 
 files(n).misc = ''; 
 files(n).tip1 = 615; files(n).tip2 = 625; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = []; %these look good except drift_pre has very low activity, like activity drifted in
@@ -977,6 +1039,8 @@ files(n).layers = [];
 files(n).notes = 'poor vis resp';  %%% marked by cmn 103116 
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 35; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [3 4 5];
@@ -1008,6 +1072,8 @@ files(n).misc = '';
 files(n).tip1 = 550; files(n).tip2 = 550; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [2 3 7 8];
 
 
@@ -1034,6 +1100,8 @@ files(n).layers = [];
 files(n).notes = 'good data';
 files(n).misc = ''; 
 files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
 files(n).badsites = [];
@@ -1065,6 +1133,8 @@ files(n).misc = '';
 files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 n=n+1;
@@ -1091,6 +1161,8 @@ files(n).notes = 'bad data';
 files(n).misc = ''; 
 % files(n).predark_camera = 'dark_pre_090116_eye';  
 % files(n).postdark_camera = 'dark_post_090116_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [1 6];
 files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;
 
@@ -1204,6 +1276,8 @@ files(n).misc = '';
 files(n).tip1 = 750; files(n).tip2 = 750; files(n).angle = 45;  %%% example
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 
@@ -1232,6 +1306,8 @@ files(n).misc = '';
 files(n).tip1 = 650; files(n).tip2 = 600; files(n).angle = 45;
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 
 % n=n+1;
@@ -1312,6 +1388,8 @@ files(n).layers = [];
 files(n).notes = 'bad data'; %re-seleced, but only one good unit...tried a second time...too much drift
 files(n).misc = '10 mg/kg'; 
 files(n).tip1 = 700; files(n).tip2 = 725; files(n).angle = 45; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [];
@@ -1362,6 +1440,8 @@ files(n).postbars = '';
 files(n).pretreatment = '';
 files(n).injection = 'injection';
 files(n).treatment = 'Ketanserin'; %actually lisuride 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).layers = [];
@@ -1393,6 +1473,8 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data'; %re-selected units
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; 
 files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 35; 
 % files(n).predark_camera = 'dark_pre_051216_eye';  
@@ -1423,6 +1505,8 @@ files(n).layers = [];
 files(n).notes = 'poor vis resp';   %%% noted by cmn 102616, not vis resp
 files(n).misc = '10 mg/kg'; 
 files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 35;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [4 6 10]; %do not cluster sites 28,30,32,59,61,63 (used Johanna's probe (995F))
@@ -1478,6 +1562,8 @@ files(n).layers = [];
 files(n).notes = 'bad data'; %when re-selected
 files(n).misc = '15mg/kg ly379268'; 
 files(n).tip1 = 700; files(n).tip2 = 750; files(n).angle = 45;  %%% example
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [];
@@ -1532,6 +1618,8 @@ files(n).layers = [];
 files(n).notes = 'good data'; %re-selected, many units
 files(n).misc = ''; 
 files(n).tip1 = 700; files(n).tip2 = 750; files(n).angle = 45;  
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 files(n).badsites = [];
@@ -1558,8 +1646,12 @@ files(n).prepinpFile = ''
 files(n).postpinpFile = ''
 files(n).layers = [];
 files(n).notes = 'good data';
+files(n).prebar_camera = 'bars_pre_060216_eye';
+files(n).postbar_camera = 'bars_post_060216_eye';
 files(n).misc = 'dose: 15mg/kg ketanserin, 10mg/kg doi'; 
 files(n).tip1 = 600; files(n).tip2 = 650; files(n).angle = 45; 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 % files(n).predark_camera = 'dark_pre_051216_eye';  
 % files(n).postdark_camera = 'dark_post_051216_eye';
 
@@ -1742,6 +1834,8 @@ files(n).misc = 'ketanserin ';
 files(n).tip1 = 550; files(n).tip2 = 525; files(n).angle = 45;  
 files(n).predark_camera = 'bars_pre_041416_eye';  
 files(n).postdark_camera = 'bars_post_041416_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 
 % n=n+1;
 % files(n).expt = '040716';
@@ -1812,6 +1906,8 @@ files(n).notes = 'drift'; %re-selected, no good units
 files(n).misc = 'atropine';
 files(n).tip1 = 525; files(n).tip2 = 500; files(n).angle = 45;  %%% example
 files(n).badsites = [];
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 
 % %files(n).wn_camera = {'eyefile1.mat','eyefile2.mat'};  %%% example
 % 
@@ -1857,8 +1953,8 @@ files(n).layers = [];
 files(n).notes = 'bad data'; %HTR2A animal...use data? only one good unit
 files(n).misc = 'atropine';
 %files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  %%% example
-files(n).predark_camera = 'bars_pre_030916_eye';  
-files(n).postdark_camera = 'bars_post_030916_eye'; 
+files(n).prebar_camera = 'bars_pre_030916_eye';  
+files(n).postbar_camera = 'bars_post_030916_eye'; 
 files(n).badsites = [ 14 12 10 9 7 6 2 ];
 %Laser trials
 
@@ -1880,10 +1976,10 @@ files(n).injection = 'injection';
 files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'good data';% not great data %re-selected, more units by cutting out dark pre (much lower than dark post)
-files(n).misc = '';
+files(n).misc = 'eyetrack';
 files(n).tip1 = 500; files(n).tip2 = 450; files(n).angle = 35;  
-files(n).predark_camera = 'bars_presal_020516_eye';  
-files(n).postdark_camera = 'bars_postsal_020516_eye';% 
+files(n).prebar_camera = 'bars_presal_020516_eye';  
+files(n).postbar_camera = 'bars_postsal_020516_eye';% 
 files(n).badsites =[];
 
 n=n+1;
@@ -1904,9 +2000,9 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data';
-files(n).misc = '';
-files(n).predark_camera = 'bars_pre_012916_eye';  
-files(n).postdark_camera = 'bars_postdoi_012916';
+files(n).misc = 'eyetrack';
+files(n).prebar_camera = 'bars_pre_012916_eye'; %dark, might not work post when pupil is very small
+files(n).postbar_camera = 'bars_postdoi_012916';
 files(n).tip1 = 600; files(n).tip2 = 550; files(n).angle = 45;  
 files(n).badsites = []; %re-seleced bad sites from old analysis file: [ 41 38 37 26 25 23 21 20 19 17 15 14 13 12 4]; 
 
@@ -1974,6 +2070,10 @@ files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'drift'; %tried to re-select units,bad data
+files(n).predark_camera = '12_14_15_darkpre';
+files(n).postdark_camera = '12_14_14_darkpostdoi';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = [12 11 10 8 5];
 
@@ -1996,8 +2096,9 @@ files(n).treatment = 'DOI';
 files(n).layers = [4 5 6];
 files(n).notes = 'bad data';
 files(n).misc = 'seizure';
-files(n).predark_camera = 'bars_predoi_120915';  
-files(n).postdark_camera = 'bars_postdoi_120915';
+files(n).prebar_camera = 'bars_predoi_120915';  
+files(n).postbar_camera = 'bars_postdoi_120915';
+
 
 % n=n+1;
 % files(n).expt = '120415';
@@ -2042,9 +2143,11 @@ files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'large shift'; %re-selected, all bad unis %%% modified by cmn 092116 
-files(n).misc = '';
-files(n).predark_camera = 'bars_predoi_120215';  
-files(n).postdark_camera = 'bars_postdoi_120215'; 
+files(n).misc = 'eyetrack';
+files(n).predark_camera = '120215_dark_predoi1';  
+files(n).postdark_camera = 'dark_postdoi_120215';
+files(n).prebar_camera = 'bars_predoi_120215';  
+files(n).postbar_camera = 'bars_postdoi_120215';
 files(n).badsites = [52 50 49 48 43 42 41 41 38 37 36 32 30 29 ...
                     27 26 21 20 19 18 17 16 14 13 11 10 9 8 6 5 4 3 2 1];
 files(n).tip1 = 700; files(n).tip2 = 650; files(n).angle = 45;  
@@ -2070,9 +2173,11 @@ files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'bad data'; %not sure why bad data...if desperae re-select
-files(n).misc = '';
-files(n).predark_camera = 'bars_predoi_111915_eye';  
-files(n).postdark_camera = 'bars_postdoi_111915_eye';
+files(n).misc = 'eyetrack';
+files(n).predark_camera = 'dark_predoi_111915_eye';  
+files(n).postdark_camera = 'dark_postdoi_111915';
+files(n).prebar_camera = 'bars_predoi_111915_eye'
+files(n).postbar_camera = 'bars_postdoi_111915_eye'
 files(n).tip1 = 675; files(n).tip2 = 625; files(n).angle = 45;  
 
 
@@ -2096,6 +2201,10 @@ files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [4 5 6];
 files(n).notes = 'drift';%tried to re-select, very noisy
+files(n).predark_camera = '11_04_15_dark_predoi_eye';
+files(n).postdark_camera = '11_04_15_darkpost_doi_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = [23 22 21 20 19 18];
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  
@@ -2145,6 +2254,10 @@ files(n).injection = 'injection';
 files(n).treatment = 'DOI';
 files(n).layers = [5 6];
 files(n).notes = 'good data' 
+files(n).predark_camera = '10_19_15_dark_predoi_eye';
+files(n).postdark_camera = '10_19_15_dark_postdoi_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = ''; %32
 files(n).badsites = []%[1 2 3 5 6 13]%[38 37 35 34 31 24 23 21 20 19 18 12 3];
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45; %make sure this matches with original analysis file
@@ -2169,7 +2282,11 @@ files(n).injection = 'injection_1';
 files(n).treatment = 'Saline';
 files(n).layers = [5 6]; 
 files(n).notes = 'poor vis and drift';  %%% noted by cmn 102616, some drift and poor vis resp
-files(n).misc = '';
+files(n).misc = 'eyetrack';
+files(n).predark_camera = '10_09_15_dark_presal_eye';
+files(n).postdark_camera = '10_09_15_dark_postsal_eye';
+files(n).prebar_camera = '10_09_15_presal_bars_eye';
+files(n).postbar_camera = '10_09_15_bars_postsal_eye';
 files(n).badsites = [32 26 20 18 17 7 5 4];
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  
 
@@ -2193,7 +2310,11 @@ files(n).injection = 'injection';
 files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'drift'; %re-selected...still bad unis
-files(n).misc = '';
+files(n).predark_camera = '10_02_dark_presal_eye';
+files(n).postdark_camera = '10_02_15_dark_postsal_eye';
+files(n).prebar_camera = '10_02_15_bars_presal_eye';
+files(n).postbar_camera = '10_02_15_bars_postsal_eye';
+files(n).misc = 'eyetrack';
 files(n).badsites = [7 ];
 files(n).tip1 = 550; files(n).tip2 = 525; files(n).angle = 40;  
 
@@ -2218,6 +2339,10 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data';
+files(n).predark_camera = '09_30_15_dark_predoi_eye';
+files(n).postdark_camera = '09_30_15_dark_postdoi_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = []; %[44 40 27 20 19 18 14 13 11 10 7 6];
 files(n).tip1 = 475; files(n).tip2 = 475; files(n).angle = 40;  
@@ -2243,9 +2368,11 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'drift'% a few good units, but most are bad 'good data' %'drift';--reseleced units
-files(n).misc = '';
-files(n).predark_camera = '09_29_15_bars_predoi_eye';  
-files(n).postdark_camera = '09_29_15_bars_postdoi_eye'; 
+files(n).misc = 'eyetrack';
+files(n).predark_camera = '09_29_15_dark_predoi_eye';  
+files(n).postdark_camera = '09_29_15_dark_postdoi_eye'; 
+files(n).prebar_camera = '09_29_15_bars_predoi_eye';  
+files(n).postbar_camera = '09_29_15_bars_postdoi_eye'; 
 files(n).badsites = [];%[4 5];%[26 25 24 22 21 19 18 17 15];
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  
 
@@ -2270,7 +2397,9 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data'; %not many units
-files(n).misc = '';
+files(n).prebar_camera = '09_23_15_predoi_eye';
+files(n).postbar_camera = '09_23_15_postdoi_eye';
+files(n).misc = 'eyetrack';
 files(n).badsites = [];
 files(n).tip1 = 575; files(n).tip2 = 600; files(n).angle = 50;  
 
@@ -2295,6 +2424,10 @@ files(n).injection = 'inject_period';
 files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'drift';
+% files(n).predark_camera = '09_21_15_presaline_eye'; bad recordings, glare
+% files(n).postdark_camera = '09_21_15_postsaline_eye';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = [19 18 16 15];
 files(n).tip1 = 525; files(n).tip2 = 550; files(n).angle = 45;  
@@ -2342,6 +2475,11 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'poor vis and drift'; %%% noted by cmn 102616 - all of one shank seems bad, so unlikely other one is okay
+% files(n).prebar_camera = '09_14_15_predoi_eye';
+% files(n).postbar_camera = '09_14_15_postsaline_eye'; %very squinty after
+files(n).prebar_camera='';
+files(n).postbar_camera='';
+% injection
 files(n).misc = '';
 files(n).badsites = [];%[3 4 5 6 7 8 9 10 11 12 14 16 17 21 26 27 28 30 31 34 36 37 38];
 files(n).tip1 = 675; files(n).tip2 = 600; files(n).angle = 45;  
@@ -2367,6 +2505,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data'; %re-selected
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = [1 2 4 5 6];
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  
@@ -2377,7 +2517,7 @@ files(n).expt = '090715';
 files(n).dir = '09_07_15';
 files(n).tank = '';
 files(n).clusterfile = 'cluster_data_09_07_15_cluster_090715';
-files(n).analysisfile = 'analysis_090715c';
+files(n).analysisfile = 'analysis_090715d';
 files(n).predark = 'dark_predoi1';
 files(n).postdark = 'darkness_postdoi1';
 files(n).prewn = 'wn_predoi1';
@@ -2392,7 +2532,11 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data';%re-selected
-files(n).misc = '';
+% files(n).prebar_camera = '09_07_15_predoi_eye'; %not sure if dark or bars - some glar in video, not sure if it'll track well
+% files(n).postbar_camera = '09_07_15_postdoi_eye';
+files(n).prebar_camera = ''; %not sure if dark or bars - some glar in video, not sure if it'll track well
+files(n).postbar_camera = ''; % also, bars not clustered 
+files(n).misc ='';% 'eyetrack';
 files(n).badsites = [];
 files(n).tip1 = 675; files(n).tip2 = 600; files(n).angle = 45;  
 
@@ -2417,7 +2561,9 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'drift';  %tried to re-select, still lots of bad units
-files(n).misc = '';
+files(n).prebar_camera = '09_04_15_predoi_eye';
+files(n).postbar_camera = '09_04_15_postdoi_eye';
+files(n).misc = 'eyetrack';
 files(n).badsites = [45 44 43 41 40 39 38];
 
 n=n+1;
@@ -2440,7 +2586,9 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data'; %only a few good units
-files(n).misc = '';
+files(n).prebar_camera = '09_02_15_predoi_eye'; %bar pre recording, but great post
+files(n).postbar_camera = '09_02_15_postdoi_eye';
+files(n).misc ='';% 'eyetrack';
 files(n).badsites = [];
 files(n).tip1 = 700; files(n).tip2 = 700; files(n).angle = 45;  
 
@@ -2464,6 +2612,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'Lisuride';
 files(n).layers = [];
 files(n).notes = 'drift';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = [];
 
@@ -2487,6 +2637,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'Lisuride';
 files(n).layers = [];
 files(n).notes = 'drift';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 
 n=n+1;
@@ -2507,6 +2659,8 @@ files(n).prebackground = '';
 files(n).postbackground = '';
 files(n).injection = 'injection_period';
 files(n).treatment = 'Lisuride';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).layers = [];
 files(n).notes = 'drift';
 files(n).misc = '';
@@ -2532,6 +2686,8 @@ files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'bad data' %reselected 3 times and got only a few good units %'something shifted during first drift. maybe redo from wn on? also clipped units';
 files(n).misc = '';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = []
 files(n).tip1 = 650; files(n).tip2 = 625; files(n).angle = 45;  %%% example
 
@@ -2557,6 +2713,8 @@ files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'drift';
 files(n).misc = '';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [ 22 21];
 
 n=n+1;
@@ -2579,6 +2737,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'Lisuride';
 files(n).layers = [];
 files(n).notes = 'drift';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 
 n=n+1;
@@ -2601,6 +2761,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'Saline';
 files(n).layers = [];
 files(n).notes = 'good data';%re-did select-units
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = []; 
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 40; 
@@ -2626,6 +2788,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data'; %re-selected units 
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = []; % bad sites for a version of afile [29 28 27 25 24 23 22 17 16 6]; %accidentally selected most units from last tetrode before looking at them
 files(n).tip1 = 600; files(n).tip2 = 600; files(n).angle = 45;  %%% example
@@ -2652,6 +2816,8 @@ files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'bad data'; %very noisy
 files(n).misc = '';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [1 2 3 4 6]
 
 n=n+1;
@@ -2674,6 +2840,8 @@ files(n).injection = 'injection_period';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'drift'; %maybe try re-clustering
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 
 n=n+1;
@@ -2695,6 +2863,8 @@ files(n).postbackground = '';
 files(n).injection = 'injection_period2';
 files(n).treatment = 'DOI';
 files(n).layers = [];
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).notes = 'drift';  %re-selected units and most were bad...bad data%%% most cells on shank 1 are badsites, marked by cmn 103116
 files(n).misc = '';
 %files(n).badsites = [23 22 21 20 15 14 12 10 9 8 7 5 4 3];
@@ -2722,6 +2892,8 @@ files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'good data' % re-selected units %'drift';  %%% most sites on shank 1 showed drift, marked by cmn 103116
 files(n).misc = '';
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).badsites = [];
 files(n).tip1 = 450; files(n).tip2 = 450; files(n).angle = 45; 
 
@@ -2744,6 +2916,8 @@ files(n).injection = 'injectionperiod';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'poor vis resp';   %%% marked by cmn 103116
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).badsites = [7 6 5 1];
 
@@ -2765,6 +2939,8 @@ files(n).injection = '';
 files(n).treatment = 'DOI';
 files(n).layers = [];
 files(n).notes = 'bad data'; %only one good unit
+files(n).prebar_camera='';
+files(n).postbar_camera='';
 files(n).misc = '';
 files(n).tip1 = 500; files(n).tip2 = 500; files(n).angle = 45; %need to check
 
@@ -2794,6 +2970,7 @@ for f = 1:length(files);
     files(f).blockDark = {files(f).predark files(f).postdark};
     files(f).blockBar = {files(f).prebars files(f).postbars};
     files(f).blockDrift = {files(f).predrift files(f).postdrift};
+    files(f).blockEye = {files(f).prebar_camera files(f).postbar_camera};
 end
 
 

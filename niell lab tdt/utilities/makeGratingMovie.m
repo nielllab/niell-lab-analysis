@@ -18,7 +18,12 @@ for orient = 1:8;
 end
 
 moviedata = uint8(mov);
+
+save fullcontrastGratings -v7.3
+
     
+
+%%
 for i = 1:size(moviedata,3);
     imshow(moviedata(:,:,i));
     getframe(gcf);

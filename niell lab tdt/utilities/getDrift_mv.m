@@ -26,33 +26,34 @@ if ~exist('drift_mv','var') | length(drift_mv)<blocknum  | isempty(drift_mv(bloc
         for i= 1:length(cond)-1;
            s = find(spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5);
            trialPsth(c,i,:) = hist(spikes.sp{c}(s)-condT(i),dt/2:dt:2.5)/dt;
-         %  trialSpT{c,i} = spikes.sp{c}(s)-condT(i),dt/2:dt:2.5./dt;
-          % t(i) = cond(condT(i)+2.5)
+          trialSpT{c,i} = spikes.sp{c}(s)-condT(i),dt/2:dt:2.5./dt;
+      %   t(i) = cond(condT(i)+2.5)
         end
-        %  cellFigs(c)=figure;
+         cellFigs(c)=figure;
     end
     
-
+% 
 %     for c =1 :length(spikes.sp);
 %         for i= 1:length(cond)-1;
 %             s = find(spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5);
-%           %  o(i,:) = spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5;
+%             o(i,:) = spikes.sp{c}>=condT(i) & spikes.sp{c}<condT(i)+2.5;
 %             trialSpT{c,i} = spikes.sp{c}(s)-condT(i),dt/2:dt:2.5/dt;
-%             %  spikeT(c,i,:) = spikes.sp{c}(condT(i))
-%             % t(i) = cond(condT(i)+2.5)
+%              spikeT(c,i,:) = spikes.sp{c}(condT(i))
+%           %  t(i) = cond(condT(i)+2.5)
 %         end
-%         %  cellFigs(c)=figure;
+%          cellFigs(c)=figure;
 %     end
     
 
 % %separate into bins: dt/2:dt:2.5
+
 %    g=round(spikes.sp{1}/2.5)
 %     d = spikes.sp{1}
 %     figure;plot(d,2,'.')
-%      z=find(d(condT(354):condT(355)))
+%      z=find(d(condT(end-2):condT(end-1)))
     
     for i = 1:74;
-        i
+        i;
         ori = ceil(i/6); sf = mod(i-1,6)+1;
         
         trials = find(cond==i);
@@ -180,7 +181,7 @@ end
     
     drift_mv(blocknum).frameSpd = frameSpd(1:end-1);
     drift_mv(blocknum).trialPsth = trialPsth;
-   % drift_mv(blocknum).drift_spikeT = trialSpT;
+    drift_mv(blocknum).drift_spikeT = trialSpT;
     
     %     catch
     %         drift_mv(blocknum).tuning = [];
