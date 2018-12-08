@@ -96,7 +96,7 @@ if movietype==cm_noise
 else
     contrast_modulated=0;
     correct_spectrum=0;
-    pos_neg=0;
+    pos_neg=1;
     compute_svd=0;
     crop_mov=0;
     % pos_neg = input('separate on/off sta? 0/1 : ');
@@ -1045,8 +1045,11 @@ for cell_n = cell_range
             fl(cell_n).onset_hist=onset_hist;
             fl(cell_n).onset_bins=onset_bins;
             fl(cell_n).sta_pos=[x y];
-            
-   if ~isnan(onset_hist);
+            if pos_neg
+                fl(cell_n).onSTA = sta_pos;
+                fl(cell_n).offSTA = sta_neg;
+            end
+            if ~isnan(onset_hist);
        
                OnOffFlash;
      fl(cell_n).sustainBias=sustain;
@@ -1092,6 +1095,10 @@ for cell_n = cell_range
             mv(cell_n).onset_hist=onset_hist;
             mv(cell_n).onset_bins=onset_bins;
             mv(cell_n).sta_pos=[x y];
+            if pos_neg
+                mv(cell_n).onSTA = sta_pos;
+                mv(cell_n).offSTA = sta_neg;
+            end
         end
         
         

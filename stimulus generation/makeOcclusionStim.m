@@ -43,7 +43,7 @@ isi = 1;
 sf = 0.1067;
 tf = 2 ;
 thetaRange = [pi/4 3*pi/4];
-phaseRange = linspace(0,2*pi,13);
+phaseRange = linspace(0,2*pi,4);
 phaseRange = phaseRange(1:end-1);
 
 condRange = 1:6;
@@ -209,7 +209,7 @@ moviedata = moviedata(1:xsz,1:ysz,:);
 
 
 
-save occludeStim5cond_2theta_24min moviedata  tf sf phase theta framerate duration isi cond occContrast condList -v7.3
+save occludeStim5cond_2theta_6min moviedata  tf sf phase theta framerate duration isi cond occContrast condList -v7.3
 size(moviedata)
 length(moviedata)/(60)
 figure

@@ -19,7 +19,7 @@ nx = ceil(256+2*max(sz)/degperpix);
 nout_x = 256;
 nout_y = 128;
 
-density = 0.2;
+density = 0.04;
 
 MovieRate = 30;
 frame_duration = 1/MovieRate;
@@ -65,7 +65,7 @@ tic
 
 for f = 1:nframes
    if round(f/100) == f/100
-       sprintf('%f done, estimate %f to go',f/nframes, toc*(nframes-f)/f)
+       sprintf('%0.2f%% done, estimate %0.1f secs to go',100*f/nframes, toc*(nframes-f)/f)
    end
   
    frm = zeros(nx,ny,'int8');
