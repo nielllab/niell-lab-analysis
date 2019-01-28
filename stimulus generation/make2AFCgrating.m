@@ -1,9 +1,9 @@
 %%
 clear all
 
-cd('C:\Users\nlab\Box Sync\Phil Niell Lab\Behavior\Stimuli')
+cd('C:\Users\nlab\Desktop\GitHubCode\nlab-behavior')
 
-xsz = 1280; %set to 1x mag on psych stim controller
+xsz = 1920; %set to 1x mag on psych stim controller
 ysz = xsz*9/16;
 dist = 20;
 width = 50;
@@ -33,7 +33,11 @@ dist = sqrt((X-rad2x).^2 + (Y-rady).^2);
 stim2(dist<(rad1/degperpix)) = 0;
 figure;imshow(stim2)
 
-imwrite(stim1,'stim1.bmp','BMP')
-imwrite(stim2,'stim2.bmp','BMP')
+% imwrite(stim1,'stim1.bmp','BMP')
+% imwrite(stim2,'stim2.bmp','BMP')
 
-save 2AFCgrating
+stimdata = zeros(size(stim1,1),size(stim1,2),2);
+stimdata(:,:,1) = stim1;
+stimdata(:,:,2) = stim2;
+
+save BigSmall2AFC stimdata
