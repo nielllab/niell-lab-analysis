@@ -1,24 +1,23 @@
 clear all
 
 
-duration = 2;
+duration = 0.5;
 framerate = 60;
-isi = 2;
+isi = 1;
 % sfrange = [0 0.04 0.16];
 % tfrange =[0 2 8];
-sfrange = [ 0 0.04  0.16 ];
-
-tfrange =[ 1 8 ];
-phaserange = linspace(0, 2*pi,6);
-phaserange=phaserange(1:2);
-phaserange = [0 pi]
-ntheta = 4;
+sfrange = [0 0.02 0.04 0.08 0.16 0.32];
+tfrange =[0 2 8 16];
+% phaserange = linspace(0, 2*pi,6);
+% phaserange=phaserange(1:2);
+phaserange = 0;
+ntheta = 8;
 nx = 3; ny =2;
 sigma=0.5;
 randomOrder=1;
 randomTheta=0;
 binarize=0;
-blank=1;
+blank=0;
 
 totalDuration = (duration+isi)*length(sfrange)*length(tfrange)*length(phaserange)*ntheta*nx*ny/60
 % clear all
@@ -64,7 +63,6 @@ xpos = linspace(1,xsz,nx+2);
 xposrange = round(xpos(2:end-1)-blockwidth/2);
 
 ypos = linspace(1+ysz/20,ysz-ysz/10,ny+1);
-%ypos = linspace(1,ysz,ny+1);
 yposrange = round(ypos(1:end-1));
 
 
@@ -104,7 +102,7 @@ order = randperm(trial);
 xpos = xpos(order); ypos=ypos(order); sf =sf(order); tf=tf(order); phase=phase(order); theta=theta(order);
 end
 
-trial*duration/60
+trial*(duration+isi)/60
 
 [x y] =meshgrid(1:blockwidth,1:blockwidth);
 xgrid=(x-mean(x(:)))/max(x(:));; ygrid=(y-mean(y(:)))/max(y(:));
@@ -144,6 +142,8 @@ end
 moviedata = moviedata(1:xsz,1:ysz,:);
 mapMonitor
 
+save('grating3x2y6sf4tf_1728sec.mat','moviedata','xpos','xpos','tf','sf','phase','theta','framerate','duration',...
+    'isi','nx','ny','sigma','-v7.3')
 
 figure
 for i = 1:length(moviedata)/50
@@ -154,4 +154,3 @@ end
 figure
 imshow(moviedata(:,:,50))
 
-save gratingPatch2p24min moviedata xpos ypos tf sf phase theta framerate duration isi nx ny sigma
