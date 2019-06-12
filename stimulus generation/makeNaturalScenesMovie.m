@@ -13,8 +13,8 @@ nreps = 12; %number of repititions of each image
 previewStim = 0; %if you want to preview the stimuli
 
 %parameters of the stimulus movie
-scaledown = 4; %how much to scale the movie down from 1280*720
-xsz = 1280/scaledown;ysz = xsz*(9/16); %size of the movie in pixels
+scaledown = 8; %how much to scale the movie down from 1280*720
+xsz = 1920/scaledown;ysz = xsz*(9/16); %size of the movie in pixels
 framerate = 20; %display framerate (usually 60)
 duration = 1; %stimulus duration
 isi = 1; %interstimulus interval
@@ -67,7 +67,7 @@ for d = 1:length(dirs)
 end
 
 if blank
-    familiar = [familiar 0];
+    familiar = [familiar 2];
     fileidx = [fileidx 0];
 end
 
@@ -97,7 +97,7 @@ for tr = 1:trial
     end
 end
 
-save C:\src\movies\naturalImagesEnrichment648s.mat moviedata allfiles framerate duration isi blank randomOrder nreps familiar fileidx -v7.3
+save C:\src\movies\naturalImagesEnrichment8mag648s.mat moviedata allfiles framerate duration isi blank randomOrder nreps familiar fileidx -v7.3
 
 if previewStim
     figure
@@ -113,7 +113,7 @@ mov = rot90(mov,3);
 mov = mat2im(mov,gray);
 mov = immovie(permute(mov,[1 2 4 3]));
 vid = VideoWriter(prevmov);
-vid.FrameRate=20;
+vid.FrameRate=framerate;
 open(vid);
 disp('writing movie')
 writeVideo(vid,mov);
