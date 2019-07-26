@@ -1,4 +1,4 @@
-function data = alignHead(fname, nPts,showMovies)
+function data = alignHead(fname, nPts,showMovies,psfilename)
 %%% reads in csv data from deepLabCut with head and cricket positions
 %%%
 %%% computes head position, even in presence of noisy/absent points, by
@@ -21,11 +21,15 @@ function data = alignHead(fname, nPts,showMovies)
 % % % data.crickSp = crickSp  smoothed cricket speed (pix/frame)
 % % % data.range = range;   distance to cricket from mouse (pix)
 % % % data.az = az;    angle of cricket relative to head direction
-
-
-if ~exist('fname','var')
-    fname =  'top_cricket1_062519_3DeepCut_resnet50_TopVidJun25shuffle1_900000_numeric.csv';
+if exist('psfilename','var')
+    savePDF=1;
 end
+
+  
+
+% if ~exist('fname','var')
+%     fname =  'top_cricket1_062519_3DeepCut_resnet50_TopVidJun25shuffle1_900000_numeric.csv';
+% end
 
 if ~exist('showMovies','var')
     showMovies = 1; %%% change this to 0 after debugging
@@ -34,7 +38,9 @@ end
 %%% load data
 %%% note : removed top 3 rows from original csv file since they are non-numeric
 %data = dlmread(fname);
-data = dlmread(fname,',',3,1)
+%data = dlmread(fname,',',3,1)
+
+data=csvread(fname,3,0)
 
 %%% likelihood threshold for including pts
 p_thresh = 0.999;
@@ -58,11 +64,21 @@ useN = sum(good,1);
 figure
 plot(useN); xlabel('frame'); ylabel('#of good points'); ylim([0 npts]);
 use = useN==npts; %%% for now, only use times when all points are good
+ if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
+
 
 badFraction = 1-mean(good,2);
 figure
 bar(badFraction); ylabel('fraction bad timepoints'); xlabel('point #')
-
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
 
 %%% draw all points on tracks
 % figure
@@ -152,6 +168,12 @@ for i = 1:npts
 end
 drawHead(meanHead); axis square; axis equal
 title('alignment from times with all good points')
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
+
 
 if showMovies
     figure
@@ -208,6 +230,7 @@ hold on
 plot(centroid(1,:),centroid(2,:),'k')
 legend('all points','only good points')
 
+
 %%% draw all centered
 figure
 if showMovies
@@ -254,6 +277,11 @@ thAll(thAll>pi) = thAll(thAll>pi)-2*pi;  %%% range = -pi : pi
 figure
 plot(thAll); title('final theta')
 xlabel('frame'); ylabel('theta');
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
 
 meanHeadAll = nanmean(alignedAll,3);
 figure
@@ -263,6 +291,11 @@ for i = 1:npts
 end
 drawHead(meanHeadAll); axis square; axis equal
 title('alignment from all timepoints')
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
 
 if showMovies
     figure
@@ -274,15 +307,83 @@ if showMovies
     end
 end
 
+
 %%% cricket pts
+p_thresh_c =0.95;
 crick = data(:,npts*3 +(2:3))';
 crick_p = data(:,npts*3 + 4);
 
 figure
 plot(crick_p)
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
+   crick(:,crick_p<p_thresh_c) = NaN
+   
+   figure
+plot(crick)
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
+   
+%    for v=1:length(p_thresh_c)
+%    crick(:,crick_p<p_thresh_c{v},v) = NaN;
+%    end
+   
+%    
+% crick(:,crick_p<0:.9) = NaN;
+% figure; plot(crick(1,:),crick(2,:),'c'); hold on
+% crick(:,crick_p<.9:.95) = NaN;
+% plot(crick(1,:),crick(2,:),'g'); hold on
+% % crick(:,crick_p<.6:.8) = NaN;
+% % plot(crick(1,:),crick(2,:),'y'); hold on
+% crick(:,crick_p<.95:.98) = NaN;
+% plot(crick(1,:),crick(2,:),'r'); hold on
+% crick(:,crick_p<.99:.995) = NaN;
+% plot(crick(1,:),crick(2,:),'m'); hold on
+% crick(:,crick_p<.997:.998) = NaN;
+% plot(crick(1,:),crick(2,:),'b'); hold on
+% crick(:,crick_p<.999:1) = NaN;
+% plot(crick(1,:),crick(2,:),'k'); hold on
+% 
+% 
+% 
 
-crick(:,crick_p<p_thresh) = NaN;
 
+% figure;
+% axis tight manual
+% ax = gca;
+% ax.NextPlot = 'replaceChildren';
+% vidfile = VideoWriter('cricketLikelihood2.mp4','MPEG-4');
+% open(vidfile);
+% figure
+%      plot(crick(1,:),crick(2,:),'-','Color', [.5 .5 .5]); hold on; axis ij; xlim([-200 1800]);ylim([-200 1200]);
+% 
+% for i = 1:length(crick)
+%     if crick(:,crick_p(i)<0:.9)
+%         plot(crick(1,i),crick(2,i),'oc'); hold on; axis ij; xlim([-200 1800]);ylim([-200 1200]);
+%     elseif crick(:,crick_p(i)<0:.9:.95)
+%         plot(crick(1,i),crick(2,i),'og'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);
+%     elseif crick(:,crick_p(i)<0:.95:.98)
+%         plot(crick(1,i),crick(2,i),'or'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);
+%     elseif crick(:,crick_p(i)<0:.99:.995)
+%         plot(crick(1,i),crick(2,i),'om'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);
+%     elseif crick(:,crick_p(i)<0:.997:.998)
+%         plot(crick(1,i),crick(2,i),'ob'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);
+%     else crick(:,crick_p(i)<0:.999:1)
+%         plot(crick(1,i),crick(2,i),'ok'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);        
+%     end
+%         drawnow limitrate;
+%    F(i) = getframe(gcf); 
+%     writeVideo(vidfile,F(i));
+% end
+% close(vidfile)
+
+    
 vx = diff(crick(1,:)); vy = diff(crick(2,:));
 filt = ones(3,1); filt = filt/sum(filt);
 vx = conv(vx,filt,'same'); vy = conv(vy,filt,'same');
@@ -328,7 +429,13 @@ hold on
 for i = 1:npts
     plot(squeeze(alignedAll(i,1,:)),squeeze(alignedAll(i,2,:)),'.');
 end
+
 drawHead(meanHeadAll); axis square; axis equal
+if savePDF
+        set(gcf, 'PaperPositionMode', 'auto');
+        print('-dpsc',psfilename,'-append');
+    end
+   close(gcf)
 
 clear data
 data.mouse_xy = cent;
@@ -339,6 +446,7 @@ data.crick_xy = crick;
 data.crickSp = crickSp
 data.range = range;
 data.az = az;
+data.crick_p = crick_p;
 
 
 
@@ -358,5 +466,6 @@ if showMovies
         axis([1 sz 1 sz])
         drawnow
     end
+    
 end
 

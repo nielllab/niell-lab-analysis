@@ -29,6 +29,7 @@ fprintf('Done Reading in Left Video \n');
 % Read in Eye Tracking Video
 if f ~=0
     TempVidR = VideoReader(fullfile(p,f));
+    
     frameR=1; k=1;
     while hasFrame(TempVidR) 
         EyeVid(:,:,frameR) = rgb2gray(readFrame(TempVidR));
