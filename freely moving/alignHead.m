@@ -1,4 +1,4 @@
-function data = alignHead(fname, nPts,showMovies,psfilename)
+function data = alignHead(fname, nPts,showMovies,psfilename, mousethresh, crickthresh)
 %%% reads in csv data from deepLabCut with head and cricket positions
 %%%
 %%% computes head position, even in presence of noisy/absent points, by
@@ -25,7 +25,7 @@ if exist('psfilename','var')
     savePDF=1;
 end
 
-  
+
 
 % if ~exist('fname','var')
 %     fname =  'top_cricket1_062519_3DeepCut_resnet50_TopVidJun25shuffle1_900000_numeric.csv';
@@ -43,56 +43,79 @@ end
 data=csvread(fname,3,0)
 
 %%% likelihood threshold for including pts
-p_thresh = 0.999;
+if exist('mousethresh','var')
+    p_thresh = mousethresh;
+else
+    p_thresh = 0.99;
+end
 
-nframes = 100
+nframes = 50
 
 %%% head pts
-%%% pts(npts, x/y, t);
+%%% pts(nPts, x/y, t);
 clear p pts
-npts = 8;
-for i = 1:npts
+figure
+for i = 1:nPts
     p(i,:) = data(:,i*3+1);
     pts(i,:,:) = data(:,(i-1)*3 + (2:3))';
     ptsRaw(i,:,:) = pts(i,:,:); %%% keep a clean version before inserting NaNs
     pts(i,:,p(i,:)<p_thresh)=NaN;
+    subplot(2,4,i)
+    plot(squeeze(pts(i,1,:)),squeeze(pts(i,2,:)),'*b'); hold on; axis square
+    try
+    for xy=1:2
+        pts(i,xy,:)=interpNan(squeeze(pts(i,xy,:)),1,'linear');
+    end
+    catch
+    end
+    plot(squeeze(pts(i,1,:)),squeeze(pts(i,2,:)),'og'); hold on; axis square
+    plot(squeeze(pts(i,1,:)),squeeze(pts(i,2,:)),'k'); axis square
+ 
 end
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
+
+
 
 %%% find times when all pts are good
 good = p>p_thresh; %%% select points over threshold
 useN = sum(good,1);
 figure
-plot(useN); xlabel('frame'); ylabel('#of good points'); ylim([0 npts]);
-use = useN==npts; %%% for now, only use times when all points are good
- if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
+plot(useN); xlabel('frame'); ylabel('#of good points'); ylim([0 nPts]);
+use = useN==nPts; %%% for now, only use times when all points are good
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 
 badFraction = 1-mean(good,2);
 figure
 bar(badFraction); ylabel('fraction bad timepoints'); xlabel('point #')
 if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 %%% draw all points on tracks
-% figure
-% hold on
-% for i = 1:npts
-%     plot(squeeze(pts(i,1,:)),squeeze(pts(i,2,:)));
-% end
+figure
+hold on
+for i = 1:nPts
+    plot(squeeze(pts(i,1,:)),squeeze(pts(i,2,:)));
+end
 
 %%% calculate centroid at each timpoint (will be NaN for ones with a bad
 %%% timepoint
 centroid = squeeze(mean(pts,1));
+
 % figure
 % plot(centroid(1,:),centroid(2,:));
-for i = 1:npts
+for i = 1:nPts
     centered(i,:,:) = squeeze(pts(i,:,:))-centroid;
 end
 
@@ -103,7 +126,7 @@ title('only 8 good points')
 if showMovies
     for t= 1:nframes;
         if ~isnan(centroid(1,t))
-            %plot(squeeze(centered(:,1,t)),squeeze(centered(:,2,t)),'o')
+            plot(squeeze(centered(:,1,t)),squeeze(centered(:,2,t)),'o')
             hold off
             drawHead(centered(:,:,t)); axis square; axis([-70 70 -70 70])
             drawnow
@@ -117,6 +140,7 @@ end
 %%% the results
 refnum = min(find(use));
 ref = centered(:,:,refnum);
+
 % figure
 % drawHead(ref)
 
@@ -152,7 +176,7 @@ toc
 meanHead = nanmean(aligned,3);
 
 %%% rotate mean head to align to x-axis
-longAxis = meanHead([8 1],:); %%% line between middle of head and nose points
+longAxis = meanHead([nPts 1],:); %%% line between middle of head and nose points
 longTheta = atan2(diff(longAxis(:,2)), diff(longAxis(:,1)));  %%% angle of line
 headRot= rotmat(-longTheta);  %%% rotation matrix to fix this
 for i = 1:size(aligned,3);
@@ -163,16 +187,16 @@ meanHead = nanmean(aligned,3);
 %%% show aligned points
 figure
 hold on
-for i = 1:npts
+for i = 1:nPts
     plot(squeeze(aligned(i,1,:)),squeeze(aligned(i,2,:)),'o');
 end
 drawHead(meanHead); axis square; axis equal
 title('alignment from times with all good points')
 if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 
 if showMovies
@@ -180,9 +204,9 @@ if showMovies
     for t= 1:nframes;
         if ~isnan(centroid(1,t))
             hold off
-        drawHead(meanHead)
-        drawHead(aligned(:,:,t)); axis square; axis([-70 70 -70 70])
-        drawnow
+            drawHead(meanHead)
+            drawHead(aligned(:,:,t)); axis square; axis([-70 70 -70 70])
+            drawnow
         end
     end
 end
@@ -207,7 +231,7 @@ for t = 1:size(centroid,2);  %%% all timepoints
     %%% then calculate error of how far this is from where it should be,
     %%% then add these up
     err = 0;
-    for i = 1:npts
+    for i = 1:nPts
         if ~isnan (c(i,1))
             r = sqrt((x-c(i,1)).^2  + (y-c(i,2)).^2); %%% distance
             err  = err+ (meanD(i) - r).^2;  %%% error
@@ -220,7 +244,7 @@ for t = 1:size(centroid,2);  %%% all timepoints
 end
 toc
 %%% center all points using calculated centroid
-for i = 1:npts
+for i = 1:nPts
     centered(i,:,:) = squeeze(pts(i,:,:))-cent;
 end
 
@@ -278,24 +302,24 @@ figure
 plot(thAll); title('final theta')
 xlabel('frame'); ylabel('theta');
 if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 meanHeadAll = nanmean(alignedAll,3);
 figure
 hold on
-for i = 1:npts
+for i = 1:nPts
     plot(squeeze(alignedAll(i,1,:)),squeeze(alignedAll(i,2,:)),'o');
 end
 drawHead(meanHeadAll); axis square; axis equal
 title('alignment from all timepoints')
 if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 if showMovies
     figure
@@ -309,32 +333,39 @@ end
 
 
 %%% cricket pts
-p_thresh_c =0.95;
-crick = data(:,npts*3 +(2:3))';
-crick_p = data(:,npts*3 + 4);
+if exist('crickthresh','var')
+    p_thresh_c = crickthresh;
+else
+    p_thresh_c = 0.95;
+end
 
-figure
-plot(crick_p)
+
+crick = data(:,nPts*3 +(2:3))';
+crick_p = data(:,nPts*3 + 4);
+
+crick(:,crick_p<p_thresh_c) = NaN
+figure;
+plot(crick(1,:),crick(2,:),'*b');hold on
+try
+for xy = 1:2
+    crick(xy,:)=interpNan(crick(xy,:),3,'linear')
+end
+catch
+end
+plot(crick(1,:),crick(2,:),'og');hold on
+plot(crick(1,:),crick(2,:),'k');hold on
 if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
-   crick(:,crick_p<p_thresh_c) = NaN
-   
-   figure
-plot(crick)
-if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
-   
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
+
+
 %    for v=1:length(p_thresh_c)
 %    crick(:,crick_p<p_thresh_c{v},v) = NaN;
 %    end
-   
-%    
+
+%
 % crick(:,crick_p<0:.9) = NaN;
 % figure; plot(crick(1,:),crick(2,:),'c'); hold on
 % crick(:,crick_p<.9:.95) = NaN;
@@ -349,9 +380,9 @@ if savePDF
 % plot(crick(1,:),crick(2,:),'b'); hold on
 % crick(:,crick_p<.999:1) = NaN;
 % plot(crick(1,:),crick(2,:),'k'); hold on
-% 
-% 
-% 
+%
+%
+%
 
 
 % figure;
@@ -362,7 +393,7 @@ if savePDF
 % open(vidfile);
 % figure
 %      plot(crick(1,:),crick(2,:),'-','Color', [.5 .5 .5]); hold on; axis ij; xlim([-200 1800]);ylim([-200 1200]);
-% 
+%
 % for i = 1:length(crick)
 %     if crick(:,crick_p(i)<0:.9)
 %         plot(crick(1,i),crick(2,i),'oc'); hold on; axis ij; xlim([-200 1800]);ylim([-200 1200]);
@@ -375,15 +406,15 @@ if savePDF
 %     elseif crick(:,crick_p(i)<0:.997:.998)
 %         plot(crick(1,i),crick(2,i),'ob'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);
 %     else crick(:,crick_p(i)<0:.999:1)
-%         plot(crick(1,i),crick(2,i),'ok'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);        
+%         plot(crick(1,i),crick(2,i),'ok'); hold on; axis ij;xlim([-200 1800]);ylim([-200 1200]);
 %     end
 %         drawnow limitrate;
-%    F(i) = getframe(gcf); 
+%    F(i) = getframe(gcf);
 %     writeVideo(vidfile,F(i));
 % end
 % close(vidfile)
 
-    
+
 vx = diff(crick(1,:)); vy = diff(crick(2,:));
 filt = ones(3,1); filt = filt/sum(filt);
 vx = conv(vx,filt,'same'); vy = conv(vy,filt,'same');
@@ -426,16 +457,16 @@ title('mouse speed'); xlabel('frame'); ylabel('pix / sec')
 
 subplot(2,3,6)
 hold on
-for i = 1:npts
+for i = 1:nPts
     plot(squeeze(alignedAll(i,1,:)),squeeze(alignedAll(i,2,:)),'.');
 end
 
 drawHead(meanHeadAll); axis square; axis equal
 if savePDF
-        set(gcf, 'PaperPositionMode', 'auto');
-        print('-dpsc',psfilename,'-append');
-    end
-   close(gcf)
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 clear data
 data.mouse_xy = cent;

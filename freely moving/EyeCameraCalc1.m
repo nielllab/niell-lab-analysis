@@ -72,7 +72,7 @@ thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale);
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale);
 
 %%
-i=100;
+i=50;
 w = EllipseParams(i,5); L=EllipseParams(i,3); l=EllipseParams(i,4); x_C=EllipseParams(i,1); y_C=EllipseParams(i,2);
 Rotation1 = [cos(w),-sin(w);sin(w),cos(w)];
 L1 = [L,0;0,l];
