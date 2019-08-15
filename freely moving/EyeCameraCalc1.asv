@@ -77,9 +77,9 @@ CamCent=(A'*A)\A'*b;
 Ellipticity = EllipseParams(list,4)./EllipseParams(list,3);
 scale = nansum(sqrt(1-(Ellipticity).^2).*vecnorm(EllipseParams(list,1:2)'-CamCent,2,1)')./nansum(1-(Ellipticity).^2);
 
-theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale); %in radians
-thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
-phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
+theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale);
+thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale);
+phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale);
 
 %%
 i=50;
@@ -153,8 +153,8 @@ close(gcf)
 
 %% Theta and Phi
 
-newtheta = (real(thetad(usegood)));
-newphi = (real(phi(usegood)));
+newtheta = (real(thetad));
+newphi = (real(phi));
 
 figure; subplot(121);
 plot(diff(movmean(newtheta,10)),'LineWidth',2); %hold on; plot(diff(newlongang),'LineWidth',1)
