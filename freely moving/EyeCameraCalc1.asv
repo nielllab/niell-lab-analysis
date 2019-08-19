@@ -76,6 +76,7 @@ CamCent=(A'*A)\A'*b;
 %     nansum(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2);
 Ellipticity = EllipseParams(list,4)./EllipseParams(list,3);
 scale = nansum(sqrt(1-(Ellipticity).^2).*vecnorm(EllipseParams(list,1:2)'-CamCent,2,1)')./nansum(1-(Ellipticity).^2);
+scale=1;
 theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale); %in radians
 thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
