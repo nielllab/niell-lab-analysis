@@ -76,12 +76,8 @@ if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
-%close(gcf)
+close(gcf)
 
-figure
-plot(p');
-ylim([0 1]); ylabel('likelihood');
-title('likelihood for all points');
 
 
 %%% find times when all pts are good
@@ -94,9 +90,7 @@ if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
-%close(gcf)
-
-goodPtsHist= hist(useN,1:nPts)/length(useN);
+close(gcf)
 
 
 badFraction = 1-mean(good,2);
@@ -106,7 +100,7 @@ if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
 end
-%close(gcf)
+close(gcf)
 
 %%% draw all points on tracks
 figure
@@ -147,9 +141,6 @@ end
 refnum = min(find(use));
 ref = centered(:,:,refnum);
 
-if sum(use)==0
-    display('danger danger!!! no times with all 8 points')
-end
 % figure
 % drawHead(ref)
 
@@ -301,16 +292,9 @@ for t = 1:size(centroid,2)
     else
         thAll(t) = NaN;
         alignedAll(:,:,t)=NaN;
-        cent(:,t) = NaN;
     end
 end
 toc
-
-if sum(use)==0   %%% if there were no timepoints where all 8 pts were good, the rest is meaningless so set to NaN
-    thAll(:) = NaN;
-    alignedAll(:) = NaN;
-    cent(:) = NaN;
-end
 
 thAll = 2*pi-thAll; %%% because angle of head is actually negative of what we needed to correct it
 thAll(thAll>pi) = thAll(thAll>pi)-2*pi;  %%% range = -pi : pi
@@ -367,7 +351,6 @@ for xy = 1:2
     crick(xy,:)=interpNan(crick(xy,:),3,'linear')
 end
 catch
-    display('couldnt do isnan!!!')
 end
 plot(crick(1,:),crick(2,:),'og');hold on
 plot(crick(1,:),crick(2,:),'k');hold on
@@ -495,7 +478,11 @@ data.crickSp = crickSp
 data.range = range;
 data.az = az;
 data.crick_p = crick_p;
-data.goodHist = goodPtsHist;
+
+
+
+cricket.pos = crick;
+
 
 sz = max(pts(:));
 if showMovies
