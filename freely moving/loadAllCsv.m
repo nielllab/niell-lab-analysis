@@ -120,7 +120,7 @@ for j=1:length(fileList)
         start=max([startT,startR,startL]); endT = min([TopTs(end),RTS(end),LTS(end)])
         xq=(start:1/30:endT)';
         
-        try
+  
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
             Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw);
         
@@ -132,24 +132,20 @@ for j=1:length(fileList)
         Data(j).cricketxy =adjustedTS.cricketxyAdj;
         Data(j).cricketV = (adjustedTS.cricketVAdj)';
         Data(j).cricketP=adjustedTS.cricketPAdj;
-        catch
-        end
-        
-        try
+       
+  
         adjustedTS = adjustTiming(RTS,xq,Data(j).Rtheta, Data(j).Rphi,Data(j).XRcent,Data(j).YRcent,psfilename);
         Data(j).XRcent =adjustedTS.x_centAdj;
         Data(j).YRcent =adjustedTS.y_centAdj;
         Data(j).Rtheta =adjustedTS.thetaAdj;
         Data(j).Rphi =adjustedTS.phiAdj;
-        catch
-        end
-        try
+       
         adjustedTS = adjustTiming(LTS,xq,Data(j).Ltheta,Data(j).Lphi,Data(j).XLcent,Data(j).YLcent,psfilename);
         Data(j).XLcent =adjustedTS.x_centAdj;
         Data(j).YLcent =adjustedTS.y_centAdj;
         Data(j).Ltheta =adjustedTS.thetaAdj;
         Data(j).Lphi =adjustedTS.phiAdj;
-        catch end
+      
         
     end
     if savePDF
@@ -163,7 +159,7 @@ for j=1:length(fileList)
     
     
 end
-afilename=sprintf('%s',ani,'.mat')
+afilename=sprintf('%s',ani,'081419_interpTest','.mat')
 save(fullfile(pSname, afilename))
 %save('J463c_test_data.mat')
 
