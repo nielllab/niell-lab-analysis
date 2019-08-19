@@ -26,12 +26,12 @@ pname={'T:\PreyCaptureNew\Cohort3\J462c(blue)\081519\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462c(blue)\073019\Approach\'};
 
 %% J463b(white) %male %all vids analyzed in DLC
-pname ={'T:\PreyCaptureNew\Cohort3\J463b(white)\081419\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463b(white)\081219\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463b(white)\080819\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463b(white)\080519\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463b(white)\080119\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463b(white)\072819\Approach\'};
+pname ={'T:\PreyCaptureNew\Cohort3\J463b(white)\081419\Approach\'};
+%     'T:\PreyCaptureNew\Cohort3\J463b(white)\081219\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463b(white)\080819\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463b(white)\080519\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463b(white)\080119\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463b(white)\072819\Approach\'};
 
 %% J463c(blue) %male
 pname={'T:\PreyCaptureNew\Cohort3\J463c(blue)\081419\Approach\';
