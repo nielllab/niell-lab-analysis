@@ -15,7 +15,8 @@ end
 % fileList=sort(fileList);
 % TSfileList=sort(TSfileList);
 
-name =fileList.name;
+% name =fileList.name;
+% headangle= radtodeg(atan2(PointsxT(:,2)-PointsxT(:,4),PointsyT(:,2)-PointsyT(:,4)))
 
 %%
 
@@ -45,7 +46,8 @@ for j=1:length(fileList)
     %Rfname = strrep(fname,'Top','Eye1r');
     Rfname = strrep(fname,'Top','Eye');
     Rfname = strrep(Rfname,'top','eye1r');
-    Rfname = strrep(Rfname,'900000','1030000'); Rfname = strrep(Rfname,'Jun25','Jul12');
+   % Rfname = strrep(Rfname,'900000','1030000'); 
+    Rfname = strrep(Rfname,'Aug15','Jul12');
     %   Lfname = strrep(Rfname,'Eye1r','Eye2l');
     Lfname = strrep(Rfname,'eye1r','eye2l');
     Data(j).DataR = (csvread(Rfname,3,0))
@@ -57,15 +59,19 @@ for j=1:length(fileList)
     Data(j).difRL = length(Data(j).DataR)-length(Data(j).DataL)
     
     aligned = alignHead(fname,8,0,psfilename,.90, .95)
-    Data(j).mouse_xy=aligned.mouse_xy;
-    Data(j).mouseV=aligned.mouseSp;
-    Data(j).theta=aligned.theta;
-    Data(j).dTheta=aligned.dTheta;
-    Data(j).cricketxy=aligned.crick_xy;
-    Data(j).cricketV=aligned.crickSp;
-    Data(j).range=aligned.range;
-    Data(j).az=aligned.az;
+    Data(j).mouse_xyRaw=aligned.mouse_xy;
+    Data(j).mouseVRaw=aligned.mouseSp;
+    Data(j).thetaRaw=aligned.theta;
+    Data(j).dThetaRaw=aligned.dTheta;
+    Data(j).cricketxyRaw=aligned.crick_xy;
+    Data(j).cricketVRaw=aligned.crickSp;
+    Data(j).rangeRaw=aligned.range;
+    Data(j).azRaw=aligned.az;
     Data(j).cricketP=aligned.crick_p;
+    Data(j).ThetaFract=aligned.ThetaFract;  
+    Data(j).dThetaFract=aligned.dThetaFract;    
+    Data(j).longTheta=aligned.longTheta;
+    Data(j).longThetaFract=aligned.longThetaFract;
     
     Data(j).xR=Data(j).DataR(:,2:3:end);
     Data(j).yR=Data(j).DataR(:,3:3:end);
@@ -115,8 +121,8 @@ for j=1:length(fileList)
         xq=(start:1/30:endT)';
         
         try
-        adjustedTS = adjustTimingTop(TopTs,xq,Data(j).az, Data(j).range,Data(j).mouse_xy,Data(j).mouseV,...
-            Data(j).cricketxy,Data(j).cricketV, Data(j).cricketP, Data(j).theta);
+        adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
+            Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw);
         
         Data(j).az =(adjustedTS.azAdj)';
         Data(j).theta =(adjustedTS.headThetaAdj)';

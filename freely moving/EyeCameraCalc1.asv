@@ -35,7 +35,7 @@ end
 % axis([1 size(Vid1,1) 1 size(Vid1,2)])
 
 
-good = Likelihood>=.95;
+good = Likelihood>=.95; %likelihood of all 8 pts must be >=.95 
 for v=1:numFrames
     clear allgood
     allgood=good(v,:)==1;
@@ -76,13 +76,13 @@ CamCent=(A'*A)\A'*b;
 %     nansum(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2);
 Ellipticity = EllipseParams(list,4)./EllipseParams(list,3);
 scale = nansum(sqrt(1-(Ellipticity).^2).*vecnorm(EllipseParams(list,1:2)'-CamCent,2,1)')./nansum(1-(Ellipticity).^2);
-
-theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale);
-thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale);
-phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale);
+scale=1;
+theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale); %in radians
+thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
+phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
 
 %%
-i=50;
+i=100;
 w = EllipseParams(i,5); L=EllipseParams(i,3); l=EllipseParams(i,4); x_C=EllipseParams(i,1); y_C=EllipseParams(i,2);
 Rotation1 = [cos(w),-sin(w);sin(w),cos(w)];
 L1 = [L,0;0,l];
@@ -153,8 +153,8 @@ close(gcf)
 
 %% Theta and Phi
 
-newtheta = (real(thetad));
-newphi = (real(phi));
+newtheta = (real(thetad(usegood)));
+newphi = (real(phi(usegood)));
 
 figure; subplot(121);
 plot(diff(movmean(newtheta,10)),'LineWidth',2); %hold on; plot(diff(newlongang),'LineWidth',1)

@@ -362,14 +362,12 @@ figure;
 for xy = 1:2
     crick(xy,:)=interpNan(crick(xy,:),3,'linear')
         crickB(xy,:)=interpNan(crickB(xy,:),3,'linear')
+
 end
 % catch
-%end
+end
 plot(crick(1,:),crick(2,:),'og');hold on
 plot(crick(1,:),crick(2,:),'k');hold on
-plot(crickB(1,:),crickB(2,:),'ob');hold on
-plot(crickB(1,:),crickB(2,:),'k');hold on
-
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
