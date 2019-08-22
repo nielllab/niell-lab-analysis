@@ -1,10 +1,11 @@
 %%%%% Eye Camera Calculations
-function [newtheta,newphi,EllipseParams,ExtraParams] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename)
+function [newtheta,newphi,EllipseParams,ExtraParams good] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
 
 % Inputs:
 %   Vid1 - 3D grayscale array of video frames
 %   Pointsx - The X component of Deeplabcut tracking
 %   Pointsy - The Y component of Deeplabcut tracking
+%    eyethresh - likelihood threshold for including eye points
 
 % Outputs:
 %   newtheta - the horizontal angle difference between Camera center and
@@ -20,6 +21,11 @@ function [newtheta,newphi,EllipseParams,ExtraParams] = EyeCameraCalc1(numFrames,
 %       Column6 (angleFromX) - angle from hoizontal plane to long axis
 %       Column7 (phi) - the tilt of the ellipse
 %   ExtraParams - Extra parameters to explore
+%  good - # of pupil points above threshold
+
+if ~exist('eyethresh','var')
+    eyethresh = 0.95;
+end
 
 if exist('psfilename','var')
     savePDF=1;
@@ -81,7 +87,7 @@ thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
 
 %%
-i=100;
+i=50;
 w = EllipseParams(i,5); L=EllipseParams(i,3); l=EllipseParams(i,4); x_C=EllipseParams(i,1); y_C=EllipseParams(i,2);
 Rotation1 = [cos(w),-sin(w);sin(w),cos(w)];
 L1 = [L,0;0,l];
@@ -152,8 +158,8 @@ close(gcf)
 
 %% Theta and Phi
 
-newtheta = (real(thetad(usegood)));
-newphi = (real(phi(usegood)));
+newtheta = (real(thetad));
+newphi = (real(phi));
 
 figure; subplot(121);
 plot(diff(movmean(newtheta,10)),'LineWidth',2); %hold on; plot(diff(newlongang),'LineWidth',1)

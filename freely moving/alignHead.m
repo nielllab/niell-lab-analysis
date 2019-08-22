@@ -456,9 +456,9 @@ title('azimuth'); xlabel('frame'); ylabel('radians')
 dTheta = diff(thAll);
 dTheta(dTheta>pi) = dTheta(dTheta>pi)-2*pi;
 dTheta(dTheta<-pi) = dTheta(dTheta<-pi) + 2*pi
-filt = ones(3,1); filt = filt/sum(filt);
-dTheta = conv(dTheta,filt,'same');
-dThetaFract=sum(~isnan(dTheta)/(length(dTheta)));
+% filt = ones(3,1); filt = filt/sum(filt);
+% dTheta = conv(dTheta,filt,'same');
+% dThetaFract=sum(~isnan(dTheta)/(length(dTheta)));
 ThetaFract=sum(~isnan(thAll))/(length(thAll));
 longThetaFract = sum(~isnan(longTheta))/(length(longTheta))
 subplot(2,3,4)
@@ -481,12 +481,7 @@ for i = 1:nPts
 end
 
 drawHead(meanHeadAll); axis square; axis equal
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-end
-close(gcf)
-
+c
 clear data
 data.mouse_xy = cent;
 data.mouseSp = mouseV;
@@ -497,10 +492,12 @@ data.crickSp = crickSp
 data.range = range;
 data.az = az;
 data.crick_p = crick_p;
-data.dThetaFract=dThetaFract;
+%data.dThetaFract=dThetaFract;
 data.ThetaFract=ThetaFract;
-data.longTheta=longTheta;
-data.longThetaFract=longThetaFract;
+% data.longTheta=longTheta;
+% data.longThetaFract=longThetaFract;
+data.crickB = crickB;
+data.crick_pB=crick_pB;
 
 cricket.pos = crick;
 
