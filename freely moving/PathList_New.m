@@ -2,17 +2,17 @@
 % from new DLC network trained on 8/15/19
 % all files are on \\new-monster\
 
-%% J462a(green)%female
+%% J462a(green)%female %need to fix file names
 pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\080219\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'};
- %'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\';
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; %fixing in dlc
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};%fixing in DLC
 %% J462b(blue) %female
 pname={'T:\PreyCaptureNew\Cohort3\J462b(blue)\081519\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\081319\Approach\';
-'T:\PreyCaptureNew\Cohort3\J462b(blue)\080919\Approach\';
+'T:\PreyCaptureNew\ohort3\J462b(blue)\080919\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\080719\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\080219\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\073019\Approach\'};
@@ -49,9 +49,9 @@ pname={'T:\PreyCaptureNew\Cohort3\J463c(white)\081419\Approach\';
 %% J465d(black) %male
 pname={'T:\PreyCaptureNew\Cohort4\J465d(black)\081219\Approach\';
     'T:\PreyCaptureNew\Cohort4\J465d(black)\080719\Approach\';};
-%% J475c(green) %male
-pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\081219\Approach\';
-    'T:\PreyCaptureNew\Cohort4\J475c(green)\080719\Approach\';
+%% J475c(green) %male % data look awful - go through eye videos individually to make sure all are tracking
+%pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\081219\Approach\';
+pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\080719\Approach\';
     'T:\PreyCaptureNew\Cohort4\J475c(green)\072919\Approach\'};
 
 %% J470a(blue) %female

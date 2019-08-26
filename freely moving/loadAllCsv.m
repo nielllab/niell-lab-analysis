@@ -153,9 +153,14 @@ for j=1:length(fileList)
         Data(j).Ltheta =interp1(LTS,Data(j).Lthetaraw,xq);
         Data(j).Lphi =interp1(LTS,Data(j).Lphiraw,xq);
       
-        Data(j).dxR = diff(Data(j).XRcent); Data(j).dxL = diff(Data(j).XLcent); 
-        Data(j).dxRTheta = diff(Data(j).Rtheta); Data(j).dxLTheta = diff(Data(j).Ltheta); 
-        Data(j).dxRPhi = diff(Data(j).Rphi); Data(j).dxLPhi = diff(Data(j).Lphi); 
+        Data(j).dxR = diff(Data(j).XRcent);
+        Data(j).dxL = diff(Data(j).XLcent); 
+        Data(j).dyR = diff(Data(j).YRcent);
+        Data(j).dyL = diff(Data(j).YLcent); 
+        Data(j).dxRTheta = diff(Data(j).Rtheta);
+        Data(j).dxLTheta = diff(Data(j).Ltheta); 
+        Data(j).dxRPhi = diff(Data(j).Rphi); 
+        Data(j).dxLPhi = diff(Data(j).Lphi); 
         Data(j).dth = Data(j).dtheta;
         
         figure
