@@ -172,8 +172,7 @@ Q = [a b/2; b/2 c];
 [eigVec, eigValue] = eig(Q); 
 
 % compute the angle to the long axis 
-% angleToX = atand(abs(eigVec(2,1))/abs(eigVec(1,1))); 
-% 
+angleToX = atand(abs(eigVec(2,1))/abs(eigVec(1,1))); 
 
 % % check sign to get angles from 90-180
 % % since vector could point other way have to check all 4 quadrants
@@ -198,8 +197,6 @@ Q = [a b/2; b/2 c];
 %     end
 % end
 
-angleToX = atan2d(eigVec(2,1),eigVec(1,1));
-angleFromX = angleToX;
 
 % a2 = max(a,b);
 % b2 = min(a,b);

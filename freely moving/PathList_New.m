@@ -7,8 +7,8 @@ pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\080219\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; %fixing in dlc
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};%fixing in DLC
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; 
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};
 %% J462b(blue) %female
 pname={'T:\PreyCaptureNew\Cohort3\J462b(blue)\081519\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\081319\Approach\';
@@ -47,12 +47,14 @@ pname={'T:\PreyCaptureNew\Cohort3\J463c(white)\081419\Approach\';
     'T:\PreyCaptureNew\Cohort3\J463c(white)\080519\Approach\'};
 
 %% J465d(black) %male
-pname={'T:\PreyCaptureNew\Cohort4\J465d(black)\081219\Approach\';
+pname={'T:\PreyCaptureNew\Cohort4\J465d(black)\081519\Approach\'
+    'T:\PreyCaptureNew\Cohort4\J465d(black)\081219\Approach\';
     'T:\PreyCaptureNew\Cohort4\J465d(black)\080719\Approach\';};
 %% J475c(green) %male % data look awful - go through eye videos individually to make sure all are tracking
-%pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\081219\Approach\';
-pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\080719\Approach\';
+pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\081519\Approach\'
+    'T:\PreyCaptureNew\Cohort4\J475c(green)\081219\Approach\';
     'T:\PreyCaptureNew\Cohort4\J475c(green)\072919\Approach\'};
+% 'T:\PreyCaptureNew\Cohort4\J475c(green)\080719\Approach\';
 
 %% J470a(blue) %female
 pname={'T:\PreyCaptureNew\Cohort4\J470a (blue)\081619\Approach\';

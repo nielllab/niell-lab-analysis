@@ -119,10 +119,10 @@ for j=1:length(fileList)
         startL = LTS(1);
         Data(j).LTS = LTS - startL;
         
-        start=max([startT,startR,startL]); endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
+        start=max([startT,startR,startL]);
+        endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
         xq=(start:1/30:endT)';
-        
-  
+          
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
             Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketBRaw,Data(j).cricket_pBRaw);
         
@@ -223,7 +223,7 @@ for j=1:length(fileList)
     
     
 end
-afilename=sprintf('%s',ani,'AllVids','.mat')
+afilename=sprintf('%s',ani,'partVids','.mat')
 save(fullfile(pSname, afilename))
 %save('J463c_test_data.mat')
 

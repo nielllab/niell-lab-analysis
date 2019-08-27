@@ -89,7 +89,7 @@ thetad = asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
 
 %%
-i=50;
+i=250;
 w = EllipseParams(i,5); L=EllipseParams(i,3); l=EllipseParams(i,4); x_C=EllipseParams(i,1); y_C=EllipseParams(i,2);
 Rotation1 = [cos(w),-sin(w);sin(w),cos(w)];
 L1 = [L,0;0,l];
@@ -117,7 +117,7 @@ scatter(PointsRot(1,:),PointsRot(2,:),100,'.b'); %transformation from red to gre
 axis equal; axis([250 400 250 400])
 title(sprintf('omega = %.2f',EllipseParams(i,5)*180/pi))
 
-%  scatter(EyeShift(i,2),EyeShift(i,3),100,'.y')
+ scatter(EyeShift(i,2),EyeShift(i,3),100,'.y')
 
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
