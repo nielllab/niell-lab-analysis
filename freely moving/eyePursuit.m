@@ -6,6 +6,12 @@ load(fullfile(p,f));
 vid = input('which trial? ');
 
 %%% zero-center eye positions
+% Data(vid).Rtheta = Data(vid).Rtheta - nanmedian(Data(vid).Rtheta);
+% Data(vid).Ltheta = Data(vid).Ltheta - nanmedian(Data(vid).Ltheta);
+% Data(vid).Rphi = Data(vid).Rphi - nanmedian(Data(vid).Rphi);
+% Data(vid).Lphi = Data(vid).Lphi - nanmedian(Data(vid).Lphi);
+
+
 Data(vid).Rtheta = Data(vid).Rtheta - nanmedian(Data(vid).Rtheta);
 Data(vid).Ltheta = Data(vid).Ltheta - nanmedian(Data(vid).Ltheta);
 Data(vid).Rphi = Data(vid).Rphi - nanmedian(Data(vid).Rphi);
@@ -45,8 +51,11 @@ for i = (1+startLag):length(Data(vid).Rtheta)
     %%% at 45deg (pi/4)
     rth = Data(vid).theta(i) + pi/4 + Data(vid).Rtheta(i)*pi/180;
     lth = Data(vid).theta(i) - pi/4 + Data(vid).Ltheta(i)*pi/180;
-    plot(Data(vid).mouse_xy(1,i) + [0 100*cos(rth) ] ,Data(vid).mouse_xy(2,i) + [0 100*sin(rth)],'r', 'Linewidth',2)
-    plot(Data(vid).mouse_xy(1,i) + [0 100*cos(lth) ] ,Data(vid).mouse_xy(2,i) + [0 100*sin(lth)],'r', 'Linewidth',2)
+%     rth = Data(vid).theta(i) + Data(vid).Rtheta(i)*pi/180;
+%     lth = Data(vid).theta(i) + Data(vid).Ltheta(i)*pi/180;
+    
+    plot(Data(vid).mouse_xy(1,i) + [0 200*cos(rth) ] ,Data(vid).mouse_xy(2,i) + [0 200*sin(rth)],'c', 'Linewidth',2)
+    plot(Data(vid).mouse_xy(1,i) + [0 200*cos(lth) ] ,Data(vid).mouse_xy(2,i) + [0 200*sin(lth)],'m', 'Linewidth',2)
     
     axis equal; axis([0 1600 0 1200]);  hold off
     

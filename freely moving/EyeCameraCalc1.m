@@ -1,10 +1,11 @@
 %%%%% Eye Camera Calculations
-function [newtheta,newphi,EllipseParams,ExtraParams] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename)
+function [newtheta,newphi,EllipseParams,ExtraParams good] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
 
 % Inputs:
 %   Vid1 - 3D grayscale array of video frames
 %   Pointsx - The X component of Deeplabcut tracking
 %   Pointsy - The Y component of Deeplabcut tracking
+%    eyethresh - likelihood threshold for including eye points
 
 % Outputs:
 %   newtheta - the horizontal angle difference between Camera center and
@@ -20,6 +21,11 @@ function [newtheta,newphi,EllipseParams,ExtraParams] = EyeCameraCalc1(numFrames,
 %       Column6 (angleFromX) - angle from hoizontal plane to long axis
 %       Column7 (phi) - the tilt of the ellipse
 %   ExtraParams - Extra parameters to explore
+%  good - # of pupil points above threshold
+
+if ~exist('eyethresh','var')
+    eyethresh = 0.95;
+end
 
 if exist('psfilename','var')
     savePDF=1;
@@ -47,7 +53,7 @@ ExtraParams = zeros(numFrames,6);
 
 
 parfor v=1:(numFrames)
-    if usegood(v)==1 && (~any((Pointsx(v,:)<10)| (Pointsy(v,:)<10)| (isnan(Pointsx(v,:)))))
+    if usegood(v)==1 && (~any((Pointsx(v,:)<10) | (Pointsy(v,:)<10)| (isnan(Pointsx(v,:)))))
         e_t = fit_ellipse2(Pointsx(v,:),Pointsy(v,:));
         if isempty(e_t.status)==1 &&  ((e_t.short_axis/2)/(e_t.long_axis/2) >.5)
             EllipseParams(v,:)=[e_t.X0_in, e_t.Y0_in, e_t.long_axis/2, e_t.short_axis/2,  e_t.angleToX*pi/180, e_t.angleFromX*pi/180, e_t.phi];
@@ -67,21 +73,23 @@ ExtraParams = fillmissing(ExtraParams,'linear',1);
 
 %%  Calc Camera Center
 R = linspace(0,2*pi,100);
-list = find(EllipseParams(:,4)./EllipseParams(:,3)<.95); %randi([1 size(EllipseParams,1)],50);%  1:size(EllipseParams,1); %
-A = [cos(EllipseParams(list,5)),sin(EllipseParams(list,5))];
-b=diag(A*EllipseParams(:,1:2)');
-CamCent=(A'*A)\A'*b;
-%
+list = find(EllipseParams(:,4)./EllipseParams(:,3)<.9); %randi([1 size(EllipseParams,1)],50);%  1:size(EllipseParams,1); %
+A = [cos(EllipseParams(list,5)),sin(EllipseParams(list,5))]; %%% cosw  + sinw
+b=diag(A*EllipseParams(list,1:2)');
+CamCent=(A'*A)\(A'*b)   %%% camcent*A = EllipseParams(list,1:2)*A
+
+
+
 % scale = nansum(sqrt(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2)'*vecnorm([EllipseParams(:,1)';EllipseParams(:,2)']-CamCent,2,1)')/...
 %     nansum(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2);
 Ellipticity = EllipseParams(list,4)./EllipseParams(list,3);
 scale = nansum(sqrt(1-(Ellipticity).^2).*vecnorm(EllipseParams(list,1:2)'-CamCent,2,1)')./nansum(1-(Ellipticity).^2);
 theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale); %in radians
-thetad =asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
+thetad = asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
 
 %%
-i=100;
+i=50;
 w = EllipseParams(i,5); L=EllipseParams(i,3); l=EllipseParams(i,4); x_C=EllipseParams(i,1); y_C=EllipseParams(i,2);
 Rotation1 = [cos(w),-sin(w);sin(w),cos(w)];
 L1 = [L,0;0,l];
@@ -91,8 +99,8 @@ q_star = Rotation1*L1*q+C1;
 qcirc = [L/scale,0;0,L/scale]*q;
 qcirc2 = [L,0;0,L]*q+CamCent;
 
-theta2 = asin((EllipseParams(i,1)-CamCent(1))*1/scale);
-phi2 = asin((EllipseParams(i,2)-CamCent(2))./cos(theta2)*1/scale);
+theta2 = real(asin((EllipseParams(i,1)-CamCent(1))*1/scale));
+phi2 = real(asin((EllipseParams(i,2)-CamCent(2))./cos(theta2)*1/scale));
 
 newCent = scale*[sin(theta2); sin(phi2).*cos(theta2)]+CamCent;
 PointsRot = newCent + scale*[cos(theta2), 0; -sin(theta2)*sin(phi2), cos(phi2)]*qcirc;
@@ -100,11 +108,14 @@ PointsRot = newCent + scale*[cos(theta2), 0; -sin(theta2)*sin(phi2), cos(phi2)]*
 figure;
 %imagesc(Vid1(:,:,i)); colormap gray;
 axis equal off;
-plot(q_star(1,:),q_star(2,:),'g','LineWidth',2); scatter(EllipseParams(i,1),EllipseParams(i,2),100,'og');hold on;
-scatter(Pointsx(i,:),Pointsy(i,:),100,'.m');
-scatter(CamCent(1),CamCent(2),100,'or'); scatter(qcirc2(1,:),qcirc2(2,:),50,'.r');
-scatter(newCent(1),newCent(2),100,'xb')
-scatter(PointsRot(1,:),PointsRot(2,:),100,'.b');
+plot(q_star(1,:),q_star(2,:),'g','LineWidth',2);hold on; scatter(EllipseParams(i,1),EllipseParams(i,2),100,'og');
+scatter(Pointsx(i,:),Pointsy(i,:),100,'.m'); %DLC pts
+scatter(CamCent(1),CamCent(2),100,'or'); % theoretical cam center
+scatter(qcirc2(1,:),qcirc2(2,:),50,'.r'); %theoretical circle of camera axis (eye is straight ahead)
+scatter(newCent(1),newCent(2),100,'xb'); % new center 
+scatter(PointsRot(1,:),PointsRot(2,:),100,'.b'); %transformation from red to green, good if matches green
+axis equal; axis([250 400 250 400])
+title(sprintf('omega = %.2f',EllipseParams(i,5)*180/pi))
 
 %  scatter(EyeShift(i,2),EyeShift(i,3),100,'.y')
 
@@ -122,6 +133,7 @@ axis equal;hold on;
 plot(linspace(0,250),linspace(0,250),'r')
 title('Scale Factor Calibration')
 axis([0 50 0 50])
+
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
@@ -152,8 +164,8 @@ close(gcf)
 
 %% Theta and Phi
 
-newtheta = (real(thetad(usegood)));
-newphi = (real(phi(usegood)));
+newtheta = (real(thetad));
+newphi = (real(phi));
 
 figure; subplot(121);
 plot(diff(movmean(newtheta,10)),'LineWidth',2); %hold on; plot(diff(newlongang),'LineWidth',1)

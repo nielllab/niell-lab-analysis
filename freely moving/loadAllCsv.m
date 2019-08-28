@@ -65,28 +65,30 @@ for j=1:length(fileList)
     Data(j).dThetaRaw=aligned.dTheta;
     Data(j).cricketxyRaw=aligned.crick_xy;
     Data(j).cricketVRaw=aligned.crickSp;
+    Data(j).cricketBRaw=aligned.crickB;
+    Data(j).cricket_pBRaw=aligned.crick_pB;
     Data(j).rangeRaw=aligned.range;
     Data(j).azRaw=aligned.az;
     Data(j).cricketP=aligned.crick_p;
     Data(j).ThetaFract=aligned.ThetaFract;  
-    Data(j).dThetaFract=aligned.dThetaFract;    
-    Data(j).longTheta=aligned.longTheta;
-    Data(j).longThetaFract=aligned.longThetaFract;
+%    Data(j).dThetaFract=aligned.dThetaFract;    
+%     Data(j).longTheta=aligned.longTheta;
+%     Data(j).longThetaFract=aligned.longThetaFract;
     
     Data(j).xR=Data(j).DataR(:,2:3:end);
     Data(j).yR=Data(j).DataR(:,3:3:end);
     Data(j).RLikelihood=Data(j).DataR(:,4:3:end);
-    [Data(j).Rtheta,Data(j).Rphi,Data(j).EllipseParamsR,Data(j).ExtraParamsR] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
-    Data(j).XRcent=Data(j).EllipseParamsR(:,1);  Data(j).YRcent=Data(j).EllipseParamsR(:,2);
-    
-    
+    [Data(j).Rthetaraw,Data(j).Rphiraw,Data(j).EllipseParamsR,Data(j).ExtraParamsR] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
+    Data(j).XRcentraw=Data(j).EllipseParamsR(:,1);  Data(j).YRcentraw=Data(j).EllipseParamsR(:,2);
+
+  
+  %  Data(j).xL=Data(j).DataL(:,2:3:end);
     Data(j).xL= abs((Data(j).DataL(:,2:3:end))-640);
-    %Data(j).xL=(Data(j).DataL(:,2:3:end)); %sign flip for x values for L eye camera
-    Data(j).xL=Data(j).DataL(:,2:3:end);
     Data(j).yL=Data(j).DataL(:,3:3:end);
     Data(j).LLikelihood=Data(j).DataL(:,4:3:end);
-    [Data(j).Ltheta,Data(j).Lphi,Data(j).EllipseParamsL,Data(j).ExtraParamsL] = EyeCameraCalc1(length(Data(j).xL(:,1)),Data(j).xL,Data(j).yL, Data(j).LLikelihood,psfilename)
-    Data(j).XLcent=Data(j).EllipseParamsL(:,1); Data(j).YLcent=Data(j).EllipseParamsL(:,2);
+    [Data(j).Lthetaraw,Data(j).Lphiraw,Data(j).EllipseParamsL,Data(j).ExtraParamsL] = EyeCameraCalc1(length(Data(j).xL(:,1)),Data(j).xL,Data(j).yL, Data(j).LLikelihood,psfilename)
+    Data(j).XLcentraw=Data(j).EllipseParamsL(:,1); 
+    Data(j).YLcentraw=Data(j).EllipseParamsL(:,2);
     
     %fxn to adjust timing between videos of different lengths
     TSfname = strcat(ani,'_','topTS','_',sname{3},'_',date,'_',clipnum,'.csv');
@@ -117,39 +119,97 @@ for j=1:length(fileList)
         startL = LTS(1);
         Data(j).LTS = LTS - startL;
         
-        start=max([startT,startR,startL]); endT = min([TopTs(end),RTS(end),LTS(end)])
+        start=max([startT,startR,startL]);
+        endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
         xq=(start:1/30:endT)';
-        
-        try
+          
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
-            Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw);
+            Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketBRaw,Data(j).cricket_pBRaw);
         
         Data(j).az =(adjustedTS.azAdj)';
         Data(j).theta =(adjustedTS.headThetaAdj)';
+        Data(j).dtheta = interp1(TopTs(1:end-1),Data(j).dThetaRaw,xq);
         Data(j).mouse_xy =adjustedTS.mousexyAdj;
         Data(j).mouseV =(adjustedTS.mouseVAdj)';
         Data(j).range=(adjustedTS.rangeAdj)';
         Data(j).cricketxy =adjustedTS.cricketxyAdj;
         Data(j).cricketV = (adjustedTS.cricketVAdj)';
         Data(j).cricketP=adjustedTS.cricketPAdj;
-        catch
-        end
+        Data(j).cricketBody=adjustedTS.cricketBAdj;
+        Data(j).cricket_pB=adjustedTS.cricketpBAdj;
+       
+  
+        Data(j).XRcent =interp1(RTS,Data(j).XRcentraw,xq);
+        Data(j).YRcent =interp1(RTS,Data(j).YRcentraw,xq);
+        %%% hack to put X,Y into theta/phi as we figure out why
+        %%% theta/phi are different length than x/y coming out of ellipseParams
+        Data(j).Rtheta =interp1(RTS,Data(j).Rthetaraw,xq);
+        Data(j).Rphi = interp1(RTS,Data(j).Rphiraw,xq);
+%        
+        Data(j).XLcent =interp1(LTS,Data(j).XLcentraw,xq);
+        Data(j).YLcent =interp1(LTS,Data(j).YLcentraw,xq);
+                %%% hack to put X,Y into theta/phi as we figure out why
+        %%% theta/phi are different length than x/y coming out of ellipseParams
+        Data(j).Ltheta =interp1(LTS,Data(j).Lthetaraw,xq);
+        Data(j).Lphi =interp1(LTS,Data(j).Lphiraw,xq);
+      
+        Data(j).dxR = diff(Data(j).XRcent);
+        Data(j).dxL = diff(Data(j).XLcent); 
+        Data(j).dyR = diff(Data(j).YRcent);
+        Data(j).dyL = diff(Data(j).YLcent); 
+        Data(j).dxRTheta = diff(Data(j).Rtheta);
+        Data(j).dxLTheta = diff(Data(j).Ltheta); 
+        Data(j).dxRPhi = diff(Data(j).Rphi); 
+        Data(j).dxLPhi = diff(Data(j).Lphi); 
+        Data(j).dth = Data(j).dtheta;
         
-        try
-        adjustedTS = adjustTiming(RTS,xq,Data(j).Rtheta, Data(j).Rphi,Data(j).XRcent,Data(j).YRcent,psfilename);
-        Data(j).XRcent =adjustedTS.x_centAdj;
-        Data(j).YRcent =adjustedTS.y_centAdj;
-        Data(j).Rtheta =adjustedTS.thetaAdj;
-        Data(j).Rphi =adjustedTS.phiAdj;
-        catch
+        figure
+        plot(xcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
+        
+        figure
+        plot(xcorr(Data(j).dxR,Data(j).dth(1:end-1),30,'coeff'))
+        hold on
+        plot(xcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
+        plot(xcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
+        legend('R','L','R-L')  
+        title('eye position & head theta');
+        if savePDF
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
         end
-        try
-        adjustedTS = adjustTiming(LTS,xq,Data(j).Ltheta,Data(j).Lphi,Data(j).XLcent,Data(j).YLcent,psfilename);
-        Data(j).XLcent =adjustedTS.x_centAdj;
-        Data(j).YLcent =adjustedTS.y_centAdj;
-        Data(j).Ltheta =adjustedTS.thetaAdj;
-        Data(j).Lphi =adjustedTS.phiAdj;
-        catch end
+        close(gcf)
+      
+        figure
+        plot(xcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
+        
+        
+         figure
+        plot(xcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),30,'coeff'))
+        hold on
+        plot(xcorr(Data(j).dxLTheta,Data(j).dth(1:end-1),30,'coeff'))
+        plot(xcorr(Data(j).dxRTheta,-Data(j).dxLTheta,30,'coeff'))
+        legend('R','L','R-L')  
+        title('eye theta & head theta');
+        if savePDF
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+        end
+        close(gcf)
+        
+            figure
+        plot(xcorr(Data(j).dxRPhi,Data(j).dth(1:end-1),30,'coeff'))
+        hold on
+        plot(xcorr(Data(j).dxLPhi,Data(j).dth(1:end-1),30,'coeff'))
+        plot(xcorr(Data(j).dxRPhi,Data(j).dxLPhi,30,'coeff'))
+        legend('R','L','R-L')  
+        title('eye phi & head theta');
+        if savePDF
+            set(gcf, 'PaperPositionMode', 'auto');
+            print('-dpsc',psfilename,'-append');
+        end
+        close(gcf)
+        
+        
         
     end
     if savePDF
@@ -163,7 +223,7 @@ for j=1:length(fileList)
     
     
 end
-afilename=sprintf('%s',ani,'.mat')
+afilename=sprintf('%s',ani,'partVids','.mat')
 save(fullfile(pSname, afilename))
 %save('J463c_test_data.mat')
 
