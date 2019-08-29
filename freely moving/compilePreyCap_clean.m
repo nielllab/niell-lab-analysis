@@ -1,5 +1,5 @@
 clear all; close all
-load('J465dpartVids.mat'); 
+load('J463bAllVids_082819_a.mat'); 
 savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
@@ -63,6 +63,8 @@ for i=1:length(Data)
     YRcent{i,:} =Data(i).YRcent;
     XLcent{i,1} = Data(i).XLcent;
     YLcent{i,:} =Data(i).YLcent;
+    RRad{i,:}=Data(i).RRad;
+    LRad{i,:}=Data(i).LRad;
     
     
     longR{i,1}=EllipseParamsR{i,1}(:,3);longL{i,1}=EllipseParamsL{i,1}(:,3);
@@ -869,7 +871,7 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_082719','.pdf')
+    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_082819','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
