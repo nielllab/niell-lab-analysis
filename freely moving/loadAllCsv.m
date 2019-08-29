@@ -78,7 +78,7 @@ for j=1:length(fileList)
     Data(j).xR=Data(j).DataR(:,2:3:end);
     Data(j).yR=Data(j).DataR(:,3:3:end);
     Data(j).RLikelihood=Data(j).DataR(:,4:3:end);
-    [Data(j).Rthetaraw,Data(j).Rphiraw,Data(j).EllipseParamsR,Data(j).ExtraParamsR] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
+    [Data(j).Rthetaraw,Data(j).Rphiraw,Data(j).EllipseParamsR,Data(j).ExtraParamsR,Data(j).goodReye] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
     Data(j).XRcentraw=Data(j).EllipseParamsR(:,1);  Data(j).YRcentraw=Data(j).EllipseParamsR(:,2);
 
   
@@ -86,9 +86,14 @@ for j=1:length(fileList)
     Data(j).xL= abs((Data(j).DataL(:,2:3:end))-640);
     Data(j).yL=Data(j).DataL(:,3:3:end);
     Data(j).LLikelihood=Data(j).DataL(:,4:3:end);
-    [Data(j).Lthetaraw,Data(j).Lphiraw,Data(j).EllipseParamsL,Data(j).ExtraParamsL] = EyeCameraCalc1(length(Data(j).xL(:,1)),Data(j).xL,Data(j).yL, Data(j).LLikelihood,psfilename)
+    [Data(j).Lthetaraw,Data(j).Lphiraw,Data(j).EllipseParamsL,Data(j).ExtraParamsL,Data(j).goodLeye] = EyeCameraCalc1(length(Data(j).xL(:,1)),Data(j).xL,Data(j).yL, Data(j).LLikelihood,psfilename)
     Data(j).XLcentraw=Data(j).EllipseParamsL(:,1); 
     Data(j).YLcentraw=Data(j).EllipseParamsL(:,2);
+    
+    
+    Data(j).RRadRaw = (Data(j).EllipseParamsR(:,3)+ Data(j).EllipseParamsR(:,4))/2;
+    Data(j).LRadRaw = (Data(j).EllipseParamsL(:,3)+ Data(j).EllipseParamsL(:,4))/2;
+    
     
     %fxn to adjust timing between videos of different lengths
     TSfname = strcat(ani,'_','topTS','_',sname{3},'_',date,'_',clipnum,'.csv');
@@ -145,6 +150,7 @@ for j=1:length(fileList)
         %%% theta/phi are different length than x/y coming out of ellipseParams
         Data(j).Rtheta =interp1(RTS,Data(j).Rthetaraw,xq);
         Data(j).Rphi = interp1(RTS,Data(j).Rphiraw,xq);
+        Data(j).RRad = interp1(RTS,Data(j).RRadRaw,xq);
 %        
         Data(j).XLcent =interp1(LTS,Data(j).XLcentraw,xq);
         Data(j).YLcent =interp1(LTS,Data(j).YLcentraw,xq);
@@ -152,7 +158,10 @@ for j=1:length(fileList)
         %%% theta/phi are different length than x/y coming out of ellipseParams
         Data(j).Ltheta =interp1(LTS,Data(j).Lthetaraw,xq);
         Data(j).Lphi =interp1(LTS,Data(j).Lphiraw,xq);
+        Data(j).LRad = interp1(LTS,Data(j).LRadRaw,xq);
       
+        figure;plot(Data(j).RRad); hold on; plot(Data(j).LRad);
+        title('interp pupil radius');
         Data(j).dxR = diff(Data(j).XRcent);
         Data(j).dxL = diff(Data(j).XLcent); 
         Data(j).dyR = diff(Data(j).YRcent);
@@ -223,7 +232,7 @@ for j=1:length(fileList)
     
     
 end
-afilename=sprintf('%s',ani,'partVids','.mat')
+afilename=sprintf('%s',ani,'AllVids_082819_b','.mat')
 save(fullfile(pSname, afilename))
 %save('J463c_test_data.mat')
 

@@ -47,7 +47,7 @@ for v=1:numFrames
     allgood=good(v,:)==1;
     usegood(v)=sum(allgood)>=8;
 end
-
+good=usegood;
 EllipseParams = zeros(numFrames,7);
 ExtraParams = zeros(numFrames,6);
 
@@ -72,13 +72,13 @@ ExtraParams = fillmissing(ExtraParams,'linear',1);
 
 
 %%  Calc Camera Center
-R = linspace(0,2*pi,100);
-list = find(EllipseParams(:,4)./EllipseParams(:,3)<.9); %randi([1 size(EllipseParams,1)],50);%  1:size(EllipseParams,1); %
+R = linspace(0,2*pi,100); thresh=.9;
+list = find(EllipseParams(:,4)./EllipseParams(:,3)<thresh); %randi([1 size(EllipseParams,1)],50);%  1:size(EllipseParams,1); %
 A = [cos(EllipseParams(list,5)),sin(EllipseParams(list,5))]; %%% cosw  + sinw
 b=diag(A*EllipseParams(list,1:2)');
 CamCent=(A'*A)\(A'*b)   %%% camcent*A = EllipseParams(list,1:2)*A
 
-
+  
 
 % scale = nansum(sqrt(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2)'*vecnorm([EllipseParams(:,1)';EllipseParams(:,2)']-CamCent,2,1)')/...
 %     nansum(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2);
@@ -87,6 +87,18 @@ scale = nansum(sqrt(1-(Ellipticity).^2).*vecnorm(EllipseParams(list,1:2)'-CamCen
 theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale); %in radians
 thetad = asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
+
+
+EllRange= (EllipseParams(:,4)./EllipseParams(:,3))
+figure;subplot(1,2,1); hist(EllRange); title('all values')
+subplot(1,2,2); hist(Ellipticity);title('thresholded ellipticity');
+suptitle(sprintf('ellipticity thresh = %.2f',thresh))
+
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 
 %%
 i=50;
@@ -114,7 +126,7 @@ scatter(CamCent(1),CamCent(2),100,'or'); % theoretical cam center
 scatter(qcirc2(1,:),qcirc2(2,:),50,'.r'); %theoretical circle of camera axis (eye is straight ahead)
 scatter(newCent(1),newCent(2),100,'xb'); % new center 
 scatter(PointsRot(1,:),PointsRot(2,:),100,'.b'); %transformation from red to green, good if matches green
-axis equal; axis([250 400 250 400])
+axis equal; %axis([250 400 250 400])
 title(sprintf('omega = %.2f',EllipseParams(i,5)*180/pi))
 
 %  scatter(EyeShift(i,2),EyeShift(i,3),100,'.y')
