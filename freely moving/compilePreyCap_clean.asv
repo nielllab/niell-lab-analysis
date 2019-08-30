@@ -128,7 +128,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %    % filtApp(vid,:)=sum(appEpoch{vid})
 % %   plot(d2cr(mouseV{useFilt(vid)}>5),'g');
 % end
-% 
+
 
 %%% identify approach!!!
 
@@ -182,8 +182,9 @@ for vid=1:length(useFilt)
     nframe = min(nframe, length(dthetaL{useFilt(vid)}));
     nonapp=appEpoch{useFilt(vid)}(1:nframe)==0
     dT=dTheta{useFilt(vid)}; dtR=dthetaR{useFilt(vid)}; dtL=dthetaL{useFilt(vid)};
+    cln=~isnan(dT(1:nframe))
     clear use
-    use =  ~isnan(dT(1:nframe))&(nonapp==1)';
+    use = (cln==1& nonapp==1);
   %  if sum(use)>3
     [corrR lagsR]= xcorr(dT(use),dtR(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -238,7 +239,7 @@ for vid=1:length(useFilt)
     nonapp=appEpoch{useFilt(vid)}==0
     dT=dTheta{useFilt(vid)}; dpR=dphiR{useFilt(vid)}; dpL=dphiL{useFilt(vid)};
     clear use
-    use = (nonapp==1)' & ~isnan(dT(1:length(dpR)));
+    use = nonapp==1 & ~isnan(dT(1:length(dpR)));
     if sum(use)>3
     [corrR lagsR]= xcorr(dT(use),dpR(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -292,7 +293,7 @@ for vid=1:length(useFilt)
     nframe = min(length(dthetaR{useFilt(vid)}),length(dthetaL{useFilt(vid)}));
     dtR=dthetaR{useFilt(vid)}(1:nframe); dtL=dthetaL{useFilt(vid)}(1:nframe);
     nonapp=appEpoch{useFilt(vid)}==0;
-    use = (nonapp==1)'& ~isnan(dtR(1:nframe));
+    use = nonapp==1& ~isnan(dtR(1:nframe));
     if sum(use)>3
     [corrR lagsR]= xcorr(dtR(use),dtL(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -358,7 +359,7 @@ for vid=1:length(useFilt)
     nframe = min(length(dthetaR{useFilt(vid)}),length(dphiR{useFilt(vid)}));
     dtR=dthetaR{useFilt(vid)}(1:nframe); dpR=dphiR{useFilt(vid)}(1:nframe);
     nonapp=appEpoch{useFilt(vid)}==0;
-    use = (nonapp==1)'& ~isnan(dtR(1:nframe));
+    use = nonapp==1& ~isnan(dtR(1:nframe));
     if sum(use)>3
     [corrR lagsR]= xcorr(dtR(use),dpR(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -429,7 +430,7 @@ for vid=1:length(useFilt)
      
     dT=dTheta{useFilt(vid)}(1:nframe); tR=thetaR{useFilt(vid)}(1:nframe); tL=thetaL{useFilt(vid)}(1:nframe);
     clear use
-    use = ~isnan(dT(1:nframe))& (nonapp==1)';
+    use = ~isnan(dT(1:nframe))& nonapp==1;
     if sum(use)>3
     [corrR lagsR]= xcorr(dT(use),tR(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -441,7 +442,7 @@ for vid=1:length(useFilt)
     else
     end
     clear use;
-    use=(appEpoch{vid}==1)' & ~isnan(dT(1:nframe));
+    use=appEpoch{vid}==1 & ~isnan(dT(1:nframe));
       [corrRA lagsRA]= xcorr(dT(use),tR(use),'coeff');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
@@ -492,7 +493,7 @@ for vid=1:length(useFilt)
      
     dT=dTheta{useFilt(vid)}(1:nframe); pR=phiR{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
     clear use
-    use = ~isnan(dT(1:nframe))& (nonapp==1)';
+    use = ~isnan(dT(1:nframe))& nonapp==1;
     if sum(use)>3
     [corrR lagsR]= xcorr(dT(use),pR(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -504,7 +505,7 @@ for vid=1:length(useFilt)
     else
     end
     clear use;
-    use=(appEpoch{vid}==1)' & ~isnan(dT(1:nframe));
+    use=appEpoch{vid}==1 & ~isnan(dT(1:nframe));
       [corrRA lagsRA]= xcorr(dT(use),pR(use),'coeff');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
@@ -552,7 +553,7 @@ for vid=1:length(useFilt)
     tR=thetaR{useFilt(vid)}(1:nframe); tL=thetaL{useFilt(vid)}(1:nframe);
     nonapp=appEpoch{useFilt(vid)}(1:nframe)==0;
     
-    use = (nonapp==1)' & ~isnan(tR(1:length(nonapp)));
+    use = nonapp==1 & ~isnan(tR(1:length(nonapp)));
     if sum(use)>3
     [corrR lagsR]= xcorr(tR(use),tL(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -621,7 +622,7 @@ for vid=1:length(useFilt)
     tR=thetaR{useFilt(vid)}(1:nframe); pR=phiR{useFilt(vid)}(1:nframe);
     nonapp=appEpoch{useFilt(vid)}(1:nframe)==0;
     
-    use = (nonapp==1)' & ~isnan(tR(1:length(nonapp)));
+    use = nonapp==1 & ~isnan(tR(1:length(nonapp)));
     if sum(use)>3
     [corrR lagsR]= xcorr(tR(use),pR(use),'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
@@ -901,12 +902,12 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_082819_oldApproach','.pdf')
+    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_082819','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_oldApproach','.mat')
+afilename=sprintf('%s',ani,'Analyzed_newApproach','.mat')
 save(fullfile(pSname, afilename))

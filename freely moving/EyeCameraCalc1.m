@@ -72,7 +72,7 @@ ExtraParams = fillmissing(ExtraParams,'linear',1);
 
 
 %%  Calc Camera Center
-R = linspace(0,2*pi,100); thresh=.9;
+R = linspace(0,2*pi,100); thresh=.8;
 list = find(EllipseParams(:,4)./EllipseParams(:,3)<thresh); %randi([1 size(EllipseParams,1)],50);%  1:size(EllipseParams,1); %
 A = [cos(EllipseParams(list,5)),sin(EllipseParams(list,5))]; %%% cosw  + sinw
 b=diag(A*EllipseParams(list,1:2)');
