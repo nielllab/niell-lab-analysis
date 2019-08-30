@@ -1,5 +1,5 @@
 clear all; close all
-load('J462aAllVids_082919_a.mat'); 
+load('J462aAllVids_082919_b.mat'); 
 savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
@@ -183,10 +183,11 @@ for vid=1:length(useFilt)
     nonapp=appEpoch{useFilt(vid)}(1:nframe)==0
     dT=dTheta{useFilt(vid)}; dtR=dthetaR{useFilt(vid)}; dtL=dthetaL{useFilt(vid)};
     clear use
-    use =  ~isnan(dT(1:nframe))&(nonapp==1)';
+    use =~isnan(dT(1:nframe)) & (nonapp==1)';
   %  if sum(use)>3
     [corrR lagsR]= xcorr(dT(use),dtR(use),'coeff');
-    plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
+    plot(lagsR/30,corrR,'b');%xlim([-.3 .3])
+    hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
     [corrL lagsL]= xcorr(dT(use),dtL(use),'coeff');
@@ -197,10 +198,10 @@ for vid=1:length(useFilt)
     clear use;
     use=appEpoch{vid}==1
     [corrRA lagsRA]= xcorr(dT(use),dtR(use),'coeff');
-    plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
+    plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
     [corrLA lagsLA]= xcorr(dT(use),dtL(use),'coeff');
-    plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
+    plot(lagsLA/30,corrLA,'c');%xlim([-.3 .3]);
     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
@@ -340,7 +341,8 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); xlim([21 41]); axis square
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]);
+xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
@@ -407,7 +409,8 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); xlim([21 41]); axis square
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]);
+xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
@@ -471,7 +474,8 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); xlim([21 41]); axis square
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); 
+xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
@@ -534,7 +538,8 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); xlim([21 41]); axis square
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); 
+xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
@@ -600,7 +605,8 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); xlim([21 41]); axis square
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]);
+xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
@@ -901,12 +907,12 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_082819_oldApproach','.pdf')
+    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_082819_newApproach_flip_b','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_oldApproach','.mat')
+afilename=sprintf('%s',ani,'Analyzed_082919_newApproach_flip_b','.mat')
 save(fullfile(pSname, afilename))
