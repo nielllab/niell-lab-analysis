@@ -58,6 +58,7 @@ figure
 for i = 1:nPts
     p(i,:) = data(:,i*3+1);
     pts(i,:,:) = data(:,(i-1)*3 + (2:3))';
+    pts(i,2,:) = 1200 - pts(i,2,:); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
     ptsRaw(i,:,:) = pts(i,:,:); %%% keep a clean version before inserting NaNs
     pts(i,:,p(i,:)<p_thresh)=NaN;
     subplot(2,4,i)
@@ -337,11 +338,13 @@ else
     p_thresh_c = 0.95;
 end
 
-
+%%% load in crickets
 crick = data(:,nPts*3 +(2:3))'; %labeled as cricketHead
+crick(:,2) = 1200- crick(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
 crick_p = data(:,nPts*3 + 4);
 
 crickB = data(:,nPts*3 +(5:6))'; %cricketBody
+crickB(:,2) = 1200-crickB(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
 crick_pB = data(:,nPts*3 + 7);
 
 crick(:,crick_p<p_thresh_c) = NaN
