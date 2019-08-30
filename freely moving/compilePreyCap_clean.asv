@@ -88,7 +88,7 @@ delayFull=cell2mat(slip);
 useTime = goodTheta>=.7 %& tsData==1; %|(useL & useR)
 useFilt=find(useTime)
 
-rownum=11; colnum=7
+rownum=10; colnum=6
 % rownum=round(sqrt(length(useFilt)+4))
 % colnum=round(sqrt(length(useFilt)));
 %%
@@ -175,7 +175,7 @@ for vid=1:length(useFilt)
     end
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
+%%
 %%
 clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
 figure('units','normalized','outerposition',[0 0 1 1])
@@ -312,14 +312,14 @@ for vid=1:length(useFilt)
     nonapp=squeeze(appEpoch{useFilt(vid)}(1:nframe)==0)
     dT=mouseV{useFilt(vid)}(1:nframe); rR=RRad{useFilt(vid)}(1:nframe); rL=LRad{useFilt(vid)}(1:nframe);
     clear use
-    use =  (nonapp==1) %& ~isnan(dT(1:nframe));
+    use =  (nonapp==1);%~isnan(dT(1:nframe)) &
   %  if sum(use)>3
     [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'coeff');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
     hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
-    [corrL lagsL]= xcorr(dT(use),rL(use),30,'coeff');
+    [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'coeff');
     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
     uselagsL=(lagsL>=-30 & lagsL<=30);
 %     else
@@ -1115,12 +1115,12 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'AnalyzedTS_083019_nanxcorr','.pdf')
+    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_083019_newApproach_flip_a','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_083019_nanxcorr','.mat')
+afilename=sprintf('%s',ani,'Analyzed_083019_newApproach_flip_1','.mat')
 save(fullfile(pSname, afilename))
