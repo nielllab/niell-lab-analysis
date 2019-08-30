@@ -17,7 +17,7 @@ if ~exist('maxlag','var')
     maxlag = 25;
 end
 
-if normalization == 'zero'
+if strcmp(normalization, 'zero')
     x = x-nanmean(x);
     y = y-nanmean(y);
     normalization = 'coeff';
