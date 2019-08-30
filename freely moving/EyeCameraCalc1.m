@@ -1,5 +1,5 @@
 %%%%% Eye Camera Calculations
-function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
+function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR calibrationM] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
 
 % Inputs:
 %   Vid1 - 3D grayscale array of video frames
@@ -23,9 +23,10 @@ function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood] = EyeCameraCa
 %   ExtraParams - Extra parameters to explore
 %  usegood - are all 8 points good?
 %  ngood = number of good points
+% calibrationR, calibrationM = correlation coeff and slope for calibration values (to be used as diagnostic)
 
 if ~exist('eyethresh','var')
-    eyethresh = 0.95;
+    eyethresh = 0.99;
 end
 
 if exist('psfilename','var')
@@ -48,6 +49,7 @@ good = Likelihood>=eyethresh; %likelihood of all 8 pts must be >=.95
 ngood = sum(good,2);
 usegood = ngood>=8;
 
+
 EllipseParams = zeros(numFrames,7);
 ExtraParams = zeros(numFrames,6);
 
@@ -64,24 +66,31 @@ end
 fprintf('done \n')
 close all;
 
+
+figure
+plot(Likelihood); ylim([0 1])
+ylabel('likelihood'); title('likelihood all eyepoints')
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');  print('-dpsc',psfilename,'-append'); close(gcf)
+end
+
+
 %%% plot number of good points
 figure
+subplot(2,2,3)
 plot(ngood); ylim([0 9]);
-ylabel('number of good eyepoints'); title(sprintf('%0.3f good timepoints',mean(usegood)))
+ylabel('# good eyepoints'); title(sprintf('%0.3f good thresh %0.2f',mean(usegood),eyethresh))
 if savePDF
   set(gcf, 'PaperPositionMode', 'auto'); print('-dpsc',psfilename,'-append'); close(gcf)
 end
 
 
 %%% plot values for good points
-figure
-subplot(2,1,1);
-plot(Pointsx(usegood,:)); ylabel('x'); title('trace of all good timepoints')
-subplot(2,1,2);
+
+subplot(2,2,1);
+plot(Pointsx(usegood,:)); ylabel('x'); title('trace of  good timepoints')
+subplot(2,2,2);
 plot(Pointsy(usegood,:)); ylabel('y');
-if savePDF
-  set(gcf, 'PaperPositionMode', 'auto'); print('-dpsc',psfilename,'-append'); close(gcf)
-end
 
 efitb = find(EllipseParams(:,1)==0);
 EllipseParams(efitb,:)=NaN;
@@ -93,8 +102,15 @@ e_thresh=0.9; %%% ellipticity threshold
 
 %%% plot ellipticity histogram
 EllRange= (EllipseParams(usegood,4)./EllipseParams(usegood,3))
-figure; hist(EllRange);
+subplot(2,2,4)
+hist(EllRange);
 title(sprintf('ellipticity thresh = %.2f',e_thresh))
+
+
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');  print('-dpsc',psfilename,'-append'); close(gcf)
+end
+
 
 %%  Calc Camera Center
 R = linspace(0,2*pi,100);
@@ -108,11 +124,12 @@ CamCent=(A'*A)\(A'*b)   %%% camcent*A = EllipseParams(list,1:2)*A
 w= EllipseParams(:,5);
 
 figure
-plot(CamCent(1),CamCent(2),'r*','Markersize',8);hold on
+subplot(2,2,1)
+hold on
 for i = 1:length(list);
     plot(EllipseParams(list(i),1) + [-5*cos(w(list(i))) 5*cos(w(list(i)))], EllipseParams(list(i),2) + [-5*sin(w(list(i))) 5*sin(w(list(i)))])
 end
-axis equal; 
+axis equal; plot(CamCent(1),CamCent(2),'r*','Markersize',8);
 title('eye axes relative to center');
 
 % scale = nansum(sqrt(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2)'*vecnorm([EllipseParams(:,1)';EllipseParams(:,2)']-CamCent,2,1)')/...
@@ -123,9 +140,6 @@ theta = asin((EllipseParams(:,1)-CamCent(1))*1/scale); %in radians
 thetad = asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
 
-if savePDF
-  set(gcf, 'PaperPositionMode', 'auto'); print('-dpsc',psfilename,'-append'); close(gcf)
-end
 
 
 %% calculate one example image
@@ -145,7 +159,7 @@ phi2 = real(asin((EllipseParams(i,2)-CamCent(2))./cos(theta2)*1/scale));
 newCent = scale*[sin(theta2); sin(phi2).*cos(theta2)]+CamCent;
 PointsRot = newCent + scale*[cos(theta2), 0; -sin(theta2)*sin(phi2), cos(phi2)]*qcirc;
 
-figure;
+subplot(2,2,2)
 %imagesc(Vid1(:,:,i)); colormap gray;
 axis equal off;
 plot(q_star(1,:),q_star(2,:),'g','LineWidth',2);hold on; scatter(EllipseParams(i,1),EllipseParams(i,2),100,'og');
@@ -159,28 +173,19 @@ title(sprintf('omega = %.2f',EllipseParams(i,5)*180/pi))
 
 %  scatter(EyeShift(i,2),EyeShift(i,3),100,'.y')
 
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-    close(gcf)
-end
 
 
 
 %% Check Calibration
-figure;
-plot(vecnorm(EllipseParams(:,1:2)' - CamCent),scale*sqrt(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2),'.')
-legend('all points','list points')
+
+subplot(2,2,3)
+xvals = vecnorm(EllipseParams(:,1:2)' - CamCent); yvals = scale*sqrt(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2);
+plot(xvals,yvals,'.');
+[calibrationR calibrationM b] = regression(xvals,yvals')
 axis equal;hold on; xlabel('pupil camera dist'); ylabel('scale * ellipticity');
 plot(linspace(0,250),linspace(0,250),'r')
-title('Scale Factor Calibration')
+title(sprintf('Scale=%0.1f r=%0.1f m=%0.1f',scale,calibrationR,calibrationM))
 axis([0 50 0 50])
-
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-    close(gcf)
-end
 
 %%% calibration fit test
 % x1=vecnorm(EllipseParams(:,1:2)' - CamCent)';
@@ -189,8 +194,10 @@ end
 % m = fitvars(1);
 % c = fitvars(2);
 
+subplot(2,2,4)
+
 delta = (CamCent-EllipseParams(:,1:2)');
-figure;
+
 plot(vecnorm(delta,2,1),((delta(1,:)'.*cos(EllipseParams(:,5)))+(delta(2,:)'.*sin(EllipseParams(:,5))))./vecnorm(delta,2,1)','.')
 hold on
 plot(vecnorm(delta(:,list),2,1),((delta(1,list)'.*cos(EllipseParams(list,5)))+(delta(2,list)'.*sin(EllipseParams(list,5))))./vecnorm(delta(:,list),2,1)','r.')
@@ -217,11 +224,11 @@ title('Change in smoothed theta')
 subplot(122);
 plot(diff(movmean(newphi,10)),'LineWidth',2);  % hold on; plot(diff(newlongang),'LineWidth',1)
 title('Change in smoothed phi')
-if savePDF
-    set(gcf, 'PaperPositionMode', 'auto');
-    print('-dpsc',psfilename,'-append');
-    close(gcf)
-end
+% if savePDF
+%     set(gcf, 'PaperPositionMode', 'auto');
+%     print('-dpsc',psfilename,'-append');
+%     close(gcf)
+% end
 
 
 

@@ -95,7 +95,7 @@ close(gcf)
 
 badFraction = 1-mean(good,2);
 figure
-bar(badFraction); ylabel('fraction bad timepoints'); xlabel('point #')
+bar(badFraction); ylabel('fraction bad timepoints'); xlabel('point #'); ylim([0 1])
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
     print('-dpsc',psfilename,'-append');
