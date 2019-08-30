@@ -228,7 +228,7 @@ for j=1:length(fileList)
     
     
 end
-afilename=sprintf('%s',ani,'AllVids_082919_b','.mat')
+afilename=sprintf('%s',ani,'AllVids_083019_1','.mat')
 save(fullfile(pSname, afilename))
 %save('J463c_test_data.mat')
 

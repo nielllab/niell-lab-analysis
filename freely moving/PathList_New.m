@@ -11,7 +11,8 @@ pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; 
     'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};
 %% J462b(blue) %female
-pname={'T:\PreyCaptureNew\Cohort3\J462b(blue)\081519\Approach\';
+pname={'T:\PreyCaptureNew\Cohort3\J462b(blue)\082019\Approach\';
+    'T:\PreyCaptureNew\Cohort3\J462b(blue)\081519\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\081319\Approach\';
 'T:\PreyCaptureNew\ohort3\J462b(blue)\080919\Approach\';
 'T:\PreyCaptureNew\Cohort3\J462b(blue)\080719\Approach\';
