@@ -76,20 +76,17 @@ for j=1:length(fileList)
 %     Data(j).longThetaFract=aligned.longThetaFract;
     
     Data(j).xR=Data(j).DataR(:,2:3:end);
-    Data(j).yR=Data(j).DataR(:,3:3:end);
+    Data(j).yR=480 - Data(j).DataR(:,3:3:end); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
     Data(j).RLikelihood=Data(j).DataR(:,4:3:end);
     [Data(j).Rthetaraw,Data(j).Rphiraw,Data(j).EllipseParamsR,Data(j).ExtraParamsR,Data(j).goodReye] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
     Data(j).XRcentraw=Data(j).EllipseParamsR(:,1);  Data(j).YRcentraw=Data(j).EllipseParamsR(:,2);
-
   
   %  Data(j).xL=Data(j).DataL(:,2:3:end);
-    Data(j).xL= abs((Data(j).DataL(:,2:3:end))-640);
-    Data(j).yL=Data(j).DataL(:,3:3:end);
+    Data(j).xL= 640 - Data(j).DataL(:,2:3:end);   %%% flip left eye (camera input reverses in bonsai?)
+    Data(j).yL=480 - Data(j).DataL(:,3:3:end);    %%% put into cartesian coordinates, instead of image (origin in upper left corner)
     Data(j).LLikelihood=Data(j).DataL(:,4:3:end);
     [Data(j).Lthetaraw,Data(j).Lphiraw,Data(j).EllipseParamsL,Data(j).ExtraParamsL,Data(j).goodLeye] = EyeCameraCalc1(length(Data(j).xL(:,1)),Data(j).xL,Data(j).yL, Data(j).LLikelihood,psfilename)
-    Data(j).XLcentraw=Data(j).EllipseParamsL(:,1); 
-    Data(j).YLcentraw=Data(j).EllipseParamsL(:,2);
-    
+    Data(j).XLcentraw=Data(j).EllipseParamsL(:,1);  Data(j).YLcentraw=Data(j).EllipseParamsL(:,2);
     
     Data(j).RRadRaw = (Data(j).EllipseParamsR(:,3)+ Data(j).EllipseParamsR(:,4))/2;
     Data(j).LRadRaw = (Data(j).EllipseParamsL(:,3)+ Data(j).EllipseParamsL(:,4))/2;
