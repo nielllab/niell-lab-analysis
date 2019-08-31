@@ -1,5 +1,5 @@
 %%%%% Eye Camera Calculations
-function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR calibrationM] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
+function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR calibrationM scale] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
 
 % Inputs:
 %   Vid1 - 3D grayscale array of video frames
@@ -24,6 +24,7 @@ function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR c
 %  usegood - are all 8 points good?
 %  ngood = number of good points
 % calibrationR, calibrationM = correlation coeff and slope for calibration values (to be used as diagnostic)
+% scale = scale factor to convert pix to deg based on ellipticity
 
 if ~exist('eyethresh','var')
     eyethresh = 0.99;
