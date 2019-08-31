@@ -3,13 +3,13 @@
 % all files are on \\new-monster\
 
 %% J462a(green)%female %need to fix file names
-pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\080219\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; 
-    'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};
+pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\'};
+%     'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J462a(green)\080219\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; 
+%     'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};
 %% J462b(blue) %female
 pname={'T:\PreyCaptureNew\Cohort3\J462b(blue)\082019\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462b(blue)\081519\Approach\';

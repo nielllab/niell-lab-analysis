@@ -86,8 +86,8 @@ end
 efitb = find(EllipseParams(:,1)==0);
 EllipseParams(efitb,:)=NaN;
 ExtraParams(efitb,:) = NaN;
-EllipseParams = fillmissing(EllipseParams,'linear',1);  %%% dangerous - not sure we want to do this
-ExtraParams = fillmissing(ExtraParams,'linear',1);
+% EllipseParams = fillmissing(EllipseParams,'linear',1);  %%% dangerous - not sure we want to do this
+% ExtraParams = fillmissing(ExtraParams,'linear',1);
 
 e_thresh=0.9; %%% ellipticity threshold
 

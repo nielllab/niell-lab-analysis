@@ -1,6 +1,6 @@
 clear all; close all
-load('J462bAllVids_083019_1.mat'); 
-savePDF=0;
+load('J462aOneSession_083019_1.mat'); 
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -88,7 +88,7 @@ delayFull=cell2mat(slip);
 useTime = goodTheta>=.7 %& tsData==1; %|(useL & useR)
 useFilt=find(useTime)
 
-rownum=10; colnum=6
+rownum=11; colnum=7
 % rownum=round(sqrt(length(useFilt)+4))
 % colnum=round(sqrt(length(useFilt)));
 %%
@@ -175,7 +175,7 @@ for vid=1:length(useFilt)
     end
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-%%
+
 %%
 clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
 figure('units','normalized','outerposition',[0 0 1 1])
@@ -187,25 +187,25 @@ for vid=1:length(useFilt)
     nonapp=squeeze(appEpoch{useFilt(vid)}(1:nframe)==0)
     dT=range{useFilt(vid)}(1:nframe); rR=(RRad{useFilt(vid)}(1:nframe))'; rL=LRad{useFilt(vid)}(1:nframe);
     clear use
-    use =(nonapp==1) & ~isnan(dT(1:nframe)) 
+    use =(nonapp==1)% & ~isnan(dT(1:nframe)) 
   %  if sum(use)>3
-    [corrR lagsR]= xcorr(dT(use),rR(use),30,'coeff');
+    [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'zero');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
     hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
-    [corrL lagsL]= xcorr(dT(use),rL(use),30,'coeff');
+    [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'zero');
     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
     uselagsL=(lagsL>=-30 & lagsL<=30);
 %     else
 %     end
     clear use;
-    use=appEpoch{vid}==1 & ~isnan(dT(1:nframe))
+    use=appEpoch{vid}==1% & ~isnan(dT(1:nframe))
     if sum(use)>4
-    [corrRA lagsRA]= xcorr(dT(use),rR(use),30,'coeff');
+    [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'zero');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-    [corrLA lagsLA]= xcorr(dT(use),rL(use),30,'coeff');
+    [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'zero');
     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
     else
@@ -229,7 +229,7 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([.5 1]); 
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); 
 xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
@@ -251,12 +251,12 @@ for vid=1:length(useFilt)
     clear use
     use =(nonapp==1)%&~isnan(dT(1:nframe));
   %  if sum(use)>3
-    [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'coeff');
+    [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'zero');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
     hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
-    [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'coeff');
+    [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'zero');
     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
     uselagsL=(lagsL>=-30 & lagsL<=30);
 %     else
@@ -264,10 +264,10 @@ for vid=1:length(useFilt)
     clear use;
     use=appEpoch{vid}==1% & ~isnan(dT(1:nframe))
     if sum(use)>4
-    [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'coeff');
+    [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'zero');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-    [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'coeff');
+    [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'zero');
     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
     else
@@ -291,7 +291,7 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([0 1]); 
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); 
 xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
@@ -312,25 +312,25 @@ for vid=1:length(useFilt)
     nonapp=squeeze(appEpoch{useFilt(vid)}(1:nframe)==0)
     dT=mouseV{useFilt(vid)}(1:nframe); rR=RRad{useFilt(vid)}(1:nframe); rL=LRad{useFilt(vid)}(1:nframe);
     clear use
-    use =  (nonapp==1);%~isnan(dT(1:nframe)) &
+    use =  (nonapp==1) %& ~isnan(dT(1:nframe));
   %  if sum(use)>3
-    [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'coeff');
+    [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'zero');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
     hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
-    [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'coeff');
+    [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'zero');
     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
     uselagsL=(lagsL>=-30 & lagsL<=30);
 %     else
 %     end
     clear use;
-    use=appEpoch{vid}==1 & ~isnan(dT(1:nframe))
+    use=appEpoch{vid}==1 %& ~isnan(dT(1:nframe))
     if sum(use)>4
-    [corrRA lagsRA]= xcorr(dT(use),rR(use),'coeff');
+    [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'zero');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-    [corrLA lagsLA]= xcorr(dT(use),rL(use),'coeff');
+    [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'zero');
     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
     else
@@ -354,7 +354,7 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([0 1]); 
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.5 .5]); 
 xlim([21 41]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
@@ -1115,12 +1115,12 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'AnalyzedTS_cleaned_083019_newApproach_flip_a','.pdf')
+    filen=sprintf('%s',ani,'AnalyzedTS_083019_nanxcorr','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_083019_newApproach_flip_1','.mat')
+afilename=sprintf('%s',ani,'Analyzed_083019_nanxcorr','.mat')
 save(fullfile(pSname, afilename))
