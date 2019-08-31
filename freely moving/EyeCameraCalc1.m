@@ -1,5 +1,5 @@
 %%%%% Eye Camera Calculations
-function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR calibrationM] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
+function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR calibrationM scale] = EyeCameraCalc1(numFrames,Pointsx,Pointsy,Likelihood, psfilename, eyethresh)
 
 % Inputs:
 %   Vid1 - 3D grayscale array of video frames
@@ -24,6 +24,7 @@ function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR c
 %  usegood - are all 8 points good?
 %  ngood = number of good points
 % calibrationR, calibrationM = correlation coeff and slope for calibration values (to be used as diagnostic)
+% scale = scale factor to convert pix to deg based on ellipticity
 
 if ~exist('eyethresh','var')
     eyethresh = 0.99;
@@ -179,7 +180,7 @@ title(sprintf('omega = %.2f',EllipseParams(i,5)*180/pi))
 %% Check Calibration
 
 subplot(2,2,3)
-xvals = vecnorm(EllipseParams(:,1:2)' - CamCent); yvals = scale*sqrt(1-(EllipseParams(:,4)./EllipseParams(:,3)).^2);
+xvals = vecnorm(EllipseParams(usegood,1:2)' - CamCent); yvals = scale*sqrt(1-(EllipseParams(usegood,4)./EllipseParams(usegood,3)).^2);
 plot(xvals,yvals,'.');
 [calibrationR calibrationM b] = regression(xvals,yvals')
 axis equal;hold on; xlabel('pupil camera dist'); ylabel('scale * ellipticity');
@@ -198,7 +199,7 @@ subplot(2,2,4)
 
 delta = (CamCent-EllipseParams(:,1:2)');
 
-plot(vecnorm(delta,2,1),((delta(1,:)'.*cos(EllipseParams(:,5)))+(delta(2,:)'.*sin(EllipseParams(:,5))))./vecnorm(delta,2,1)','.')
+plot(vecnorm(delta(:,usegood),2,1),((delta(1,usegood)'.*cos(EllipseParams(usegood,5)))+(delta(2,usegood)'.*sin(EllipseParams(usegood,5))))./vecnorm(delta(:,usegood),2,1)','.')
 hold on
 plot(vecnorm(delta(:,list),2,1),((delta(1,list)'.*cos(EllipseParams(list,5)))+(delta(2,list)'.*sin(EllipseParams(list,5))))./vecnorm(delta(:,list),2,1)','r.')
 title('Camera Center Calibration')
