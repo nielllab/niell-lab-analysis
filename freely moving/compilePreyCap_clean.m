@@ -1,6 +1,6 @@
 clear all; close all
-load('J462aOneSession_083019_1.mat'); 
-savePDF=1;
+load('J462aOneVid_083019_2.mat'); 
+savePDF=0;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -66,13 +66,22 @@ for i=1:length(Data)
     RRad{i,:}=Data(i).RRad;
     LRad{i,:}=Data(i).LRad;
     
+    goodR{i,:}=Data(i).goodReye; %1=all 8pts above likelihood .95
+    Rngood{i,:}=Data(i).ngoodR; %num good DLC pts
+    Rcc(i)=Data(i).RcalR;
+    Rslope(i)=Data(i).RcalM;
     
-    longR{i,1}=EllipseParamsR{i,1}(:,3);longL{i,1}=EllipseParamsL{i,1}(:,3);
-    shortR{i,1}=EllipseParamsR{i,1}(:,4);shortL{i,1}=EllipseParamsL{i,1}(:,4);
+    goodL{i,:}=Data(i).goodLeye;
+    Lngood{i,:}=Data(i).ngoodL; 
+    Lcc(i)=Data(i).LcalR;
+    Lslope(i)=Data(i).LcalM;
     
-    radR{i,1}= (longR{i,1}+shortR{i,1})./length(longR{i,1});
-    radL{i,1}= (longL{i,1}+shortL{i,1})./length(longL{i,1});
-    pupilRvel{i,1}=diff(radR{i,1}); pupilLvel{i,1}=diff(radL{i,1})
+%     longR{i,1}=EllipseParamsR{i,1}(:,3);longL{i,1}=EllipseParamsL{i,1}(:,3);
+%     shortR{i,1}=EllipseParamsR{i,1}(:,4);shortL{i,1}=EllipseParamsL{i,1}(:,4);
+%     
+%     radR{i,1}= (longR{i,1}+shortR{i,1})./length(longR{i,1});
+%     radL{i,1}= (longL{i,1}+shortL{i,1})./length(longL{i,1});
+%     pupilRvel{i,1}=diff(radR{i,1}); pupilLvel{i,1}=diff(radL{i,1})
     
    % tsData{i,1}=~isempty(Data(i).TopTs);
     
@@ -91,6 +100,18 @@ useFilt=find(useTime)
 rownum=4; colnum=3
 % rownum=round(sqrt(length(useFilt)+4))
 % colnum=round(sqrt(length(useFilt)));
+%%
+figure
+subplot(2,2,1)
+hist(Rcc); title('R corrcoef'); ylim([0 5]); xlim([0 1]);
+subplot(2,2,3)
+hist(Rslope);title(' R Cal slope');ylim([0 5]); xlim([0 1]);
+subplot(2,2,2)
+hist(Lcc); title('L corrcoef');ylim([0 5]); xlim([0 1]);
+subplot(2,2,4)
+hist(Lslope);title('L Cal slope');ylim([0 5]); xlim([0 1]);
+
+
 %%
 figure('units','normalized','outerposition',[0 0 1 1])
 for vid = 1:length(useFilt)
@@ -1238,12 +1259,12 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'Analyzed_083019_oneSess_nanxcorr','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_083019_oneSess_2','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_one_sess_083019_nanxcorr','.mat')
+afilename=sprintf('%s',ani,'Analyzed_one_sess_083019_2','.mat')
 save(fullfile(pSname, afilename))

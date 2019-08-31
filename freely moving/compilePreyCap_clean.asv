@@ -1,6 +1,6 @@
 clear all; close all
-load('J462aOneSession_083019_1.mat'); 
-savePDF=1;
+load('J462aOneVid_083019_2.mat'); 
+savePDF=0;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -66,13 +66,22 @@ for i=1:length(Data)
     RRad{i,:}=Data(i).RRad;
     LRad{i,:}=Data(i).LRad;
     
+    goodR{i,:}=Data(i).goodReye; %1=all 8pts above likelihood .95
+    Rngood{i,:}=Data(i).ngoodR; %num good DLC pts
+    Rcc(i)=Data(i).RcalR;
+    Rslope(i)=Data(i).RcalM;
     
-    longR{i,1}=EllipseParamsR{i,1}(:,3);longL{i,1}=EllipseParamsL{i,1}(:,3);
-    shortR{i,1}=EllipseParamsR{i,1}(:,4);shortL{i,1}=EllipseParamsL{i,1}(:,4);
+    goodL{i,:}=Data(i).goodLeye;
+    Lngood{i,:}=Data(i).ngoodL; 
+    Lcc(i)=Data(i).LcalR;
+    Lslope(i)=Data(i).LcalM;
     
-    radR{i,1}= (longR{i,1}+shortR{i,1})./length(longR{i,1});
-    radL{i,1}= (longL{i,1}+shortL{i,1})./length(longL{i,1});
-    pupilRvel{i,1}=diff(radR{i,1}); pupilLvel{i,1}=diff(radL{i,1})
+%     longR{i,1}=EllipseParamsR{i,1}(:,3);longL{i,1}=EllipseParamsL{i,1}(:,3);
+%     shortR{i,1}=EllipseParamsR{i,1}(:,4);shortL{i,1}=EllipseParamsL{i,1}(:,4);
+%     
+%     radR{i,1}= (longR{i,1}+shortR{i,1})./length(longR{i,1});
+%     radL{i,1}= (longL{i,1}+shortL{i,1})./length(longL{i,1});
+%     pupilRvel{i,1}=diff(radR{i,1}); pupilLvel{i,1}=diff(radL{i,1})
     
    % tsData{i,1}=~isempty(Data(i).TopTs);
     
@@ -88,9 +97,21 @@ delayFull=cell2mat(slip);
 useTime = goodTheta>=.7 %& tsData==1; %|(useL & useR)
 useFilt=find(useTime)
 
-rownum=11; colnum=7
+rownum=4; colnum=3
 % rownum=round(sqrt(length(useFilt)+4))
 % colnum=round(sqrt(length(useFilt)));
+%%
+figure
+subplot(2,2,1)
+hist(Rcc); title('R corrcoef'); ylim([0 5]); xlim([0 1]);
+subplot(2,2,3)
+hist(Rslope);title(' R Cal slope');ylim([0 5]); xlim([0 1]);
+subplot(2,2,2)
+hist(Lcc); title('L corrcoef');ylim([0 5]); xlim([0 1]);
+subplot(2,2,4)
+hist(Lslope);title('L Cal slope');ylim([0 5]); xlim([0 1]);
+
+
 %%
 figure('units','normalized','outerposition',[0 0 1 1])
 for vid = 1:length(useFilt)
@@ -765,14 +786,14 @@ for vid=1:length(useFilt)
     
     use = (nonapp==1)' %& ~isnan(tR(1:length(nonapp)));
     if sum(use)>3
-    [corrR lagsR]= nanxcorr(tR(use),tL(use),30,'coeff');
+    [corrR lagsR]= nanxcorr(tR(use),tL(use),30,'zero');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
     clear nframe
     nframe = min(length(phiR{useFilt(vid)}),length(phiL{useFilt(vid)}));
     pR=phiR{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-    [corrL lagsL]= nanxcorr(pR(use),pL(use),30,'coeff');
+    [corrL lagsL]= nanxcorr(pR(use),pL(use),30,'zero');
     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
     uselagsL=(lagsL>=-30 & lagsL<=30);
     else
@@ -780,14 +801,14 @@ for vid=1:length(useFilt)
       % use = ~isnan(dT(1:nframe));
        use=appEpoch{vid}==1;
      if sum(use)>3
-    [corrRA lagsRA]= nanxcorr(tR(use),tL(use),30,'coeff');
+    [corrRA lagsRA]= nanxcorr(tR(use),tL(use),30,'zero');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
     
 %     clear nframe
     nframe = min(length(phiR{useFilt(vid)}),length(phiL{useFilt(vid)}));
     pR=phiR{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-    [corrLA lagsLA]= nanxcorr(pR(use),pL(use),30,'coeff');
+    [corrLA lagsLA]= nanxcorr(pR(use),pL(use),30,'zero');
     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
    
@@ -836,14 +857,14 @@ for vid=1:length(useFilt)
     
     use = (nonapp==1)' %& ~isnan(tR(1:length(nonapp)));
     if sum(use)>3
-    [corrR lagsR]= nanxcorr(tR(use),pR(use),30,'coeff');
+    [corrR lagsR]= nanxcorr(tR(use),pR(use),30,'zero');
     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
     
     clear nframe
     nframe = min(length(thetaL{useFilt(vid)}),length(phiL{useFilt(vid)}));
     tL=thetaL{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-    [corrL lagsL]= nanxcorr(tL(use),pL(use),30,'coeff');
+    [corrL lagsL]= nanxcorr(tL(use),pL(use),30,'zero');
     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
     uselagsL=(lagsL>=-30 & lagsL<=30);
     else
@@ -852,14 +873,14 @@ for vid=1:length(useFilt)
     clear use
     use=appEpoch{vid}==1;
          if sum(use)>3
-    [corrRA lagsRA]= nanxcorr(tR(use),pR(use),30,'coeff');
+    [corrRA lagsRA]= nanxcorr(tR(use),pR(use),30,'zero');
     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
     uselagsRA=(lagsRA>=-30& lagsRA<=30);
     
 %     clear nframe
     nframe = min(length(thetaL{useFilt(vid)}),length(phiL{useFilt(vid)}));
     tL=thetaL{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-    [corrLA lagsLA]= nanxcorr(tL(use),pL(use),30,'coeff');
+    [corrLA lagsLA]= nanxcorr(tL(use),pL(use),30,'zero');
     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
          else
@@ -872,7 +893,7 @@ for vid=1:length(useFilt)
     else
     end
 end
-title('theta vs phi corr each eye - non app & approach');
+suptitle('theta vs phi corr each eye - non app & approach');
       if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
       
       figure('units','normalized','outerposition',[0 0 1 1])
@@ -1002,6 +1023,129 @@ for vid=1:length(useFilt)
     
 end
 
+
+
+%%
+
+% figure%('units','normalized','outerposition',[0 0 1 1])
+for vid=1:length(useFilt)
+    clear dT dpR dpL dtR dtL
+    %     subplot(rownum,colnum,vid);
+    nframe = min(length(range{useFilt(vid)}),length(RRad{useFilt(vid)}));
+    nframe = min(nframe, length(LRad{useFilt(vid)}));
+    nframe = min(nframe, length(mouseV{useFilt(vid)}));
+    nframe = min(nframe,length(cricketV{useFilt(vid)}));
+    nframe = min(nframe,length(azT{useFilt(vid)}));
+
+   r=range{useFilt(vid)}(1:nframe); rR=RRad{useFilt(vid)}(1:nframe); lR=LRad{useFilt(vid)}(1:nframe);
+    mouseSp=mouseV{useFilt(vid)}(1:nframe); crSp=cricketV{useFilt(vid)}(1:nframe);
+    az=azT{useFilt(vid)}(1:nframe);
+    useN= appEpoch{vid}==0;
+    use = (appEpoch{vid});
+    figure(1);
+    plot(rR(useN(1:15:end)),lR(useN(1:15:end)),'b.');axis square; hold on
+    xlabel('r eye'); ylabel('l eye');
+    title('two eyes, rad');
+%     x = linspace(-40,40);
+%     y = linspace(-60,60);
+%     plot(-x,y); 
+    xlim([15 36]); ylim([15 36]);
+    plot(rR(use(1:15:end)),lR(use(1:15:end)),'.g');
+    if vid==(useFilt(end))
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    figure(2);
+    plot(r(useN(1:15:end)),rR(useN(1:15:end)),'b.'); axis square; hold on
+    title('range and R Rad');
+    xlabel('range to cricket (cm)'); ylabel('R eye');
+%     x = linspace(-40,40);
+%     y = linspace(-80,80);
+%     plot(x,y);  xlim([-40 40]); ylim([-80 80]);
+    plot(r(use(1:15:end)),rR(use(1:15:end)),'.g');
+    if vid==(useFilt(end))
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    figure(3);
+    plot(r(useN(1:15:end)),lR(useN(1:15:end)),'b.');axis square; hold on
+    title('range and L Rad');
+    xlabel('range to cricket (cm)'); ylabel('L eye');
+%     x = linspace(-40,40);
+%     y = linspace(-40,40);  xlim([-40 40]); ylim([-40 40]);
+%     plot(-x,y);
+    plot(r(use(1:15:end)),lR(use(1:15:end)),'.g');
+    if vid==(useFilt(end))
+        
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    figure(4);
+    plot(mouseSp(useN(1:15:end)),rR(useN(1:15:end)),'b.');axis square; hold on;
+    title('mouse speed & R rad');
+    xlabel('mouse Speed (cm/sec)'); ylabel('R Rad');
+%     x = linspace(-40,40);  xlim([-40 40]); ylim([-80 80]);
+%     y = linspace(-80,80);
+%     plot(x,y);
+    plot(mouseSp(use(1:15:end)),rR(use(1:15:end)),'.g');
+    if vid==(useFilt(end))
+        
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    figure(5);%subplot(rownum,colnum,vid);
+    plot(mouseSp(useN(1:15:end)),lR(useN(1:15:end)),'b.');axis square; hold on;
+    title('mouse speed & L rad');
+    xlabel('mouse Speed (cm/sec)'); ylabel('L Rad');
+%     x = linspace(-80,80);
+%     y = linspace(-50,50);
+%     plot(-x,y); xlim([-80 80]); ylim([-50 50]);
+    plot(mouseSp(use(1:15:end)),lR(use(1:15:end)),'.g');
+    if vid==(useFilt(end))
+        
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    figure(6);
+    plot(crSp(useN(1:15:end)),rR(useN(1:15:end)),'b.');axis square; hold on;
+%     x = linspace(-80,80);
+%     y = linspace(-80,80);
+%     plot(-x,y);  xlim([-80 80]); ylim([-80 80]);
+    title('cricket speed & R rad');
+    xlabel('cricket Speed'); ylabel('R Rad');    
+    plot(crSp(use(1:15:end)),rR(use(1:15:end)),'.g');
+    if vid==(useFilt(end))
+        
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    
+     figure(7);
+    plot(crSp(useN(1:15:end)),lR(useN(1:15:end)),'b.');axis square; hold on;
+%     x = linspace(-80,80);
+%     y = linspace(-80,80);
+%     plot(-x,y);  xlim([-80 80]); ylim([-80 80]);
+  title('cricket speed & L rad');
+    xlabel('cricket Speed'); ylabel('l Rad');      
+    plot(crSp(use(1:15:end)),lR(use(1:15:end)),'.g');
+       if vid==(useFilt(end))
+        
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    
+    figure(8);
+    plot(az(useN(1:15:end)),r(useN(1:15:end)),'b.');axis square; hold on;
+%     x = linspace(-80,80);
+%     y = linspace(-80,80);
+%     plot(-x,y);  xlim([-80 80]); ylim([-80 80]);
+    title('az and range');
+    plot(az(use(1:15:end)),r(use(1:15:end)),'.g');
+       if vid==(useFilt(end))
+        
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+    
+end
+
+
+
+
+
+
 %%
 clear dTAll dTRALL dTLAll dPRAll dPLAll
 
@@ -1115,12 +1259,12 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'AnalyzedTS_083019_nanxcorr','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_083019_oneSess_2','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_083019_nanxcorr','.mat')
+afilename=sprintf('%s',ani,'Analyzed_one_sess_083019_2','.mat')
 save(fullfile(pSname, afilename))
