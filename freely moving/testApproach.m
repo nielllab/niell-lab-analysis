@@ -9,3 +9,7 @@ appT=find(appEpoch{trialNum}==1); startT=appT(1)/30
 
 figure;plot(mouseSp{useData(trialNum)}); hold on;
 plot(appT,mouseSp{useData(trialNum)}(appEpoch{trialNum}==1),'g')
+
+    deltaR = diff(dist{useData(trialNum)})*30;
+figure;plot(deltaR); hold on;
+plot(appT,deltaR(appEpoch{trialNum}==1),'g')
