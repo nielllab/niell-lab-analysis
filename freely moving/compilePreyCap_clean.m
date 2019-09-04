@@ -1,6 +1,6 @@
 clear all; close all;
 dbstop if error
-load('J475cAllVids_090119.mat'); 
+load('J463cAllVids_090319.mat'); 
 set(groot,'defaultFigureVisible','off') %disable figure plotting
 
 savePDF=0;
@@ -31,8 +31,8 @@ for i=1:length(Data)
     azRaw = mod(Data(i).azRaw,2*pi); azRaw(azRaw>pi) = azRaw(azRaw>pi)-2*pi;
     azTRaw{i,:,:}= azRaw;
     azDegRaw{i,:,:}=rad2deg(azTRaw{i,:,:});%az in deg
-    cricketBRaw{i,1,1} = Data(i).cricketBody;
-    cricketB{i,1,1} = Data(i).cricketBody;
+%     crickHRaw{i,1,1} = Data(i).cricketHead;
+%     crickH{i,1,1} = Data(i).crickH;
             
     mouse_xy{i,1,1}=Data(i).mouse_xy;
    % mouseV{i,:}= Data(i).mouseV; %in pix/frame
@@ -154,10 +154,10 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 % figure('units','normalized','outerposition',[0 0 1 1])
 % for vid = 1:length(useFilt)
 %     subplot(rownum,colnum,vid)  ;
-%     bar([mean(isnan(mouse_xy{useFilt(vid),1}(1,:))) mean(isnan(cricket_xy{useFilt(vid),1}(1,:))) mean(isnan(cricketB{useFilt(vid),1}(1,:)))])
+%     bar([mean(isnan(mouse_xy{useFilt(vid),1}(1,:))) mean(isnan(cricket_xy{useFilt(vid),1}(1,:))) mean(isnan(crickH{useFilt(vid),1}(1,:)))])
 %     ylabel('% error'); xlim([0.5 3.5]); ylim([0 1])
 %     set(gca,'XTick',[1 2 3])
-%     set(gca,'XTickLabel',{'mouse','c head', 'c body'})
+%     set(gca,'XTickLabel',{'mouse','c body', 'c head'})
 % end
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
@@ -1319,12 +1319,12 @@ end
 %%
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'Analyzed_090319_All_1','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_090319_All_new','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_All_090319_1','.mat')
+afilename=sprintf('%s',ani,'Analyzed_All_090319_new','.mat')
 save(fullfile(pSname, afilename))

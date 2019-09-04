@@ -121,14 +121,15 @@ clear appEpoch
 
 for vid=1:length(useData)
     deltaR = diff(dist{useData(vid)})*30;
+  %  badDist=(isnan(dist{useData(vid)}))
     badDist=(isnan(deltaR));
     vsmooth = conv(mouseSp{useData(vid)},ones(5,1)/5,'same');
     dRThresh=-10; %%%cm/sec
     vThresh=10;
     azThresh = pi/4;  %%% pi/4 = 45 deg
-   %  azThresh = pi/2;  %%% pi/2 = 90 deg
+%     azThresh = pi/2;  %%% pi/2 = 90 deg
 
-    approach = deltaR<dRThresh & vsmooth(1:end-1)>vThresh & abs(az{useData(vid)}(1:end-1))<azThresh;
+    approach = deltaR<dRThresh & vsmooth(1:end-1)>vThresh & abs(az{useData(vid)}(1:end-1))<=azThresh;
     approach(1)=0; approach(end)=0; %%% boundary conditions
     
     if sum(approach(badDist))>1
@@ -574,9 +575,9 @@ for vid=1:length(useData)
 
 nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
 nframe = min(nframe, length(az{useData(vid)}));
-tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe); azC=(az{useData(vid)}(1:nframe));
-% tR=Rtheta{useData(vid)}(5:end); tL=Ltheta{useData(vid)}(5:end); azC=(az{useData(vid)}(1:end-4));
-use= appEpoch{vid}==1;
+
+tR=Rtheta{useData(vid)}(5:end); tL=Ltheta{useData(vid)}(5:end); azC=(az{useData(vid)}(1:end-4));
+use= appEpoch{vid}(1:end-4)==1;
 % use= appEpoch{vid}(1:end-4)==1;
 
 figure(1);

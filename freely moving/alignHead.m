@@ -339,39 +339,41 @@ else
 end
 
 %%% load in crickets
-crick = data(:,nPts*3 +(2:3))'; %labeled as cricketHead
+% crick = data(:,nPts*3 +(2:3))'; %labeled as cricketHead
+crick = data(:,nPts*3 +(5:6))'; %labeled as cricketHead
 crick(:,2) = 1200- crick(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
-crick_p = data(:,nPts*3 + 4);
+% crick_p = data(:,nPts*3 + 4);
+crick_p = data(:,nPts*3 + 7);
 
-crickB = data(:,nPts*3 +(5:6))'; %cricketBody
-crickB(:,2) = 1200-crickB(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
-crick_pB = data(:,nPts*3 + 7);
+crickH = data(:,nPts*3 +(5:6))'; %cricketHead
+crickH(:,2) = 1200-crickH(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
+crick_pH = data(:,nPts*3 + 7);
 
 crick(:,crick_p<p_thresh_c) = NaN
-crickB(:,crick_pB<p_thresh_c) = NaN
+crickH(:,crick_pH<p_thresh_c) = NaN
 
-% fillCrick=(isnan(crick) & ~isnan(crickB))% times when cricketHead is bad but cricketBody is good
-% % c=find(crickB(fillCrick)) 
+% fillCrick=(isnan(crick) & ~isnan(crickH))% times when cricketHead is bad but cricketBody is good
+% % c=find(crickH(fillCrick)) 
 % figure;
 % plot(crick(1,:),crick(2,:),'*b');hold on
 % 
-% crick(fillCrick)=crickB(fillCrick)
+% crick(fillCrick)=crickH(fillCrick)
 % plot(crick(1,:),crick(2,:),'*g');hold on
 
 figure;
 % plot(crick(1,:),crick(2,:),'*b');hold on
-% plot(crickB(1,:),crickB(2,:),'*g');hold on
+% plot(crickH(1,:),crickH(2,:),'*g');hold on
 % try
 for xy = 1:2
     crick(xy,:)=interpNan(crick(xy,:),3,'linear')
-        crickB(xy,:)=interpNan(crickB(xy,:),3,'linear')
+        crickH(xy,:)=interpNan(crickH(xy,:),3,'linear')
 end
 % catch
 %end
 plot(crick(1,:),crick(2,:),'og');hold on
 plot(crick(1,:),crick(2,:),'k');hold on
-plot(crickB(1,:),crickB(2,:),'ob');hold on
-plot(crickB(1,:),crickB(2,:),'k');hold on
+plot(crickH(1,:),crickH(2,:),'ob');hold on
+plot(crickH(1,:),crickH(2,:),'k');hold on
 
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
@@ -499,8 +501,8 @@ data.crick_p = crick_p;
 data.ThetaFract=ThetaFract;
 % data.longTheta=longTheta;
 % data.longThetaFract=longThetaFract;
-data.crickB = crickB;
-data.crick_pB=crick_pB;
+data.crickH = crickH;
+data.crick_pH=crick_pH;
 
 cricket.pos = crick;
 

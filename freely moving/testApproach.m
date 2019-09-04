@@ -1,6 +1,6 @@
 %%% test approach
 %load('Analyzed_AllAnimals_090319_New.mat')
-trialNum=20
+trialNum=20  %this trial is not stitching correctly
 
 a=ani{useData(trialNum)}; d=date{useData(trialNum)};s=sess{useData(trialNum)};c=clipnum(useData(trialNum));
 disp([a,d,s,c])
