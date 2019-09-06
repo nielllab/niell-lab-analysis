@@ -503,6 +503,7 @@ data.ThetaFract=ThetaFract;
 % data.longThetaFract=longThetaFract;
 data.crickH = crickH;
 data.crick_pH=crick_pH;
+data.cricketTheta=crickTheta;
 
 cricket.pos = crick;
 

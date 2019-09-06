@@ -1,6 +1,6 @@
 clear all; close all;
 dbstop if error
-load('J463cAllVids_090319.mat'); 
+load('J462aAllVids_090419.mat'); 
 set(groot,'defaultFigureVisible','off') %disable figure plotting
 
 savePDF=0;
@@ -38,6 +38,7 @@ for i=1:length(Data)
    % mouseV{i,:}= Data(i).mouseV; %in pix/frame
     mouseV{i,:}=((Data(i).mouseV)/27)*30; %cm/sec
     cricket_xy{i,1}=Data(i).cricketxy;
+    cricketAz{i,:}=Data(i).cricketTheta;
 %    cricketV{i,:}= Data(i).cricketV % pix/frame
     cricketV{i,:} = ((Data(i).cricketV)/27)*30; %now cm/sec
     theta{i,:}= rad2deg(Data(i).theta);
@@ -1319,12 +1320,12 @@ end
 %%
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'Analyzed_090319_All_new','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_090419_All_new','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_All_090319_new','.mat')
+afilename=sprintf('%s',ani,'Analyzed_All_090419_new','.mat')
 save(fullfile(pSname, afilename))

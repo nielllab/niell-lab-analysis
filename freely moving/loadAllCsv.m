@@ -75,6 +75,7 @@ for j=1:length(fileList)
     Data(j).rangeRaw=aligned.range;
     Data(j).azRaw=aligned.az;
     Data(j).cricketP=aligned.crick_p;
+    Data(j).cricketThetaRaw=aligned.cricketTheta;
     Data(j).ThetaFract=aligned.ThetaFract;  
 %    Data(j).dThetaFract=aligned.dThetaFract;    
 %     Data(j).longTheta=aligned.longTheta;
@@ -130,7 +131,7 @@ for j=1:length(fileList)
         xq=(start:1/30:endT)';
           
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
-            Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw);
+            Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw, Data(j).cricketThetaRaw);
         
         Data(j).az =(adjustedTS.azAdj)';
         Data(j).theta =(adjustedTS.headThetaAdj)';
@@ -143,6 +144,7 @@ for j=1:length(fileList)
         Data(j).cricketP=adjustedTS.cricketPAdj;
         Data(j).cricketHead=adjustedTS.cricketHAdj;
         Data(j).cricket_pH=adjustedTS.cricketpHAdj;
+        Data(j).cricketTheta=adjustedTS.cricketThetaAdj;
        
   
         Data(j).XRcent =interp1(RTS,Data(j).XRcentraw,xq);
@@ -236,7 +238,7 @@ for j=1:length(fileList)
     
     
 end
-afilename=sprintf('%s',ani,'AllVids_090319','.mat')
+afilename=sprintf('%s',ani,'AllVids_090419','.mat')
 save(fullfile(pSname, afilename))
 %save('J463c_test_data.mat')
 

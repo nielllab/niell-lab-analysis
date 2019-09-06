@@ -1,4 +1,4 @@
-function adjustedData = adjustTimingTop(TopTS,desiredTimestamps,az,range,mousexy,mouseV,cricketxy,cricketV,cricketP,headtheta, cricketH,cricket_pH);
+function adjustedData = adjustTimingTop(TopTS,desiredTimestamps,az,range,mousexy,mouseV,cricketxy,cricketV,cricketP,headtheta, cricketH,cricket_pH, cricketTheta);
 
 azAdj = interp1(TopTS,az,desiredTimestamps);
 rangeAdj = interp1(TopTS,range,desiredTimestamps);
@@ -7,6 +7,7 @@ cricketVAdj = interp1(TopTS(1:end-1), cricketV, desiredTimestamps);
 cricketPAdj = interp1(TopTS, cricketP, desiredTimestamps);
 headThetaAdj = interp1(TopTS, headtheta, desiredTimestamps);
 cricketpHAdj = interp1(TopTS,cricket_pH,desiredTimestamps);
+cricketThAdj=interp1(TopTS,cricketTheta, desiredTimestamps);
 
 for xy=1:2
 mousexyAdj (xy,:) = interp1(TopTS,squeeze(mousexy(xy,:)),desiredTimestamps);
@@ -24,6 +25,7 @@ adjustedData.mousexyAdj=mousexyAdj;
 adjustedData.cricketxyAdj=cricketxyAdj;
 adjustedData.cricketHAdj=cricketHAdj;
 adjustedData.cricketpHAdj=cricketpHAdj;
+adjustedData.cricketThetaAdj=cricketThAdj;
 
 
 
