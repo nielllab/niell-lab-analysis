@@ -25,8 +25,8 @@ for i = 1:length(files)
     load(fname,'cricket_xy','mouse_xy','cricketV','cricketH','theta', 'dTheta','azT','mouseV','goodTheta','range','theta','dTheta','appEpoch','useData','EllipseParamsR',...
         'EllipseParamsL','thetaR','thetaL','phiR','phiL','dthetaR','dthetaL','dphiR','dphiL','dXRcent','XRcent','YRcent','YLcent','XLcent','RRad','LRad',...
         'goodR','Rcc','Rslope','Rscale','Rngood','goodL','Lcc','Lslope','Lscale','Lngood','animal','sessionN','clip','expdate');
-    nc = length(cricket_xy(:,1))'; vidrange= n+1:n+nc;
-    nvid{i} = length(cricket_xy(:,1))';
+    nc = length(cricket_xy); vidrange= n+1:n+nc;
+    nvid{i} = nc;  %%% number of videos for each animal
     %  nvidTot = nvid(i+1)
     %   delayFull{end+1,1} = cell2mat(slip);
     
@@ -46,10 +46,10 @@ for i = 1:length(files)
         cricketSp{end+1} =cricketV{j,:}; 
         cricketPos{end+1}=cricket_xy{j,:};
         
-        thetaHead{end+1,1} = theta{j,:};
+        thetaHead{end+1,1} = theta{j,:};  %%% don't need second index in cell array
         d_Theta{end+1,1,1} = dTheta{j,:};
-        az{end+1,1}=azT{j,:};
-        dist{end+1,1}=range{j,:};
+        az{end+1}=azT{j,:};
+        dist{end+1}=range{j,:};
         theta_good(end+1)=goodTheta(j);
         %         useData(end+1)=useData(j);
         %         approach{end+1}=appEpoch{j,:};
@@ -70,18 +70,18 @@ for i = 1:length(files)
         %       %  dxR{end+1,2} =dYRcent{j,:}; %undefined from single animal compile
         
         Rcent{end+1,1} =XRcent{j,:};
-        Rcent{end,2} =YRcent{j,:};
+        Rcent{end+1,2} =YRcent{j,:};
         Lcent{end+1,1} =XLcent{j,:};
-        Lcent{end,2} =YLcent{j,:};
-        radR{end+1,1}=RRad{j,:};
-        radL{end+1,1}=LRad{j,:};
+        Lcent{end+1,2} =YLcent{j,:};
+        radR{end+1}=RRad{j,:};
+        radL{end+1}=LRad{j,:};
         
-        Rgood{end+1,1}= Rngood{j,:};% goodR(j);%1=all 8pts above likelihood .95 %doesn't makes sense here...
+        Rgood{end+1}= Rngood{j,:};% goodR(j);%1=all 8pts above likelihood .95 %doesn't makes sense here...
         ccR(end+1)= Rcc(j);
         slopeR(end+1)= Rslope(j);
         scaleR(end+1)= Rscale(j);
         
-        Lgood{end+1,1}= Lngood{j,:};
+        Lgood{end+1}= Lngood{j,:};
         ccL(end+1)= Lcc(j);
         slopeL(end+1)= Lslope(j);
         scaleL(end+1)= Lscale(j);
@@ -92,11 +92,15 @@ for i = 1:length(files)
     
 end
 clear goodR goodL
-goodR=ccR>.3;
-goodL=ccL>.3;
+
+%%% select good time points - key filtering step!
+goodR=ccR>.3;  %%% maybe 0.4 is better?
+goodL=ccL>.3;  %%% maybe 0.4 is better?
 useTime = theta_good>=.7 & goodR & goodL;
 useData=find(useTime);
-%%
+
+
+%% quality of eye fits
 figure;
 subplot(2,2,1)
 plot(ccR,slopeR,'o'); axis square; xlim([0 1]); ylim([0 1]); title('R');
@@ -116,7 +120,7 @@ title('L');
 xlabel('L corrcoef');ylabel('L Scale');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-%%
+%% define approaches
 clear appEpoch
 
 for vid=1:length(useData)
@@ -159,14 +163,26 @@ clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corr
 
 for vid=1:length(useData)
     %subplot(rownum,colnum,vid);
+    %%% this is dangerous - these should all be the same length (except head dtheta slightly shorter due to diff), if not
+    %%% something is wrong. I added check for this below %cmn
     nframe = min(length(d_Theta{useData(vid)}),length(dRtheta{useData(vid)}));
     nframe = min(nframe, length(dLtheta{useData(vid)}));
+    
+    nframe = length(dRtheta{useData(vid)});
+    if length(dLtheta{useData(vid)}) ~= length(dRtheta{useData(vid)})
+        display('mismatched eye length!')
+    end
+    if  length(d_Theta{useData(vid)}) - length(dLtheta{useData(vid)}) ~=1
+        display('mismatched eye and head length!')
+    end
     nonapp=appEpoch{vid}(1:nframe)==0
     dT=d_Theta{useData(vid)}; dtR=dRtheta{useData(vid)}; dtL=dLtheta{useData(vid)};
     clear use
     use = (nonapp==1)'; %~isnan(dT(1:nframe)) &
+    use = ~appEpoch{vid};  %%% I think this is much simpler way %cmn
+    
     %  if sum(use)>3
-    [corrR lagsR]= nanxcorr(dT(use),dtR(use),30,'coeff');
+    [corrR lagsR]= nanxcorr(dT(use),dtR(use),30,'coeff');  %%% just use variable maxlags =30, and then can just save out lags output once %cmn
     %  plot(lagsR/30,corrR,'b');%xlim([-.3 .3])
     hold on;
     uselagsR=(lagsR>=-30& lagsR<=30);
