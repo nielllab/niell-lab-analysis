@@ -341,12 +341,12 @@ end
 %%% load in crickets
 % crick = data(:,nPts*3 +(2:3))'; %labeled as cricketHead
 crick = data(:,nPts*3 +(5:6))'; %labeled as cricketHead
-crick(:,2) = 1200- crick(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
+crick(2,:) = 1200- crick(2,:); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
 % crick_p = data(:,nPts*3 + 4);
 crick_p = data(:,nPts*3 + 7);
 
 crickH = data(:,nPts*3 +(5:6))'; %cricketHead
-crickH(:,2) = 1200-crickH(:,2); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
+crickH(2,:) = 1200-crickH(2,:); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
 crick_pH = data(:,nPts*3 + 7);
 
 crick(:,crick_p<p_thresh_c) = NaN
