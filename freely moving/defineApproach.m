@@ -1,11 +1,10 @@
 close all
 framerate =30;
-for m = 1:length(useData);
+for m = 38:165%length(useData);
 
-    vid = useData(m);
-
-
+vid = useData(m);
 deltaR = diff(dist{vid})*30;
+
 figure
 plot(deltaR);
 vsmooth = conv(mouseSp{vid},ones(5,1)/5,'same');
@@ -55,24 +54,26 @@ Lth = Ltheta{vid} - nanmedian(Ltheta{vid});
 Rph = Rphi{vid} - nanmedian(Rphi{vid});
 Lph = Lphi{vid} - nanmedian(Lphi{vid});
 
-angles = 0:0.01:2*pi; R= 5; %%% substitute actual eye radii
-
+angles = 0:0.01:2*pi; R=5;
+RR= radR{vid}/4; %%% substitute actual eye radii
+RL=radL{vid}/4;
 startLag = 10; %%% offset from beginning (neededfor trails behind mouse)
 
 figure
+clear mov
 set(gcf,'Position',[100 0 560 840] )
 for i = (1+startLag):length(Rth)-1
     
     %%% plot left eye position (with circle)
     subplot(5,2,3);
     plot(Lth,Lph); hold on
-    plot(Lth(i)+R*cos(angles),Lph(i)+R*sin(angles),'Linewidth',2);
+    plot(Lth(i)+RL(i)*cos(angles),Lph(i)+RL(i)*sin(angles),'Linewidth',2);
     axis equal; axis([-45 45 -45 45]); hold off; title('left eye'); xlabel('theta'); ylabel('phi')
     
     %%% plot right eye position (with circle)
     subplot(5,2,4);
     plot(Rth,Rph); hold on
-    plot(Rth(i)+R*cos(angles),Rph(i)+R*sin(angles),'Linewidth',2);
+    plot(Rth(i)+RR(i)*cos(angles),Rph(i)+RR(i)*sin(angles),'Linewidth',2);
     axis equal; axis([-45 45 -45 45]); hold off; title('right eye'); xlabel('theta'); ylabel('phi')
     
     if approach(i)

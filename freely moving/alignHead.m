@@ -340,7 +340,7 @@ end
 
 %%% load in crickets
 % crick = data(:,nPts*3 +(2:3))'; %labeled as cricketHead
-crick = data(:,nPts*3 +(5:6))'; %labeled as cricketHead
+crick = data(:,nPts*3 +(5:6))'; %labeled as body
 crick(2,:) = 1200- crick(2,:); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
 % crick_p = data(:,nPts*3 + 4);
 crick_p = data(:,nPts*3 + 7);
