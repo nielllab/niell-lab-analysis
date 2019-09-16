@@ -121,13 +121,24 @@ for i = 1:length(appEpoch)
     
     dur = endApp - newApp;
     [mx longest] = max(dur);
-    appRange = appPts(newApp(longest)  : endApp(longest));
+    mainApp = appPts(newApp(longest)  : endApp(longest)); %%% approach time only
+    %%% add 2 secs on either side
+    try
+    appStart = max(appPts(newApp(longest))-60,1); appOffset = appPts(newApp(longest))-appStart;
+    appEnd = min(appPts(endApp(longest))+60,length(app)); endOffset = appPts(endApp(longest))-appStart;
+    
+    appRange = appStart  : appEnd;
+    catch
+        appRange = appPts(newApp(longest)  : endApp(longest));
+        appOffset =0;
+    end
     
     %%% get rid of large jumps
     hthnonan = hth;
     hthnonan(abs(diff(hth))>90)=NaN;
     
-    hthApp = hth(appRange)-nanmean(hth(appRange));
+    hthApp = hth(appRange)-nanmedian(hth(mainApp));
+ hthApp = mod(hthApp + 180,360)-180;
     
     gz = hthApp +0.5*( rth(appRange) +lth(appRange))';
     vg =  0.5*( rth(appRange) +lth(appRange))';
@@ -136,6 +147,8 @@ for i = 1:length(appEpoch)
     gzDiff = [gzDiff diff(gz)];
     vergAll =[vergAll vg(1:end-1)];
     
+    
+    %%% calculate change in position at different lags, as measure of stability
     for lag = 1:20;
         d_gz(i,lag) = nanmean(abs(gz(1:end-lag) - gz((lag+1):end)));
         d_hd(i,lag) = nanmean(abs(hthApp(1:end-lag) - hthApp((lag+1):end)));
@@ -145,38 +158,38 @@ for i = 1:length(appEpoch)
   
     if round(i/skip)==i/skip
        
-            win = 15;
-    xc = slidingXC(dth(1:end-1)', drth+dlth,10,-win:win);
-    figure
-    subplot(7,5,16:35)
-   imagesc(xc',[-1 1]); colormap jet; title('xcorr dhead dEye theta'); xlabel('frames')
-  subplot(7,5,1:5);
-    plot(mouseSp{vid}); xlim([1 size(xc,1)]); ylim([0 50]); 
-    title('speed')   
-    subplot(7,5,6:10);
-    plot(azdeg(win:(end-win)));xlim([1 size(xc,1)]); ylim([-180 180])
-    title('azimuth')  
-    subplot(7,5,11:15);
-    plot(app(win:(end-win)),'g','Linewidth',2); ylim([0.5 1.2]); xlim([1 size(xc,1)])
-    title('approach')
-    
-    
-    
-    win = 15;
-     xc = slidingXC(dth', (azdeg),10,-win:win);
-    figure
-      subplot(7,5,16:35)
-    imagesc(xc',[-1 1]); colormap jet; title('xcorr dHead vs Azimuth'); xlabel('frames')
-    
-    subplot(7,5,1:5);
-    plot(mouseSp{vid}); xlim([1 size(xc,1)]); ylim([0 50]); 
-    title('speed')   
-    subplot(7,5,6:10);
-    plot(azdeg(win:(end-win)));xlim([1 size(xc,1)]); ylim([-180 180])
-    title('azimuth')  
-    subplot(7,5,11:15);
-    plot(app(win:(end-win)),'g','Linewidth',2); ylim([0.5 1.2]); xlim([1 size(xc,1)])
-    title('approach')
+%             win = 15;
+%     xc = slidingXC(dth(1:end-1)', drth+dlth,10,-win:win);
+%     figure
+%     subplot(7,5,16:35)
+%    imagesc(xc',[-1 1]); colormap jet; title('xcorr dhead dEye theta'); xlabel('frames')
+%   subplot(7,5,1:5);
+%     plot(mouseSp{vid}); xlim([1 size(xc,1)]); ylim([0 50]); 
+%     title('speed')   
+%     subplot(7,5,6:10);
+%     plot(azdeg(win:(end-win)));xlim([1 size(xc,1)]); ylim([-180 180])
+%     title('azimuth')  
+%     subplot(7,5,11:15);
+%     plot(app(win:(end-win)),'g','Linewidth',2); ylim([0.5 1.2]); xlim([1 size(xc,1)])
+%     title('approach')
+%     
+%     
+%     
+%     win = 15;
+%      xc = slidingXC(dth', (azdeg),10,-win:win);
+%     figure
+%       subplot(7,5,16:35)
+%     imagesc(xc',[-1 1]); colormap jet; title('xcorr dHead vs Azimuth'); xlabel('frames')
+%     
+%     subplot(7,5,1:5);
+%     plot(mouseSp{vid}); xlim([1 size(xc,1)]); ylim([0 50]); 
+%     title('speed')   
+%     subplot(7,5,6:10);
+%     plot(azdeg(win:(end-win)));xlim([1 size(xc,1)]); ylim([-180 180])
+%     title('azimuth')  
+%     subplot(7,5,11:15);
+%     plot(app(win:(end-win)),'g','Linewidth',2); ylim([0.5 1.2]); xlim([1 size(xc,1)])
+%     title('approach')
         
         
         %%% eye/head correlations
@@ -210,27 +223,35 @@ for i = 1:length(appEpoch)
         %%% pursuit eye/head/gaze positions
         
         figure
-        subplot(3,1,1);
+        subplot(4,1,1);
         plot(hthnonan,'k'); hold on; plot(rth,'r'); plot(lth,'b'); legend('head th','right th','left th');
         plot(find(app),ones(sum(app),1)*90,'g.'); ylim([-180 180])
-               
-        subplot(3,1,2);
+           title(sprintf('vid %d',vid));
+           
+        subplot(4,1,2);
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on; plot( rth(appRange)','r'); hold on; plot(lth(appRange)','b');
-        ylim([-30 30])
+        ylim([-30 30]);  xlim([0 max(length(appRange),1)]); plot(appOffset,0,'g*'); plot(endOffset,0,'r*');
         legend('mean','right','left');
         
-        subplot(3,1,3);
-        hold on; plot(hthApp +0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2);   plot(hthApp,'g');
-        ylim([-45 45]); xlabel('frames'); ylabel('deg');
+        subplot(4,1,3);
+        hold on; plot(hthApp +0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2);   plot(hthApp,'g');       
+        plot(appOffset,0,'g*'); plot(endOffset,0,'r*');
+        ylim([-60 60]); xlim([0 max(length(appRange),1)]); xlabel('frames'); ylabel('deg');
         legend('gaze','head')
         
-        drawnow  
+        subplot(4,1,4); hold on 
+        plot(azdeg(appRange)); plot(mouseSp{vid}(appRange)*2); ylim([-90 90]); 
+        plot(appOffset,0,'g*'); xlim([0 max(length(appRange),1)]); plot(endOffset,0,'r*');
+        legend('azimuth','speed');
+        
+        set(gcf,'Position',[440 100 560 640])
     end
     
+    drawnow
     
     %%% eye movements around the time of head saccades
     %%% work in progress!
-    saccades
+
     win = 3;
     thSum = conv(dth,ones(win,1));
     thrange = [2.5 5 10 20 40 80];
