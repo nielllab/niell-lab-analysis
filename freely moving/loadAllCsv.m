@@ -112,19 +112,21 @@ for j=1:length(fileList)
         TopTs = dlmread(topTSfile);
         TopTs= TopTs(:,1)*60*60 + TopTs(:,2)*60 + TopTs(:,3);  %%% data is read as hours, mins, secs
         startT = TopTs(1);
-        Data(j).TopTs = TopTs - startT;
-        
+       % Data(j).TopTs = TopTs - startT;  %%% don't subtract off startT, so we store absolute time
+        Data(j).TopTs = TopTs;
         
         % if exist(rTSfile)
         RTS = dlmread(rTSfile);
-        RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3);
+        RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3); 
         startR = RTS(1);
-        Data(j).RTS = RTS - startR;
+        %Data(j).RTS = RTS - startR; %%% don't subtract off startR, so we store absolute time
+        Data(j).RTS = RTS;
         
         LTS = dlmread(lTSfile);
         LTS= LTS(:,1)*60*60 + LTS(:,2)*60 + LTS(:,3);
         startL = LTS(1);
-        Data(j).LTS = LTS - startL;
+       % Data(j).LTS = LTS - startL; %%% don't subtract off startL, so we store absolute time
+        Data(j).LTS = LTS;
         
         start=max([startT,startR,startL]);
         endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
