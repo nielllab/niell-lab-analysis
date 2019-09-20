@@ -48,6 +48,10 @@ for i = 1:length(appEpoch)
     if nl(i)<nthresh
         lthAz_xc(:,i) = NaN;
     end
+
+%     %%% interp across missing data if needed
+%     lth = interp1(find(~isnan(lth)),lth(~isnan(lth)),1:length(lth))';
+%     rth = interp1(find(~isnan(rth)),rth(~isnan(rth)),1:length(rth))';
     
     rthAz_xc(:,i) = nanxcorr(azdeg(app),rth(app),maxlag,'zero');
     %     subplot(2,3,5)
@@ -230,25 +234,28 @@ for i = 1:length(appEpoch)
            
         subplot(4,1,2);
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on; plot( rth(appRange)','r'); hold on; plot(lth(appRange)','b');
-        ylim([-30 30]);  xlim([0 max(length(appRange),1)]); plot(appOffset,0,'g*'); plot(endOffset,0,'r*');
+        ylim([-30 30]);  xlim([0 max(length(appRange),1)]);         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
         
         subplot(4,1,3);
-        hold on; plot(hthApp +0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2);   plot(hthApp,'g');       
-        plot(appOffset,0,'g*'); plot(endOffset,0,'r*');
+        hold on; plot(hthApp +0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2);   plot(hthApp,'Color',[0 0.75 0]);       
+        plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         ylim([-60 60]); xlim([0 max(length(appRange),1)]); xlabel('frames'); ylabel('deg');
         legend('gaze','head')
         
         subplot(4,1,4); hold on 
         plot(azdeg(appRange)); plot(mouseSp{vid}(appRange)*2); ylim([-90 90]); 
-        plot(appOffset,0,'g*'); xlim([0 max(length(appRange),1)]); plot(endOffset,0,'r*');
+                plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+     xlim([0 max(length(appRange),1)]); 
         legend('azimuth','speed');
         
         set(gcf,'Position',[440 100 560 640])
     end
     
+    
     drawnow
     
+
     %%% eye movements around the time of head saccades
     %%% work in progress!
 
