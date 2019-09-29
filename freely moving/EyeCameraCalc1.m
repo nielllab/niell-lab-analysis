@@ -27,7 +27,7 @@ function [newtheta,newphi,EllipseParams,ExtraParams usegood ngood calibrationR c
 % scale = scale factor to convert pix to deg based on ellipticity
 
 if ~exist('eyethresh','var')
-    eyethresh = 0.99;
+    eyethresh = 0.97;
 end
 
 if exist('psfilename','var')

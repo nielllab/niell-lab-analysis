@@ -1,7 +1,7 @@
 %do for each animal, all sessions? or all animals together?
 %clear all; close all
- set(groot,'defaultFigureVisible','off') %disable figure plotting
-savePDF=0; dbstop if error
+ set(groot,'defaultFigureVisible','on') %disable figure plotting
+savePDF=1; dbstop if error
 %pname={'T:\PreyCapture\Cohort4\J465d(black)\071119\Approach\';
 %    'T:\PreyCapture\Cohort4\J465d(black)\070919\Approach\'};
 
@@ -227,20 +227,21 @@ for j=1:length(fileList)
         
     end
     if savePDF
-        pSname='T:\PreyCaptureAnalysis\Data\';
+        pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
         C={ani, date, sessionnum, clipnum};
         filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'.pdf')
         pdfilename=fullfile(pSname,filen)
         dos(['ps2pdf ' psfilename ' ' pdfilename]);
         delete(psfilename);
     else
-     pSname='T:\PreyCaptureAnalysis\Data\';
+     pFile='T:\PreyCaptureAnalysis\Data\';
        
     end
     
     
 end
-afilename=sprintf('%s',ani,'AllVids_090519','.mat')
-save(fullfile(pSname, afilename))
+pFile='T:\PreyCaptureAnalysis\Data\';
+afilename=sprintf('%s',ani,'one_Session','.mat')
+save(fullfile(pFile, afilename))
 %save('J463c_test_data.mat')
 

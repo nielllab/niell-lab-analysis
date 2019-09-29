@@ -1,6 +1,6 @@
 clear all; close all;
 dbstop if error
-load('J470bAllVids_090519.mat'); 
+load('J462aone_Session.mat'); 
 set(groot,'defaultFigureVisible','off') %disable figure plotting
 
 savePDF=0;
@@ -1320,12 +1320,12 @@ end
 %%
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'Analyzed_090519_All_new','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_oneSess_090519','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_All_090519_new','.mat')
+afilename=sprintf('%s',ani,'Analyzed_oneSess_090519','.mat')
 save(fullfile(pSname, afilename))

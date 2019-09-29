@@ -42,17 +42,19 @@ for i = 1:length(appEpoch)
         rthHist(:,:,i) = NaN;
     end
     
+    if  nl(i)>nthresh
     lthAz_xc(:,i) = nanxcorr(azdeg(app),lth(app),maxlag,'zero');
     %     subplot(2,3,4)
     %     plot(-maxlag:maxlag,lthAz_xc(:,i)); ylim([-0.5 0.5])
-    if nl(i)<nthresh
+    else
         lthAz_xc(:,i) = NaN;
     end
     
+    if nr(i)>nthresh
     rthAz_xc(:,i) = nanxcorr(azdeg(app),rth(app),maxlag,'zero');
     %     subplot(2,3,5)
     %     plot(-maxlag:maxlag,rthAz_xc(:,i));  ylim([-0.5 0.5])
-    if nr(i)<nthresh
+    else
         rthAz_xc(:,i) = NaN;
     end
     
@@ -62,8 +64,13 @@ for i = 1:length(appEpoch)
     hth = thetaHead{vid};
     dth = d_Theta{vid};
     n(i) = sum(~isnan(azdeg(app)) & ~isnan(dth(app))');
+    if n(i)>0
     dheadAz_xc(:,1,i) =nanxcorr(azdeg(app),dth(app),maxlag,'zero');
     dheadAz_xc(:,2,i) =nanxcorr(azdeg(~app),dth(~app),maxlag,'zero');
+    else
+        dheadAz_xc(:,1,i)=NaN;
+        dheadAz_xc(:,2,i)=NaN;
+    end
     %      subplot(2,3,6)
 %          plot(-maxlag:maxlag,dheadAz_xc(:,:,i)); axis([-maxlag maxlag -0.5 0.5]);
 %         title(sprintf('az vs dhead %d pts',n(i)))
