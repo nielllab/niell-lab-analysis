@@ -1,21 +1,30 @@
 close all; clear all
-pathname = {'D:\gdrive\cohort5_100919\Cohort5\timestamp info\'};
+pathname = {'./'};
 
-fileList = [];
+fileList = []; paths = {};
+n=0;
 for i = 1:length(pathname)
-    fileList = [fileList ; dir([pathname{i} '*.csv'])];
+    
+    fs = dir([pathname{i} '*.dat']);
+    for j= 1:length(fs);
+        n=n+1;
+        paths{n} =pathname{i};
+    end
+    fileList = [fileList ; fs];
 end
 
 for f = 1:length(fileList);
-    topcam_fname = fileList(f).name;
-    ttl_fname = strrep(topcam_fname,'top','opto');
-    ttl_fname = strrep(ttl_fname,'csv','dat');
-    thispath = fileList(f).folder;
+    ttl_fname = fileList(f).name;
+    topcam_fname = strrep(ttl_fname,'opto','top');
+    topcam_fname = strrep(topcam_fname,'dat','csv');
+    thispath = paths{f}
     
-    TopTs = dlmread(fullfile(thispath,topcam_fname));
+try
+        
+    TopTs = dlmread(fullfile(paths{f},topcam_fname));
     TopTs= TopTs(:,1)*60*60 + TopTs(:,2)*60 + TopTs(:,3);
     
-    ttl = dlmread(fullfile(thispath,ttl_fname));
+    ttl = dlmread(fullfile(paths{f},ttl_fname));
     
     
     %%% get timestamps (column 1)
@@ -23,10 +32,10 @@ for f = 1:length(fileList);
     ttlTs = mod(ttlTs-7*60*60,24*60*60); %%% time is elapsed secs since midnight 1904 GMT; subtract 7 hrs to get local time (but what about daylight savings change!)
     
     ttlSig = ttl(:,2);
-    win = 150;
-    ttlSigFilt = double(ttlSig<-0.1);
-    ttlOn = conv(ttlSigFilt,ones(win,1)/win,'same');
-    ttlOn(ttlOn>0)=1;
+    win = 10;
+   
+    ttlSigFilt = conv(ttlSig,ones(win,1)/win,'same');
+    ttlOn= double(ttlSigFilt>0.5);
     ttlOn(1:win) = ttlOn(win+1);
     ttlOn(end:end-win) = ttlOn(end-(win+1));
     
@@ -37,9 +46,9 @@ for f = 1:length(fileList);
     title(ttl_fname);
     
     ttlSync = interp1(ttlTs,ttlOn,TopTs);
-    figure
-    plot(TopTs - TopTs(1),ttlSync)
-    title(ttl_fname);
+%     figure
+%     plot(TopTs - TopTs(1),ttlSync)
+%     title(ttl_fname);
     
     
     matName = strrep(ttl_fname,'dat','mat');
@@ -74,4 +83,58 @@ for f = 1:length(fileList);
     
 ttlAll{f} = ttlSync;
 
+     data = readtable([paths{f} 'states/' topcam_fname]); 
+     %data = readtable([paths{f} strrep(topcam_fname,'top','labeled')]); 
+    times = (data{16:end,1});
+        states = data{16:end,6};
+    startstop = data{16:end,9};
+    vidT = TopTs - TopTs(1);
+    
+    fps = data{16,4};
+    fps = str2num(fps{1});
+    for i = 1:length(times)
+        stateT(i) = str2num(times{i});
+        stateF(i) = ceil(stateT(i)*fps);
+    end
+    
+    vidDt = median(diff(vidT));
+    
+    chase = strcmp(states,'pursue/chasing') &strcmp(startstop,'START');
+    endChase = strcmp(states,'pursue/chasing') &strcmp(startstop,'STOP');
+     capture = strcmp(states,'consuming') &strcmp(startstop,'START');
+     optoDur(1,f) = sum(ttlSync==0)*vidDt;
+     optoDur(2,f) = sum(ttlSync==1)*vidDt;
+     nChase(1,f) = sum(ttlSync(stateF(chase))==0);
+     nChase(2,f) = sum(ttlSync(stateF(chase))==1);
+     nCapture(1,f) = sum(ttlSync(stateF(capture))==0);
+   nCapture(2,f) = sum(ttlSync(stateF(capture))==1);
+   
+       figure
+    plot(ttlSync); ylim([-0.1 1.1]);
+    hold on
+    plot(stateF(chase),ones(size(stateF(chase)))*0.5,'g*');
+    plot(stateF(endChase),ones(size(stateF(endChase)))*0.5,'r*');
+    plot(stateF(capture),ones(size(stateF(capture)))*0.5,'b*');
+    
+    title(sprintf('%s chase %0.2f %0.2f capture %0.2f %0.2f',ttl_fname,pChase(1,f),pChase(2,f),pCapture(1,f),pCapture(2,f)));
+    
+   
+    catch
+   %  sprintf('couldnt do %s boris',topcam_fname)
 end
+ 
+    
+end
+
+pChase = nChase./optoDur
+pCapture = nCapture./optoDur
+
+display('chase')
+nanmean(pChase,2)
+nansum(nChase,2)./nansum(optoDur,2)
+
+display('capture')
+nanmean(pCapture,2)
+nansum(nCapture,2)./nansum(optoDur,2)
+
+

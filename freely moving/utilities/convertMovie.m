@@ -1,5 +1,5 @@
 close all; clear all
-pathname = {'D:\gdrive\cohort5_100919\Cohort5\timestamp info\'};
+pathname = {'./'};
 
 fileList = [];
 for i = 1:length(pathname)
@@ -11,8 +11,9 @@ for f = 1:length(fileList);
  f
  
     movName = fileList(f).name;
-    thispath = fileList(f).folder;
-    topMov = VideoReader(fullfile(thispath,movName));
+    %thispath = fileList(f).folder;
+    thispath = pathname{1};
+    topMov = VideoReader(movName);
     nframe = floor(topMov.duration*topMov.framerate)
     mov = zeros(topMov.Height,topMov.Width,3,nframe,'uint8');   
    
