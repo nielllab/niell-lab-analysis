@@ -1,9 +1,9 @@
 clear all; close all;
 dbstop if error
-load('J462aone_Session.mat'); 
-set(groot,'defaultFigureVisible','off') %disable figure plotting
+load('J462c_AllSessions_110619.mat'); 
+set(groot,'defaultFigureVisible','on') %disable figure plotting
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -51,6 +51,7 @@ for i=1:length(Data)
     slip{i,2} = Data(i).difTL;
     slip{i,3} = Data(i).difRL;
     goodTheta(i,:) = Data(i).ThetaFract; %from un-interpolated theta
+    TSused{i,:}=Data(i).usedTS;
 
     EllipseParamsR{i,1,1} = Data(i).EllipseParamsR;
     EllipseParamsL{i,1,1} = Data(i).EllipseParamsL;
@@ -98,22 +99,22 @@ for i=1:length(Data)
    % tsData{i,1}=~isempty(Data(i).TopTs);
     
 end
-
+% 
 % tsData= cell2mat(tsData)
 % delayFull=cell2mat(slip);
-% goodR=Rcc>.3
-% goodL=Lcc>.3
-% % useL = (delayFull(:,2)<=3 & delayFull(:,2)>=-3);
-% % useR = (delayFull(:,1)<=3 & delayFull(:,1)>=-3);
-% % useE = (delayFull(:,3)<=3 & delayFull(:,3)>=-3);
-% 
-% useTime = goodTheta>=.7 &goodR' & goodL'%tsData==1; %|(useL & useR)
-% useFilt=find(useTime); %useFilt=useFilt(1:4,6:end);
-% 
-%  rownum=10 ; colnum=8; 
-% % rownum=round(sqrt(length(useFilt)+4))
-% % colnum=round(sqrt(length(useFilt)));
-% %%
+goodR=Rcc>.3
+goodL=Lcc>.3
+% useL = (delayFull(:,2)<=3 & delayFull(:,2)>=-3);
+% useR = (delayFull(:,1)<=3 & delayFull(:,1)>=-3);
+% useE = (delayFull(:,3)<=3 & delayFull(:,3)>=-3);
+
+useTime = goodTheta>=.7% & goodR & goodL %tsData==1; %|(useL & useR)
+useFilt=find(useTime); %useFilt=useFilt(1:4,6:end);
+
+ rownum=10 ; colnum=8; 
+% rownum=round(sqrt(length(useFilt)+4))
+% colnum=round(sqrt(length(useFilt)));
+%%
 % figure
 % subplot(3,2,1)
 % hist(Rcc); title('R corrcoef'); ylim([0 30]); xlim([0 1]);
@@ -128,98 +129,98 @@ end
 % subplot(3,2,6)
 % hist(Lscale);title('L Cal scale');ylim([0 30]); xlim([20 80]);
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
-% %%
-% figure;
-% subplot(2,2,1)
-% plot(Rcc,Rslope,'o'); axis square; xlim([0 1]); ylim([0 1]); title('R');
-% xlabel('R corrcoef');ylabel('R Slope');
-% hold on; plot([0,1],[0,1]);
-% subplot(2,2,2)
-% plot(Lcc,Lslope,'o');axis square; xlim([0 1]); hold on;ylim([0 1]);plot([0,1],[0,1]);
-% title('L');
-% xlabel('L corrcoef');ylabel('L Slope');
-% subplot(2,2,3)
-% plot(Rcc,Rscale,'o'); axis square; xlim([0 1]); ylim([0 100]); title('R');
-% xlabel('R corrcoef');ylabel('R Scale');
-% hold on; plot([0,1],[0,100]);
-% subplot(2,2,4)
-% plot(Lcc,Lscale,'o');axis square; xlim([0 1]); hold on;ylim([0 100]);plot([0,1],[0,100]);
-% title('L');
-% xlabel('L corrcoef');ylabel('L Scale');
-% 
+
+%%
+figure;
+subplot(2,2,1)
+plot(Rcc,Rslope,'o'); axis square; xlim([0 1]); ylim([0 1]); title('R');
+xlabel('R corrcoef');ylabel('R Slope');
+hold on; plot([0,1],[0,1]);
+subplot(2,2,2)
+plot(Lcc,Lslope,'o');axis square; xlim([0 1]); hold on;ylim([0 1]);plot([0,1],[0,1]);
+title('L');
+xlabel('L corrcoef');ylabel('L Slope');
+subplot(2,2,3)
+plot(Rcc,Rscale,'o'); axis square; xlim([0 1]); ylim([0 100]); title('R');
+xlabel('R corrcoef');ylabel('R Scale');
+hold on; plot([0,1],[0,100]);
+subplot(2,2,4)
+plot(Lcc,Lscale,'o');axis square; xlim([0 1]); hold on;ylim([0 100]);plot([0,1],[0,100]);
+title('L');
+xlabel('L corrcoef');ylabel('L Scale');
+
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
+%%
+% figure('units','normalized','outerposition',[0 0 1 1])
+% for vid = 1:length(useFilt)
+%     subplot(rownum,colnum,vid)  ;
+%     bar([mean(isnan(mouse_xy{useFilt(vid),1}(1,:))) mean(isnan(cricket_xy{useFilt(vid),1}(1,:))) mean(isnan(crickH{useFilt(vid),1}(1,:)))])
+%     ylabel('% error'); xlim([0.5 3.5]); ylim([0 1])
+%     set(gca,'XTick',[1 2 3])
+%     set(gca,'XTickLabel',{'mouse','c body', 'c head'})
+% end
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
-% 
-% %%
-% % figure('units','normalized','outerposition',[0 0 1 1])
-% % for vid = 1:length(useFilt)
-% %     subplot(rownum,colnum,vid)  ;
-% %     bar([mean(isnan(mouse_xy{useFilt(vid),1}(1,:))) mean(isnan(cricket_xy{useFilt(vid),1}(1,:))) mean(isnan(crickH{useFilt(vid),1}(1,:)))])
-% %     ylabel('% error'); xlim([0.5 3.5]); ylim([0 1])
-% %     set(gca,'XTick',[1 2 3])
-% %     set(gca,'XTickLabel',{'mouse','c body', 'c head'})
-% % end
-% % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% %%
-% % figure
-% % for vid=1:length(useFilt)
-% %     clear approach speed dec heading nframe d2cr dDist
-% %    % subplot(rownum,colnum,vid)
-% %   % subplot(7,6,vid)
-% % 
-% %     d2cr=(range{useFilt(vid)});
-% %     dDist=diff(d2cr);
-% % %  dDist=interpNan(dDist,3,'linear')
-% % %  dDist=medfilt2(dDist)
-% %     distThresh= d2cr<10; %long approaches can happen at up to 60cm away from cricket, which is diagonal through entire arena
-% %     dec = (dDist<-.2) %threshold for change in range to cricket
-% %     speed= mouseV{useFilt(vid)}>=5
-% %     az=azDeg{useFilt(vid)}; %too many missing points - heading looks weird
-% %     %azFilt=interpNan(az,3,'linear');
-% %     heading=(az<90) &(az>-90) ;
-% %     nframe=min(length(speed),length(heading));
-% %     nframe=min(nframe,length(dec));
-% %     speed=speed(1:nframe)';heading=heading(1:nframe)';dec=dec(1:nframe)'; distThresh=distThresh(1:nframe)';
-% %     approach =dec==1&(speed==1) &(distThresh==1) &heading==1
-% % %     plot(d2cr,'b'); hold on;
-% % %     plot(find(approach),d2cr(approach),'og');
-% %     appEpoch{vid,:}=(approach); axis square
-% %    % filtApp(vid,:)=sum(appEpoch{vid})
-% % %   plot(d2cr(mouseV{useFilt(vid)}>5),'g');
-% % end
-% % 
-% 
-% %%% identify approach!!!
-% 
+%%
+% figure
 % for vid=1:length(useFilt)
-% deltaR = diff(range{useFilt(vid)})*30;
-% vsmooth = conv(mouseV{useFilt(vid)},ones(5,1)/5,'same');
-% dRThresh=-10; %%%cm/sec
-% vThresh=10;
-% azThresh = pi/4;  %%% pi/4 = 45 deg
-% approach = deltaR<dRThresh & vsmooth(1:end-1)>vThresh & abs(azT{useFilt(vid)}(1:end-1))<azThresh;
-% approach(1)=0; approach(end)=0; %%% boundary conditions
+%     clear approach speed dec heading nframe d2cr dDist
+%    % subplot(rownum,colnum,vid)
+%   % subplot(7,6,vid)
 % 
-% starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% find start;stop
-% 
-% for j= 1:length(ends)-1;  %%% stitch together approachs with gap of less than 5 frames
-%     if (starts(j+1)-ends(j))<5 & (range{useFilt(vid)}(starts(j+1))- range{useFilt(vid)}(ends(j)))<3
-%         approach(ends(j) : starts(j+1))=1;
-%     end
+%     d2cr=(range{useFilt(vid)});
+%     dDist=diff(d2cr);
+% %  dDist=interpNan(dDist,3,'linear')
+% %  dDist=medfilt2(dDist)
+%     distThresh= d2cr<10; %long approaches can happen at up to 60cm away from cricket, which is diagonal through entire arena
+%     dec = (dDist<-.2) %threshold for change in range to cricket
+%     speed= mouseV{useFilt(vid)}>=5
+%     az=azDeg{useFilt(vid)}; %too many missing points - heading looks weird
+%     %azFilt=interpNan(az,3,'linear');
+%     heading=(az<90) &(az>-90) ;
+%     nframe=min(length(speed),length(heading));
+%     nframe=min(nframe,length(dec));
+%     speed=speed(1:nframe)';heading=heading(1:nframe)';dec=dec(1:nframe)'; distThresh=distThresh(1:nframe)';
+%     approach =dec==1&(speed==1) &(distThresh==1) &heading==1
+% %     plot(d2cr,'b'); hold on;
+% %     plot(find(approach),d2cr(approach),'og');
+%     appEpoch{vid,:}=(approach); axis square
+%    % filtApp(vid,:)=sum(appEpoch{vid})
+% %   plot(d2cr(mouseV{useFilt(vid)}>5),'g');
 % end
-% starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% update start;stop
 % 
-% for j = 1:length(starts);   %%% remove short approaches (less than 10 frames)
-%     if ends(j)-starts(j)<10
-%         approach(starts(j):ends(j))=0;
-%     end
-% end
-% starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% update start;stop
-% appEpoch{vid,:}=approach;
-% end
-% 
-% 
+
+%%% identify approach!!!
+
+for vid=1:length(useFilt)
+deltaR = diff(range{useFilt(vid)})*30;
+vsmooth = conv(mouseV{useFilt(vid)},ones(5,1)/5,'same');
+dRThresh=-10; %%%cm/sec
+vThresh=10;
+azThresh = pi/4;  %%% pi/4 = 45 deg
+approach = deltaR<dRThresh & vsmooth(1:end-1)>vThresh & abs(azT{useFilt(vid)}(1:end-1))<azThresh;
+approach(1)=0; approach(end)=0; %%% boundary conditions
+
+starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% find start;stop
+
+for j= 1:length(ends)-1;  %%% stitch together approachs with gap of less than 5 frames
+    if (starts(j+1)-ends(j))<5 & (range{useFilt(vid)}(starts(j+1))- range{useFilt(vid)}(ends(j)))<3
+        approach(ends(j) : starts(j+1))=1;
+    end
+end
+starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% update start;stop
+
+for j = 1:length(starts);   %%% remove short approaches (less than 10 frames)
+    if ends(j)-starts(j)<10
+        approach(starts(j):ends(j))=0;
+    end
+end
+starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% update start;stop
+appEpoch{vid,:}=approach;
+end
+
+
 % %%
 % figure('units','normalized','outerposition',[0 0 1 1])
 % for vid=1:length(useFilt)
@@ -1318,14 +1319,15 @@ end
 % end
 
 %%
-if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s',ani,'Analyzed_oneSess_090519','.pdf')
+if savePDF
+    filen=sprintf('%s',ani,'Analyzed_110619_allSessions','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
+    
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_oneSess_090519','.mat')
+afilename=sprintf('%s',ani,'Analyzed_110619_allSessions','.mat')
 save(fullfile(pSname, afilename))

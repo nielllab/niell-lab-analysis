@@ -2,7 +2,7 @@
 %clear all; close all
  set(groot,'defaultFigureVisible','on') %disable figure plotting
 savePDF=1; dbstop if error
-%pname={'T:\PreyCapture\Cohort4\J465d(black)\071119\Approach\';
+% pname={'T:\PreyCapture\Cohort4\J465d(black)\071119\Approach\'};
 %    'T:\PreyCapture\Cohort4\J465d(black)\070919\Approach\'};
 
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[]; %finds all files w/top.csv in the name
@@ -132,6 +132,8 @@ for j=1:length(fileList)
         endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
         xq=(start:1/30:endT)';
           
+       Data(j).usedTS=xq; 
+       
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
             Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw, Data(j).cricketThetaRaw);
         
@@ -241,7 +243,7 @@ for j=1:length(fileList)
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'one_Session','.mat')
+afilename=sprintf('%s',ani,'_AllSessions_110619','.mat')
 save(fullfile(pFile, afilename))
 %save('J463c_test_data.mat')
 

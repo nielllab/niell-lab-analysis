@@ -4,18 +4,18 @@ function adjustedData = adjustTimingTop(TopTS,desiredTimestamps,az,range,mousexy
 % cricketTheta=mod(cricketTheta+pi,2*pi)-pi;
 % headtheta=mod(headtheta+pi,2*pi)-pi;
 
-%azAdj = circInterp(TopTS,az,desiredTimestamps);
-azAdj = interp1(TopTS,az,desiredTimestamps);
+azAdj = circInterp(TopTS,az,desiredTimestamps);
+% azAdj = interp1(TopTS,az,desiredTimestamps);
 rangeAdj = interp1(TopTS,range,desiredTimestamps);
 mouseVAdj = interp1(TopTS(1:end-1),mouseV,desiredTimestamps);
 cricketVAdj = interp1(TopTS(1:end-1), cricketV, desiredTimestamps);
 cricketPAdj = interp1(TopTS, cricketP, desiredTimestamps);
-headThetaAdj = interp1(TopTS, headtheta, desiredTimestamps);
-%headThetaAdj = circInterp(TopTS, headtheta, desiredTimestamps);
+% headThetaAdj = interp1(TopTS, headtheta, desiredTimestamps);
+headThetaAdj = circInterp(TopTS, headtheta, desiredTimestamps);
 
 cricketpHAdj = interp1(TopTS,cricket_pH,desiredTimestamps);
-cricketThAdj=interp1(TopTS,cricketTheta, desiredTimestamps);
-%cricketThAdj=circInterp(TopTS,cricketTheta, desiredTimestamps);
+% cricketThAdj=interp1(TopTS,cricketTheta, desiredTimestamps);
+cricketThAdj=circInterp(TopTS,cricketTheta, desiredTimestamps);
 
 for xy=1:2
 mousexyAdj (xy,:) = interp1(TopTS,squeeze(mousexy(xy,:)),desiredTimestamps);

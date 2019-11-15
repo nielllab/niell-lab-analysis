@@ -484,54 +484,19 @@ xlabel('delta gaze'); ylabel('delta mn eye theta')
 plot(gzDiff,vgDiff,'og');
 title('delta gaze, delta eye theta')
 %%
-gaze= allGz(1:10:end); verg=allVg(1:10:end)
-
-%%
 
 figure
-subplot(3,2,1)
-scatplot(diff(gaze),diff(verg),'circles',10,[],[],1,4);
+subplot(1,2,1)
+scatplot(diff(allGz(1:10:end)),diff(allVg(1:10:end)),'circles',10,20,5,1,4);
 axis xy
 xlabel('delta gaze'); ylabel('delta eye theta')
 axis equal; axis([-90 90 -90 90]);
-title('rad = 10')
-
-subplot(3,2,2)
-scatplot(gzDiff(1:10:end),vgDiff(1:10:end),'circles',10,[],[],1,4);
+subplot(1,2,2)
+scatplot(gzDiff(1:10:end),vgDiff(1:10:end),'circles',10,20,5,1,4);
 title('Approach: delta gaze, delta eye theta')
 axis equal; axis([-90 90 -90 90])
 xlabel('delta gaze'); ylabel('delta eye theta')
 
-
-
-subplot(3,2,3)
-scatplot(diff(gaze),diff(verg),'circles',10,30,[],1,4);
-axis xy
-xlabel('delta gaze'); ylabel('delta eye theta')
-axis equal; axis([-90 90 -90 90]);
-title('rad = 10, mesh=30')
-
-
-subplot(3,2,4)
-scatplot(gzDiff(1:10:end),vgDiff(1:10:end),'circles',10,30,[],1,4);
-title('Approach: delta gaze, delta eye theta')
-axis equal; axis([-90 90 -90 90])
-xlabel('delta gaze'); ylabel('delta eye theta')
-
-
-subplot(3,2,5)
-scatplot(diff(gaze),diff(verg),'circles',10,30,10,1,4);
-axis xy
-xlabel('delta gaze'); ylabel('delta eye theta')
-axis equal; axis([-90 90 -90 90]);
-title('rad = 10, mesh=30 r_mean =10')
-
-
-subplot(3,2,6)
-scatplot(gzDiff(1:10:end),vgDiff(1:10:end),'circles',10,30,10,1,4);
-title('Approach: delta gaze, delta eye theta')
-axis equal; axis([-90 90 -90 90])
-xlabel('delta gaze'); ylabel('delta eye theta')
 
 %%
 
