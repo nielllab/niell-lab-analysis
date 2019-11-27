@@ -15,7 +15,6 @@ mouse_xy=[];cricket_xy=[];EllipseParamsR=[];EllipseParamsL=[]; radR=[]; az=[];
 for i=1:length(Data)
     
     animal(i,:)=Data(i).ani;
-   % sessionN(i) = Data(i).sessionnum;
     expdate(i)=Data(i).date;
     clip(i)=Data(i).clipnum;
     
@@ -36,7 +35,7 @@ for i=1:length(Data)
             
     mouse_xy{i,1,1}=Data(i).mouse_xy;
    % mouseV{i,:}= Data(i).mouseV; %in pix/frame
-    mouseV{i,:}=((Data(i).mouseV)/27)*30; %cm/sec
+    mouseV{i,:}=((Data(i).mouseV)/27)*30; %cm/sec - Change this for side camera!
     cricket_xy{i,1}=Data(i).cricketxy;
     cricketAz{i,:}=Data(i).cricketTheta;
 %    cricketV{i,:}= Data(i).cricketV % pix/frame
@@ -182,66 +181,8 @@ for vid = 1:length(useFilt)
     set(gca,'XTickLabel',{'mouse','c body', 'c head'})
 end
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-%%
-% figure
-% for vid=1:length(useFilt)
-%     clear approach speed dec heading nframe d2cr dDist
-%    % subplot(rownum,colnum,vid)
-%   % subplot(7,6,vid)
-% 
-%     d2cr=(range{useFilt(vid)});
-%     dDist=diff(d2cr);
-% %  dDist=interpNan(dDist,3,'linear')
-% %  dDist=medfilt2(dDist)
-%     distThresh= d2cr<10; %long approaches can happen at up to 60cm away from cricket, which is diagonal through entire arena
-%     dec = (dDist<-.2) %threshold for change in range to cricket
-%     speed= mouseV{useFilt(vid)}>=5
-%     az=azDeg{useFilt(vid)}; %too many missing points - heading looks weird
-%     %azFilt=interpNan(az,3,'linear');
-%     heading=(az<90) &(az>-90) ;
-%     nframe=min(length(speed),length(heading));
-%     nframe=min(nframe,length(dec));
-%     speed=speed(1:nframe)';heading=heading(1:nframe)';dec=dec(1:nframe)'; distThresh=distThresh(1:nframe)';
-%     approach =dec==1&(speed==1) &(distThresh==1) &heading==1
-% %     plot(d2cr,'b'); hold on;
-% %     plot(find(approach),d2cr(approach),'og');
-%     appEpoch{vid,:}=(approach); axis square
-%    % filtApp(vid,:)=sum(appEpoch{vid})
-% %   plot(d2cr(mouseV{useFilt(vid)}>5),'g');
-% end
-% 
 
-%%% identify approach!!!
-
-for vid=1:length(useFilt)
-deltaR = diff(range{useFilt(vid)})*30;
-vsmooth = conv(mouseV{useFilt(vid)},ones(5,1)/5,'same');
-dRThresh=-10; %%%cm/sec
-vThresh=10;
-azThresh = pi/4;  %%% pi/4 = 45 deg
-approach = deltaR<dRThresh & vsmooth(1:end-1)>vThresh & abs(azT{useFilt(vid)}(1:end-1))<azThresh;
-approach(1)=0; approach(end)=0; %%% boundary conditions
-
-starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% find start;stop
-
-for j= 1:length(ends)-1;  %%% stitch together approachs with gap of less than 5 frames
-    if (starts(j+1)-ends(j))<5 & (range{useFilt(vid)}(starts(j+1))- range{useFilt(vid)}(ends(j)))<3
-        approach(ends(j) : starts(j+1))=1;
-    end
-end
-starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% update start;stop
-
-for j = 1:length(starts);   %%% remove short approaches (less than 10 frames)
-    if ends(j)-starts(j)<10
-        approach(starts(j):ends(j))=0;
-    end
-end
-starts = find(diff(approach)>0);  ends = find(diff(approach)<0);  %%% update start;stop
-appEpoch{vid,:}=approach;
-end
-
-
-% %%
+ %%
 % figure('units','normalized','outerposition',[0 0 1 1])
 % for vid=1:length(useFilt)
 %     clear dur
@@ -449,58 +390,58 @@ end
 % % 
 % % 
 % 
-% %%
-% % clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
-% % figure('units','normalized','outerposition',[0 0 1 1])
-% % for vid=1:length(useFilt)
-% %     clear uselagsRA
-% %     subplot(rownum,colnum,vid);
-% %     nframe = min(length(dTheta{useFilt(vid)}),length(dthetaR{useFilt(vid)}));
-% %     nframe = min(nframe, length(dthetaL{useFilt(vid)}));
-% %     nonapp=appEpoch{vid}(1:nframe)==0
-% %     dT=dTheta{useFilt(vid)}; dtR=dthetaR{useFilt(vid)}; dtL=dthetaL{useFilt(vid)};
-% %     clear use
-% %     use = (nonapp==1)'; %~isnan(dT(1:nframe)) &
-% %   %  if sum(use)>3
-% %     [corrR lagsR]= nanxcorr(dT(use),dtR(use),30,'coeff');
-% %     plot(lagsR/30,corrR,'b');%xlim([-.3 .3])
-% %     hold on;
-% %     uselagsR=(lagsR>=-30& lagsR<=30);
-% %     
-% %     [corrL lagsL]= nanxcorr(dT(use),dtL(use),30,'coeff');
-% %     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-% %     uselagsL=(lagsL>=-30 & lagsL<=30);
-% % %     else
-% % %     end
-% %     clear use;
-% %     use=appEpoch{vid}==1
-% %     if sum(use)>4 & sum(~isnan(dtR(use)))>20
-% %     [corrRA lagsRA]= nanxcorr(dT(use),dtR(use),30,'coeff');
-% %     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
-% %     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-% % 
-% %     else
-% %         corrRA=NaN;uselagsRA=NaN;
-% %            
-% % 
-% %     end
-% %      if sum(use)>4 & sum(~isnan(dtL(use)))>20
-% %     [corrLA lagsLA]= nanxcorr(dT(use),dtL(use),30,'coeff');
-% %     plot(lagsLA/30,corrLA,'c');%xlim([-.3 .3]);
-% %     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
-% %     else 
-% %     end
-% %     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
-% %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
-% %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
-% %         
-% %     else
-% % 
-% %     end
-% % end
-% % 
-% % 
-% % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
+figure('units','normalized','outerposition',[0 0 1 1])
+for vid=1:length(useFilt)
+    clear uselagsRA
+    subplot(rownum,colnum,vid);
+    nframe = min(length(dTheta{useFilt(vid)}),length(dthetaR{useFilt(vid)}));
+    nframe = min(nframe, length(dthetaL{useFilt(vid)}));
+    nonapp=appEpoch{vid}(1:nframe)==0
+    dT=dTheta{useFilt(vid)}; dtR=dthetaR{useFilt(vid)}; dtL=dthetaL{useFilt(vid)};
+    clear use
+    use = (nonapp==1)'; %~isnan(dT(1:nframe)) &
+  %  if sum(use)>3
+    [corrR lagsR]= nanxcorr(dT(use),dtR(use),30,'coeff');
+    plot(lagsR/30,corrR,'b');%xlim([-.3 .3])
+    hold on;
+    uselagsR=(lagsR>=-30& lagsR<=30);
+    
+    [corrL lagsL]= nanxcorr(dT(use),dtL(use),30,'coeff');
+    plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
+    uselagsL=(lagsL>=-30 & lagsL<=30);
+%     else
+%     end
+    clear use;
+    use=appEpoch{vid}==1
+    if sum(use)>4 & sum(~isnan(dtR(use)))>20
+    [corrRA lagsRA]= nanxcorr(dT(use),dtR(use),30,'coeff');
+    plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
+    uselagsRA=(lagsRA>=-30& lagsRA<=30);
+
+    else
+        corrRA=NaN;uselagsRA=NaN;
+           
+
+    end
+     if sum(use)>4 & sum(~isnan(dtL(use)))>20
+    [corrLA lagsLA]= nanxcorr(dT(use),dtL(use),30,'coeff');
+    plot(lagsLA/30,corrLA,'c');%xlim([-.3 .3]);
+    uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+    else 
+    end
+    if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+        corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
+        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
+        
+    else
+
+    end
+end
+
+
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 % % 
 % % figure('units','normalized','outerposition',[0 0 1 1])
 % % errR= nanstd(corrRAll)/(sqrt(length(corrRAll))); errL = nanstd(corrLAll)/(sqrt(length(corrLAll)));

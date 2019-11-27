@@ -190,7 +190,7 @@ hold on
 for i = 1:nPts
     plot(squeeze(aligned(i,1,:)),squeeze(aligned(i,2,:)),'o');
 end
-drawHead(meanHead); axis square; axis equal
+% drawHead(meanHead); axis square; axis equal
 title('alignment from times with all good points')
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
@@ -199,17 +199,17 @@ end
 close(gcf)
 
 
-if showMovies
-    figure
-    for t= 1:nframes;
-        if ~isnan(centroid(1,t))
-            hold off
-            drawHead(meanHead)
-            drawHead(aligned(:,:,t)); axis square; axis([-70 70 -70 70])
-            drawnow
-        end
-    end
-end
+% if showMovies
+%     figure
+%     for t= 1:nframes;
+%         if ~isnan(centroid(1,t))
+%             hold off
+%             drawHead(meanHead)
+%             drawHead(aligned(:,:,t)); axis square; axis([-70 70 -70 70])
+%             drawnow
+%         end
+%     end
+% end
 
 
 
@@ -276,7 +276,7 @@ alignedAll = zeros(size(centered));
 clear d
 for t = 1:size(centroid,2)
     c = centered(:,:,t);
-    if useN(t)>=4  %%% need 4 points to fit well
+    if useN(t)>=3  %%% need 4 points to fit well
         %%% loop over thetas, rotate points, calculate error
         theta = linspace(0,2*pi,1001); theta = theta(1:end-1);
         clear d
@@ -312,7 +312,7 @@ hold on
 for i = 1:nPts
     plot(squeeze(alignedAll(i,1,:)),squeeze(alignedAll(i,2,:)),'o');
 end
-drawHead(meanHeadAll); axis square; axis equal
+% drawHead(meanHeadAll); axis square; axis equal
 title('alignment from all timepoints')
 if savePDF
     set(gcf, 'PaperPositionMode', 'auto');
@@ -320,15 +320,15 @@ if savePDF
 end
 close(gcf)
 
-if showMovies
-    figure
-    for t= 1:nframes;
-        hold off
-        drawHead(meanHeadAll)
-        drawHead(alignedAll(:,:,t)); axis square; axis([-70 70 -70 70])
-        drawnow
-    end
-end
+% if showMovies
+%     figure
+%     for t= 1:nframes;
+%         hold off
+%         drawHead(meanHeadAll)
+%         drawHead(alignedAll(:,:,t)); axis square; axis([-70 70 -70 70])
+%         drawnow
+%     end
+% end
 
 
 %%% cricket pts
@@ -485,8 +485,8 @@ for i = 1:nPts
     plot(squeeze(alignedAll(i,1,:)),squeeze(alignedAll(i,2,:)),'.');
 end
 
-drawHead(meanHeadAll); axis square; axis equal
-c
+% drawHead(meanHeadAll); axis square; axis equal
+
 clear data
 data.mouse_xy = cent;
 data.mouseSp = mouseV;
@@ -509,18 +509,18 @@ cricket.pos = crick;
 
 
 sz = max(pts(:));
-if showMovies
-    figure
-    for t = 1:size(pts,3);
-        hold off
-        currentHead = meanHeadAll*rotmat(thAll(t))';
-        currentHead = currentHead + repmat(cent(:,t)',[8 1]);
-        drawHead(currentHead,1);
-        plot(squeeze(ptsRaw(:,1,t)),squeeze(ptsRaw(:,2,t)),'b.','MarkerSize',12);
-        plot(crick(1,t),crick(1,t),'ro')
-        axis([1 sz 1 sz])
-        drawnow
-    end
-    
-end
+% if showMovies
+%     figure
+%     for t = 1:size(pts,3);
+%         hold off
+%         currentHead = meanHeadAll*rotmat(thAll(t))';
+%         currentHead = currentHead + repmat(cent(:,t)',[8 1]);
+%         drawHead(currentHead,1);
+%         plot(squeeze(ptsRaw(:,1,t)),squeeze(ptsRaw(:,2,t)),'b.','MarkerSize',12);
+%         plot(crick(1,t),crick(1,t),'ro')
+%         axis([1 sz 1 sz])
+%         drawnow
+%     end
+%     
+% end
 

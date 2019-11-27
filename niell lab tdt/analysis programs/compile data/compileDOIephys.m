@@ -1110,7 +1110,6 @@ for mv=1:2
 end
 
 %%
-%%
 
 %spont FR from wn
 clear mdl rsquared c
