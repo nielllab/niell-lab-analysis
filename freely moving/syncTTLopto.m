@@ -13,7 +13,7 @@ for i = 1:length(pathname)
     fileList = [fileList ; fs];
 end
 
-for f = 1:length(fileList);
+for f =1:length(fileList);
     ttl_fname = fileList(f).name;
     topcam_fname = strrep(ttl_fname,'opto','top');
     topcam_fname = strrep(topcam_fname,'dat','csv');
@@ -32,20 +32,38 @@ try
     ttlTs = mod(ttlTs-7*60*60,24*60*60); %%% time is elapsed secs since midnight 1904 GMT; subtract 7 hrs to get local time (but what about daylight savings change!)
     
     ttlSig = ttl(:,2);
-    win = 10;
+    win = 15;
    
     ttlSigFilt = conv(ttlSig,ones(win,1)/win,'same');
-    ttlOn= double(ttlSigFilt>0.5);
+    ttlOn= double(ttlSigFilt>0.25);
     ttlOn(1:win) = ttlOn(win+1);
     ttlOn(end:end-win) = ttlOn(end-(win+1));
     
-    figure
-    plot(ttlTs - ttlTs(1),ttlSig);hold on
-    plot(ttlTs - ttlTs(1),ttlSigFilt/10);
-    plot(ttlTs-ttlTs(1),ttlOn/10,'g');
-    title(ttl_fname);
-    
+%     figure
+%     plot(ttlTs - ttlTs(1),ttlSig);hold on
+%     plot(ttlTs - ttlTs(1),ttlSigFilt/10);
+%     plot(ttlTs-ttlTs(1),ttlOn/10,'g');
+%     title(ttl_fname);
+%     
     ttlSync = interp1(ttlTs,ttlOn,TopTs);
+    ttlPre = ttlSync;
+    firstgood = min(find(~isnan(ttlSync)));
+    if firstgood>1
+        ttlSync(1:firstgood) = ttlSync(firstgood);
+    end
+    lastgood = max(find(~isnan(ttlSync)));
+    if lastgood<length(ttlSync);
+        ttlSync(lastgood:end)=ttlSync(lastgood);
+    end
+    
+     if sum(~isnan(ttlSync))==0;
+         ttlSync(:) = 0;
+     end
+    
+%     figure
+%     plot(ttlSync); hold on; plot(ttlPre);  
+    
+    
 %     figure
 %     plot(TopTs - TopTs(1),ttlSync)
 %     title(ttl_fname);
@@ -83,8 +101,8 @@ try
     
 ttlAll{f} = ttlSync;
 
-     data = readtable([paths{f} 'states/' topcam_fname]); 
-     %data = readtable([paths{f} strrep(topcam_fname,'top','labeled')]); 
+    % data = readtable([paths{f} 'states/' topcam_fname]); 
+     data = readtable([paths{f} strrep(topcam_fname,'top','labeled')]); 
     times = (data{16:end,1});
         states = data{16:end,6};
     startstop = data{16:end,9};
@@ -94,7 +112,7 @@ ttlAll{f} = ttlSync;
     fps = str2num(fps{1});
     for i = 1:length(times)
         stateT(i) = str2num(times{i});
-        stateF(i) = ceil(stateT(i)*fps);
+        stateF(i) = round(stateT(i)*fps)+1;
     end
     
     vidDt = median(diff(vidT));
@@ -102,6 +120,19 @@ ttlAll{f} = ttlSync;
     chase = strcmp(states,'pursue/chasing') &strcmp(startstop,'START');
     endChase = strcmp(states,'pursue/chasing') &strcmp(startstop,'STOP');
      capture = strcmp(states,'consuming') &strcmp(startstop,'START');
+     if sum(capture)==0
+         capture(max(find(endChase)))=1;
+     end
+     
+     if sum(endChase)==0;
+         endChase(max(find(capture)))=1;
+     end
+     
+     if sum(chase)==0;
+         chase(max(find(endChase)))=1;
+     end
+     
+     ttlSync = ttlSync(1:stateF(find(capture,1,'last')));
      optoDur(1,f) = sum(ttlSync==0)*vidDt;
      optoDur(2,f) = sum(ttlSync==1)*vidDt;
      nChase(1,f) = sum(ttlSync(stateF(chase))==0);
@@ -109,32 +140,46 @@ ttlAll{f} = ttlSync;
      nCapture(1,f) = sum(ttlSync(stateF(capture))==0);
    nCapture(2,f) = sum(ttlSync(stateF(capture))==1);
    
-       figure
-    plot(ttlSync); ylim([-0.1 1.1]);
+      figure
+      t = (1:length(ttlSync))*vidDt;
+    plot(t,ttlSync); ylim([-0.1 1.1]);
     hold on
-    plot(stateF(chase),ones(size(stateF(chase)))*0.5,'g*');
-    plot(stateF(endChase),ones(size(stateF(endChase)))*0.5,'r*');
-    plot(stateF(capture),ones(size(stateF(capture)))*0.5,'b*');
+    plot(stateF(chase)*vidDt,ones(size(stateF(chase)))*0.5,'g*');
+    plot(stateF(endChase)*vidDt,ones(size(stateF(endChase)))*0.5,'r*');
+    plot(stateF(capture)*vidDt,ones(size(stateF(capture)))*0.6,'b*');
     
-    title(sprintf('%s chase %0.2f %0.2f capture %0.2f %0.2f',ttl_fname,pChase(1,f),pChase(2,f),pCapture(1,f),pCapture(2,f)));
+    xlim([ 0 max(60, length(ttlSync)*vidDt)])
+    
+    title(sprintf('%s chase %0.2f %0.2f capture %0.2f %0.2f',ttl_fname,nChase(1,f),nChase(2,f),nCapture(1,f),nCapture(2,f)));
     
    
-    catch
-   %  sprintf('couldnt do %s boris',topcam_fname)
+   catch
+     sprintf('couldnt do %s boris',topcam_fname)
 end
  
     
 end
 
+optoDur = optoDur(:,1:size(nCapture,2));
+
+
 pChase = nChase./optoDur
 pCapture = nCapture./optoDur
 
+
+totalDur = sum(optoDur,1);
+use = totalDur<600; %%% don't take > 2 cycles
+
+
+
 display('chase')
-nanmean(pChase,2)
-nansum(nChase,2)./nansum(optoDur,2)
+%1./nanmean(pChase,2)
+nansum(optoDur(:,use),2)./nansum(nChase(:,use),2)
+
 
 display('capture')
-nanmean(pCapture,2)
-nansum(nCapture,2)./nansum(optoDur,2)
+%1./nanmean(pCapture,2)
+nansum(optoDur(:,use),2)./nansum(nCapture(:,use),2)
+
 
 

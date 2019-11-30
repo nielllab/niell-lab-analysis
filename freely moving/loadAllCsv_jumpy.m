@@ -1,17 +1,18 @@
 %do for each animal, all sessions? or all animals together?
 %clear all; close all
+close all
+clear all
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 savePDF=1; dbstop if error
-pname={'T:\jumpy\'};
+pname={'D:\labeledDLC\'};
 
 
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[]; %finds all files w/top.csv in the name
 for i=1:length(pname)
-    fileList = [fileList; dir([pname{i} '*resnet50_Top*.csv'])];
+    fileList = [fileList; dir([pname{i} '*resnet50_3DJump*.csv'])];
     %     TSfileList = [TSfileList; dir([pname{i} '*topTS*.csv'])];
     
 end
-
 
 %%
 
@@ -25,31 +26,28 @@ for j=1:length(fileList)
        psfilename = 'C:\analysisPS.ps';
 
     end
-    clear path %TSfileList
-    %     path = fileList(j).folder
-    %     TSfileList = [fileList; dir([path '*topTS*.csv'])];
+    clear path 
     
     clear Rfname Lfname   
     fname=fullfile(fileList(j).folder,fileList(j).name);
     
     sname = split(fname,'_');
-    ani = sname{1}(end-4:end);
-    sessionnum = sname{3}(end);
-    date = sname{4};
-    clipnum = sname{5}(~isletter(sname{5}));
+    ani = sname{2};
+%     sessionnum = sname{3}(end);
+    date = sname{1}(end-5:end);
+    clipnum = sname{5}(1:2);
     
     Data(j).ani= {ani}; %Data(j).trialtype = {trialtype};
-    Data(j).sessionnum = {sessionnum};
+%     Data(j).sessionnum = {sessionnum};
     Data(j).date = {date};
     Data(j).clipnum = {clipnum};
     Data(j).Data = csvread(fname,3,0);
-    %Rfname = strrep(fname,'Top','Eye1r');
-    Rfname = strrep(fname,'Top','Eye');
-    Rfname = strrep(Rfname,'top','eye1r');
+    Rfname = strrep(fname,'3DJump','EyeCams');
+    Rfname = strrep(Rfname,'cam1','minicam_0');
    % Rfname = strrep(Rfname,'900000','1030000'); 
-    Rfname = strrep(Rfname,'Aug15','Jul12');
+    Rfname = strrep(Rfname,'Nov25','Nov26');
     %   Lfname = strrep(Rfname,'Eye1r','Eye2l');
-    Lfname = strrep(Rfname,'eye1r','eye2l');
+    Lfname = strrep(Rfname,'minicam_0','minicam_1');
     Data(j).DataR = (csvread(Rfname,3,0))
     Data(j).DataL=(csvread(Lfname,3,0));
     
@@ -58,7 +56,7 @@ for j=1:length(fileList)
     Data(j).difTL = length(Data(j).Data)-length(Data(j).DataL)
     Data(j).difRL = length(Data(j).DataR)-length(Data(j).DataL)
     
-    aligned = alignHead(fname,8,0,psfilename,.90, .95)
+    aligned = alignHead(fname,3,0,psfilename,.90, .95)
     Data(j).mouse_xyRaw=aligned.mouse_xy;
     Data(j).mouseVRaw=aligned.mouseSp;
     Data(j).thetaRaw=aligned.theta;
@@ -76,7 +74,7 @@ for j=1:length(fileList)
 %     Data(j).longTheta=aligned.longTheta;
 %     Data(j).longThetaFract=aligned.longThetaFract;
     
-    Data(j).xR=640 - Data(j).DataR(:,2:3:end); %%% flip right eye since this camera is reversed in bonsai
+    Data(j).xR= Data(j).DataR(:,2:3:end); %%% flip right eye since this camera is reversed in bonsai
     Data(j).yR=480 - Data(j).DataR(:,3:3:end); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
     Data(j).RLikelihood=Data(j).DataR(:,4:3:end);
     [Data(j).Rthetaraw,Data(j).Rphiraw,Data(j).EllipseParamsR,Data(j).ExtraParamsR,Data(j).goodReye, Data(j).ngoodR, Data(j).RcalR,Data(j).RcalM, Data(j).scaleR] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
@@ -93,7 +91,7 @@ for j=1:length(fileList)
     
     
     %fxn to adjust timing between videos of different lengths
-    TSfname = strcat(ani,'_','topTS','_',sname{3},'_',date,'_',clipnum,'.csv');
+    TSfname = strcat(date,'_',ani,'_','cam1','_','trial','_',clipnum,'.csv');
     cd(fileList(j).folder)
     %read in timestamp files
     if ~isfile(TSfname)
@@ -102,23 +100,24 @@ for j=1:length(fileList)
     else
         topTSfile=fullfile(fileList(j).folder,TSfname);
         
-        rTSfile = strrep(topTSfile,'top','eye1r');
-        lTSfile =  strrep(rTSfile,'eye1r','eye2l');
-        TopTs = dlmread(topTSfile);
-        TopTs= TopTs(:,1)*60*60 + TopTs(:,2)*60 + TopTs(:,3);  %%% data is read as hours, mins, secs
+        rTSfile = strrep(topTSfile,'cam1','minicam_0');
+        lTSfile =  strrep(rTSfile,'minicam_0','minicam_1');
+        TopTs = csvread(topTSfile,1,0);
+        TopTs= (TopTs(:,2)/1000);  %%% data is read as hours, mins, secs
+
         startT = TopTs(1);
        % Data(j).TopTs = TopTs - startT;  %%% don't subtract off startT, so we store absolute time
         Data(j).TopTs = TopTs;
         
         % if exist(rTSfile)
-        RTS = dlmread(rTSfile);
-        RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3); 
+        RTS = csvread(rTSfile,1,0);
+        RTS= (RTS(:,2)/1000); 
         startR = RTS(1);
         %Data(j).RTS = RTS - startR; %%% don't subtract off startR, so we store absolute time
         Data(j).RTS = RTS;
         
-        LTS = dlmread(lTSfile);
-        LTS= LTS(:,1)*60*60 + LTS(:,2)*60 + LTS(:,3);
+        LTS = csvread(lTSfile,1,0);
+        LTS= (LTS(:,2)/1000);
         startL = LTS(1);
        % Data(j).LTS = LTS - startL; %%% don't subtract off startL, so we store absolute time
         Data(j).LTS = LTS;
@@ -129,9 +128,14 @@ for j=1:length(fileList)
           
        Data(j).usedTS=xq; 
        
-        adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
-            Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw, Data(j).cricketThetaRaw);
-        
+       try       
+           adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
+                Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw, Data(j).cricketThetaRaw);
+       catch
+           adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw(1:end-1), Data(j).rangeRaw(1:end-1),Data(j).mouse_xyRaw(:,1:end-1),Data(j).mouseVRaw(1:end-1),...
+                Data(j).cricketxyRaw(:,1:end-1),Data(j).cricketVRaw(1:end-1), Data(j).cricketP(1:end-1), Data(j).thetaRaw(1:end-1),Data(j).cricketHRaw(:,1:end-1),Data(j).cricket_pHRaw(1:end-1), Data(j).cricketThetaRaw(1:end-1));
+       end
+       
         Data(j).az =(adjustedTS.azAdj)';
         Data(j).theta =(adjustedTS.headThetaAdj)';
         Data(j).dtheta = interp1(TopTs(1:end-1),Data(j).dThetaRaw,xq);
@@ -175,13 +179,13 @@ for j=1:length(fileList)
         Data(j).dth = Data(j).dtheta;
         
         figure
-        plot(xcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
+        plot(nanxcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
         
         figure
-        plot(xcorr(Data(j).dxR,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxR,Data(j).dth(1:end-1),30,'coeff'))
         hold on
-        plot(xcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
-        plot(xcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
+        plot(nanxcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
         legend('R','L','R-L')  
         title('eye position & head theta');
         if savePDF
@@ -191,14 +195,14 @@ for j=1:length(fileList)
         close(gcf)
       
         figure
-        plot(xcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
         
         
          figure
-        plot(xcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),30,'coeff'))
         hold on
-        plot(xcorr(Data(j).dxLTheta,Data(j).dth(1:end-1),30,'coeff'))
-        plot(xcorr(Data(j).dxRTheta,-Data(j).dxLTheta,30,'coeff'))
+        plot(nanxcorr(Data(j).dxLTheta,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxRTheta,-Data(j).dxLTheta,30,'coeff'))
         legend('R','L','R-L')  
         title('eye theta & head theta');
         if savePDF
@@ -208,10 +212,10 @@ for j=1:length(fileList)
         close(gcf)
         
             figure
-        plot(xcorr(Data(j).dxRPhi,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxRPhi,Data(j).dth(1:end-1),30,'coeff'))
         hold on
-        plot(xcorr(Data(j).dxLPhi,Data(j).dth(1:end-1),30,'coeff'))
-        plot(xcorr(Data(j).dxRPhi,Data(j).dxLPhi,30,'coeff'))
+        plot(nanxcorr(Data(j).dxLPhi,Data(j).dth(1:end-1),30,'coeff'))
+        plot(nanxcorr(Data(j).dxRPhi,Data(j).dxLPhi,30,'coeff'))
         legend('R','L','R-L')  
         title('eye phi & head theta');
         if savePDF
@@ -224,21 +228,25 @@ for j=1:length(fileList)
         
     end
     if savePDF
-        pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
-        C={ani, date, sessionnum, clipnum};
-        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'.pdf')
+        pSname='D:\labeledDLC\pdfs\';
+        C={ani, date, clipnum};
+        filen=sprintf('%s%s%s',date,ani,clipnum,'.pdf')
         pdfilename=fullfile(pSname,filen)
-        dos(['ps2pdf ' psfilename ' ' pdfilename]);
-        delete(psfilename);
+        try
+            dos(['ps2pdf ' psfilename ' ' pdfilename]);
+            delete(psfilename);
+        catch
+            print('could not generate pdf')
+        end
     else
-     pFile='T:\PreyCaptureAnalysis\Data\';
+     pFile='D:\labeledDLC\pdfs\';
        
     end
     
     
 end
-pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_AllSessions_110619','.mat')
+pFile='D:\labeledDLC\pdfs\';
+afilename=sprintf('%s',ani,'_AllSessions_112719','.mat')
 save(fullfile(pFile, afilename))
 %save('J463c_test_data.mat')
 

@@ -1,6 +1,6 @@
 clear all; close all;
 dbstop if error
-load('CK2-CK2-7P1-RT_AllSessions_112719.mat'); 
+load('J462a_ACCSessions_112119.mat'); 
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
 savePDF=1;
@@ -15,7 +15,7 @@ mouse_xy=[];cricket_xy=[];EllipseParamsR=[];EllipseParamsL=[]; radR=[]; az=[];
 for i=1:length(Data)
     
     animal(i,:)=Data(i).ani;
-   % sessionN(i) = Data(i).sessionnum;
+    sessionN(i) = Data(i).sessionnum;
     expdate(i)=Data(i).date;
     clip(i)=Data(i).clipnum;
     
@@ -53,10 +53,7 @@ for i=1:length(Data)
     goodTheta(i,:) = Data(i).ThetaFract; %from un-interpolated theta
     TSused{i,:}=Data(i).usedTS;
     
-%     accelData{i,:} = Data(i).accShift;
-%     accelCorr(i) =Data(i).accXcorrMax;
-%     accelDrift(i) =Data(i).accXcorrLag;
-
+    accelData{i,:} = Data(i).accShift;
 
     EllipseParamsR{i,1,1} = Data(i).EllipseParamsR;
     EllipseParamsL{i,1,1} = Data(i).EllipseParamsL;
@@ -156,31 +153,29 @@ xlabel('L corrcoef');ylabel('L Scale');
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
-% for ch=[1:2,6]
-%     figure('units','normalized','outerposition',[0 0 1 1])
-%     set(gcf,'Name', sprintf('acc ch = %d',ch));
-%     
-%     for vid = 1:length(useFilt)
-%          subplot(2,4,vid);
-%         plot((accelData{vid}(:,ch))); hold on; axis square
-%         if ch==1
-%             plot((phiR{useFilt(vid)}-phiL{useFilt(vid)}));
-%         elseif ch==2
-%             plot((thetaR{useFilt(vid)}-thetaL{useFilt(vid)}));
-%         elseif ch==6
-%             plot(dTheta{useFilt(vid)});
-%         end
-%     end
-% end
-%%
+for ch=1%:6
 figure('units','normalized','outerposition',[0 0 1 1])
+        set(gcf,'Name', 'hist saline');
+
 for vid = 1:length(useFilt)
-    subplot(rownum,colnum,vid)  ;
-    bar([mean(isnan(mouse_xy{useFilt(vid),1}(1,:))) mean(isnan(cricket_xy{useFilt(vid),1}(1,:))) mean(isnan(crickH{useFilt(vid),1}(1,:)))])
-    ylabel('% error'); xlim([0.5 3.5]); ylim([0 1])
-    set(gca,'XTick',[1 2 3])
-    set(gca,'XTickLabel',{'mouse','c body', 'c head'})
+    subplot(3,4,vid);
+    plot((accelData{vid}(:,ch))*20); hold on; axis square
+if ch==1
+    plot((phiR{useFilt(vid)}-phiL{useFilt(vid)}));
+else
 end
+%     suptitle(sprintf('ch = %d',ch));
+end
+end
+%%
+% figure('units','normalized','outerposition',[0 0 1 1])
+% for vid = 1:length(useFilt)
+%     subplot(rownum,colnum,vid)  ;
+%     bar([mean(isnan(mouse_xy{useFilt(vid),1}(1,:))) mean(isnan(cricket_xy{useFilt(vid),1}(1,:))) mean(isnan(crickH{useFilt(vid),1}(1,:)))])
+%     ylabel('% error'); xlim([0.5 3.5]); ylim([0 1])
+%     set(gca,'XTick',[1 2 3])
+%     set(gca,'XTickLabel',{'mouse','c body', 'c head'})
+% end
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
 % figure
@@ -1341,7 +1336,7 @@ end
 %%
     pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Analyzed_112619_allSessions','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_110619_allSessions','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1349,5 +1344,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_112619_allSessions','.mat')
+afilename=sprintf('%s',ani,'Analyzed_110619_allSessions','.mat')
 save(fullfile(pSname, afilename))

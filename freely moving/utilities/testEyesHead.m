@@ -36,7 +36,7 @@ Data(j).Rphiraw = -Data(j).Rphiraw;   %%% reverse because images have 1 at top l
 [f p]= uigetfile('*.avi','left eye movie file');
 topMov = VideoReader(fullfile(p,f));
 nframe = round(topMov.duration*topMov.framerate);
-nframe = 600;
+nframe = 300;
 
 for frm = 1:nframe
     if round((frm-1)/25) == (frm-1)/25
@@ -48,7 +48,7 @@ end
 [f p]= uigetfile('*.avi','right eye movie file');
 topMov = VideoReader(fullfile(p,f));
 nframe = round(topMov.duration*topMov.framerate)
-nframe = 600
+nframe = 300
 for frm = 1:nframe
     if round((frm-1)/25) == (frm-1)/25
         display(sprintf('done %d/%d frames',frm-1,nframe))
@@ -60,7 +60,7 @@ end
 [f p] = uigetfile('*.csv','top csv file');
 fname = fullfile(p,f);
 
-psfilename = 'c:\temp\test.ps';
+    psfilename = 'C:\analysisPS.ps';
 
 aligned = alignHead(fname,8,0,psfilename,.90, .95)
 Data(j).mouse_xyRaw=aligned.mouse_xy;
@@ -92,12 +92,12 @@ Lth = interp1(LTS,Lth,RTS);
 eyeTh = 0.5*(Lth + Rth);
 
 figure
-nframe = 120;
+nframe = 300;
 clear mov
 
 hthDeg = (hth-nanmean(hth(1:nframe)))*180/pi;
 
-for i = 1:nframe
+for i =1:nframe
     subplot(3,2,1)
     imagesc((leftmov(:,:,:,i))); axis equal;
     
@@ -114,12 +114,12 @@ for i = 1:nframe
     plot(eyeTh,'k','Linewidth',2); hold on; plot(Lth,'b');  plot(Rth,'r'); 
     plot(i,Lth(i),'bo'); plot(i,Rth(i),'ro');
     ylim([-30 30]); xlim([1 nframe])
-    
+  %  xlim([70 175]);
     
     subplot(3,2,5:6);hold off
     plot(hthDeg + eyeTh,'k','LineWidth',2); hold on; plot(hthDeg,'g'); plot(i,hthDeg(i),'go');
-    ylim([-90 90]);xlim([1 nframe]); legend('gaze','head');
-    
+    ylim([-250 250]); legend('gaze','head');
+    xlim([1 nframe]);
     mov(i) = getframe(gcf);
 end
 

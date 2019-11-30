@@ -10,7 +10,7 @@ load(fullfile(p,f));
 
 savepath = uigetdir('','folder to save videos in');close all
 framerate =30;
-for m = 38:165%length(useData);
+for m = 179:184%1:5:length(useData);
     
     vid = useData(m);
     deltaR = diff(dist{vid})*30;

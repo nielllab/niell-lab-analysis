@@ -326,15 +326,13 @@ for i = 1:length(appEpoch)
         
         %  mnEye=0.5*(rth(appRange) +lth(appRange))'
         
-         headTh=hthnonan; fullvg=.5*(rth+lth); fullgaze=headTh+fullvg';
-    headTheta=[headTheta headTh(1:end-1)];
-    dHeadTh = [dHeadTh diff(headTh)];
-    gazeAll = [gazeAll fullgaze(1:end-1)];
-    d_gaze =[d_gaze diff(fullgaze)];
-    eye_vg = [eye_vg fullvg(1:end-1)'];
-    dvergence=[dvergence diff(fullvg')];
-        
-        
+        headTh=hthnonan; fullvg=.5*(rth+lth); fullgaze=headTh+fullvg';
+        headTheta=[headTheta headTh(1:end-1)];
+        dHeadTh = [dHeadTh diff(headTh)];
+        gazeAll = [gazeAll fullgaze(1:end-1)];
+        d_gaze =[d_gaze diff(fullgaze)];
+        eye_vg = [eye_vg fullvg(1:end-1)'];
+        dvergence=[dvergence diff(fullvg')];
         
         eye=fullvg;
         dEye=diff(eye);
@@ -342,15 +340,15 @@ for i = 1:length(appEpoch)
         %    gaze=hthApp+.5*(rth(appRange)+lth(appRange))'
         dgaze=diff(fullgaze);
         gaze=fullgaze;
-        resetPt=((diff(fullvg'))>8 & (diff(fullgaze))>8)|((diff(fullvg'))<-8 & (diff(fullgaze))<-8);
+        resetPt=((diff(fullvg'))>8 & (diff(fullgaze))>8) | ((diff(fullvg'))<-8 & (diff(fullgaze))<-8);
         stablePt = ((diff(fullgaze))>-7 & (diff(fullgaze))<7) & (dEye<7) & (dEye>-7);
-        headTurnPt =((dEye>--4 & dEye<4) & (dgaze>10|dgaze<-10));
+        headTurnPt =((dEye>-4 & dEye<4) & (dgaze>10|dgaze<-10));
 
         %         subplot(3,1,3);
         %  plot(hthApp+eye,'k','LineWidth',2); hold on;%gaze
         %        plot(gaze,'k','LineWidth',2); hold on;
         
-    %    plot(find(resetPt(appRange)),gaze(resetPt(appRange)),'co')
+          plot(find(resetPt(find(appRange))),gaze(resetPt(find(appRange))),'co')
 %         plot(find(resetPt(appRange)),gaze(resetPt(appRange)),'co','LineWidth',3); hold on;
 %         plot(find(headTurnPt(appRange)),gaze(headTurnPt(appRange)),'ro','LineWidth',.5); hold on;
 %         plot(find(stablePt(appRange)),gaze(stablePt(appRange)),'go','LineWidth',.5); hold on;
