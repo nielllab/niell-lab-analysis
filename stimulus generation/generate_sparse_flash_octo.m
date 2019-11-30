@@ -11,19 +11,23 @@ screenWidthDeg = 2*atan(0.5*screenWidthCm/screenDistanceCm)*180/pi
 degperpix = (screenWidthDeg/screenWidthPix)*MovieMag
 
 
-sz = [ 2 4 8 ];
+% sz = [ 2 4 8 ];
+sz = [ 0.8 2 4 8  ];
 p_flash=0.01;  %%% prob of full-field flash
-density = 0.1;
+%density = 0.1;
+density = 0.075;
+
 
 flash_duration = 0.5;
 MovieRate = 1/flash_duration
 frame_duration = 1/MovieRate;
-total_duration = 600;
+total_duration = 1200;
 flash_frames = total_duration/flash_duration;
 
 for s= 1:length(sz);
     f=fspecial('disk',round(sz(s)/degperpix));
-    f(f>0)=1;
+   f(f>0)=1;
+   
     filt{s}=f;
     area(s) = sum(sum(f));
 end
