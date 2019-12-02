@@ -16,16 +16,14 @@ if exist(psfilename,'file')==2; delete(psfilename);end
 for i= 1:length(Data);
     
     clear R L
-    %%% zero-center eye data (can also edit this to select pixels vs angles from fit
-    R(:,1) = Data(i).XRcent - nanmedian(Data(i).XRcent);
-    R(:,2) = Data(i).YRcent - nanmedian(Data(i).YRcent);
-    L(:,1) = Data(i).XLcent - nanmedian(Data(i).XLcent);
-    L(:,2) = Data(i).YLcent - nanmedian(Data(i).YLcent);
-    
+    %%% zero-center eye data (can also edit this to select pixels vs angles from fit    
     R(:,1) = Data(i).Rtheta - nanmedian(Data(i).Rtheta);
     R(:,2) = Data(i).Rphi - nanmedian(Data(i).Rphi);
     L(:,1) = Data(i).Ltheta - nanmedian(Data(i).Ltheta);
     L(:,2) = Data(i).Lphi - nanmedian(Data(i).Lphi);
+    
+    R = R*Data(i).scaleR/50;
+    L = L*Data(i).scaleL/50;
     
     %%% zero-center head theta, and get rid of wrap-around effect (mod 360)
     th = Data(i).theta;
@@ -46,7 +44,7 @@ for i= 1:length(Data);
     plot(th);
     % plot(R(:,1)); plot(L(:,1));
     plot(gaze_th); plot(div); plot(gaze_phi);
-    title(sprintf('%s %s %s R=%0.2f L=%0.2f',Data(i).ani{1},Data(i).date{1},Data(i).clipnum{1}, Data(i).scaleR,Data(i).scaleL));
+    title(sprintf('%d %s %s %s R=%0.2f L=%0.2f',i,Data(i).ani{1},Data(i).date{1},Data(i).clipnum{1}, Data(i).scaleR,Data(i).scaleL));
     legend('head','eye th','eye div','eye phi');
     ylabel('deg'); xlabel('frames');
     
