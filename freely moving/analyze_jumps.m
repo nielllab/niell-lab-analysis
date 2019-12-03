@@ -61,9 +61,11 @@ for i= 1:length(Data);
     [th_phi(:,i) lags] = nanxcorr(th, gaze_phi,30,'coeff');
     plot(lags,th_phi(:,i)); ylim([-1 1]); title('head theta vs phi');
     title('head theta xcorr');
-   if i ==1, legend('gaze','div','phi');end
+    if i ==1, legend('gaze','div','phi');end; % put legend on first figure only
     
     %%% scatter plots
+    %%% could correct this for using optimal lag from xcorr
+    %%% (seems to be +/- 3 frames typically)
     subplot(2,3,5);
     plot(th, div,'.'); axis square; axis([-40 40 -40 40]); hold on; plot([-40 40],[40 -40],'r:');
     xlabel('head th deg'); ylabel('eye div deg');
