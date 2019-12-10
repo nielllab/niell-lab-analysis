@@ -1,10 +1,10 @@
 close all
 clear L H R
-skip =40; %%% only shows figures at this interval
+skip = 5; %%% only shows figures at this interval
 nthresh  = 60;  %%% threshold for number of approach points to be included in averages
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
-savePDF=1; dbstop if error
+savePDF=0; dbstop if error
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;
@@ -48,7 +48,6 @@ for i = 1:length(appEpoch)
     appT=[appT app];
     nonapp=~appEpoch{i};
     thbins = -60:5:60;
-    
     %figure
     
     lth = Ltheta{vid} - nanmedian(Ltheta{vid});
@@ -184,13 +183,22 @@ for i = 1:length(appEpoch)
     hthnonan(abs(diff(hth))>90)=NaN;
     
     % head, gaze, vergence not separated by approach/non-approach
-    headTh=hthnonan; fullvg=.5*(rth+lth); fullgaze=headTh+fullvg';
+    clear headTh fullvg fullgaze resetPt stablePt headTurnPt
+    headTh=hthnonan; fullvg=.5*(rth+lth)'; fullgaze=headTh+fullvg;
     headTheta=[headTheta headTh(1:end-1)];
     dHeadTh = [dHeadTh diff(headTh)];
     gazeAll = [gazeAll fullgaze(1:end-1)];
     d_gaze =[d_gaze diff(fullgaze)];
-    eye_vg = [eye_vg fullvg(1:end-1)'];
-    dvergence=[dvergence diff(fullvg')];
+    eye_vg = [eye_vg fullvg(1:end-1)];
+    dvergence=[dvergence diff(fullvg)];
+    
+    resetPt=((diff(fullvg))>5 & (diff(fullgaze))>5) | ((diff(fullvg))<-5 & (diff(fullgaze))<-5);
+    stablePt = ((diff(fullgaze))>-5 & (diff(fullgaze))<5) & ((diff(fullvg)<30) & ((diff(fullvg)>-30)));
+
+    headTurnPt =((diff(fullvg)>-2 & diff(fullvg)<2) & ((diff(fullgaze)>10 |(diff(fullgaze)<-10))) & (diff(headTh)>10 | diff(headTh)<-10));
+    reset = [reset resetPt];
+    stable = [stable stablePt];
+    headTurn = [headTurn headTurnPt];
     
 %     dHeadThApp = [dHeadThApp diff(headTh(app(1:end-1)))];
 %     dgazeApp=[dgazeApp diff(fullgaze(app(1:end-1)))];
@@ -215,17 +223,20 @@ for i = 1:length(appEpoch)
     vergAll =[vergAll vg(1:end-1)];
     gzApp = [gzApp gz];
     
-    
     allGz = [allGz, gzFull];
     allVg=[allVg,vgFull];
     allHth=[allHth, hthFull];
     
     %%% calculate change in position at different lags, as measure of stability
-    for lag = 1:20;
-        d_gz(i,lag) = nanmean(abs(gz(1:end-lag) - gz((lag+1):end)));
-        d_hd(i,lag) = nanmean(abs(hthApp(1:end-lag) - hthApp((lag+1):end)));
+%     for lag = 1:20;
+%         d_gz(i,lag) = nanmean(abs(gz(1:end-lag) - gz((lag+1):end)));
+%         d_hd(i,lag) = nanmean(abs(hthApp(1:end-lag) - hthApp((lag+1):end)));
+%     end
+%     
+        for lag = 1:20;
+        d_gz(i,lag) = nanmean(abs(fullgaze(1:end-lag) - fullgaze((lag+1):end)));
+        d_hd(i,lag) = nanmean(abs(headTh(1:end-lag) - headTh((lag+1):end)));
     end
-    
     
     
     if round(i/skip)==i/skip
@@ -303,7 +314,8 @@ for i = 1:length(appEpoch)
         
         subplot(3,1,2);
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on; plot( rth(appRange)','r'); hold on; plot(lth(appRange)','b');
-        ylim([-30 30]);  xlim([0 max(length(appRange),1)]);         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+        ylim([-30 30]);  xlim([0 max(length(appRange),1)]);         
+        plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
         
         subplot(3,1,3);
@@ -324,36 +336,14 @@ for i = 1:length(appEpoch)
         %      xlim([0 max(length(appRange),1)]);
         %         legend('azimuth','speed');
         
-        %  mnEye=0.5*(rth(appRange) +lth(appRange))'
-        
-         headTh=hthnonan; fullvg=.5*(rth+lth); fullgaze=headTh+fullvg';
-    headTheta=[headTheta headTh(1:end-1)];
-    dHeadTh = [dHeadTh diff(headTh)];
-    gazeAll = [gazeAll fullgaze(1:end-1)];
-    d_gaze =[d_gaze diff(fullgaze)];
-    eye_vg = [eye_vg fullvg(1:end-1)'];
-    dvergence=[dvergence diff(fullvg')];
-        
-        
-        
-        eye=fullvg;
-        dEye=diff(eye);
-        dhth=diff(headTh);
-        %    gaze=hthApp+.5*(rth(appRange)+lth(appRange))'
-        dgaze=diff(fullgaze);
-        gaze=fullgaze;
-        resetPt=((diff(fullvg'))>8 & (diff(fullgaze))>8)|((diff(fullvg'))<-8 & (diff(fullgaze))<-8);
-        stablePt = ((diff(fullgaze))>-7 & (diff(fullgaze))<7) & (dEye<7) & (dEye>-7);
-        headTurnPt =((dEye>--4 & dEye<4) & (dgaze>10|dgaze<-10));
 
-        %         subplot(3,1,3);
-        %  plot(hthApp+eye,'k','LineWidth',2); hold on;%gaze
-        %        plot(gaze,'k','LineWidth',2); hold on;
-        
-    %    plot(find(resetPt(appRange)),gaze(resetPt(appRange)),'co')
-%         plot(find(resetPt(appRange)),gaze(resetPt(appRange)),'co','LineWidth',3); hold on;
-%         plot(find(headTurnPt(appRange)),gaze(headTurnPt(appRange)),'ro','LineWidth',.5); hold on;
-%         plot(find(stablePt(appRange)),gaze(stablePt(appRange)),'go','LineWidth',.5); hold on;
+
+      
+
+        appGaze =(hthApp +0.5*( rth(appRange) +lth(appRange))')
+        hold on;plot(find(resetPt(appRange)),appGaze(resetPt(appRange)),'ob');
+        plot(find(stablePt(appRange)),appGaze(stablePt(appRange)),'og')
+        plot(find(headTurnPt(appRange)),appGaze(headTurnPt(appRange)),'or')
         if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
         
         %         legend('gaze','non-comp','eyes still');   
@@ -364,9 +354,6 @@ for i = 1:length(appEpoch)
         %         set(gcf,'Position',[440 100 560 640])
         
         
-%         reset = [reset resetPt];
-%         stable = [stable stablePt];
-%         headTurn = [headTurn headTurnPt];
         
     end
     
@@ -556,32 +543,29 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 
 
-figure
-plot(hdDiff,gzDiff,'.');
-axis equal; axis([-25 25 -25 25]);
-hold on; plot([-25 25],[-25 25],'r')
-xlabel('delta head'); ylabel('delta gaze');
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-figure
-plot(hdDiff,vgDiff,'.');
-axis equal; hold on
-% axis([-20 20 -20 20]);
-plot([-20 20],[20 -20],'r')
-xlabel('delta head'); ylabel('delta theta mean eye');
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% figure
+% plot(hdDiff,gzDiff,'.');
+% axis equal; axis([-25 25 -25 25]);
+% hold on; plot([-25 25],[-25 25],'r')
+% xlabel('delta head'); ylabel('delta gaze');
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+% figure
+% plot(hdDiff,vgDiff,'.');
+% axis equal; hold on
+% % axis([-20 20 -20 20]);
+% plot([-20 20],[20 -20],'r')
+% xlabel('delta head'); ylabel('delta theta mean eye');
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%
 dvg=dvergence;
 dgz=d_gaze;
 dht =dHeadTh;
-% r=((diff(allGz)>8 & diff(allVg)>8) | (diff(allGz)<-8 & diff(allVg)<-8));
-% s=find(diff(allGz)>-5 & diff(allGz)<5 & diff(allVg)<20 & diff(allVg)>-20)
-% ht=find((diff(allVg)<20 & diff(allVg)>-20) & (diff(allGz)<-20 | diff(allGz)>20))
 
-r=(dvg>8 & dgz>8)|(dvg<-8 & dgz<-8);
-s=(dgz>-7) & (dgz<7) & (dvg<7) & (dvg>-7);
-ht=(dvg>-4 & dvg<4) & (dgz>10| dgz<-10);
-figure;plot(dgz,dvg,'.'); hold on; 
+r=reset; s=stable; ht=headTurn; 
+a=sum(r)+sum(s)+sum(ht); 
+figure;plot(randsample(dgz,20000),randsample(dvg,20000),'.'); hold on; 
 axis equal; axis([-40 40 -40 40])
 plot([-90 90],[0 0]);
 plot([-0 0],[-50 50])
@@ -592,13 +576,54 @@ plot(dgz(find(s)),dvg(find(s)),'.g')
 plot(dgz(find(ht)),dvg(find(ht)),'.r')
 axis equal; axis([-40 40 -40 40])
 xlabel('d gaze');ylabel ('d eye theta')
+title('non-approach')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
+figure;plot(randsample(dgz(find(appT)),20000),randsample(dvg(find(appT)),20000),'.'); hold on; 
+plot(dgz(find(appT&r)),dvg(find(appT&r)),'.c')
+plot(dgz(find(appT&s)),dvg(find(appT&s)),'.g')
+plot(dgz(find(appT&ht)),dvg(find(appT&ht)),'.r')
+axis equal; axis([-40 40 -40 40])
+plot([-90 90],[0 0]);
+plot([-0 0],[-50 50])
+plot([-100 100],[-50 50])
+xlabel('d gaze');ylabel ('d eye theta');
+title('approaches')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+%%
+figure;
+subplot(1,2,1)
+plot(randsample(dht,15000),randsample(dvg,15000),'.'); hold on; 
+% plot(dht(find(r)),dvg(find(r)),'.c')
+% plot(dht(find(s)),dvg(find(s)),'.g')
+% plot(dht(find(ht)),dvg(find(ht)),'.r')
+axis equal; axis([-40 40 -40 40])
+% plot([-90 90],[0 0]);
+% plot([-0 0],[-50 50])
+% plot([-100 100],[-50 50])
+xlabel('d head th');ylabel ('d eye theta')
+title('non-approach')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+ % for approaches
+% figure;
+subplot(1,2,2);
+plot(randsample(dht(find(appT)),15000),randsample(dvg(find(appT)),15000),'.'); hold on; 
+% plot(dht(find(appT&r)),dvg(find(appT&r)),'.c')
+% plot(dht(find(appT&s)),dvg(find(appT&s)),'.g')
+% plot(dht(find(appT&ht)),dvg(find(appT&ht)),'.r')
+axis equal; axis([-40 40 -40 40])
+% plot([-90 90],[0 0]);
+% plot([-0 0],[-50 50])
+% plot([-100 100],[-50 50])
+xlabel('d head th');ylabel ('d eye theta');
+title('approaches')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
 figure;plot3(dgz,dvg,dht,'o'); hold on
-plot3(dgz(r),dvg(r),dht(r),'oc');
-plot3(dgz(ht),dvg(ht),dht(ht),'or')
-plot3(dgz(s),dvg(s),dht(s),'og');
+plot3(dgz(find(r)),dvg(find(r)),dht(find(r)),'oc');
+plot3(dgz(find(ht)),dvg(find(ht)),dht(find(ht)),'or')
+plot3(dgz(find(s)),dvg(find(s)),dht(find(s)),'og');
 axis([-90 90 -40 40 -90 90])
 xlabel('d gaze'); ylabel('d eye'); zlabel('d head')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -642,7 +667,8 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 % scatplot(gaze(1:10:end),verg(1:10:end),'circles',5,[],[],1,4); %smaller radius elongates along horizontal axis
 % axis xy
 % xlabel('delta gaze'); ylabel('delta eye theta')
-% axis equal; axis([-90 90 -90 90]);
+% axis equal; 
+% axis([-40 40 -40 40]);
 % title('rad = 10')
 %
 % subplot(3,2,2)
@@ -683,7 +709,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 
 figure
-plot(vergAll,vgDiff,'.');
+plot(eye_vg,dvergence,'.');
 axis equal; axis([-20 20 -20 20])
 xlabel('mean eye theta'); ylabel('delta mean eye theta')
 
@@ -699,10 +725,14 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\azApp\';
-    filen=sprintf('%s','azAppAll_112519_a','.pdf')
+    filen=sprintf('%s','azAppAll_120319_a','.pdf')
     pdfilename=fullfile(pSname,filen)
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
 else
     pFile='T:\PreyCaptureAnalysis\Data\azApp\';
 end
+
+
+afilename=sprintf('AzApp_AllAnimals','.mat');
+save(fullfile(pSname, afilename));

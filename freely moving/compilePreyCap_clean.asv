@@ -1,14 +1,13 @@
 clear all; close all;
 dbstop if error
-load('J462a_ACCSessions_112119.mat'); 
+load('J462a_AllACCSessions_120619_a.mat'); 
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
-savePDF=1;
+savePDF=0;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
 end
-
 
 mouse_xy=[];cricket_xy=[];EllipseParamsR=[];EllipseParamsL=[]; radR=[]; az=[];
 
@@ -43,6 +42,7 @@ for i=1:length(Data)
     cricketV{i,:} = ((Data(i).cricketV)/27)*30; %now cm/sec
     theta{i,:}= rad2deg(Data(i).theta);
     dTheta{i,:}=rad2deg(Data(i).dth);
+    dThetaFilt{i,:}=medfilt1(dTheta{i,:},10);
     range{i,:}= (Data(i).range)/27; %convert pixels to cm
     az = mod(Data(i).az,2*pi); az(az>pi) = az(az>pi)-2*pi;
     azT{i,:,:}= az;
@@ -52,15 +52,21 @@ for i=1:length(Data)
     slip{i,3} = Data(i).difRL;
     goodTheta(i,:) = Data(i).ThetaFract; %from un-interpolated theta
     TSused{i,:}=Data(i).usedTS;
+    thMissing(i)= sum(~isnan(Data(i).theta))/(length(Data(i).theta)); %proportion of non-nans
     
     accelData{i,:} = Data(i).accShift;
+    accelCorr(i) =Data(i).accXcorrMax;
+    accelDrift(i) =Data(i).accXcorrLag;
+    accelDataRaw{i,:}= Data(i).rawAccShift
 
     EllipseParamsR{i,1,1} = Data(i).EllipseParamsR;
     EllipseParamsL{i,1,1} = Data(i).EllipseParamsL;
-    thetaR{i,:} =Data(i).Rtheta;
+    thetaR{i,:} = Data(i).Rtheta;
     thetaL{i,:} =Data(i).Ltheta;
     phiR{i,:} =Data(i).Rphi;
     phiL{i,:} =Data(i).Lphi;
+    rMissing(i)=sum(~isnan(Data(i).Rtheta))/(length(Data(i).Rtheta)); %proportion of non-nans
+    lMissing(i)=sum(~isnan(Data(i).Ltheta))/(length(Data(i).Ltheta));
     
     dthetaR{i,:} =(Data(i).dxRTheta);
     dthetaL{i,:} =(Data(i).dxLTheta);
@@ -79,7 +85,7 @@ for i=1:length(Data)
     LRad{i,:}=Data(i).LRad;
     
     goodR{i,:}=Data(i).goodReye; %1=all 8pts above likelihood .95
-    Rngood{i,:}=Data(i).ngoodR; %num good DLC pts
+    Rngood{i,:}=Data(i).ngoodR; % num good DLC pts
     Rcc(i)=Data(i).RcalR;
     Rslope(i)=Data(i).RcalM;
     Rscale(i)=Data(i).scaleR;
@@ -104,13 +110,13 @@ end
 % 
 % tsData= cell2mat(tsData)
 % delayFull=cell2mat(slip);
-goodR=Rcc>.3
-goodL=Lcc>.3
+goodR= Rcc>.3 & rMissing>.75;
+goodL=Lcc>.3 & lMissing>.75;
 % useL = (delayFull(:,2)<=3 & delayFull(:,2)>=-3);
 % useR = (delayFull(:,1)<=3 & delayFull(:,1)>=-3);
 % useE = (delayFull(:,3)<=3 & delayFull(:,3)>=-3);
 
-useTime = goodTheta>=.7% & goodR & goodL %tsData==1; %|(useL & useR)
+useTime = goodTheta>=.9 & goodR' & goodL' & thMissing'>.90; %tsData==1; %|(useL & useR)
 useFilt=find(useTime); %useFilt=useFilt(1:4,6:end);
 
  rownum=10 ; colnum=8; 
@@ -153,20 +159,204 @@ xlabel('L corrcoef');ylabel('L Scale');
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
-for ch=1%:6
-figure('units','normalized','outerposition',[0 0 1 1])
-        set(gcf,'Name', 'hist saline');
+allTilt=[];allRoll=[];allYaw=[]; dlcVerg=[];dlcDverg=[];allGyro1=[];allGyro2=[];allGyro3=[];
+dlcDverg=[]; dlcDphi=[]; dlcPhi=[];dlcDhth=[];dlcHth=[];
 
 for vid = 1:length(useFilt)
-    subplot(3,4,vid);
-    plot((accelData{vid}(:,ch))*20); hold on; axis square
-if ch==1
+%     figure('units','normalized','outerposition',[0 0 1 1])
+    tilt = accelData{useFilt(vid)}(:,2);
+    tiltFilt = medfilt1(tilt,10);
+    roll = accelData{useFilt(vid)}(:,1);
+    rollFilt = medfilt1(roll,5);
+    yaw = accelData{useFilt(vid)}(:,3);
+    yawFilt = medfilt1(yaw,10);
+    verg=(thetaR{useFilt(vid)}-thetaL{useFilt(vid)});
+    dverg=(dthetaR{useFilt(vid)}-dthetaL{useFilt(vid)});
+    gyro1=(accelData{useFilt(vid)}(:,4));
+    gyro2=(accelData{useFilt(vid)}(:,5));
+    gyro3=(accelData{useFilt(vid)}(:,6));
+    phi=(phiR{useFilt(vid)}-phiL{useFilt(vid)}); phi=phi-nanmean(phi);
+    dphi=(dphiR{useFilt(vid)}-dphiL{useFilt(vid)});dphi=dphi-nanmean(dphi);
+    hth=theta{useFilt(vid)}; hth=hth-nanmean(hth);
+    dhth=dTheta{useFilt(vid)};dhth=dhth-nanmean(dhth);
+    
+    subplot(4,3,1)
+    plot(rollFilt); hold on; axis square;
     plot((phiR{useFilt(vid)}-phiL{useFilt(vid)}));
-else
+    title('acc 1 - roll, phi')
+    subplot(4,3,2)
+    plot(tiltFilt); hold on; axis square;plot(verg);
+    title('acc 2 - tilt, vg')
+    subplot(4,3,3)
+    plot(yawFilt); hold on; axis square; plot(verg);
+    title('acc 3 - yaw, vg')
+    subplot(4,3,4)
+    plot(gyro1); hold on; axis square; plot(verg);
+    title('gyro 1, vg')
+    subplot(4,3,5)
+    plot(gyro2); hold on; axis square; plot(dphi);
+    title('gyro 2, dPhi')
+    subplot(4,3,6)
+    plot(gyro3); hold on; axis square
+    plot(dhth); title('gyro 3, dHead Th')
+    subplot(4,3,7);
+    plot(-30:30,nanxcorr(rollFilt,phi,30,'coeff'))
+    title('roll, phi diff');ylim([-1 1]);
+    subplot(4,3,8);
+    plot(-30:30,nanxcorr(tiltFilt,verg,30,'coeff'))
+    title('tilt, vergence');ylim([-1 1]);
+    subplot(4,3,9);
+    plot(-30:30,nanxcorr(yawFilt,verg,30,'coeff'))
+    title('yaw, vergence');ylim([-1 1]);
+    subplot(4,3,10)
+    plot(-30:30,nanxcorr(gyro1(1:end-1),dverg,30,'coeff'))
+    title('gyro 1, dVg');ylim([-1 1]);
+    subplot(4,3,11)
+    plot(-30:30,nanxcorr(gyro2(1:end-1),dphi,30,'coeff'))
+    title('gyro 2, dPhi eyes');ylim([-1 1]);
+    subplot(4,3,12)
+    plot(-30:30,nanxcorr(gyro3,dhth,30,'coeff'))
+    title('gyro 3, dHead th');ylim([-1 1]);
+    
+    allTilt=[allTilt tiltFilt(1:end-1)'];
+    allRoll=[allRoll rollFilt(1:end-1)'];
+    allYaw=[allYaw yawFilt(1:end-1)'];
+    dlcVerg=[dlcVerg verg(1:end-1)'];
+    dlcDverg=[dlcDverg dverg'];
+    allGyro1=[allGyro1 gyro1(1:end-1)'];
+    allGyro2=[allGyro2 gyro2(1:end-1)'];
+    allGyro3=[allGyro3 gyro3(1:end-1)'];
+    dlcPhi=[dlcPhi phi(1:end-1)'];
+    dlcDphi=[dlcDphi dphi'];
+    dlcHth=[dlcHth hth(1:end-1)];
+    dlcDhth=[dlcDhth dhth(1:end-1)'];
+             if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
-%     suptitle(sprintf('ch = %d',ch));
+%%
+figure
+plot(allTilt,dlcVerg,'.'); axis equal; hold on; lsline
+mdl = fitlm(allTilt,dlcVerg)
+axis([-90 90 -90 90]);
+xlabel('acc pitch'); ylabel('vergence')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
+figure
+plot(allRoll,dlcPhi,'.'); axis equal; hold on; lsline
+axis([-90 90 -90 90]);
+xlabel('acc roll'); ylabel('eye phi')
+mdl = fitlm(allRoll,dlcPhi)
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+%%
+figure
+subplot(2,3,1)
+plot(allRoll,dlcPhi,'.'); axis equal; hold on; lsline
+xlabel('acc roll'); ylabel('eye phi');
+ylim([-90 90]); xlim([-90 90]);
+R=corrcoef(allRoll, dlcPhi,'Rows','pairwise')
+text(-80,80, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
+title('acc ch 1');
+
+subplot(2,3,2)
+plot(allTilt,dlcVerg,'.'); axis equal; hold on; lsline
+xlabel('acc tilt'); ylabel('eye vergence');
+ylim([-90 90]); xlim([-90 90]);
+R=corrcoef(allTilt, dlcVerg,'Rows','pairwise')
+text(-80,80, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
+title('acc ch 2');
+
+subplot(2,3,3)
+plot(allYaw,dlcVerg,'.'); axis equal; hold on; lsline
+xlabel('acc yaw'); ylabel('eye verg');
+ylim([-90 90]); xlim([-90 90]);
+R=corrcoef(allYaw, dlcVerg,'Rows','pairwise')
+text(-80,80, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
+title('acc ch 3');
+
+subplot(2,3,4)
+plot(allGyro1,dlcDverg,'.');axis equal; hold on; lsline %dlcVerg
+xlabel('gyro 1'); ylabel('eye verg');
+ylim([-30 30]); xlim([-30 30]);
+R=corrcoef(allGyro1, dlcDverg,'Rows','pairwise')
+text(-25,25, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
+title('gyro ch 1')
+
+subplot(2,3,5)
+plot(allGyro2,dlcDphi,'.');axis equal; hold on; lsline
+xlabel('gyro 2'); ylabel('d phi');
+ylim([-50 50]); xlim([-50 50]);
+R=corrcoef(allGyro2, dlcDphi,'Rows','pairwise')
+text(-40,40, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
+title('gyro ch 2')
+
+subplot(2,3,6)
+plot(allGyro3,dlcDhth,'.');axis equal; hold on; lsline
+xlabel('gyro 3'); ylabel('d head theta');
+ylim([-90 90]); xlim([-90 90]);
+R=corrcoef(allGyro3, dlcDhth,'Rows','pairwise')
+text(-80,80, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
+title('gyro ch 3')
+
+R=corrcoef(allGyro3(test==0), dlcDhth(test==0),'Rows','pairwise')
+
+test=allGyro3>-5& allGyro3<5  & (dlcDhth>15|dlcDhth<-15);
+plot(allGyro3(test),dlcDhth(test),'.')
+RS=corrcoef(allGyro3(test==0), dlcDhth(test==0),'Rows','pairwise')
+text(-80,70, ['corrcoef = ' num2str(RS(1,2),'%.2f')],'FontSize',10)
+
+
+figure
+for vid = 1:length(useFilt)
+subplot(5,5,vid)
+plot(dTheta{useFilt(vid)});
+hold on; 
+plot(accelData{useFilt(vid)}(:,6));
+test=accelData{useFilt(vid)}(:,6)>-5& accelData{useFilt(vid)}(:,6)<5  & ((dTheta{useFilt(vid)})>15 |(dTheta{useFilt(vid)})<-15);
+plot(find(test),dTheta{useFilt(vid)}(test==1),'og')
 end
-end
+
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+%%
+figure
+subplot(2,3,1)
+[corr lags]=(nanxcorr(allRoll,dlcPhi,30,'coeff')); 
+plot(lags,corr);axis square
+title('acc roll, phi');
+ylim([-1 1]);
+
+subplot(2,3,2)
+[corr lags]=(nanxcorr(allTilt,dlcVerg,30,'coeff')); 
+plot(lags,corr)
+axis square;ylim([-1 1]);
+title('acc tilt, vergence');
+
+subplot(2,3,3)
+[corr lags]=(nanxcorr(allYaw,dlcVerg,30,'coeff')); 
+plot(lags, corr)
+axis square;ylim([-1 1]);
+title('acc yaw, vergence');
+
+subplot(2,3,4)
+[corr lags]=(nanxcorr(allGyro1,dlcDverg,30,'coeff'));
+plot(lags, corr)
+axis square;ylim([-1 1]);
+title('gyro1, d vergence');
+
+subplot(2,3,5)
+[corr lags]=(nanxcorr(allGyro2,dlcDphi,30,'coeff'));
+plot(lags, corr)
+axis square;ylim([-1 1]);
+title('gyro2, d phi');
+
+subplot(2,3,6)
+[corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),30,'coeff'));
+plot(lags, corr)
+axis square;ylim([-1 1]);
+title('gyro ch 3,d head')
+
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 %%
 % figure('units','normalized','outerposition',[0 0 1 1])
 % for vid = 1:length(useFilt)
@@ -204,9 +394,9 @@ end
 %    % filtApp(vid,:)=sum(appEpoch{vid})
 % %   plot(d2cr(mouseV{useFilt(vid)}>5),'g');
 % end
-% 
 
-%%% identify approach!!!
+
+%% identify approach!!!
 
 for vid=1:length(useFilt)
 deltaR = diff(range{useFilt(vid)})*30;
@@ -1336,7 +1526,7 @@ end
 %%
     pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Analyzed_110619_allSessions','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_120619','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1344,5 +1534,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_110619_allSessions','.mat')
+afilename=sprintf('%s',ani,'Analyzed_120619_allSessions_b','.mat');
 save(fullfile(pSname, afilename))
