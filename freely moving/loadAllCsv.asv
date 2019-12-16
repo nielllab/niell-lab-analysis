@@ -45,16 +45,16 @@ for j=1:length(fileList)
     Data(j).Data = csvread(fname,3,0);
     %Rfname = strrep(fname,'Top','Eye1r');
     Rfname = strrep(fname,'Top','Eye');
-        Rfname = strrep(Rfname,'DeepCut','_DeInterDeepCut');
+    %     Rfname = strrep(Rfname,'DeepCut','_DeInterDeepCut');
     Rfname = strrep(Rfname,'top','eye1r');
     % Rfname = strrep(Rfname,'900000','1030000');
     Rfname = strrep(Rfname,'Aug15','Jul12');
     %   Lfname = strrep(Rfname,'Eye1r','Eye2l');
     Lfname = strrep(Rfname,'eye1r','eye2l');
     Data(j).DataR = (csvread(Rfname,3,0))
-        Data(j).DataR=downsamplebin(Data(j).DataR,1,2,1)
+    %     Data(j).DataR=downsamplebin(Data(j).DataR,1,2,1)
     Data(j).DataL=(csvread(Lfname,3,0));
-        Data(j).DataL=downsamplebin(Data(j).DataL,1,2,1)
+    %     Data(j).DataL=downsamplebin(Data(j).DataL,1,2,1)
     
     
     Data(j).difTR = length(Data(j).Data)-length(Data(j).DataR)
@@ -254,7 +254,7 @@ for j=1:length(fileList)
     if savePDF
         pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
         C={ani, date, sessionnum, clipnum};
-        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'deinterlaced','.pdf')
+        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'original','.pdf')
         pdfilename=fullfile(pSname,filen)
         dos(['ps2pdf ' psfilename ' ' pdfilename]);
         delete(psfilename);
@@ -266,7 +266,7 @@ for j=1:length(fileList)
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
- afilename=sprintf('%s',ani,'_deInterTest_DEINTERLACED_121019','.mat')
+ afilename=sprintf('%s',ani,'_deInterTest_ORIGINAL_121019','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))

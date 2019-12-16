@@ -1,7 +1,7 @@
 clear all; close all;
 dbstop if error
 % load('J462a_AllACCSessions_120619_a.mat');
-load('J462a_ACCSessions_120919_b.mat');
+load('J462a_ACCSessions_from110819_121419_c.mat');
 
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
@@ -168,9 +168,9 @@ for vid = 1:length(useFilt)
      figure('units','normalized','outerposition',[0 0 1 1])
     tilt = (accelData{useFilt(vid)}(:,2));
     tiltFilt = medfilt1(tilt,10);
-    roll = accelData{useFilt(vid)}(:,1);
+    roll = (accelData{useFilt(vid)}(:,1));
     rollFilt = medfilt1(roll,5);
-    yaw = accelData{useFilt(vid)}(:,3);
+    yaw = (accelData{useFilt(vid)}(:,3));
     yawFilt = medfilt1(yaw,10);
     verg=(thetaR{useFilt(vid)}-thetaL{useFilt(vid)});
     dverg=(dthetaR{useFilt(vid)}-dthetaL{useFilt(vid)});

@@ -5,7 +5,7 @@ skip = 5; %%% only shows figures at this interval
 nthresh  = 60;  %%% threshold for number of approach points to be included in averages
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
-savePDF=1; dbstop if error
+savePDF=0; dbstop if error
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;
@@ -646,16 +646,9 @@ xlabel('d gaze');ylabel ('d eye theta');
 title('approaches')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
-
-pts = randsample(1:length(dht),20000);
-head = dht(pts); eyes = dEye(pts);
-
-he=[dht+dEye;dht-dEye];
-
-
+he=[dht;dEye];
 % gm = fitgmdist(he',6);
 gm = fitgmdist(he',5);
-he=[head+eyes;head - eyes];
 idx = cluster(gm,he')
 X=he;
 
@@ -825,5 +818,5 @@ else
 end
 
 
-afilename=sprintf('AzApp_AllAnimals_121219_a','.mat');
+afilename=sprintf('AzApp_AllAnimals','.mat');
 save(fullfile(pSname, afilename));
