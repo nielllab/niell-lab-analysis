@@ -1,0 +1,46 @@
+function data = getAcc(accname,psfilename)
+filterWin = 5; %%% timepoints to median filter over for acceleration
+
+data=dlmread(accname)
+
+accTs = data(:,1); %timestamps
+accTs = mod(accTs-8*60*60,24*60*60); %%% time is elapsed secs since midnight 1904 GMT; subtract 8 hrs to get local time (but what about daylight savings change!)
+
+figure
+plot(diff(accTs))
+ylabel('secs'); title(sprintf('diff of acc timestamps; median = %0.3f',median(diff(accTs))));
+if exist('psfilename','var')
+    savePDF=1;
+end
+
+rawAcc=data(:,2:7);
+filtAcc = (medfilt1(rawAcc(:,1:3),filterWin)-2.5)*1.6; %  acc ch conversion and filtering
+filtAcc(filtAcc>1)=1; filtAcc(filtAcc<-1)=-1;
+acc = asind(filtAcc);
+
+% good = abs(acc)<1;
+% 
+% acc(good) = real(acc(good));
+% acc(~good) = NaN;
+acc(:,2)=-acc(:,2); %flip sign of channel 2 & 3
+acc(:,3)=-acc(:,3); %flip sign of channel 2 & 3
+% gyro = ((data(:,5:7))-2.5)*400*(pi/180); % convert voltage from gyro channels to degrees
+gyro = (data(:,5:7)-2.5)*12.5; %convert voltage from gyro channels to degrees
+
+%%% get data (columns 2-7)
+
+figure
+plot(accTs-accTs(1),acc);
+plot(accTs-accTs(1),gyro);
+xlabel('secs'); ylim([0 5]);
+
+if exist('psfilename','var')
+    savePDF=1;
+    
+clear data
+data.accTrace(:,1:3) = acc;
+data.accTrace(:,4:6) = gyro;
+data.accTs = accTs;
+data.rawAcc=rawAcc;
+
+end

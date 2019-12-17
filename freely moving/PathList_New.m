@@ -56,10 +56,10 @@ pname={'T:\PreyCaptureNew\Cohort3\J463c(blue)\081419\Approach\';
 %% J463d(green) %male very bad tracking, not worth it
 % pname={'T:\PreyCaptureNew\Cohort3\J463d(green)\082119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463d(green)\081919\Approach\';
-pname={'T:\PreyCaptureNew\Cohort3\J463d(green)\081419\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463d(green)\081219\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463d(green)\080819\Approach\';
-    'T:\PreyCaptureNew\Cohort3\J463d(green)\080519\Approach\'};
+% pname={'T:\PreyCaptureNew\Cohort3\J463d(green)\081419\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463d(green)\081219\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463d(green)\080819\Approach\';
+%     'T:\PreyCaptureNew\Cohort3\J463d(green)\080519\Approach\'};
 
 %% J465d(black) %male %DLC 09/01 %redo 090519, new cricket
 %redo 11/4/19
@@ -71,10 +71,10 @@ pname={'T:\PreyCaptureNew\Cohort4\J465d(black)\081919\Approach\';
 %% J475c(green) %male % redo 090519, data look awful - go through eye videos individually to make sure all are tracking
 %redo, 090319, new cricket
 %redo 11/4/19
-pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\082319\Approach\';
-    'T:\PreyCaptureNew\Cohort4\J475c(green)\081519\Approach\';
-    'T:\PreyCaptureNew\Cohort4\J475c(green)\081219\Approach\';
-    'T:\PreyCaptureNew\Cohort4\J475c(green)\072919\Approach\'};
+% pname={'T:\PreyCaptureNew\Cohort4\J475c(green)\082319\Approach\';
+%     'T:\PreyCaptureNew\Cohort4\J475c(green)\081519\Approach\';
+%     'T:\PreyCaptureNew\Cohort4\J475c(green)\081219\Approach\';
+%     'T:\PreyCaptureNew\Cohort4\J475c(green)\072919\Approach\'};
 % 'T:\PreyCaptureNew\Cohort4\J475c(green)\080719\Approach\';
 
 %% J470a(blue) %female
@@ -98,8 +98,8 @@ pname={'T:\PreyCaptureNew\Cohort4\J470b (pink)\082319\Approach\';
 %% J470c(white) %female
  % only 4 videos from 3 sessions with decent eyes - not worth it
 % pname={'T:\PreyCaptureNew\Cohort4\J470c (white)\082319\Approach\';
-pname={'T:\PreyCaptureNew\Cohort4\J470c (white)\082019\Approach\';
-    'T:\PreyCaptureNew\Cohort4\J470c (white)\081619\Approach\'
-    'T:\PreyCaptureNew\Cohort4\J470c (white)\081319\Approach\'};
+% pname={'T:\PreyCaptureNew\Cohort4\J470c (white)\082019\Approach\';
+%     'T:\PreyCaptureNew\Cohort4\J470c (white)\081619\Approach\'
+%     'T:\PreyCaptureNew\Cohort4\J470c (white)\081319\Approach\'};
 %     'T:\PreyCaptureNew\Cohort4\J470c (white)\080919\Approach\'};
 
