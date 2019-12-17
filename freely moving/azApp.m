@@ -28,140 +28,82 @@ reset=[];
 stable=[];
 headTurn=[];
 
-headTheta=[];
-dHeadTh = []
+hthAll=[];
+dthAll = []
 gazeAll = [];
-d_gaze =[]
-eye_vg = [];
-dvergence=[];
+dgazeAll =[]
+vergAll = [];
+dvergAll=[];
 
 dHeadThApp = [];
 dgazeApp=[];
 d_vgApp=[];
-avgEye=[];
-dEye=[];
+mnEyeAll=[];
+dEyeAll=[];
 
 appT=[];
 
+maxlag = 30;
+thbins = -60:5:60;
+
 for i = 1:length(appEpoch)
+   
     vid = useData(i)
     
-    azdeg = az{vid}*180/pi;
+    %%% get approaches
     app = appEpoch{i};
     appT=[appT app];
     nonapp=~appEpoch{i};
-    thbins = -60:5:60;
-    %figure
     
+    %%% get left eye positions
     lth = Ltheta{vid} - nanmedian(Ltheta{vid});
+    dlth = dLtheta{vid};
     nl(i) = sum(~isnan(lth(app))); %%% # good eye approach points
     lthHist(:,1,i) = hist(lth(app),thbins)/nl(i);
     lthHist(:,2,i) = hist(lth(~app),thbins)/sum(~isnan(lth(~app)));
-    %     subplot(2,3,1)
-    %     plot(thbins,lthHist(:,:,i)); ylim([0 0.5]); legend('app','non-app'); title('left')
-    %     title(sprintf('left %d pts app',sum(~isnan(lth(app)))))
     if nl(i)<nthresh
         lthHist(:,:,i) = NaN;
-    end
+    end  
     
-    maxlag = 30;
-    
+    %%% get right eye positions
     rth = Rtheta{vid} - nanmedian(Rtheta{vid});
+    drth = dRtheta{vid};
     nr(i) =sum(~isnan(lth(app))); %%% # good eye approach points
     rthHist(:,1,i) = hist(rth(app),thbins)/nr(i);
     rthHist(:,2,i) = hist(rth(~app),thbins)/sum(~isnan(rth(~app)));
-    %     subplot(2,3,2)
-    %     plot(thbins,rthHist(:,:,i)); ylim([0 0.5]); legend('app','non-app');
-    %     title(sprintf('right %d pts app',sum(~isnan(rth(app)))))
-    %
     if nr(i)<nthresh
         rthHist(:,:,i) = NaN;
     end
-    
-    %     if  nl(i)>nthresh
-    %     lthAz_xc(:,i) = nanxcorr(azdeg(app),lth(app),maxlag,'zero');
-    %     %     subplot(2,3,4)
-    %     %     plot(-maxlag:maxlag,lthAz_xc(:,i)); ylim([-0.5 0.5])
-    %     else
-    %         lthAz_xc(:,i) = NaN;
-    %     end
-    
-    %     %%% interp across missing data if needed
-    %     lth = interp1(find(~isnan(lth)),lth(~isnan(lth)),1:length(lth))';
-    %     rth = interp1(find(~isnan(rth)),rth(~isnan(rth)),1:length(rth))';
-    
-    %     if nr(i)>nthresh
-    %     rthAz_xc(:,i) = nanxcorr(azdeg(app),rth(app),maxlag,'zero');
-    %     %     subplot(2,3,5)
-    %     %     plot(-maxlag:maxlag,rthAz_xc(:,i));  ylim([-0.5 0.5])
-    %     else
-    %         rthAz_xc(:,i) = NaN;
-    %     end
-    
-    %%% close all figs except on interval of skip
-    
-    
+
+    %%% get head positions
     hth = thetaHead{vid};
     dth = d_Theta{vid};
-    n(i) = sum(~isnan(azdeg(app)) & ~isnan(dth(app))');
-    %     if n(i)>0
-    %     dheadAz_xc(:,1,i) =nanxcorr(azdeg(app),dth(app),maxlag,'zero');
-    %     dheadAz_xc(:,2,i) =nanxcorr(azdeg(~app),dth(~app),maxlag,'zero');
-    %     else
-    %         dheadAz_xc(:,1,i)=NaN;
-    %         dheadAz_xc(:,2,i)=NaN;
-    %     end
-    %      subplot(2,3,6)
-    %          plot(-maxlag:maxlag,dheadAz_xc(:,:,i)); axis([-maxlag maxlag -0.5 0.5]);
-    %         title(sprintf('az vs dhead %d pts',n(i)))
+    azdeg = az{vid}*180/pi;
     
-    
+    %%% azimuth vs eye histograms 
     az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
-    
-    
     n= sum(~isnan(azdeg(app)) & ~isnan(lth(app)'));
-    azthL_hist(:,1,i) = hist(-azdeg(app)-lth(app)',thbins)/n;
-    
+    azthL_hist(:,1,i) = hist(-azdeg(app)-lth(app)',thbins)/n;  
     n= sum(~isnan(azdeg(app)) & ~isnan(rth(app)'));
     azthR_hist(:,1,i) = hist(-azdeg(app)-rth(app)',thbins)/n;
-    %
-    %      subplot(2,3,3)
-    %     plot(thbins,az_hist(:,1,i),'b'); hold on
-    %      plot(thbins,azthL_hist(:,1,i),'r');
-    %      plot(thbins,azthR_hist(:,1,i),'g');
-    
-    
-    %%% close all figs except on interval of skip
-    % if round(i/skip)~=i/skip, close(gcf),  end
-    
+
     %%% alignment of eyes during approaches
     %%% vergence is cool! it gets very tight around 0 during approaches
-    drth = dRtheta{vid};
-    dlth = dLtheta{vid};
-    
     vergence = rth-lth;
     n= sum(~isnan(vergence(app)));
     vergeHist(:,1,i) = hist(vergence(app),thbins)/n;
     vergeHist(:,2,i) = hist(vergence(~app),thbins)/sum(~isnan(vergence(~app)));
-    %         subplot(2,3,6)
-    %         plot(thbins,vergeHist(:,:,i))
+
+    %%% mean eye theta is most important for stabilization
+    mnEyeTh = 0.5*(rth+lth);  
+    n= sum(~isnan(azdeg(app)) & ~isnan(mnEyeTh(app)'));
+    azthRL_hist(:,1,i) = hist(-azdeg(app)-mnEyeTh(app)',thbins)/n;
+
+    %%% gaze is the sum of head position + mean eye position
+    %%% key variable!!!
+    gaze = hth + mnEyeTh;
     
-    az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
-    gz = 0.5*(rth+lth);
-    
-    n= sum(~isnan(azdeg(app)) & ~isnan(gz(app)'));
-    azthRL_hist(:,1,i) = hist(-azdeg(app)-gz(app)',thbins)/n;
-    %
-    %        figure
-    %        subplot(2,2,1)
-    %
-    %     plot(-azdeg(app),gz(app),'.')
-    %     axis square ; axis([-45 45 -45 45])
-    %
-    %     subplot(2,2,2)
-    %             plot(thbins,az_hist(:,1,i),'k'); hold on
-    %          plot(thbins,azthRL_hist(:,1,i),'g');
-    
+    %%% find the longest approach, to use as example image
     appPts = find(app);
     newApp = [1 find(diff(appPts)>1)+1];
     endApp = [find(diff(appPts)>1)-1 length(appPts)];
@@ -172,8 +114,7 @@ for i = 1:length(appEpoch)
     %%% add 2 secs on either side
     try
         appStart = max(appPts(newApp(longest))-60,1); appOffset = appPts(newApp(longest))-appStart;
-        appEnd = min(appPts(endApp(longest))+60,length(app)); endOffset = appPts(endApp(longest))-appStart;
-        
+        appEnd = min(appPts(endApp(longest))+60,length(app)); endOffset = appPts(endApp(longest))-appStart;       
         appRange = appStart  : appEnd;
     catch
         appRange = appPts(newApp(longest)  : endApp(longest));
@@ -186,28 +127,27 @@ for i = 1:length(appEpoch)
     hthnonan(abs(diff(hth))>90)=NaN;
     
     % head, gaze, vergence not separated by approach/non-approach
-    clear headTh fullvg fullgaze resetPt stablePt headTurnPt mnEye
-    headTh=hthnonan; fullvg=(rth-lth)'; fullgaze=headTh+fullvg; mnEye=.5*(rth+lth)';
-    headTheta=[headTheta headTh(1:end-1)];
-    dHeadTh = [dHeadTh diff(headTh)];
-    gazeAll = [gazeAll fullgaze(1:end-1)];
-    d_gaze =[d_gaze diff(fullgaze)];
-    eye_vg = [eye_vg fullvg(1:end-1)];
-    dvergence=[dvergence diff(fullvg)];
-    avgEye=[avgEye mnEye(1:end-1)];
-    dEye=[dEye diff(mnEye)];
-          
-%     he=[diff(headTh);diff(mnEye)];
-%     % gm = fitgmdist(he',6);
-%     gm = fitgmdist(he',5);
-%     idx = cluster(gm,he')
-%     X=he;
-%     
-%     figure;
-%     gscatter(X(1,:),X(2,:),idx);
-%     legend('Cluster 1','Cluster 2','Cluster 3','Cluster 4','Cluster 5','Location','best');
-%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-%     
+
+    hthAll=[hthAll hth(1:end-1)];
+    dthAll = [dthAll dth];
+    gazeAll = [gazeAll gaze(1:end-1)];
+    dgazeAll =[dgazeAll diff(gaze)];
+    vergAll = [vergAll vergence(1:end-1)];
+    dvergAll=[dvergAll diff(fullvg)];
+    mnEyeAll=[mnEyeAll mnEyeTh(1:end-1)];
+    dEyeAll=[dEyeAll diff(mnEyeTh)];
+    
+    %     he=[diff(headTh);diff(mnEye)];
+    %     % gm = fitgmdist(he',6);
+    %     gm = fitgmdist(he',5);
+    %     idx = cluster(gm,he')
+    %     X=he;
+    %
+    %     figure;
+    %     gscatter(X(1,:),X(2,:),idx);
+    %     legend('Cluster 1','Cluster 2','Cluster 3','Cluster 4','Cluster 5','Location','best');
+    %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    %
     %     resetPt=((diff(mnEye))>5 & (diff(fullgaze))>5) | ((diff(mnEye))<-5 & (diff(fullgaze))<-5);
     %     stablePt=idx==1|idx==2
     stablePt = ((diff(fullgaze))>-5 & (diff(fullgaze))<5) & ((diff(mnEye)<30) & ((diff(mnEye)>-30)));
@@ -219,7 +159,7 @@ for i = 1:length(appEpoch)
     stable = [stable stablePt];
     headTurn = [headTurn headTurnPt];
     
-
+    
     
     
     %     dHeadThApp = [dHeadThApp diff(headTh(app(1:end-1)))];
@@ -549,37 +489,37 @@ xlabel('deg')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
 figure;
-plot(dHeadTh,dvergence,'.')
-hold on; plot(dHeadTh(find(appT)),dvergence(find(appT)),'.g')
+plot(dthAll,dvergAll,'.')
+hold on; plot(dthAll(find(appT)),dvergAll(find(appT)),'.g')
 xlabel('d head yaw'); ylabel('d vergence'); axis equal;axis([-40 40 -40 40])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-p=dHeadTh>0 & dEye<0;
+p=dthAll>0 & dEyeAll<0;
 
 figure
-plot(dHeadTh,dEye,'.'); hold on
-plot(dHeadTh(find(p)),dEye(find(p)),'.'); hold on
-plot(dHeadTh(find(appT)),dEye(find(appT)),'.g');
+plot(dthAll,dEyeAll,'.'); hold on
+plot(dthAll(find(p)),dEyeAll(find(p)),'.'); hold on
+plot(dthAll(find(appT)),dEyeAll(find(appT)),'.g');
 xlabel('d head yaw'); ylabel('d mn eye th'); axis equal; axis([-40 40 -40 40])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 
 figure
-plot(d_gaze,dvergence,'.'); hold on
-plot(d_gaze(find(appT)),dvergence(find(appT)),'.g');
+plot(dgazeAll,dvergAll,'.'); hold on
+plot(dgazeAll(find(appT)),dvergAll(find(appT)),'.g');
 xlabel('d gaze'); ylabel('d vergence'); axis equal; axis([-40 40 -40 40])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 figure
-plot(d_gaze,dEye,'.'); hold on
-plot(d_gaze(find(appT)),dEye(find(appT)),'.g');
+plot(dgazeAll,dEyeAll,'.'); hold on
+plot(dgazeAll(find(appT)),dEyeAll(find(appT)),'.g');
 xlabel('d gaze');  ylabel('d mn eye th'); axis equal; axis([-40 40 -40 40])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 figure
-plot(dEye+dHeadTh,dEye-dHeadTh,'.'); hold on; axis equal; axis([-90 90 -90 90])
-plot(dEye(find(appT)) +dHeadTh(find(appT)) ,dEye(find(appT))-dHeadTh(find(appT)),'.g');
+plot(dEyeAll+dthAll,dEyeAll-dthAll,'.'); hold on; axis equal; axis([-90 90 -90 90])
+plot(dEyeAll(find(appT)) +dthAll(find(appT)) ,dEyeAll(find(appT))-dthAll(find(appT)),'.g');
 xlabel('eye + head');  ylabel('eye - head');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
@@ -602,23 +542,23 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%
-dvg=dvergence;
-dgz=d_gaze;
-dht =dHeadTh;
+dvg=dvergAll;
+dgz=dgazeAll;
+dht =dthAll;
 
 
 r=reset; s=stable; ht=headTurn;
 figure
-plot(dht,dEye,'.'); hold on; axis square
-plot(dht(find(r)),dEye(find(r)),'.c')
-plot(dht(find(s)),dEye(find(s)),'.g')
-plot(dht(find(ht)),dEye(find(ht)),'.r')
+plot(dht,dEyeAll,'.'); hold on; axis square
+plot(dht(find(r)),dEyeAll(find(r)),'.c')
+plot(dht(find(s)),dEyeAll(find(s)),'.g')
+plot(dht(find(ht)),dEyeAll(find(ht)),'.r')
 
 figure
-plot(dgz,dEye,'.'); hold on; axis square
-plot(dgz(find(r)),dEye(find(r)),'.c')
-plot(dgz(find(s)),dEye(find(s)),'.g')
-plot(dgz(find(ht)),dEye(find(ht)),'.r')
+plot(dgz,dEyeAll,'.'); hold on; axis square
+plot(dgz(find(r)),dEyeAll(find(r)),'.c')
+plot(dgz(find(s)),dEyeAll(find(s)),'.g')
+plot(dgz(find(ht)),dEyeAll(find(ht)),'.r')
 
 figure;plot(randsample(dgz,20000),randsample(dvg,20000),'.'); hold on;
 axis equal; axis([-40 40 -40 40])
@@ -648,9 +588,9 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 
 pts = randsample(1:length(dht),20000);
-head = dht(pts); eyes = dEye(pts);
+head = dht(pts); eyes = dEyeAll(pts);
 
-he=[dht+dEye;dht-dEye];
+he=[dht+dEyeAll;dht-dEyeAll];
 
 
 % gm = fitgmdist(he',6);
@@ -684,7 +624,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 figure;
 subplot(1,2,1)
-plot(randsample(dht,15000),randsample(dEye,15000),'.'); hold on;
+plot(randsample(dht,15000),randsample(dEyeAll,15000),'.'); hold on;
 plot(dht(find(r)),dvg(find(r)),'.c')
 plot(dht(find(s)),dvg(find(s)),'.g')
 plot(dht(find(ht)),dvg(find(ht)),'.r')
@@ -699,7 +639,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 % for approaches
 % figure;
 subplot(1,2,2);
-plot(randsample(dht(find(appT)),15000),randsample(dEye(find(appT)),15000),'.'); hold on;
+plot(randsample(dht(find(appT)),15000),randsample(dEyeAll(find(appT)),15000),'.'); hold on;
 % plot(dht(find(appT&r)),dvg(find(appT&r)),'.c')
 % plot(dht(find(appT&s)),dvg(find(appT&s)),'.g')
 % plot(dht(find(appT&ht)),dvg(find(appT&ht)),'.r')
@@ -800,7 +740,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 
 figure
-plot(eye_vg,dvergence,'.');
+plot(vergAll,dvergAll,'.');
 axis equal; axis([-20 20 -20 20])
 xlabel('mean eye theta'); ylabel('delta mean eye theta')
 
