@@ -164,16 +164,13 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 allTilt=[];allRoll=[];allYaw=[]; dlcVerg=[];dlcDverg=[];allGyro1=[];allGyro2=[];allGyro3=[];
 dlcDverg=[]; dlcDphi=[]; dlcPhi=[];dlcDhth=[];dlcHth=[];
 % figure
-for vid = 1:5%1:length(useFilt)
-     figure('units','normalized','outerposition',[0 0 1 1])
-    roll = (accelData{useFilt(vid)}(:,1)); roll==roll-nanmean(roll);
-    %     roll(roll>2*std(roll))=nan;
-    rollFilt = medfilt1(roll,7);
+for vid = 1:length(useFilt)
+   % figure('units','normalized','outerposition',[0 0 1 1])
+    roll = (accelData{useFilt(vid)}(:,1)); roll=roll-nanmean(roll);
+    rollFilt = medfilt1(roll,2);
     tilt = (accelData{useFilt(vid)}(:,2)); tilt=tilt-nanmean(tilt);
-    %     tilt(tilt>2*std(tilt))=nan;
     tiltFilt = medfilt1(tilt,8);
     yaw = (accelData{useFilt(vid)}(:,3)); yaw=yaw-nanmean(yaw);
-    %     yaw(yaw>2*std(yaw))=nan;
     yawFilt = medfilt1(yaw,10);
     verg=(thetaR{useFilt(vid)}-thetaL{useFilt(vid)});
     dverg=(dthetaR{useFilt(vid)}-dthetaL{useFilt(vid)});
@@ -181,18 +178,17 @@ for vid = 1:5%1:length(useFilt)
     gyro2=accelData{useFilt(vid)}(:,5);
     gyro3=(accelData{useFilt(vid)}(:,6));
     phi=(phiR{useFilt(vid)}-phiL{useFilt(vid)}); phi=phi-nanmean(phi);
-    dphi=(dphiR{useFilt(vid)}-dphiL{useFilt(vid)});dphi=dphi-nanmean(dphi);
+    dphi=(dphiR{useFilt(vid)}-dphiL{useFilt(vid)}); dphi=dphi-nanmean(dphi);
     badE=dphi>15| dphi<-15 ;
     dphi(badE)=nan;
-    
     hth=theta{useFilt(vid)}; hth=hth-nanmean(hth);
-    dhth=dTheta{useFilt(vid)};dhth=dhth-nanmean(dhth);
+    dhth=dTheta{useFilt(vid)}; dhth=dhth-nanmean(dhth);
     bad=dhth>20 | dhth<-20;
     dhth(bad)=nan;
     
     subplot(4,3,1)
     plot(rollFilt); hold on; axis square;
-    plot((phiR{useFilt(vid)}-phiL{useFilt(vid)}));
+    plot(phi);
     title('acc 1 - roll, phi')
     subplot(4,3,2)
     plot(tiltFilt); hold on; axis square;plot(verg);
@@ -257,8 +253,6 @@ mdl = fitlm(allRoll,dlcPhi)
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%
-
-
 figure
 subplot(2,3,1)
 plot(allRoll,dlcPhi,'.'); axis equal; hold on; lsline
@@ -311,8 +305,6 @@ ylim([-90 90]); xlim([-90 90]);
 R=corrcoef(allGyro3(test==0), dlcDhth(test==0),'Rows','pairwise')
 text(-80,80, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
 title('gyro ch 3')
-
-
 
 % % test=allGyro3>-5& allGyro3<5  & (dlcDhth>15|dlcDhth<-15);
 % plot(allGyro3(test),dlcDhth(test),'.')
@@ -368,7 +360,7 @@ title('gyro2, d phi');
 
 subplot(2,3,6)
 [corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),30,'coeff'));
-plot(lags, corr,'b'); hold on;
+plot(lags, corr); hold on;
 % [corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),30,'coeff'));
 % plot(lags, corr,'r')
 axis square;ylim([-1 1]);
@@ -378,12 +370,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 
 
-
-
-
-%%
-
-for vid =1:length(useFilt)
+for vid =1:5%length(useFilt)
 tr=medfilt1(thetaR{useFilt(vid)}(1:100),8);
 pr=medfilt1(phiR{useFilt(vid)}(1:100),8);
 

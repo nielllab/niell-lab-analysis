@@ -6,12 +6,12 @@
 %redo 11/4/19 after changes to circinterp
 % pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\090519\Approach\';
 pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\082019\Approach\'};
-%     'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
-%     'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
-%     'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
-%     'T:\PreyCaptureNew\Cohort3\J462a(green)\080219\Approach\';
-%     'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; 
-%     'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\080219\Approach\';
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\073019\Approach\'; 
+    'T:\PreyCaptureNew\Cohort3\J462a(green)\080919\Approach\'};
    
     %% J462b(blue) %female DLC done 8/31 %redo on 090519, new cricket
 %%redone with updated cirqinterp 110419

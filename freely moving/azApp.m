@@ -422,6 +422,7 @@ for rep =1:5
     title(sprintf('rep %d',rep))
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
+%%
 
 %%% clean up a couple values
 diffThAll(diffThAll<-180) = diffThAll(diffThAll<-180)+360;
@@ -576,17 +577,27 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 pts = randsample(1:length(dht),20000);
 head = dht(pts); eyes = dEyeAll(pts);
 
-he=[dht+dEyeAll;dht-dEyeAll];
+
+% mnEyeAll dthAll dEyeAll
+
+he=[dthAll(appAll);dEyeAll(appAll)];
+% he=[dthAll(appAll);dgazeAll(appAll);mnEyeAll(appAll)];
 
 
 % gm = fitgmdist(he',6);
-gm = fitgmdist(he',5);
-he=[head+eyes;head - eyes];
+gm = fitgmdist(he',3);
+% he=[head+eyes;head - eyes];
 idx = cluster(gm,he')
 X=he;
 
 figure;
-gscatter(X(1,:),X(2,:),idx);
+gscatter(X(1,:),X(2,:),idx); axis equal; %axis([-25 25 -25 25]);
+figure;
+gscatter(X(2,:),X(3,:),idx); axis equal; %axis([-25 25 -25 25]);
+
+figure;
+gscatter(X(1,:),X(3,:),idx); axis equal; %axis([-25 25 -25 25]);
+
 legend('Cluster 1','Cluster 2','Cluster 3','Cluster 4','Cluster 5','Location','best');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
