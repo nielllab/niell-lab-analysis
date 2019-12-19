@@ -5,7 +5,7 @@
 %% J462a(green)% DLC done 8/31 % redo 090519, new cricket
 %redo 11/4/19 after changes to circinterp
 % pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\090519\Approach\';
-pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\082019\Approach\'};
+pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\082019\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\081519\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\081319\Approach\';
     'T:\PreyCaptureNew\Cohort3\J462a(green)\080719\Approach\';
