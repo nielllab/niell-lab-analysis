@@ -1,10 +1,10 @@
 clear all; close all;
 dbstop if error
 % load('J462a_AllACCSessions_120619_a.mat');
-load('J462a_ACCSessions_from111119_121619_a.mat');
+load('J475c_ACCSessions_121719_a.mat');
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -165,7 +165,7 @@ allTilt=[];allRoll=[];allYaw=[]; dlcVerg=[];dlcDverg=[];allGyro1=[];allGyro2=[];
 dlcDverg=[]; dlcDphi=[]; dlcPhi=[];dlcDhth=[];dlcHth=[];
 % figure
 for vid = 1:length(useFilt)
-   % figure('units','normalized','outerposition',[0 0 1 1])
+    figure('units','normalized','outerposition',[0 0 1 1])
     roll = (accelData{useFilt(vid)}(:,1)); roll=roll-nanmean(roll);
     rollFilt = medfilt1(roll,2);
     tilt = (accelData{useFilt(vid)}(:,2)); tilt=tilt-nanmean(tilt);
@@ -306,6 +306,12 @@ R=corrcoef(allGyro3(test==0), dlcDhth(test==0),'Rows','pairwise')
 text(-80,80, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
 title('gyro ch 3')
 
+
+if savePDF
+    set(gcf, 'PaperPositionMode', 'auto');
+    print('-dpsc',psfilename,'-append');
+end
+close(gcf)
 % % test=allGyro3>-5& allGyro3<5  & (dlcDhth>15|dlcDhth<-15);
 % plot(allGyro3(test),dlcDhth(test),'.')
 % RS=corrcoef(allGyro3(test==0), dlcDhth(test==0),'Rows','pairwise')
@@ -317,7 +323,7 @@ test=(dlcDhth>10|dlcDhth<-10)&allGyro3>-5& allGyro3<5;
 
 figure
 for vid = 1:length(useFilt)
-    subplot(5,5,vid)
+    subplot(5,6,vid)
     plot(dTheta{useFilt(vid)}); %blue =dlc
     hold on;
     plot(accelData{useFilt(vid)}(:,6));
@@ -1566,7 +1572,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Analyzed_121619a','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_121719a','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1574,5 +1580,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_121619_allSessions_a','.mat');
+afilename=sprintf('%s',ani,'Analyzed_121719_allSessions_a','.mat');
 save(fullfile(pSname, afilename))
