@@ -1,7 +1,7 @@
 close all
 clear all
 
-load('Analyzed_AllAnimals_120219_a.mat')
+load('ACCAnalyzed_AllAnimals_121819_a.mat')
 clear L H R
 skip = 5; %%% only shows figures at this interval
 nthresh  = 60;  %%% threshold for number of approach points to be included in averages
@@ -38,6 +38,10 @@ dgazeApp=[];
 d_vgApp=[];
 mnEyeAll=[];
 dEyeAll=[];
+
+tiltAll = [];
+rollAll = [];
+acc_dthAll = [];
 
 appAll=[];
 
@@ -77,6 +81,15 @@ for i = 1:length(appEpoch)
     hth = thetaHead{vid};
     dth = d_Theta{vid};
     azdeg = az{vid}*180/pi;
+    
+    %%% get accelerometers
+    if exist('accelData','var')
+        tilt = accelChannels{vid}(:,1);
+        roll = accelChannels{vid}(:,2);
+        acc_dth = accelChannels{vid}(:,6);
+    else
+        display('no acc')
+    end
     
     %%% azimuth vs eye histograms
     az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
@@ -139,6 +152,11 @@ for i = 1:length(appEpoch)
     lthAll = [lthAll lth(1:end-1)'];
     rthAll = [rthAll rth(1:end-1)'];
     
+    if exist('accelData','var')
+        tiltAll = [tiltAll tilt(1:end-1)'];
+        rollAll = [rollAll roll(1:end-1)'];
+        acc_dthAll = [acc_dthAll acc_dth(1:end-1)'];
+    end
     
     %     he=[diff(headTh);diff(mnEye)];
     %     % gm = fitgmdist(he',6);
@@ -232,6 +250,7 @@ for i = 1:length(appEpoch)
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
         
+        gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
         subplot(3,1,3);
         hold on; plot(hthApp +0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2);
         plot(hthApp,'Color',[0 0.75 0],'LineWidth',2);
@@ -243,6 +262,16 @@ for i = 1:length(appEpoch)
         else  ylim([-60 60]);end
         xlim([0 max(length(appRange),1)]); xlabel('frames'); ylabel('deg');
         legend('gaze','head')
+        
+       if exist('gm','var')
+           X = [dth(appRange)'; [diff(mnEyeApp) 0]; mnEyeApp]';
+        idx = cluster(gm,X);
+        sacc = find(idx==3);
+        for i = 1:length(sacc)-1;
+            plot(sacc(i):sacc(i)+1,gzApp(sacc(i):sacc(i)+1),'r')
+        end
+       end
+       
         
         %         appGaze =(hthApp +0.5*( rth(appRange) +lth(appRange))')
         %         hold on;plot(find(resetPt(appRange)),appGaze(resetPt(appRange)),'ob');
@@ -424,6 +453,44 @@ for rep =1:5
 end
 %%
 
+figure
+plot(dthAll,acc_dthAll,'.');
+axis square; axis([-25 25 -25 25]);
+
+figure
+plot(diffThAll,acc_dthAll,'.');
+axis square; axis([-25 25 -25 25]);
+
+figure
+plot(dthAll(1:end-1),dthAll(2:end),'.')
+
+bad =find( abs(dthAll-acc_dthAll)>15 & abs(acc_dthAll<5));
+notbad = find( abs(dthAll-acc_dthAll)<15 | abs(acc_dthAll>5));
+hold on
+figure
+plot(dthAll(notbad(1:end-1)),dthAll(notbad(1:end-1)+1),'b.')
+axis square
+axis([-100 100 -100 100])
+
+figure
+plot(dthAll(bad(1:end-1)),dthAll(bad(1:end-1)+1),'r.')
+axis square
+axis([-100 100 -100 100])
+
+figure
+plot(acc_dthAll(appAll),dEyeAll(appAll),'.')
+axis square; axis([-25 25 -25 25])
+
+figure
+plot(dthAll(appAll),dEyeAll(appAll),'.')
+axis square; axis([-25 25 -25 25])
+
+figure
+plot(dthAll(bad),acc_dthAll(bad),'r.')
+axis equal
+
+keyboard
+
 %%% clean up a couple values
 diffThAll(diffThAll<-180) = diffThAll(diffThAll<-180)+360;
 diffThAll(diffThAll>180) = diffThAll(diffThAll>180)-360;
@@ -432,6 +499,10 @@ appAll = appAll==1;
 
 %%% large head movement seems to be DLC errors according to accelerometers
 dthAll(abs(dthAll)>25)=NaN;
+dgazeAll = dEyeAll + dthAll;
+dgazeAll = dEyeAll + 0.9*acc_dthAll;
+
+
 
 %%% plot eye, gaze, head versus each other
 %%% hopefully can be used for clustering
@@ -440,11 +511,17 @@ plot(dthAll(appAll),dEyeAll(appAll),'.');
 axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [10 -10],'r'); plot([-10 10], [-10 10],'r')
 
 figure
+plot(acc_dthAll(appAll),dEyeAll(appAll),'.');
+axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [10 -10],'r'); plot([-10 10], [-10 10],'r')
+
+
+figure
 plot(nanxcorr(dthAll(appAll),dEyeAll(appAll),30,'coeff'))
 
 figure
-plot(dthAll(appAll),dgazeAll(appAll),'.');
-axis equal; axis equal; hold on; plot([-10 10], [-10 10],'r')
+plot(acc_dthAll(appAll),dgazeAll(appAll),'.');
+axis equal;  hold on; plot([-10 10], [-10 10],'r')
+
 
 
 figure
@@ -453,9 +530,11 @@ plot(dthAll(appAll)-dEyeAll(appAll),dthAll(appAll)+dEyeAll(appAll),'.')
 
 figure
 plot(mnEyeAll(appAll),dgazeAll(appAll),'.');
+axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [0 0],'r'); plot([0 0], [-10 10],'r')
 
 figure
 plot(mnEyeAll(appAll),dEyeAll(appAll),'.');
+axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [10 -10],'r'); plot([-10 10], [-10 10],'r')
 
 figure
 plot(mnEyeAll(appAll),dthAll(appAll),'.');
@@ -463,6 +542,44 @@ plot(mnEyeAll(appAll),dthAll(appAll),'.');
 
 figure
 plot(max(lthAll(appAll), rthAll(appAll)),dgazeAll(appAll),'.');
+
+
+he=[acc_dthAll(appAll);dEyeAll(appAll); mnEyeAll(appAll)];
+% he=[dthAll(appAll);dgazeAll(appAll);mnEyeAll(appAll)];
+
+
+% gm = fitgmdist(he',6);
+gm = fitgmdist(he',3,'Replicates',10);
+% he=[head+eyes;head - eyes];
+idx = cluster(gm,he');
+X=he;
+% figure;
+% gscatter(X(1,:),X(2,:),idx); axis equal; %axis([-25 25 -25 25]);
+% figure;
+% gscatter(X(3,:),X(2,:),idx); axis equal; %axis([-25 25 -25 25]);
+
+figure
+gscatter(mnEyeAll(appAll),dgazeAll(appAll),idx); axis equal
+
+figure
+gscatter(dEyeAll(appAll),dgazeAll(appAll),idx); axis equal
+
+figure
+gscatter(acc_dthAll(appAll),dgazeAll(appAll),idx); axis equal
+
+figure
+gscatter(acc_dthAll(appAll),dEyeAll(appAll),idx); axis equal
+
+figure;
+gscatter(X(1,:),X(3,:),idx); axis equal; %axis([-25 25 -25 25]);
+
+figure
+hist(acc_dthAll(appAll),[-20:20]); xlim([-20 20]);
+
+figure
+hist(dgazeAll(appAll),[-20:20]); xlim([-20 20]);
+
+
 
 
 
