@@ -1,4 +1,4 @@
-function deInterlaceVids(movieFilename);
+function fnew = deInterlaceVids(movieFilename);
 %%% De-interlace video to double framerate and remove interlacing artifact
 %%% Separates out every other line and places them into separate frames
 %%% Down-size along the other axis, to keep pixels square
@@ -7,7 +7,7 @@ function deInterlaceVids(movieFilename);
 %%% Ideal for NTSC/PAL cameras (e.g. head/eye cams)
 %%%
 %%% input = .avi movie filename (including path); if not provided, will ask
-%%%  re-saves movie as moviename_DeInter.avi
+%%%  re-saves movie as moviename_DeInter.avi, returned in fnew
 %%%
 %%% cmn 2019
 
@@ -21,12 +21,13 @@ end
 %%% read in movie
 TempVidT = VideoReader(movieFilename);
 frame=1; k=1;
+display('reading')
 
 while hasFrame(TempVidT)
     worldLaced(:,:,:,frame) = (readFrame(TempVidT));
     
     %%% status update
-    if mod(frame,100)==0
+    if mod(frame,500)==0
         fprintf('frame = %d\n',frame)
     end
     frame=frame+1;   
@@ -45,6 +46,7 @@ world(:,:,:,2:2:end) = imresize(worldLaced(2:2:end,:,:,:),sz);
 % imshow(world(:,:,:,1));
 
 %%% re-save as new movie
+display('saving')
 fnew = [movieFilename(1:end-4) '_DeInter.avi'];
 movObj = VideoWriter(fnew);
 movObj.FrameRate = 60;
