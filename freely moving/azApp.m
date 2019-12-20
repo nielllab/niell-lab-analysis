@@ -84,8 +84,8 @@ for i = 1:length(appEpoch)
     
     %%% get accelerometers
     if exist('accelData','var')
-        tilt = accelChannels{vid}(:,1);
-        roll = accelChannels{vid}(:,2);
+        tilt = accelChannels{vid}(:,2);
+        roll = accelChannels{vid}(:,1);
         acc_dth = accelChannels{vid}(:,6);
     else
         display('no acc')
@@ -453,44 +453,6 @@ for rep =1:5
 end
 %%
 
-figure
-plot(dthAll,acc_dthAll,'.');
-axis square; axis([-25 25 -25 25]);
-
-figure
-plot(diffThAll,acc_dthAll,'.');
-axis square; axis([-25 25 -25 25]);
-
-figure
-plot(dthAll(1:end-1),dthAll(2:end),'.')
-
-bad =find( abs(dthAll-acc_dthAll)>15 & abs(acc_dthAll<5));
-notbad = find( abs(dthAll-acc_dthAll)<15 | abs(acc_dthAll>5));
-hold on
-figure
-plot(dthAll(notbad(1:end-1)),dthAll(notbad(1:end-1)+1),'b.')
-axis square
-axis([-100 100 -100 100])
-
-figure
-plot(dthAll(bad(1:end-1)),dthAll(bad(1:end-1)+1),'r.')
-axis square
-axis([-100 100 -100 100])
-
-figure
-plot(acc_dthAll(appAll),dEyeAll(appAll),'.')
-axis square; axis([-25 25 -25 25])
-
-figure
-plot(dthAll(appAll),dEyeAll(appAll),'.')
-axis square; axis([-25 25 -25 25])
-
-figure
-plot(dthAll(bad),acc_dthAll(bad),'r.')
-axis equal
-
-keyboard
-
 %%% clean up a couple values
 diffThAll(diffThAll<-180) = diffThAll(diffThAll<-180)+360;
 diffThAll(diffThAll>180) = diffThAll(diffThAll>180)-360;
@@ -500,41 +462,84 @@ appAll = appAll==1;
 %%% large head movement seems to be DLC errors according to accelerometers
 dthAll(abs(dthAll)>25)=NaN;
 dgazeAll = dEyeAll + dthAll;
-dgazeAll = dEyeAll + 0.9*acc_dthAll;
-
-
-
-%%% plot eye, gaze, head versus each other
-%%% hopefully can be used for clustering
-figure
-plot(dthAll(appAll),dEyeAll(appAll),'.');
-axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [10 -10],'r'); plot([-10 10], [-10 10],'r')
-
-figure
-plot(acc_dthAll(appAll),dEyeAll(appAll),'.');
-axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [10 -10],'r'); plot([-10 10], [-10 10],'r')
+dgazeAll = dEyeAll + acc_dthAll;
 
 
 figure
-plot(nanxcorr(dthAll(appAll),dEyeAll(appAll),30,'coeff'))
+bins = -90:3:90;
+h = hist(tiltAll(~appAll),bins)/sum(~appAll);
+plot(bins,h,'r');
+hold on
+h = hist(tiltAll(appAll),bins)/sum(appAll);
+plot(bins,h,'g');
+xlabel('tilt') 
+
+figure
+bins = -90:3:90;
+h = hist(rollAll(~appAll),bins)/sum(~appAll);
+plot(bins,h,'r');
+hold on
+h = hist(rollAll(appAll),bins)/sum(appAll);
+plot(bins,h,'g');
+xlabel('roll')
+
+figure
+bins = -20:20;
+h = hist(acc_dthAll(~appAll),bins)/sum(~appAll);
+plot(bins,h,'r');
+hold on
+h = hist(acc_dthAll(appAll),bins)/sum(appAll);
+plot(bins,h,'g');
+xlabel('gyro 3')
+
+figure
+bins = -60:2:60;
+h = hist(vergAll(~appAll),bins)/sum(~appAll);
+plot(bins,h,'r');
+hold on
+h = hist(vergAll(appAll),bins)/sum(appAll);
+plot(bins,h,'g');
+xlabel('vergence')
+
+
+figure
+plot(dthAll(appAll),acc_dthAll(appAll),'.');
+axis square; axis([-25 25 -25 25]);
+xlabel('DLC dtheta'); ylabel('acc dtheta')
+
+figure
+plot(acc_dthAll(appAll),dEyeAll(appAll),'.')
+axis square; axis([-25 25 -25 25])
+xlabel('acc dtheta'); ylabel('dEye theta')
+
+figure
+plot(dthAll(appAll),dEyeAll(appAll),'.')
+axis square; axis([-25 25 -25 25])
+xlabel('DLC dtheta'); ylabel('dEye theta')
+
+
+figure
+plot(-30:30, nanxcorr(acc_dthAll(appAll),dEyeAll(appAll),30,'coeff'))
+title('acc dtheta vs eye dtheta')
 
 figure
 plot(acc_dthAll(appAll),dgazeAll(appAll),'.');
 axis equal;  hold on; plot([-10 10], [-10 10],'r')
-
-
+xlabel('acc dtheta'); ylabel('gaze dtheta')
 
 figure
-plot(dthAll(appAll)-dEyeAll(appAll),dthAll(appAll)+dEyeAll(appAll),'.')
-
+plot(dEyeAll(appAll),dgazeAll(appAll),'.');
+axis equal;  hold on; plot([-10 10], [-10 10],'r')
+xlabel('eye dtheta'); ylabel('gaze dtheta')
 
 figure
 plot(mnEyeAll(appAll),dgazeAll(appAll),'.');
-axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [0 0],'r'); plot([0 0], [-10 10],'r')
+axis square; axis([-25 25 -25 25]); hold on;
+xlabel('eye position'); ylabel('gaze dtheta')
 
 figure
 plot(mnEyeAll(appAll),dEyeAll(appAll),'.');
-axis square; axis([-25 25 -25 25]); hold on; plot([-10 10], [10 -10],'r'); plot([-10 10], [-10 10],'r')
+axis square; axis([-25 25 -25 25]); hold on; 
 
 figure
 plot(mnEyeAll(appAll),dthAll(appAll),'.');
