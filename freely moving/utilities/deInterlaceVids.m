@@ -11,6 +11,7 @@ function fnew = deInterlaceVids(movieFilename);
 %%%
 %%% cmn 2019
 
+doubleSize=1;
 
 %%% read in original movie file if not passed as argument
 if ~exist('movieFilename','var');
@@ -34,10 +35,20 @@ while hasFrame(TempVidT)
 end
 
 %%% separate out odd/even lines, and put them as consecutive frames
-world = zeros(size(worldLaced,1)/2, size(worldLaced,2)/2, 3, size(worldLaced,4)*2,'uint8');
+% world = zeros(size(worldLaced,1)/2, size(worldLaced,2)/2, 3, size(worldLaced,4)*2,'uint8');
+% sz = [size(world,1) size(world,2)];
+% world(:,:,:,1:2:end) = imresize(worldLaced(1:2:end,:,:,:),sz);
+% world(:,:,:,2:2:end) = imresize(worldLaced(2:2:end,:,:,:),sz);
+
+if doubleSize
+world = zeros(size(worldLaced,1), size(worldLaced,2), 3, size(worldLaced,4)*2,'uint8');
+else
+    world = zeros(size(worldLaced,1)/2, size(worldLaced,2)/2, 3, size(worldLaced,4)*2,'uint8');
+end
 sz = [size(world,1) size(world,2)];
 world(:,:,:,1:2:end) = imresize(worldLaced(1:2:end,:,:,:),sz);
 world(:,:,:,2:2:end) = imresize(worldLaced(2:2:end,:,:,:),sz);
+
 
 %%% plot as troubleshooting
 % figure
@@ -47,9 +58,15 @@ world(:,:,:,2:2:end) = imresize(worldLaced(2:2:end,:,:,:),sz);
 
 %%% re-save as new movie
 display('saving')
-fnew = [movieFilename(1:end-4) '_DeInter.avi'];
+if doubleSize
+    fnew = [movieFilename(1:end-4) '_DeInter2_100.avi'];
+else
+fnew = [movieFilename(1:end-4) '_DeInter100.avi'];
+end
+
 movObj = VideoWriter(fnew);
 movObj.FrameRate = 60;
+movObj.Quality=100;
 open(movObj);
 writeVideo(movObj,immovie(world));
 close(movObj);
