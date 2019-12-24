@@ -1,3 +1,6 @@
+%%% Note!!! this version has been incorporated into main loadAllCsv
+%%% Don't use this one except for back-reference
+
 %do for each animal, all sessions? or all animals together?
 %clear all; close all
 set(groot,'defaultFigureVisible','on') %disable figure plotting

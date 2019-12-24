@@ -3,12 +3,18 @@
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 savePDF=1; dbstop if error
 % pname={'T:\PreyCaptureNew\Cohort3\deInterlaceTest\'};
- pname={'T:\PreyCaptureNew\Cohort3\J462a(green)\082019\Approach\'}
-deInter = 1;
+ % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
+pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
-fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[]; %finds all files w/top.csv in the name
+deInter = 0;
+doAcc = 1;
+
+fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
+%finds all files w/top.csv in the name, used for all camera files
+%finds all files with acc.csv in the name for the accelerometers
 for i=1:length(pname)
     fileList = [fileList; dir([pname{i} '*resnet50_Top*.csv'])];
+    
     %     TSfileList = [TSfileList; dir([pname{i} '*topTS*.csv'])];
     
 end
@@ -88,6 +94,15 @@ for j=1:length(fileList) %%% loop over all top camera files
     %    Data(j).dThetaFract=aligned.dThetaFract;
     %     Data(j).longTheta=aligned.longTheta;
     %     Data(j).longThetaFract=aligned.longThetaFract;
+    
+    %%% read in accelerometer data
+    if doAcc
+        accname = strcat(sname{1},'_','acc','_',sname{3},'_',date,'_',clipnum,'.dat')
+        accData = getAcc(accname,psfilename);
+        Data(j).accTS=accData.accTs;  %%% timestamps
+        Data(j).rawAcc=accData.rawAcc;   %%% raw voltages
+        Data(j).accTrace =accData.accTrace;  %%% voltages converted to m/sec2 and rad/sec
+    end
     
     %%% analyze right eye points
     Data(j).xR=640 - Data(j).DataR(:,2:3:end); %%% flip right eye since this camera is reversed in bonsai
@@ -208,6 +223,32 @@ for j=1:length(fileList) %%% loop over all top camera files
         figure;plot(Data(j).RRad); hold on; plot(Data(j).LRad);
         title('interp pupil radius');
         
+        %%% interpolate accelerometers
+        if doAcc
+            
+            %%% 
+            for i = 1:6
+                Data(j).accResamp(:,i) = interp1(Data(j).accTS,Data(j).accTrace(:,i),xq);
+                Data(j).rawAccResamp(:,i)= interp1(Data(j).accTS,Data(j).rawAcc(:,i),xq)
+            end
+            
+            %%% there is a constant offset in the accelerometer timestamps coming in through labjack.
+            %%% we calculate this by taking xcorr of head rotation from DLC 
+            %%% and head rotation from gyros (should be identical) and
+            %%% we then shift the data accordingly.
+            gyro3=(Data(j).accResamp(:,6)-nanmean(Data(j).accResamp(:,6))); % gyro 3 = yaw
+            dth=Data(j).dtheta;
+            [corr lags]=nanxcorr(gyro3,dth,100,'coeff');
+            
+            figure;  plot(lags,corr); axis square; title('acc yaw, d head th')
+            [mx ind] = max(corr);
+            drift = lags(ind);
+            Data(j).accShift = circshift(Data(j).accResamp,-drift,1);
+            Data(j).accXcorrMax = mx;
+            Data(j).accXcorrLag = drift;
+            Data(j).rawAccShift = circshift(Data(j).rawAccResamp,-drift,1)          
+        end
+        
         %%% calculate differences
         Data(j).dxR = diff(Data(j).XRcent);
         Data(j).dxL = diff(Data(j).XLcent);
@@ -218,27 +259,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         Data(j).dxRPhi = diff(Data(j).Rphi);
         Data(j).dxLPhi = diff(Data(j).Lphi);
         Data(j).dth = Data(j).dtheta;
-        
-        figure
-        plot(xcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
-        
-        figure
-        plot(xcorr(Data(j).dxR,Data(j).dth(1:end-1),30,'coeff'))
-        hold on
-        plot(xcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
-        plot(xcorr(Data(j).dxR,Data(j).dxL,30,'coeff'))
-        legend('R','L','R-L')
-        title('eye position & head theta');
-        %         if savePDF
-        %             set(gcf, 'PaperPositionMode', 'auto');
-        %             print('-dpsc',psfilename,'-append');
-        %         end
-        %         close(gcf)
-        
-        figure
-        plot(nanxcorr(Data(j).dxL,Data(j).dth(1:end-1),30,'coeff'))
-        
-        
+
+
+        %%% a few figures ...
+           
         figure
         plot(xcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),30,'coeff'))
         hold on
