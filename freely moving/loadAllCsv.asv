@@ -24,11 +24,11 @@ end
 
 for j=1:length(fileList) %%% loop over all top camera files
     if savePDF
-        psfilename = 'C:\analysisPS.ps';
+        psfilename = 'D:\analysisPS.ps';
         if exist(psfilename,'file')==2;
             delete(psfilename);end
     else
-        psfilename = 'C:\analysisPS.ps';
+        psfilename = 'D:\analysisPS.ps';
         
     end
     clear path Rfname Lfname %TSfileList
