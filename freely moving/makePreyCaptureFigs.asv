@@ -171,12 +171,10 @@ legend('non approach','approach')
 % Figure 2C: overlaid trace of two eyes converging and diverging
 
 % Figure 2D: scatter plot of R vs L eye yaw to show conv/divergence 
-clear numPts congMv convMv divMv Rmv Lmv
+clear numPts congMv convMv divMv
 figure
     for vid=1:length(useData)
-        clear nframe
         nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
-        nframe=min(nframe, length(appEpoch{vid}));
         tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
         tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
         useN = appEpoch{vid}(1:nframe)==0; use = appEpoch{vid}(1:nframe)==1;
@@ -185,11 +183,12 @@ figure
 %         numPts(vid,1)=length(tR(1:20:end));
 %         numPts(vid,2)=length(tR);
 
-    Rmv=nansum(tR(useN)>=0& tL(useN)>=0);
-    Lmv=nansum(tR(useN)<=0& tL(useN)<=0);
-    congMv(vid,:)=(Rmv+Lmv)./(nansum(useN & ~isnan(tR)'& ~isnan(tL)'));
-    convMv(vid,:)=(nansum(tR(useN)<=0& tL(useN)>=0))./sum(useN&~isnan(tR)'&~isnan(tL)');
-    divMv(vid,:)=(nansum(tR(useN)>=0 & tL(useN)<=0))./sum(useN&~isnan(tR)'&~isnan(tL)');
+
+    Rmv=nansum(tR(useN)>=0& tL(useN)>=0)
+    Lmv=nansum(tR(useN)<=0& tL(useN)<=0)
+    congMv(vid,:)=(Rmv+Lmv)./(nansum((useN) & ~ isnan(tR)& ~isnan(tL)));
+    convMv(vid,:)=(nansum(tR(useN)<=0& tL(useN)>=0))./sum(useN&~isnan(tR)&~isnan(tL));
+    divMv(vid,:)=(nansum(tR(useN)>=0 & tL(useN)<=0))./sum(useN&~isnan(tR)&~isnan(tL));
     end
 
 % Figure 2E: quantification of 2D, bar plots
@@ -198,18 +197,17 @@ figure
 % Figure 2F: hist of difference in eye yaw (aka vergence)
 
 clear vergCounts vgDiff nBins vgHist
-
+figure
 for c=0:1
     for vid=1:length(useData)
         nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
-        nframe=min(nframe, length(appEpoch{vid}))
         tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
         tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
         vg=tR-tL;
-        useN= appEpoch{vid}(1:nframe)==c;
-        nBins=-90:5:90
+        useN= appEpoch{vid}==c;
+        nBins=-50:5:50
         if sum(useN)>4
-            vgHist = (hist(vg(useN),nBins))/sum(useN&~isnan(vg)');
+            vgHist = (hist(vg(useN),nBins))/sum(useN);
         else
             vgHist=NaN;
         end

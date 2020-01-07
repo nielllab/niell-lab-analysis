@@ -6,7 +6,7 @@ savePDF=1; dbstop if error
  % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
-deInter = 1;
+deInter = 0;
 doAcc = 1;
 
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
@@ -22,7 +22,7 @@ end
 
 %%
 
-for j=1:length(fileList) %%% loop over all top camera files
+for j=1% j=1:length(fileList) %%% loop over all top camera files
     if savePDF
         psfilename = 'C:\analysisPS.ps';
         if exist(psfilename,'file')==2;
@@ -295,7 +295,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     if savePDF
         pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
         C={ani, date, sessionnum, clipnum};
-        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'deInterAcc','.pdf')
+        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'originalAcc','.pdf')
         pdfilename=fullfile(pSname,filen)
         dos(['ps2pdf ' psfilename ' ' pdfilename]);
         delete(psfilename);
@@ -307,7 +307,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
- afilename=sprintf('%s',ani,'_deInterACC','.mat')
+ afilename=sprintf('%s',ani,'_originalACC','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))

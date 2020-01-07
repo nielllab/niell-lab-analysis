@@ -201,7 +201,7 @@ end
 if analyzeAcc==1
 
 tiltAll=[];rollAll=[];yawAll=[]; vergDlc=[];dvergDlc=[];gyro1All=[];gyro2All=[];gyro3All=[];
-dvergDlc=[]; dlcDphi=[]; dlcPhi=[];dlcDhth=[];dlcHth=[];appAll=[]
+dvergDlc=[]; dlcDphi=[]; dlcPhi=[];dlcDhth=[];dlcHth=[];appAll=[];
 % figure
 for i = 1:length(useData)
 %     figure('units','normalized','outerposition',[0 0 1 1])
