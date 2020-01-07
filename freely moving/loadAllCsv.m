@@ -152,8 +152,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3);
         if deInter
             RTSnew = zeros(size(RTS,1)*2,1);
-            RTSnew(2:2:end) = RTS;
-            RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
+%             RTSnew(2:2:end) = RTS;
+%             RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
+            RTSnew(2:2:end) = RTS  +0.5*median(diff(RTS)) ;
+            RTSnew(1:2:end) = RTS ;
             RTS = RTSnew;
         end
         
@@ -166,8 +168,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         LTS= LTS(:,1)*60*60 + LTS(:,2)*60 + LTS(:,3);
         if deInter
             LTSnew = zeros(size(LTS,1)*2,1);
-            LTSnew(2:2:end) = LTS;
-            LTSnew(1:2:end) = LTS- 0.5*median(diff(LTS));
+           % LTSnew(2:2:end) = LTS;
+            % LTSnew(1:2:end) = LTS- 0.5*median(diff(LTS));
+            LTSnew(2:2:end) = LTS  +0.5*median(diff(LTS)) ;
+            LTSnew(1:2:end) = LTS ;
             LTS = LTSnew;
         end
         startL = LTS(1);
