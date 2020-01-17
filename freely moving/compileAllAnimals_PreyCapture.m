@@ -1,7 +1,7 @@
 clear all; close all;
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
-savePDF=1;
+savePDF=0;
 if savePDF
     psfilename = 'C:\analysisPS_all.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -18,6 +18,11 @@ if analyzeAcc==1
     files={'J462aAnalyzed_121619_allSessions_a.mat','J462bAnalyzed_121719_allSessions_a.mat','J462cAnalyzed_121719_allSessions_a',...
         'J463bAnalyzed_121719_allSessions_a','J463cAnalyzed_121719_allSessions_a','J470cAnalyzed_121719_allSessions_a',...
         'J475cAnalyzed_121719_allSessions_a'};
+% 
+%         files={'J462aAnalyzed_010819_ACCSessions_a','J462bAnalyzed_010819_ACCSessions_a.mat','J462cAnalyzed_010819_ACCSessions_a',...
+%         'J463bAnalyzed_010819_ACCSessions_a','J463cAnalyzed_010819_ACCSessions_a','J470cAnalyzed_010819_ACCSessions_a',...
+%         'J475cAnalyzed_010819_ACCSessions_a'}; %analysis redone with daylight savings data on 010819
+    
 else
     files={'J462aAnalyzed_120219_allSessions.mat','J462bAnalyzed_120219_allSessions.mat','J462cAnalyzed_120219_allSessions.mat',...
         'J463bAnalyzed_120219_allSessions.mat','J463cAnalyzed_120219_allSessions.mat','J465dAnalyzed_120219_allSessions.mat'...
@@ -1905,7 +1910,7 @@ legend('non approach','approach')
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s','ACCAnalyzed_AllAnimals_121819_c','.pdf')
+    filen=sprintf('%s','ACCAnalyzed_AllAnimals_010820_noDLS','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1914,6 +1919,6 @@ else
 end
 
 
-afilename=sprintf('%s','ACCAnalyzed_AllAnimals_121819_c','.mat')
+afilename=sprintf('%s','ACCAnalyzed_AllAnimals_010820_noDLS','.mat')
 save(fullfile(pSname, afilename))
 

@@ -4,14 +4,14 @@ filterWin = 5; %%% timepoints to median filter over for acceleration
 data=dlmread(accname)
 
 accTs = data(:,1); %timestamps
-dname = split(accname,'_');
-expdate=dname{4};
-if sum(expdate<110319)>6
-    accTs = mod(accTs-8*60*60,24*60*60); 
-    display('pre')
-else
+% dname = split(accname,'_');
+% expdate=dname{4};
+% if sum(expdate>110319)<6
+%     accTs = mod(accTs-7*60*60,24*60*60); 
+%     display('pre dls')
+% else
 accTs = mod(accTs-8*60*60,24*60*60); %%% time is elapsed secs since midnight 1904 GMT; subtract 8 hrs to get local time (but what about daylight savings change!)
-end
+% end
 
 figure
 plot(diff(accTs))

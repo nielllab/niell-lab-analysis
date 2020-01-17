@@ -1,15 +1,44 @@
+close all; clear all;
+%  load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
+ load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
+
+savePDF=0;
+if savePDF
+    psfilename = 'C:\analysisPS.ps';
+    if exist(psfilename,'file')==2;delete(psfilename);end
+end
+
+
+pname = 'T:\PreyCaptureAnalysis\Data\';
+
+
 
 %% FIGURE 1: a freely moving eye and head tracking system
 % Figure 1G: gyro & DLC traces
-
+figure
+range=350:830;
+for vid=10%1:10%length(useData)
+%     subplot(2,5,vid);
+       plot(d_Theta{useData(vid)}(range,:)); 
+    hold on;
+    plot(accelChannels{useData(vid)}(range,6));
+end
 % Figure 1H: measure of similarity of gyro & DLC (scatter or hist of
 % difference)
 
 figure
 clear h
+subplot(1,2,1)
+plot(gyro3All(1:15:end),dlcDhth(1:15:end),'.'); xlabel('gyro yaw'); ylabel('DLC yaw')
+axis equal; xlim([-20 20]); ylim([-20 20]);
 bins=-20:2:20
 h=hist(gyro3All-dlcDhth,bins)
+subplot(1,2,2)
 plot(bins,h/length(gyro3All)); hold on
+xlabel('gyro - DLC (degrees');
+suptitle('Figure 1H: DLC is good measure of head angle')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 
 
 % Figure 1I (where is the right place to put this?): head angle is directed
@@ -50,14 +79,14 @@ shadedErrorBar(1:size(corrRAll,2),nanmean(corrRAll,1),errR,'-b',1); hold on
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); xlim([1 61]); axis square; ylim([-.2 .5]);
 
-% L(1) = plot(nan, nan, 'b-');
-% L(2) = plot(nan, nan, 'r-');
-% L(3) = plot(nan, nan, 'g-');
-% L(4) = plot(nan, nan, 'c-');
-%
-% legend(L,{'dtheta R non-app','dtheta L non-app','dtheta R Approach','dtheta L Approach'}); title('az, eye theta both eyes');
+clear L
+L(1) = plot(nan, nan, 'b-');
+L(2) = plot(nan, nan, 'g-');
+legend(L,{'az to cricket','dtheta head'});
 
-title('az and dHead Theta')
+title('Figure 1I: Corr of az and dHead Theta, head is directed to cricket')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
 
 %% FIGURE 2: Coordination of eyes during free movement
@@ -71,22 +100,25 @@ for vid=1:length(useData)
     pR=nanmean(pR)-pR; pL=nanmean(pL)-pL;
     tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
     tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
-    for c=0:1
         clear use
-        use= appEpoch{vid}==c;
+        useN = appEpoch{vid}==0;use = appEpoch{vid}==1;
         subplot(1,2,1)
-        plot(tR(use(1:20:length(use))),pR(use(1:20:length(use))),'.'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tR(useN(1:20:length(useN))),pR(useN(1:20:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tR(use(1:20:length(use))),pR(use(1:20:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
         title('R eye')
+        xlabel('yaw (deg)'); ylabel('pitch(deg)');
         subplot(1,2,2)
-        plot(tL(use(1:20:length(use))),pL(use(1:20:length(use))),'.'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tL(useN(1:20:length(useN))),pL(useN(1:20:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tL(use(1:20:length(use))),pL(use(1:20:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        xlabel('yaw (deg)'); ylabel('pitch(deg)');
         title('L eye')
-    end
-    xlabel('yaw'); ylabel('pitch')
 end
+suptitle('Figure 2A: R & L eye yaw & pitch');
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 %%
 % Figure 2B: histograms of yaw and pitch from panel above
 clear tNcounts tAcounts allThN allThA
- figure
 for vid=1:length(useData)
     nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
     pR=Rphi{useData(vid)}(1:nframe); pL=Lphi{useData(vid)}(1:nframe);
@@ -94,16 +126,9 @@ for vid=1:length(useData)
     tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
     tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
     useN= appEpoch{vid}==0; use= appEpoch{vid}==1;
-    subplot(1,2,1)
-    plot(tR(useN(1:20:end)),pR(useN(1:20:end)),'b.'); hold on; axis square
-    plot(tR(use(1:20:end)),pR(use(1:20:end)),'g.'); hold on
-     subplot(1,2,2);
-      plot(tL(useN(1:20:end)),pL(useN(1:20:end)),'b.'); hold on; axis square
-      plot(tL(use(1:20:end)),pL(use(1:20:end)),'g.'); hold on; axis square
-
     clear r l
     if sum(useN)>4
-    nBins=-90:20:90; nBinsP=-50:5:50
+    nBins=-90:5:90; nBinsP=-50:5:50
     r= (hist(tR(useN),nBins))/sum(useN);l= (hist(tL(useN),nBins))/sum(useN);
      rP= (hist(pR(useN),nBinsP))/sum(useN);lP= (hist(pL(useN),nBinsP))/sum(useN);
     else
@@ -127,7 +152,7 @@ for vid=1:length(useData)
 %     plot(tR(use(1:20:end)),tL(use(1:20:end)),'go'); hold on; axis square; %ylim([-30 30]); xlim([-30 30]);
     clear r l
     if sum(use)>4
-        nBins=-90:20:90; nBinsP=-50:5:50
+        nBins=-90:5:90; nBinsP=-50:5:50
         r= (hist(tR(use),nBins))/sum(use);l= (hist(tL(use),nBins))/sum(use);
         rP= (hist(pR(use),nBinsP))/sum(use);lP= (hist(pL(use),nBinsP))/sum(use);
 
@@ -149,10 +174,12 @@ allThA(:,1)=nansum(tAcounts(:,:,1),1)./(length(useData))
 allThA(:,2)=nansum(tAcounts(:,:,2),1)./(length(useData))
 
 figure;subplot(1,2,1); plot(nBins,allThN(:,1),'b'); hold on; plot(nBins,allThA(:,1),'g'); title('Right Eye Theta'); axis square
-ylim([0 .6]);
+ylim([0 .25]); xlabel('theta (degrees)'); ylabel('proportion of time');
 subplot(1,2,2);plot(nBins,allThN(:,2),'b'); hold on; plot(nBins,allThA(:,2),'g');title('Left Eye Theta');axis square
-ylim([0 .6]);
+ylim([0 .25]); xlabel('theta (degrees)'); ylabel('proportion of time');
 legend('non approach','approach')
+suptitle('Figure 2B: eyes are more centered in yaw during app')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 allThNP(:,1)=nansum(tNcountsP(:,:,1),1)./(length(useData))
@@ -162,18 +189,70 @@ allThAP(:,1)=nansum(tAcountsP(:,:,1),1)./(length(useData))
 allThAP(:,2)=nansum(tAcountsP(:,:,2),1)./(length(useData))
 
 figure;subplot(1,2,1); plot(nBinsP,allThNP(:,1),'b'); hold on; plot(nBinsP,allThAP(:,1),'g'); title('Right Eye Phi'); axis square
-ylim([0 .32]);
+ylim([0 .35]);
 subplot(1,2,2);plot(nBinsP,allThNP(:,2),'b'); hold on; plot(nBinsP,allThAP(:,2),'g');title('Left Eye Phi');axis square
-ylim([0 .32]);
+ylim([0 .35]);
+xlabel('phi (degrees)'); ylabel('proportion of time');
 legend('non approach','approach')
+suptitle('Figure 2B: eyes are more centered in phi during app')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 
 %%
 % Figure 2C: overlaid trace of two eyes converging and diverging
 
+figure
+plot(Rtheta{useData(40)}(1:5400)); hold on; %3 minute segment
+plot(Ltheta{useData(40)}(1:5400)); hold on;
+
+range=3000:4800
+figure
+plot(Rtheta{useData(40)}(range,:)); hold on; % 1 minute segment
+plot(Ltheta{useData(40)}(range,:)); hold on;
+
+range=3500:4400
+figure
+plot(Rtheta{useData(40)}(range,:)); hold on; % 30 second segment
+plot(Ltheta{useData(40)}(range,:)); hold on;
+
+range=4000:4600
+for vid =40%(useData)
+    
+   if length(Rtheta{useData(vid)})>=100
+tr=medfilt1(Rtheta{useData(vid)}(range,:),8);
+pr=medfilt1(Rphi{useData(vid)}(range,:),8);
+
+tl=medfilt1(Ltheta{useData(vid)}(range,:),8);
+pl=medfilt1(Lphi{useData(vid)}(range,:),8);
+
+
+figure
+subplot(1,2,1)
+plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+title('right eye'); xlim([-40 40]); ylim([-40 40]); colormap jet; colorbar
+
+subplot(1,2,2)
+plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+title('left eye'); xlim([-40 40]); ylim([-40 40]); colorbar
+
+for i =1:length(tl)
+subplot(1,2,1)
+plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+subplot(1,2,2)
+plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+
+ end
+
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+   
+   end
+end
+
+
 % Figure 2D: scatter plot of R vs L eye yaw to show conv/divergence 
 clear numPts congMv convMv divMv Rmv Lmv
 figure
-    for vid=1:length(useData)
+for vid=1:length(useData)
         clear nframe
         nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
         nframe=min(nframe, length(appEpoch{vid}));
@@ -182,17 +261,38 @@ figure
         useN = appEpoch{vid}(1:nframe)==0; use = appEpoch{vid}(1:nframe)==1;
         plot(tR(useN(1:20:end)),tL(useN(1:20:end)),'bo'); hold on; axis square; xlim([-50 50]);ylim([-50 50]);
         plot(tR(use(1:20:end)),tL(use(1:20:end)),'go');
-%         numPts(vid,1)=length(tR(1:20:end));
-%         numPts(vid,2)=length(tR);
+        clear tR tL
+         tR=dRtheta{useData(vid)}(1:nframe); tL=dLtheta{useData(vid)}(1:nframe);
+        tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
+        useN = appEpoch{vid}(1:nframe)==0; use = appEpoch{vid}(1:nframe)==1;
+        xlabel('R eye theta'); ylabel('L eye theta');
+        Rmv=nansum(tR(useN)>=0 & tL(useN)>=0);
+        Lmv=nansum(tR(useN)<=0 & tL(useN)<=0);
+       
+        congMv(vid,1)=(Rmv+Lmv);
+        convMv(vid,1)=(nansum(tR(useN)<=0 & tL(useN)>=0));
+        divMv(vid,1)=(nansum(tR(useN)>=0 & tL(useN)<=0));
+        
+        clear Rmv Lmv
+        Rmv=nansum(tR(use)>=0 & tL(use)>=0);
+        Lmv=nansum(tR(use)<=0 & tL(use)<=0);
 
-    Rmv=nansum(tR(useN)>=0& tL(useN)>=0);
-    Lmv=nansum(tR(useN)<=0& tL(useN)<=0);
-    congMv(vid,:)=(Rmv+Lmv)./(nansum(useN & ~isnan(tR)'& ~isnan(tL)'));
-    convMv(vid,:)=(nansum(tR(useN)<=0& tL(useN)>=0))./sum(useN&~isnan(tR)'&~isnan(tL)');
-    divMv(vid,:)=(nansum(tR(useN)>=0 & tL(useN)<=0))./sum(useN&~isnan(tR)'&~isnan(tL)');
+        congMv(vid,2)=(Rmv+Lmv);
+        convMv(vid,2)=(nansum(tR(use)<=0 & tL(use)>=0));
+        divMv(vid,2)=(nansum(tR(use)>=0 & tL(use)<=0));
+        
+        nPts(vid,1) = nansum((useN) & sum(~isnan(tR))' & sum(~isnan(tL))');
+        nPts(vid,2)= nansum((use) & sum(~isnan(tR))' & sum(~isnan(tL))');
     end
 
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
 % Figure 2E: quantification of 2D, bar plots
+eyeTypes = [nansum(congMv,1)./(nansum(nPts,1)); nansum(convMv,1)./(nansum(nPts,1)); nansum(divMv,1)./(nansum(nPts,1))];
+figure;bar(eyeTypes)
+title('Figure 2E: proportions of congruent and incongruent eye movements')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 % Figure 2F: hist of difference in eye yaw (aka vergence)
@@ -222,9 +322,11 @@ vergCounts(:,2)=nansum(vgDiff(:,:,2),1)./(length(useData))
 
 figure;plot(nBins,vergCounts(:,1),'b');
 hold on; 
-plot(nBins,vergCounts(:,2),'g'); title('diff in vergence'); axis square
+plot(nBins,vergCounts(:,2),'g'); title('Figure 2F: vergence (R - L eye)'); axis square
+xlabel('vergence (deg)'); ylabel('proportion of time');
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-
+%stats here
 
 
 % Figure 2G: correlation of eye thetas & eye phis 
@@ -282,7 +384,7 @@ L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
 L(4) = plot(nan, nan, 'c-');
 
-legend(L,{'dTheta non-app','dPhi non-app','dTh Approach','dPhi app'}); title('mean between eye corr, dtheta & dphi');
+legend(L,{'dTheta non-app','dPhi non-app','dTh Approach','dPhi app'}); title('Figure 2G: mean between eye corr, dtheta & dphi');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %% FIGURE 3: during approaches, eyes are more centered (smaller vergence), due to less head movements in pitch and roll
@@ -290,98 +392,291 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 % Figure 3A: overlaid traces of pitch & eye vergence
 
 % Figure 3B: scatter & corr of pitch (tilt) and vergence
+close all
+
 for c=0:1
     clear use
 use = find(appAll==c);
 
-figure(3)
+figure(1)
 plot(tiltAll(use),vergDlc(use),'.'); axis equal; hold on; lsline
 xlabel('acc tilt'); ylabel('eye vergence');
 ylim([-90 90]); xlim([-90 90]);
 R=corrcoef(tiltAll(use), vergDlc(use),'Rows','pairwise')
 text(-80,(80-c*5), ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
-title('acc ch 2');
+title('Figure 3B: acc tilt and dlc eye vergence');
 if c==1
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
 
 
-figure(4)
+figure(2)
 [corr lags]=(nanxcorr(tiltAll(use),vergDlc(use),30,'coeff'));
-plot(lags,corr); hold on
+plot(lags,corr); hold on; ylabel('correlation coeff');
 axis square;ylim([-1 1]);
-title('acc tilt, vergence');
+title('Figure 3C: corr of acc tilt & eye vergence');
 if c==1
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
 
+
+figure(3)
+clear nBins h
+nBins=-90:5:90
+h=hist(tiltAll(use),nBins);
+plot(nBins, h/length(tiltAll(use))); hold on
+title('Figure 3D: acc pitch (tilt) is less during approach)')
+if c==1
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+end
 end
 
 % Figure 3C: example trace, less change in pitch during approach
 
 % Figure 3D: hist or corr, less change in pitch during approach
+% corr & hist above in loop
 
 % Figure 3E: overlaid traces of roll & eye phi
 
 % Figure 3F: scatter & corr of roll & eye phi
+close all
 for c=0:1
     clear use
 use = find(appAll==c);
-figure(1)
+figure(4)
 plot(rollAll(use),dlcPhi(use),'.'); axis equal; hold on; lsline
 xlabel('acc roll'); ylabel('eye phi');
 ylim([-90 90]); xlim([-90 90]);
 R=corrcoef(rollAll(use), dlcPhi(use),'Rows','pairwise')
 text(-80,(80-c*5), ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
-title('acc ch 1');
+title('Figure 3F: acc roll & diff of eye phi)');
 if c==1
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 end
 
-figure(2)
+figure(5)
 [corr lags]=(nanxcorr(rollAll(use),dlcPhi(use),30,'coeff'));
 plot(lags,corr);axis square; hold on
-title('acc roll, phi');
+title('Figure 3G: corr of acc roll & diff between eye phi'); ylabel('corr coeff')
 ylim([-1 1]);
 if c==1
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
 
+figure(6)
+clear nBins h
+nBins=-90:5:90
+h=hist(rollAll(use),nBins);
+plot(nBins, h/length(tiltAll(use))); hold on; title('acc roll')
+title('Figure 3H: roll during app is less')
+if c==1
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+end
 end
 
 % Figure 3G: example trace, less change in roll during approach
 
 % Figure 3H: hist or corr, less change in roll during approach
+% hist and corr above in loop
 
 %% FIGURE 4: Coordination of eyes and head
 
 % Figure 4A: hist of head yaw app and non approach (not different)
+figure
+for c=0:1
+clear nBins h use
+use = find(appAll==c);
+nBins=-30:2:30
+h=hist(gyro3All(use),nBins);
+plot(nBins, h/length(gyro3All(use))); hold on; title('head yaw from gyro')
+title('Figure 4A: head angle is not diff between non-app and app')
+if c==1
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+end
+end
+%%% stats here
 
-% Figure 4B: hist of mean eye yaw, app and non app 
+% Figure 4B: hist of mean eye yaw, app and non app
+d_mnEyeAll=[];mnPhiAll=[];allDLChead=[];mnEyeAll=[];
+for vid=1:length(useData)
+mnEye =.5*(Rtheta{useData(vid)}+Ltheta{useData(vid)});
+mnEye=mnEye-nanmean(mnEye);
+mnEyeAll=[mnEyeAll mnEye(1:end-1)'];
+
+mnEyeD =.5*(dRtheta{useData(vid)}+dLtheta{useData(vid)});
+mnEyeD=mnEyeD-nanmean(mnEyeD);
+d_mnEyeAll=[d_mnEyeAll mnEyeD'];
+
+mnPhi =.5*(dRphi{useData(vid)}+dLphi{useData(vid)});
+mnPhi=mnPhi-nanmean(mnPhi);
+mnPhiAll=[mnPhiAll mnPhi'];
+dHead=d_Theta{useData(vid)}; dHead=dHead-nanmean(dHead);
+allDLChead = [allDLChead dHead'];
+end
+
+figure
+for c=0:1
+    hold on
+    clear nBins h use hp
+    use = find(appAll==c);
+    nBins= -30:2:30
+    h=hist(d_mnEyeAll(use),nBins);
+    subplot(1,2,1)
+    plot(nBins,h/length(d_mnEyeAll(use))); hold on; title('mn Eye Yaw'); axis square
+    plot([-20,-20],[.5,0],'k--');
+    plot([20,20],[.5,0],'k--');
+    
+    hp=hist(mnPhiAll(use),nBins);
+    subplot(1,2,2)
+    plot(nBins, hp/length(mnPhiAll(use))); axis square; hold on; title('mn Eye Phi')
+    
+    if c==1
+        suptitle('Figure 4B: mn Eye yaw falls within binocular zone');
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
+end
+
 
 % Figure 4C: ex trace when dTh is 0, eyes are also 0, then hist
 
 % Figure 4D: scatter of change in head yaw and change in eye yaw, shows
 % mostly congruent but not all
+figure
+for c=1:2
+    clear use 
+    use = find(appAll==c-1);
+    samp(c,:)=randsample(use,7375);
+    plot(gyro3All(samp(c,:)), d_mnEyeAll(samp(c,:)),'.')
+    axis([-35 35 -35 35]); axis square
+    hold on
+end
+    xlabel('gyro yaw'); ylabel('d eye yaw');
+
+title('Figure 4D: head & eye thetas, not all compensatory')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 % Figure 4E: corr of change in head and eye yaw, congruence
 % (non-compensation) at short time scales
+
+
+clear corrYaw corrAllYaw err errA lagsYaw
+for c=0:1
+  for vid=1:length(useData)   
+    nframe = min(length(accelChannels{useData(vid)}(:,6)),length(dRtheta{useData(vid)}));
+    nframe = min(nframe, length(dLtheta{useData(vid)}));
+    nframe=min(nframe, length(appEpoch{vid}));
+    use=appEpoch{vid}(1:nframe)==c;
+    dth=d_Theta{useData(vid)}(1:nframe);
+    g3=accelChannels{useData(vid)}(1:nframe,6); dtR=dRtheta{useData(vid)}(1:nframe); dtL=dLtheta{useData(vid)}(1:nframe);
+    mnEye=.5*(dtR+dtL); g3=g3-nanmean(g3); mnEye=mnEye-nanmean(mnEye);
+    if sum(use)>5
+    [corrYaw lagsYaw]= nanxcorr(g3(use),mnEye(use),30,'coeff');
+     uselags=(lagsYaw>=-30& lags<=30);
+ end
+    if sum(uselags)==61 
+        corrAllYaw(vid,:,c+1)=corrYaw(uselags); 
+    else
+    end
+end
+end
+
+figure('units','normalized','outerposition',[0 0 1 1])
+err= nanstd(corrAllYaw(:,:,1))/(sqrt(length(corrAllYaw))); 
+errA= nanstd(corrAllYaw(:,:,2))/(sqrt(length(corrAllYaw))); 
+shadedErrorBar(1:size(corrAllYaw,2),nanmean(corrAllYaw(:,:,1),1),err,'-b',1); hold on
+shadedErrorBar(1:size(corrAllYaw,2),nanmean(corrAllYaw(:,:,2),1),errA,'-g',1);
+
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); 
+ylim([-.5 .3]); %xlim([21 41]); %15 and 46 ==500 ms
+xlabel('time'); ylabel('correlation coeff');
+axis square
+title('Figure 4E: eye movements are mostly compensatory');
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %% FIGURE 5: Non-compensatory eye movements
 
 % Figure 5A: same as 4D (change in eye and head yaw), but separated by eye mvmt types from gmm
   % maybe bar plot showing prop of time non-app and app that each occurs
+mvmtsSamp=[gyro3All(samp(2,:)); d_mnEyeAll(samp(2,:)); mnEyeAll(samp(2,:))];
+gm = fitgmdist(mvmtsSamp',3,'Replicates',10);
+idx = cluster(gm,mvmtsSamp');
+X=mvmtsSamp;
+figure
+gscatter(gyro3All(samp(2,:)),d_mnEyeAll(samp(2,:)),idx); axis equal
+title('from rand sample approach only');
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+full=[samp(1,:) samp(2,:)]
+mvmtsSamp=[gyro3All(full); d_mnEyeAll(full); mnEyeAll(full)];
+
+gm = fitgmdist(mvmtsSamp',3,'Replicates',10);
+idx = cluster(gm,mvmtsSamp');
+X=mvmtsSamp;
+figure
+gscatter(gyro3All(full),d_mnEyeAll(full),idx); axis equal
+title('from rand sample, nonapproach and approach');
+ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+clear mvmts
+mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1); mnEyeAll(appAll==1)];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
+title('all approach pts only')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+clear mvmts
+mvmts=[gyro3All(appAll==0); d_mnEyeAll(appAll==0); mnEyeAll(appAll==0)];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==0),d_mnEyeAll(appAll==0),idx); axis equal
+title('non-approach pts')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+clear mvmts
+mvmts=[gyro3All; d_mnEyeAll; mnEyeAll];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+X=mvmts;
+figure
+gscatter(gyro3All,d_mnEyeAll,idx); axis equal
+title('all pts')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 % Figure 5B: example of target selection saccades 
 
 % Figure 5C: quantification of target selection sacc
+% 
+% clusters(1,:)=sum(idx==1|idx==3)/length(idx);
+% clusters(2,:)=sum(idx==2)/length(idx);
+% 
+% clustersErr(1,:) = squeeze(nanstd(idx(idx==1|idx==3)))/sqrt(length(idx));
+% clustersErr(2,:) = squeeze(nanstd(idx(idx==2)))/sqrt(length(idx));
+% barweb(clusters,clustersErr)
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 % Figure 5D: example of resetting saccades
 
 % Figure 5E: quantification of resetting sacc
 
 
+
+if savePDF
+    pSname='T:\PreyCaptureAnalysis\Data\';
+    filen=sprintf('%s','PaperFigs_011519_DEINTERLACED_b','.pdf')
+%     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
+    pdfilename=fullfile(pSname,filen);
+    dos(['ps2pdf ' psfilename ' ' pdfilename]);
+    delete(psfilename);
+else
+    pSname='T:\PreyCaptureAnalysis\Data\';
+end
 
 
 

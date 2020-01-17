@@ -1,18 +1,18 @@
 clear all; close all;
 dbstop if error
 % load('J462a_AllACCSessions_120619_a.mat');
-load('J475c_ACCSessions_121719_a.mat');
+load('J475c_deInterACC_NN.mat');
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
 savePDF=1;
 if savePDF
-    psfilename = 'C:\analysisPS.ps';
+    psfilename = 'C:\analysisPS3.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
 end
 
 mouse_xy=[];cricket_xy=[];EllipseParamsR=[];EllipseParamsL=[]; radR=[]; az=[];
 
-for i=1:length(Data)
+for i=[1:3 6:11]%1:length(Data)
     
     animal(i,:)=Data(i).ani;
     sessionN(i) = Data(i).sessionnum;
@@ -56,7 +56,6 @@ for i=1:length(Data)
     thMissing(i)= sum(~isnan(Data(i).theta))/(length(Data(i).theta)); %proportion of non-nans
     
     accelData{i,:} = Data(i).accShift;
-    %     accelData{i,:}(accelData{i,:}>2*std(accelData{i,:}))=nan;
     accelCorr(i) =Data(i).accXcorrMax;
     accelDrift(i) =Data(i).accXcorrLag;
     accelDataRaw{i,:}= Data(i).rawAccShift;
@@ -239,18 +238,18 @@ for vid = 1:length(useFilt)
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
 %%
-figure
-plot(allTilt,dlcVerg,'.'); axis equal; hold on; lsline
-mdl = fitlm(allTilt,dlcVerg)
-axis([-90 90 -90 90]);
-xlabel('acc pitch'); ylabel('vergence')
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-figure
-plot(allRoll,dlcPhi,'.'); axis equal; hold on; lsline
-axis([-90 90 -90 90]);
-xlabel('acc roll'); ylabel('eye phi')
-mdl = fitlm(allRoll,dlcPhi)
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% figure
+% plot(allTilt,dlcVerg,'.'); axis equal; hold on; lsline
+% mdl = fitlm(allTilt,dlcVerg)
+% axis([-90 90 -90 90]);
+% xlabel('acc pitch'); ylabel('vergence')
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% figure
+% plot(allRoll,dlcPhi,'.'); axis equal; hold on; lsline
+% axis([-90 90 -90 90]);
+% xlabel('acc roll'); ylabel('eye phi')
+% mdl = fitlm(allRoll,dlcPhi)
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%
 figure
@@ -376,7 +375,9 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 
 
-for vid =1:5%length(useFilt)
+for vid =1:length(useFilt)
+    
+   if length(thetaR{useFilt(vid)})>=100
 tr=medfilt1(thetaR{useFilt(vid)}(1:100),8);
 pr=medfilt1(phiR{useFilt(vid)}(1:100),8);
 
@@ -398,9 +399,12 @@ subplot(1,2,1)
 plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
 subplot(1,2,2)
 plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-end
+ end
+
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+   
+   end
 end
 
 %%
@@ -1572,7 +1576,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Analyzed_121719a','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_dInter_NN','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1580,5 +1584,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_121719_allSessions_a','.mat');
+afilename=sprintf('%s',ani,'Analyzed_Analyzed_dInter_NN','.mat');
 save(fullfile(pSname, afilename))

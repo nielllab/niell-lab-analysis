@@ -6,7 +6,7 @@ savePDF=1; dbstop if error
  % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
-deInter = 0;
+deInter = 1;
 doAcc = 1;
 
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
@@ -14,15 +14,12 @@ fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
 %finds all files with acc.csv in the name for the accelerometers
 for i=1:length(pname)
     fileList = [fileList; dir([pname{i} '*resnet50_Top*.csv'])];
-    
-    %     TSfileList = [TSfileList; dir([pname{i} '*topTS*.csv'])];
-    
 end
 
 
 %%
 
-for j=1% j=1:length(fileList) %%% loop over all top camera files
+for j=1:length(fileList) %%% loop over all top camera files
     if savePDF
         psfilename = 'C:\analysisPS.ps';
         if exist(psfilename,'file')==2;
@@ -60,7 +57,9 @@ for j=1% j=1:length(fileList) %%% loop over all top camera files
     end
     Rfname = strrep(Rfname,'top','eye1r');
     % Rfname = strrep(Rfname,'900000','1030000');
-    Rfname = strrep(Rfname,'Aug15','Jul12');
+   % Rfname = strrep(Rfname,'Aug15','Jul12');
+    Rfname = strrep(Rfname,'Aug15','Jan8');
+
     %   Lfname = strrep(Rfname,'Eye1r','Eye2l');
     Lfname = strrep(Rfname,'eye1r','eye2l');
     
@@ -173,18 +172,27 @@ for j=1% j=1:length(fileList) %%% loop over all top camera files
             LTSnew(2:2:end) = LTS  +0.5*median(diff(LTS)) ;
             LTSnew(1:2:end) = LTS ;
             LTS = LTSnew;
-        end
+                  end
         startL = LTS(1);
         Data(j).LTS = LTS;
         
         %%% determine new timestamps, based on maximum possible window
         %%% given start/stop times
-        start=max([startT,startR,startL]);
-        endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
+ 
+   
+        if doAcc==1
+            if mean(TopTs) - mean(Data(j).accTS(end))>60*2
+              Data(j).accTS=Data(j).accTS+1*60*60; % if before daylight savings (or after?), add one hour
+            end
+            start=max([startT,startR,startL,Data(j).accTS(1)]);
+            endT = min([TopTs(end-1),RTS(end), LTS(end),Data(j).accTS(end)])
+        else
+            start=max([startT,startR,startL]);
+            endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
+        end
         xq=(start:1/30:endT)';  %%% 30Hz resample
-        
         Data(j).usedTS=xq;
-        
+
         %%% resample top cam values
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
             Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw, Data(j).cricketThetaRaw);
@@ -233,7 +241,7 @@ for j=1% j=1:length(fileList) %%% loop over all top camera files
             %%% 
             for i = 1:6
                 Data(j).accResamp(:,i) = interp1(Data(j).accTS,Data(j).accTrace(:,i),xq);
-                Data(j).rawAccResamp(:,i)= interp1(Data(j).accTS,Data(j).rawAcc(:,i),xq)
+                Data(j).rawAccResamp(:,i)= interp1(Data(j).accTS,Data(j).rawAcc(:,i),xq);
             end
             
             %%% there is a constant offset in the accelerometer timestamps coming in through labjack.
@@ -299,7 +307,7 @@ for j=1% j=1:length(fileList) %%% loop over all top camera files
     if savePDF
         pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
         C={ani, date, sessionnum, clipnum};
-        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'originalAcc','.pdf')
+        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'deInterAcc_NN','.pdf')
         pdfilename=fullfile(pSname,filen)
         dos(['ps2pdf ' psfilename ' ' pdfilename]);
         delete(psfilename);
@@ -311,7 +319,7 @@ for j=1% j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
- afilename=sprintf('%s',ani,'_originalACC','.mat')
+ afilename=sprintf('%s',ani,'_deInterACC_NN','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))
