@@ -1,5 +1,5 @@
 close all; clear all;
-%   load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
+   load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
  %load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
 savePDF=1;
@@ -957,9 +957,14 @@ X=mvmts;
 figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
 title('all approach pts only')
-xlim([-25 25]); ylim([-25 25]);
+xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25], [25 -25],'r')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
+figure
+gscatter(gyro3All(appAll==1)-median(gyro3All),1.2*d_mnEyeAll(appAll==1),idx); axis equal
+title('all approach pts only')
+xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25], [18 -32],'r')
+plot([-25 25], [32 -18],'r')
 
 fullData=[gyro3All;d_mnEyeAll;mnEyeAll];
 idxAll=cluster(gm, fullData');
@@ -1043,12 +1048,16 @@ for i = 1:length(appEpoch)
         lphiHist(:,:,i) = NaN;
     end
     
+
     %%% get head positions
     hth = thetaHead{vid}; 
     dth = d_Theta{vid};
     azdeg = az{vid}*180/pi;
     
     %%% get accelerometers
+
+       %%% get accelerometers
+
     if exist('accelData','var')
         tilt = accelChannels{vid}(:,2);
         roll = accelChannels{vid}(:,1);
@@ -1056,6 +1065,17 @@ for i = 1:length(appEpoch)
     else
         display('no acc')
     end
+    
+    %%% get head positions
+     hth = thetaHead{vid}; 
+     %%% alternate: use acc data to calculate cumulative head position
+    %%% may drift, but probably more accurate over short timeframes
+    acc_hth = [hth(1) cumsum(acc_dth(1:end-1) - median(acc_dth))'];
+    
+    dth = d_Theta{vid};
+    azdeg = az{vid}*180/pi;
+    
+ 
     
     %%% azimuth vs eye histograms
     az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
@@ -1100,12 +1120,15 @@ for i = 1:length(appEpoch)
     
     
     %%% get rid of large jumps
-    hthnonan = hth;
-    hthnonan(abs(diff(hth))>90)=NaN;
+   % hthnonan = hth;
+    %hthnonan(abs(diff(hth))>90)=NaN;
+    hthnonan = acc_hth;
     
-    hthApp = hth(appRange)-nanmedian(hth(mainApp));
+   % hthApp = hth(appRange)-nanmedian(hth(mainApp));
+   hthApp = acc_hth(appRange) - nanmedian(acc_hth(mainApp));
     hthApp = mod(hthApp + 180,360)-180;
-    
+     
+     
     gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
     mnEyeApp =  0.5*(rth(appRange) +lth(appRange))';
     
