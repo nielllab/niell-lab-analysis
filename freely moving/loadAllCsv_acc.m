@@ -244,19 +244,43 @@ for j=1:length(fileList)
         end
         close(gcf)
         
-        gyro3=(Data(j).accResamp(:,6)-nanmean(Data(j).accResamp(:,6))); % gyro 3 = yaw
-        dth=Data(j).dtheta;
-        [corr lags]=nanxcorr(gyro3,dth,100,'coeff');
+        %%% test range of offsets to interpolate accelerometers for precise alignment
+        %%% needed because there is a fixed delay in acc timestamps (from labjack?)
+        %%% here we test a range of offsets, by interpolating with these and then comparing them to head dtheta from DLC
         
-        subplot(1,2,2);
-        plot(lags,corr); axis square;
-        title('acc yaw, d head th')
-        [mx ind] = max(corr);
-        drift = lags(ind);
-        Data(j).accShift = circshift(Data(j).accResamp,-drift,1);
-        Data(j).accXcorrMax = mx;
-        Data(j).accXcorrLag = drift;
-        Data(j).rawAccShift = circshift(Data(j).rawAccResamp,-drift,1)
+        accPre = Data(j).accTrace(:,6);   %%% pull out yaw gyro from raw acc Data
+        ts = Data(j).accTS;               %%% accelerometer timestamps
+        
+        %%% loop over -10 to 10 secs at 5 msec intervals
+        offsets = -10:0.005:10;
+        clear xc
+        for shift = 1:length(offsets)
+            newinterp = interp1(ts+offsets(shift),accPre, xq);
+            xc(shift)= nanxcorr(newinterp(1:end-1),dth,0, 'coeff');
+        end
+        
+        [max_xcorr max_ind] = max(xc);
+        accPost = interp1(ts+offsets(max_ind),accPre, xq);
+         Data(j).accShift = interp1(ts+offsets(max_ind),Data(j).accTrace, xq);
+        Data(j).accXcorrMax = max_xcorr;
+        Data(j).accXcorrLag = offsets(max_ind);
+        Data(j).rawAccShift = interp1(ts+offsets(max_ind),Data(j).rawAcc, xq);
+        
+        
+        
+%         gyro3=(Data(j).accResamp(:,6)-nanmean(Data(j).accResamp(:,6))); % gyro 3 = yaw
+%         dth=Data(j).dtheta;
+%         [corr lags]=nanxcorr(gyro3,dth,100,'coeff');
+%         
+%         subplot(1,2,2);
+%         plot(lags,corr); axis square;
+%         title('acc yaw, d head th')
+%         [mx ind] = max(corr);
+%         drift = lags(ind);
+%         Data(j).accShift = circshift(Data(j).accResamp,-drift,1);
+%         Data(j).accXcorrMax = mx;
+%         Data(j).accXcorrLag = drift;
+%         Data(j).rawAccShift = circshift(Data(j).rawAccResamp,-drift,1)
         
    if savePDF
             set(gcf, 'PaperPositionMode', 'auto');
