@@ -2,7 +2,7 @@ close all; clear all;
 %   load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
  %load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS_B.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -37,7 +37,7 @@ Cntrl_err= nanstd(Cntrl_speed)/sqrt(length(useData));
 
 clear mouseSp appEpoch useData appTime thetaHead vid
 load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
     appTime=appEpoch{vid};
@@ -193,19 +193,42 @@ for vid=1:length(useData)
         clear use
         useN = appEpoch{vid}==0;use = appEpoch{vid}==1;
         subplot(1,2,1)
-        plot(tR(useN(1:20:length(useN))),pR(useN(1:20:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
-        plot(tR(use(1:20:length(use))),pR(use(1:20:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tR(useN(1:60:length(useN))),pR(useN(1:60:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tR(use(1:60:length(use))),pR(use(1:60:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
         title('R eye')
         xlabel('yaw (deg)'); ylabel('pitch(deg)');
         subplot(1,2,2)
-        plot(tL(useN(1:20:length(useN))),pL(useN(1:20:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
-        plot(tL(use(1:20:length(use))),pL(use(1:20:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tL(useN(1:60:length(useN))),pL(useN(1:60:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+        plot(tL(use(1:60:length(use))),pL(use(1:60:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
         xlabel('yaw (deg)'); ylabel('pitch(deg)');
         title('L eye')
 end
 suptitle('Figure 2A: R & L eye yaw & pitch');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
+
+
+% figure
+% for vid=1:length(useData)
+%     nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
+%     pR=Rphi{useData(vid)}(1:nframe); pL=Lphi{useData(vid)}(1:nframe);
+%     pR=nanmean(pR)-pR; pL=nanmean(pL)-pL;
+%     tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
+%     tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
+%         clear use
+%         useN = appEpoch{vid}==0;use = appEpoch{vid}==1;
+%         subplot(1,2,1)
+%         polarscatter(tR(useN(1:100:length(useN))),pR(useN(1:100:length(useN))),'.b'); hold on;% xlim([-100 100]);ylim([-100 100]); axis square
+%         polarscatter(tR(use(1:50:length(use))),pR(use(1:50:length(use))),'.g'); hold on; rlim([0 40]);%ylim([-100 100]); axis square
+%         title('R eye')
+%      %   xlabel('yaw (deg)'); ylabel('pitch(deg)');
+%         subplot(1,2,2)
+%         polarscatter(tL(useN(1:100:length(useN))),pL(useN(1:100:length(useN))),'.b'); hold on; rlim([0 40])% xlim([-100 100]);ylim([-100 100]); axis square
+%         polarscatter(tL(use(1:50:length(use))),pL(use(1:50:length(use))),'.g'); hold on;% xlim([-100 100]);ylim([-100 100]); axis square
+%       %  xlabel('yaw (deg)'); ylabel('pitch(deg)');
+%         title('L eye')
+% end
+% suptitle('Figure 2A: R & L eye yaw & pitch');
 %%
 % Figure 2B: histograms of yaw and pitch from panel above
 clear tNcounts tAcounts allThN allThA
@@ -293,7 +316,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 clear all
 load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
-savePDF=0;
+savePDF=1;
     psfilename = 'C:\analysisPS_B.ps';
 
 figure
@@ -359,7 +382,7 @@ end
 
 clear all
 load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
-savePDF=0;
+savePDF=1;
     psfilename = 'C:\analysisPS_B.ps';
     
  % Figure 2D: example of convergence during approach
@@ -543,6 +566,7 @@ for c=0:1
         tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
         tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
         vg=tR-tL;
+%         vgErr=nanstd(vg)./(sqrt(length(vg)));
         useN= appEpoch{vid}(1:nframe)==c;
         nBins=-90:5:90
         if sum(useN)>4
@@ -556,11 +580,14 @@ end
 
 vergCounts(:,1)=nansum(vgDiff(:,:,1),1)./(length(useData))
 vergCounts(:,2)=nansum(vgDiff(:,:,2),1)./(length(useData))
+vergErr=nanstd(vgDiff)./(sqrt(length(vgDiff))); vergErr=squeeze(vergErr);
 
-figure;plot(nBins,vergCounts(:,1),'b');
-hold on; 
-plot(nBins,vergCounts(:,2),'g'); title('Figure 2F: vergence (R - L eye)'); axis square
+figure; shadedErrorBar(nBins,vergCounts(:,1),vergErr(:,1),'b',1); hold on
+shadedErrorBar(nBins,vergCounts(:,2),vergErr(:,2),'g',1); hold on
+
+title('Figure 2F: vergence (R - L eye)'); axis square
 xlabel('vergence (deg)'); ylabel('proportion of time');
+ylim([0 .22])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 [h p]=kstest2(vergCounts(:,1),vergCounts(:,2))
 
@@ -581,6 +608,7 @@ for vid=1:length(useData)
         dpR=dRphi{useData(vid)}(1:nframe); dpL=dLphi{useData(vid)}(1:nframe);
         [corrL lagsL]= nanxcorr(dpR(use),dpL(use),30,'coeff');
         uselagsL=(lagsL>=-30 & lagsL<=30);
+
     else
     end
     use=appEpoch{vid}==1;
@@ -598,7 +626,7 @@ for vid=1:length(useData)
     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
-
+%         errVidR(vid)=errRvid;errVidL(vid)=errLvid;
     else
     end
 end
@@ -665,6 +693,39 @@ if c==1
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 end
 end
+
+for c=0:1
+    for vid=1:length(useData)
+     clear useN tilt
+        tilt=accelChannels{useData(vid)}(:,2);
+        useN= appEpoch{vid}==c;
+        nframe=min(length(tilt), length(useN));
+        useN=useN(1:nframe);tilt=tilt(1:nframe); 
+        tilt=tilt-nanmean(tilt);
+        nBins=-90:5:90
+        if sum(useN)>1
+            tiltHist = (hist(tilt(useN),nBins))./sum(find(~isnan(tilt(useN)))& find(useN)');
+        else
+            tiltHist=NaN;
+        end
+      tiltFull(vid,:,c+1)=tiltHist;
+    end
+end
+
+%this doesn't add to 1 for approaches 
+tiltCounts(:,1)=nansum(tiltFull(:,:,1),1)./(length(useData))
+tiltCounts(:,2)=nansum(tiltFull(:,:,2),1)./(length(useData))
+tiltErr=nanstd(tiltFull)./(sqrt(length(tiltFull))); tiltErr=squeeze(tiltErr);
+
+figure; shadedErrorBar(nBins,tiltCounts(:,1),tiltErr(:,1),'b',1); hold on
+shadedErrorBar(nBins,tiltCounts(:,2),tiltErr(:,2),'g',1); hold on
+
+title('Figure 3B: pitch'); axis square
+xlabel('pitch (deg)'); ylabel('proportion of time');
+ylim([0 .16])
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+[h p]=kstest2(tiltCounts(:,1),tiltCounts(:,2))
+
 
 % Figure 3C: example trace, less change in pitch during approach
 
@@ -813,18 +874,26 @@ end
 figure
 clear nBins h use hp
 stationary = mouseSpAll<5;
-nBins= -20:1:20;
+nBins= -40:1:40;
 hs=hist(d_mnEyeAll(stationary),nBins);
 plot(nBins,hs/sum(stationary)); hold on; title('mn Eye Yaw, stationary'); axis square
-hma=hist(d_mnEyeAll(appAll==1 & stationary==0),nBins);
-plot(nBins,hma/sum(stationary==0&appAll==1)); hold on; title('mn Eye Yaw, moving approach'); axis square
-h=hist(d_mnEyeAll(appAll==1),nBins);
-plot(nBins,h/sum(appAll==1)); hold on; title('mn Eye Yaw, approach'); axis square
-legend('stationary','moving & approach','all approach');
+
+hma=hist(d_mnEyeAll(stationary==0),nBins);
+plot(nBins,hma/sum(stationary==0)); hold on; title('mn Eye Yaw, moving approach'); axis square
+% h=hist(d_mnEyeAll(appAll==1),nBins);
+% plot(nBins,h/sum(appAll==1)); hold on; title('mn Eye Yaw, approach'); axis square
+legend('stationary','moving');
 plot([-3,-3],[.3,0],'k--');
 plot([3,3],[.3,0],'k--');
+ylim([0 .32]); xlim([-22 22]);
 title('Figure 4C: when mouse is stationary, so are eyes');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
+
+nBins= -90:1:90;
+eyeHist=hist(d_mnEyeAll,nBins);
+plot(nBins,hs/length(d_mnEyeAll)); hold on; title('mn Eye Yaw, stationary'); axis square
 
 % Figure 4D: scatter of change in head yaw and change in eye yaw, shows
 % mostly congruent but not all
@@ -892,9 +961,24 @@ figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
 title('all approach pts only')
 xlim([-25 25]); ylim([-25 25]);
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-fullData=[gyro
-idxAll=cluster(gm
+
+fullData=[gyro3All;d_mnEyeAll;mnEyeAll];
+idxAll=cluster(gm, fullData');
+[sacc, clust]=min([sum(idx==1),sum(idx==2), sum(idx==3)])
+
+figure;
+[corr lags]=nanxcorr(gyro3All(idxAll==clust),d_mnEyeAll(idxAll==clust),30,'coeff')
+plot(lags,corr)
+% 
+% propNC(:,1)=(length(find(~appAll'&idxAll==clust)))/(sum(appAll==0));
+% propNC(:,2)=(length(find(appAll'&idxAll==clust)))/(sum(appAll==1));
+% propC(:,1)=(length(find(~appAll'&idxAll~=clust)))/(sum(appAll==0));
+% propC(:,2)=(length(find(appAll'&idxAll~=clust)))/(sum(appAll==1));
+% 
+% figure; bar([propC propNC]);
+
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 [sacc, clust]=min([sum(idx==1),sum(idx==2), sum(idx==3)])
@@ -915,15 +999,14 @@ maxlag = 30;
 thbins = -60:5:60;
 skip = 1; %%% only shows figures at this interval
 nthresh  = 60;
+headAll=[];
+eyeAll=[];
+% figure
 for i = 1:length(appEpoch)
-    
-    vid = useData(i)
-    
+    vid = useData(i);
     %%% get approaches
     app = appEpoch{i};
-%     appAll=[appAll app];
     nonapp=~appEpoch{i};
-    
     %%% get left eye positions
     lth = Ltheta{vid} - nanmedian(Ltheta{vid});
     dlth = dLtheta{vid};
@@ -933,7 +1016,6 @@ for i = 1:length(appEpoch)
     if nl(i)<nthresh
         lthHist(:,:,i) = NaN;
     end
-    
     %%% get right eye positions
     rth = Rtheta{vid} - nanmedian(Rtheta{vid});
     drth = dRtheta{vid};
@@ -965,7 +1047,7 @@ for i = 1:length(appEpoch)
     end
     
     %%% get head positions
-    hth = thetaHead{vid};
+    hth = thetaHead{vid}; 
     dth = d_Theta{vid};
     azdeg = az{vid}*180/pi;
     
@@ -1030,6 +1112,11 @@ for i = 1:length(appEpoch)
     gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
     mnEyeApp =  0.5*(rth(appRange) +lth(appRange))';
     
+    dhthnonan = dth;
+    dhthnonan(abs(diff(dth))>90)=NaN;
+    
+    dhthApp = dth(appRange)-nanmedian(dth(mainApp));
+    dhthApp = mod(dhthApp + 180,360)-180;
     
     %%% calculate change in position at different lags, as measure of stability
    
@@ -1037,78 +1124,110 @@ for i = 1:length(appEpoch)
     
     if round(i/skip)==i/skip
         
-        figure
-        subplot(6,1,1);
-%         plot(hthnonan,'k'); hold on;
-        plot(rth,'r');hold on; plot(lth,'b'); legend('right th','left th');
-        plot(find(app),ones(sum(app),1)*90,'g.'); %ylim([-180 180])
-        title(sprintf('vid %d',vid));
-        
+%          figure
+         figure('Renderer', 'painters', 'Position', [10 10 600 960])
+%         subplot(6,1,1);
+% %         plot(hthnonan,'k'); hold on;
+%         plot(rth,'r');hold on; plot(lth,'b'); legend('right th','left th');
+%         plot(find(app),ones(sum(app),1)*90,'g.'); %ylim([-180 180])
         roll = accelChannels{vid}(:,1); roll=roll-nanmean(roll); roll=medfilt1(roll,5);
         tilt=accelChannels{vid}(:,2); tilt=tilt-nanmean(tilt); tilt=medfilt1(tilt,8);
         g3=accelChannels{vid}(:,6); g3=g3-nanmean(g3);
 
         newData=[g3(1:end-1) diff(.5*(rth+lth)) (.5*(rth(1:end-1)+lth(1:end-1)));];
-        idx2=cluster(gm,newData)
+        idx2=cluster(gm,newData);
         
-        
-        subplot(6,1,2)
-        plot(roll); hold on;
-        plot(tilt);
+         propNCVid(i,1) = length(find(~app' & idx2==clust))./(length(newData(~app)));
+         propNCVid(i,2) = length(find(app' & idx2==clust))./(length(newData(app)));
+         propCVid(i,1)=  length(find(~app' & idx2~=clust))./(length(newData(~app)));
+         propCVid(i,2)= length(find(app' & idx2~=clust))./(length(newData(app)));
+         
+%         subplot(6,1,2)
+%         plot(roll); hold on;
+%         plot(tilt);
+%         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+%         legend('roll','tilt');
 
-        plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
-        legend('roll','tilt');
-
-        subplot(6,1,3);
+%         subplot(6,1,3);
+        subplot(4,1,1)
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on; 
         plot(rth(appRange)','r'); hold on; plot(lth(appRange)','b');
         plot(find(idx2(appRange)==clust),0.5*(rth(appRange(idx2(appRange)==clust)) +lth(appRange(idx2(appRange)==clust)))','og')
         ylim([-30 30]);  xlim([0 max(length(appRange),1)]);
+%         xlim([40 110]);
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
-        
-        subplot(6,1,4)
-        plot(roll(appRange)); hold on;
-        plot(tilt(appRange));
-        plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'og')
-        plot(find(idx2(appRange)==clust),tilt(appRange(idx2(appRange)==clust)),'og')
-        plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
-        plot([1  max(length(appRange),1)],[0 0],'--')
-        xlim([0 max(length(appRange),1)]);
-        if ~isempty(appRange)
-        ylim([((min(min(roll(appRange),tilt(appRange))))-5) ((max(max(roll(appRange),tilt(appRange))))+5)]);
-        end
-        legend('roll','tilt');
-        
-        subplot(6,1,5)
-        vgPhi=rphi(appRange)-lphi(appRange);
-        plot(vgPhi); hold on
-        plot(roll(appRange),'k'); hold on
-        plot(find(idx2(appRange)==clust),vgPhi((idx2(appRange)==clust)),'go')
-        plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'go')
+         title(sprintf('vid %d',vid));
 
+
+        subplot(4,1,2)
+        plot(0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',2); hold on; 
+        plot(drth(appRange)','r'); hold on; plot(dlth(appRange)','b');
+        plot(find(idx2(appRange)==clust),0.5*(drth(appRange(idx2(appRange)==clust)) +dlth(appRange(idx2(appRange)==clust)))','og')
+        ylim([-20 20]);  xlim([0 max(length(appRange),1)]);
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
-        xlim([0 max(length(appRange),1)]);
-        legend('R phi- L phi','acc roll')
-            if ~isempty(appRange)
-        ylim([((min(min(roll(appRange),vgPhi)))-5) ((max(max(roll(appRange),vgPhi)))+5)]);
-        end
+        title('d eye theta')
+%         subplot(6,1,4)
+%         plot(roll(appRange)); hold on;
+%         plot(tilt(appRange));
+%         plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'og')
+%         plot(find(idx2(appRange)==clust),tilt(appRange(idx2(appRange)==clust)),'og')
+%         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+%         plot([1  max(length(appRange),1)],[0 0],'--')
+%         xlim([0 max(length(appRange),1)]);
+%         if ~isempty(appRange)
+%         ylim([((min(min(roll(appRange),tilt(appRange))))-5) ((max(max(roll(appRange),tilt(appRange))))+5)]);
+%         end
+%         legend('roll','tilt');
+%         
+%         subplot(6,1,5)
+%         vgPhi=rphi(appRange)-lphi(appRange);
+%         plot(vgPhi); hold on
+%         plot(roll(appRange),'k'); hold on
+%         plot(find(idx2(appRange)==clust),vgPhi((idx2(appRange)==clust)),'go')
+%         plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'go')
+% 
+%         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+%         xlim([0 max(length(appRange),1)]);
+%         legend('R phi- L phi','acc roll')
+%             if ~isempty(appRange)
+%         ylim([((min(min(roll(appRange),vgPhi)))-5) ((max(max(roll(appRange),vgPhi)))+5)]);
+%         end
+
+subplot(4,1,4)
+hold on
+plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
+plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
+        plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
+ylim([-50 50])
+title('d head, dgaze')
+
+if appOffset>0
+    plot([appOffset appOffset],[-60 60],'g');end
+plot([endOffset endOffset],[-60 60],'r');
+if ~isempty(min(hthApp))
+    %ylim([min(hthApp)-20 max(hthApp)+20]);
+    ylim([-50 50])
+else  ylim([-50 50]);end
         
-        gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
-        subplot(6,1,6);
-        hold on; plot(hthApp +0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2);
-        plot(hthApp,'Color',[0 0.75 0],'LineWidth',2);
-        plot(find(idx2(appRange)==clust),hthApp(idx2(appRange)==clust),'bo')
-        plot(find(idx2(appRange)==clust),gzApp(idx2(appRange)==clust),'bo')
-       
-        if appOffset>0
-            plot([appOffset appOffset],[-60 60],'g');end
-        plot([endOffset endOffset],[-60 60],'r');
-        if ~isempty(min(hthApp))
-            ylim([min(hthApp)-20 max(hthApp)+20]);
-        else  ylim([-60 60]);end
-        xlim([0 max(length(appRange),1)]); xlabel('frames'); ylabel('deg');
-        legend('gaze','head')
+
+gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+% subplot(6,1,6);
+subplot(4,1,3)
+hold on
+plot(hthApp,'Color',[0 0.75 0],'LineWidth',2);
+plot((hthApp +0.5*( rth(appRange) +lth(appRange))'+30),'k','LineWidth',.75);
+plot(find(idx2(appRange)==clust),hthApp(idx2(appRange)==clust),'bo');
+
+if appOffset>0
+    plot([appOffset appOffset],[-60 60],'g');end
+plot([endOffset endOffset],[-60 60],'r');
+if ~isempty(min(hthApp))
+    ylim([min(hthApp)-20 max(gzApp)+30]);
+else  ylim([-60 60]);end
+% xlim([0 max(length(appRange),1)]);
+xlabel('frames'); ylabel('deg');
+% legend('gaze','head')
         
 %        if exist('gm','var')
 %            X = [dth(appRange)'; [diff(mnEyeApp) 0]; mnEyeApp]';
@@ -1117,7 +1236,7 @@ for i = 1:length(appEpoch)
 %         for i = 1:length(sacc)-1;
 %             plot(sacc(i):sacc(i)+1,gzApp(sacc(i):sacc(i)+1),'r')
 %         end
-%        end
+       end
        
         
         %         appGaze =(hthApp +0.5*( rth(appRange) +lth(appRange))')
@@ -1125,18 +1244,48 @@ for i = 1:length(appEpoch)
         %         plot(find(stablePt(appRange)),appGaze(stablePt(appRange)),'og')
         %         plot(find(headTurnPt(appRange)),appGaze(headTurnPt(appRange)),'or')
         %
+%         clear head eyeTrace useT
+%         useTAll=(find(idx2(appRange)==clust)); 
+%         useT=useTAll-1; 
+%         %head=g3(find(idx2(appRange)==clust));
+%         head =(.5*(rth+lth));head = head(find(idx2(appRange)==clust));
+%         eyeTrace=(.5*(drth+dlth)); 
+%      
+%         if ~isempty(useT) && useT(1)==0|useT(1)<0
+%         useT=useT(2:end);
+%         head=head(2:end);
+%         end
+%         plot(head,eyeTrace(useT),'bo'); hold on;
+        drawnow
         
-        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end  
-        
+         if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end  
+    
+%           clear corr lags 
+% %           if ~isempty(useT)
+% %               [corr lags]=nanxcorr(head, eyeTrace(useT),30,'coeff');
+% %               corrVid(i,:)=corr; lagsVid(i,:)=lags;
+% %           end
+%     headAll=[headAll head'];
+%     eyeAll=[eyeAll eyeTrace(useT)'];
     end
-    
-    drawnow
-    
-   
- 
-    
-end
 
+
+% ylabel('delta eye theta n-1');
+% xlabel('eye position')
+% xlim([-30 30]);ylim([-30 30]);
+% 
+% errC=nanstd(propCVid)./(sqrt(length(useData)));
+% errNC=nanstd(propNCVid)./(sqrt(length(useData)));
+% figure; barweb([nanmean(propCVid) nanmean(propNCVid)],[errC errNC]);
+% ylim([0 1]);
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% for vid=1:15
+%     subplot(3,5,vid)
+%     plot(lagsVid(vid,:),corrVid(vid,:)); axis square
+% 
+% end
 % Figure 5B: example of target selection saccades 
 
 % Figure 5C: quantification of target selection sacc
@@ -1157,7 +1306,7 @@ end
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s','PaperFigs_021020_traces','.pdf')
+    filen=sprintf('%s','PaperFigs_021220_traces_c','.pdf')
 %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
