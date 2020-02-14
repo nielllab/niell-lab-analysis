@@ -5,6 +5,10 @@ function y = circInterp(x0,y0,x);
 y0 = mod(y0+pi,2*pi)-pi; %%% get centered between -pi to pi. Some are larger (e.g. azimuth)
 y0raw = y0;
 nanList = isnan(y0);
+if isnan(y0(1))
+    y0(1) =0;
+end
+
 for i =2:length(y0);
     if isnan(y0(i))
         y0(i)= y0(i-1);
