@@ -238,18 +238,18 @@ for j=1:length(fileList) %%% loop over all top camera files
         %%% interpolate accelerometers
         if doAcc
             
-            %%%
-            for i = 1:6
-                Data(j).accResamp(:,i) = interp1(Data(j).accTS,Data(j).accTrace(:,i),xq);
-                Data(j).rawAccResamp(:,i)= interp1(Data(j).accTS,Data(j).rawAcc(:,i),xq);
-            end
-            
+ 
             %%% there is a constant offset in the accelerometer timestamps coming in through labjack.
             %%% we calculate this by taking xcorr of head rotation from DLC
             %%% and head rotation from gyros (should be identical) and
             %%% we then shift the data accordingly.
             
+            
             %             %%% old way of doing it!!!
+            %             for i = 1:6
+            %                  Data(j).accResamp(:,i) = interp1(Data(j).accTS,Data(j).accTrace(:,i),xq);
+            %                  Data(j).rawAccResamp(:,i)= interp1(Data(j).accTS,Data(j).rawAcc(:,i),xq);
+            %              end
             %             gyro3=(Data(j).accResamp(:,6)-nanmean(Data(j).accResamp(:,6))); % gyro 3 = yaw
             %             dth=Data(j).dtheta;
             %             [corr lags]=nanxcorr(gyro3,dth,100,'coeff');
@@ -272,8 +272,8 @@ for j=1:length(fileList) %%% loop over all top camera files
             %%% calculate head movement from DLC (straight from theta,rather than using interpolated dtheta, for max precision
             dth=diff(Data(j).theta); dth(dth<-pi)= dth(dth<-pi)+2*pi; dth(dth>pi) = dth(dth>pi) -2*pi;
                 
-            %%% loop over -10 to 10 secs at 5 msec intervals
-            offsets = -10:0.005:10;
+            %%% loop over -3 to 3 secs at 5 msec intervals
+            offsets = -3:0.005:3;
             clear xc
             for shift = 1:length(offsets)
                 newinterp = interp1(ts+offsets(shift),accPre, xq);
@@ -288,6 +288,12 @@ for j=1:length(fileList) %%% loop over all top camera files
             %%% store out diagnostics
             Data(j).accXcorrMax = max_xcorr;
             Data(j).accXcorrLag = offsets(max_ind);
+            
+            
+            figure
+            eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
+            plot(Data(j).accShift(1:end-1,6),eyes,'.');
+            axis equal; axis([-20 20 -20 20]); xlabel('gyro 3 interp'); ylabel('mean eye dtheta');
             
         end
         
