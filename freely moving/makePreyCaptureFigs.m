@@ -1075,7 +1075,6 @@ for i = 1:length(appEpoch)
     dth = d_Theta{vid};
     azdeg = az{vid}*180/pi;
     
- 
     
     %%% azimuth vs eye histograms
     az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
@@ -1326,7 +1325,7 @@ xlabel('frames'); ylabel('deg');
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s','PaperFigs_021220_traces_c','.pdf')
+    filen=sprintf('%s','PaperFigs_021320_traces_a','.pdf')
 %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);

@@ -6,7 +6,7 @@ savePDF=1; dbstop if error
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
-deInter = 1;
+deInter = 0;
 doAcc = 1;
 
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
@@ -57,8 +57,8 @@ for j=1:length(fileList) %%% loop over all top camera files
     end
     Rfname = strrep(Rfname,'top','eye1r');
     % Rfname = strrep(Rfname,'900000','1030000');
-    % Rfname = strrep(Rfname,'Aug15','Jul12');
-    Rfname = strrep(Rfname,'Aug15','Jan8');
+     Rfname = strrep(Rfname,'Aug15','Jul12');
+   % Rfname = strrep(Rfname,'Aug15','Jan8');
     
     %   Lfname = strrep(Rfname,'Eye1r','Eye2l');
     Lfname = strrep(Rfname,'eye1r','eye2l');
@@ -355,7 +355,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_deInterACC_NN','.mat')
+afilename=sprintf('%s',ani,'_021320','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))
