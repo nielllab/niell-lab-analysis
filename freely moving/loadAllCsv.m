@@ -3,7 +3,7 @@
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 savePDF=1; dbstop if error
 % pname={'T:\PreyCaptureNew\Cohort3\deInterlaceTest\'};
- % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
+% pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
 deInter = 1;
@@ -31,7 +31,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     clear path Rfname Lfname %TSfileList
     %     path = fileList(j).folder
     %     TSfileList = [fileList; dir([path '*topTS*.csv'])];
-
+    
     fname=fullfile(fileList(j).folder,fileList(j).name);
     
     %%% parse top camera filename
@@ -47,7 +47,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     Data(j).date = {date};
     Data(j).clipnum = {clipnum};
     Data(j).Data = csvread(fname,3,0);
-   
+    
     %%% generate left and right eye filenames
     
     %Rfname = strrep(fname,'Top','Eye1r');
@@ -57,9 +57,9 @@ for j=1:length(fileList) %%% loop over all top camera files
     end
     Rfname = strrep(Rfname,'top','eye1r');
     % Rfname = strrep(Rfname,'900000','1030000');
-   % Rfname = strrep(Rfname,'Aug15','Jul12');
+    % Rfname = strrep(Rfname,'Aug15','Jul12');
     Rfname = strrep(Rfname,'Aug15','Jan8');
-
+    
     %   Lfname = strrep(Rfname,'Eye1r','Eye2l');
     Lfname = strrep(Rfname,'eye1r','eye2l');
     
@@ -151,8 +151,8 @@ for j=1:length(fileList) %%% loop over all top camera files
         RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3);
         if deInter
             RTSnew = zeros(size(RTS,1)*2,1);
-%             RTSnew(2:2:end) = RTS;
-%             RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
+            %             RTSnew(2:2:end) = RTS;
+            %             RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
             RTSnew(2:2:end) = RTS  +0.5*median(diff(RTS)) ;
             RTSnew(1:2:end) = RTS ;
             RTS = RTSnew;
@@ -167,22 +167,22 @@ for j=1:length(fileList) %%% loop over all top camera files
         LTS= LTS(:,1)*60*60 + LTS(:,2)*60 + LTS(:,3);
         if deInter
             LTSnew = zeros(size(LTS,1)*2,1);
-           % LTSnew(2:2:end) = LTS;
+            % LTSnew(2:2:end) = LTS;
             % LTSnew(1:2:end) = LTS- 0.5*median(diff(LTS));
             LTSnew(2:2:end) = LTS  +0.5*median(diff(LTS)) ;
             LTSnew(1:2:end) = LTS ;
             LTS = LTSnew;
-                  end
+        end
         startL = LTS(1);
         Data(j).LTS = LTS;
         
         %%% determine new timestamps, based on maximum possible window
         %%% given start/stop times
- 
-   
+        
+        
         if doAcc==1
             if mean(TopTs) - mean(Data(j).accTS(end))>60*2
-              Data(j).accTS=Data(j).accTS+1*60*60; % if before daylight savings (or after?), add one hour
+                Data(j).accTS=Data(j).accTS+1*60*60; % if before daylight savings (or after?), add one hour
             end
             start=max([startT,startR,startL,Data(j).accTS(1)]);
             endT = min([TopTs(end-1),RTS(end), LTS(end),Data(j).accTS(end)])
@@ -192,7 +192,7 @@ for j=1:length(fileList) %%% loop over all top camera files
         end
         xq=(start:1/30:endT)';  %%% 30Hz resample
         Data(j).usedTS=xq;
-
+        
         %%% resample top cam values
         adjustedTS = adjustTimingTop(TopTs,xq,Data(j).azRaw, Data(j).rangeRaw,Data(j).mouse_xyRaw,Data(j).mouseVRaw,...
             Data(j).cricketxyRaw,Data(j).cricketVRaw, Data(j).cricketP, Data(j).thetaRaw,Data(j).cricketHRaw,Data(j).cricket_pHRaw, Data(j).cricketThetaRaw);
@@ -216,7 +216,7 @@ for j=1:length(fileList) %%% loop over all top camera files
         Data(j).Rtheta =interp1(RTS,Data(j).Rthetaraw,xq);
         Data(j).Rphi = interp1(RTS,Data(j).Rphiraw,xq);
         Data(j).RRad = interp1(RTS,Data(j).RRadRaw,xq);
-       
+        
         %%% interpolate left eye points
         Data(j).XLcent =interp1(LTS,Data(j).XLcentraw,xq);
         Data(j).YLcent =interp1(LTS,Data(j).YLcentraw,xq);
@@ -238,27 +238,57 @@ for j=1:length(fileList) %%% loop over all top camera files
         %%% interpolate accelerometers
         if doAcc
             
-            %%% 
+            %%%
             for i = 1:6
                 Data(j).accResamp(:,i) = interp1(Data(j).accTS,Data(j).accTrace(:,i),xq);
                 Data(j).rawAccResamp(:,i)= interp1(Data(j).accTS,Data(j).rawAcc(:,i),xq);
             end
             
             %%% there is a constant offset in the accelerometer timestamps coming in through labjack.
-            %%% we calculate this by taking xcorr of head rotation from DLC 
+            %%% we calculate this by taking xcorr of head rotation from DLC
             %%% and head rotation from gyros (should be identical) and
             %%% we then shift the data accordingly.
-            gyro3=(Data(j).accResamp(:,6)-nanmean(Data(j).accResamp(:,6))); % gyro 3 = yaw
-            dth=Data(j).dtheta;
-            [corr lags]=nanxcorr(gyro3,dth,100,'coeff');
             
-            figure;  plot(lags,corr); axis square; title('acc yaw, d head th')
-            [mx ind] = max(corr);
-            drift = lags(ind);
-            Data(j).accShift = circshift(Data(j).accResamp,-drift,1);
-            Data(j).accXcorrMax = mx;
-            Data(j).accXcorrLag = drift;
-            Data(j).rawAccShift = circshift(Data(j).rawAccResamp,-drift,1)          
+            %             %%% old way of doing it!!!
+            %             gyro3=(Data(j).accResamp(:,6)-nanmean(Data(j).accResamp(:,6))); % gyro 3 = yaw
+            %             dth=Data(j).dtheta;
+            %             [corr lags]=nanxcorr(gyro3,dth,100,'coeff');
+            %
+            %             figure;  plot(lags,corr); axis square; title('acc yaw, d head th')
+            %             [mx ind] = max(corr);
+            %             drift = lags(ind);
+            %             Data(j).accShift = circshift(Data(j).accResamp,-drift,1);
+            %             Data(j).accXcorrMax = mx;
+            %             Data(j).accXcorrLag = drift;
+            %             Data(j).rawAccShift = circshift(Data(j).rawAccResamp,-drift,1)
+            
+            %%% New way!!! test range of offsets to interpolate accelerometers for precise alignment
+            %%% needed because there is a fixed delay in acc timestamps (from labjack?)
+            %%% here we test a range of offsets, by interpolating with these and then comparing them to head dtheta from DLC
+            
+            accPre = Data(j).accTrace(:,6);   %%% pull out yaw gyro from raw acc Data
+            ts = Data(j).accTS;               %%% accelerometer timestamps
+            
+            %%% calculate head movement from DLC (straight from theta,rather than using interpolated dtheta, for max precision
+            dth=diff(Data(j).theta); dth(dth<-pi)= dth(dth<-pi)+2*pi; dth(dth>pi) = dth(dth>pi) -2*pi;
+                
+            %%% loop over -10 to 10 secs at 5 msec intervals
+            offsets = -10:0.005:10;
+            clear xc
+            for shift = 1:length(offsets)
+                newinterp = interp1(ts+offsets(shift),accPre, xq);
+                xc(shift)= nanxcorr(newinterp(1:end-1),dth,0, 'coeff');
+            end
+            
+            %%% get optimal offset
+            [max_xcorr max_ind] = max(xc);
+            %%% reinterpolate with this setting
+            Data(j).accShift = interp1(ts+offsets(max_ind),Data(j).accTrace, xq);
+            Data(j).rawAccShift = interp1(ts+offsets(max_ind),Data(j).rawAcc, xq);
+            %%% store out diagnostics
+            Data(j).accXcorrMax = max_xcorr;
+            Data(j).accXcorrLag = offsets(max_ind);
+            
         end
         
         %%% calculate differences
@@ -271,10 +301,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         Data(j).dxRPhi = diff(Data(j).Rphi);
         Data(j).dxLPhi = diff(Data(j).Lphi);
         Data(j).dth = Data(j).dtheta;
-
-
+        
+        
         %%% a few figures ...
-           
+        
         figure
         plot(xcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),30,'coeff'))
         hold on
@@ -319,7 +349,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
- afilename=sprintf('%s',ani,'_deInterACC_NN','.mat')
+afilename=sprintf('%s',ani,'_deInterACC_NN','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))
