@@ -954,27 +954,82 @@ title('Figure 4E: eye movements are mostly compensatory');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %% FIGURE 5: Non-compensatory eye movements
+gyro3All = gyro3All - nanmedian(gyro3All);
+
+%%% cluster on dHead vs dEye
 clear mvmts
-mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1); mnEyeAll(appAll==1)];
+mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
+%mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
 gm = fitgmdist(mvmts',3,'Replicates',10);
 idx = cluster(gm,mvmts');
 
-dGz= gyro3All(appAll==1) + mnEyeAll(appAll==1)
-nBins=-50:1:50
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=3); axis equal
+title('cluster on dHead vs dEye')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+%hold on; plot([-25 25], [21 -29],'r'); plot([-25 25], [29 -21],'r')
+
+
+
+dGz= gyro3All(appAll==1) + d_mnEyeAll(appAll==1);
+
+%%% cluster on dGz
+clear mvmts
+mvmts = dGz;;
+gm = fitgmdist(mvmts',2,'Replicates',10);
+idx = cluster(gm,mvmts');
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
+title('sluter on dGz')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+%hold on; plot([-25 25], [21 -29],'r'); plot([-25 25], [29 -21],'r')
+
+
+%%% histogram of gaze
+nBins=-20:0.25:20
 dGzHist=hist(dGz,nBins);
 figure;
-plot(nBins, dGzHist)
+plot(nBins, dGzHist);
+
+%%%% try to directly fit from dGz. looks like it ends up being a bit restrictive
+sigmas = 0.1:0.1:10; A = max(dGzHist);
+for s= 1:length(sigmas);
+    g = A*exp(-(nBins.^2)/(0.5*sigmas(s)^2));
+    err(s) = sum((g-dGzHist).^2);
+end
+figure
+plot(sigmas,err)
+[e min_s] = min(err);
+sig = sigmas(min_s)*1.5; fit = A*exp(-(nBins.^2)/(0.5*sig^2));
+figure;
+plot(nBins, dGzHist); hold on; plot(nBins,fit);
+p = fit./(dGzHist+0.0001); p(p>1)=1;  %%% add 0.0001 to prevent 0/0
+figure
+plot(nBins,p)
+
+prob = interp1(nBins,p,dGz);
+clust1 = rand(size(prob))<prob;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),clust1); axis equal
+title('clutering based on gaussian fit to dGz')
+
+    
 
 X=mvmts;
 figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
 title('all approach pts only')
 xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25], [25 -25],'r')
+hold on; plot([-25 25], [21 -29],'r')
+plot([-25 25], [29 -21],'r')
+
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 figure
-gscatter(gyro3All(appAll==1)-median(gyro3All),1.2*d_mnEyeAll(appAll==1),idx); axis equal; hold on
+gscatter(gyro3All(appAll==1)-nanmedian(gyro3All),1.2*d_mnEyeAll(appAll==1),idx); axis equal; hold on
 title('all approach pts only')
 xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25], [18 -32],'r')
 plot([-25 25], [32 -18],'r')
@@ -1074,7 +1129,7 @@ for i = 1:length(appEpoch)
     if exist('accelData','var')
         tilt = accelChannels{vid}(:,2);
         roll = accelChannels{vid}(:,1);
-        acc_dth = accelChannels{vid}(:,6);
+        acc_dth = accelChannels{vid}(:,6)-nanmedian(acc_dth);
     else
         display('no acc')
     end
@@ -1083,8 +1138,8 @@ for i = 1:length(appEpoch)
      hth = thetaHead{vid}; 
      %%% alternate: use acc data to calculate cumulative head position
     %%% may drift, but probably more accurate over short timeframes
-    acc_hth = [hth(1) cumsum(acc_dth(1:end-1) - median(acc_dth))'];
-    
+    acc_hth = nancumsum([hth(1) acc_dth(1:end-1)'],[],2);
+
     dth = d_Theta{vid};
     azdeg = az{vid}*180/pi;
     
