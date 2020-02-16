@@ -1,7 +1,7 @@
 clear all; close all;
 dbstop if error
 % load('J462a_AllACCSessions_120619_a.mat');
-load('J475c_deInterACC_NN.mat');
+load('J475c_021420.mat');
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 
 savePDF=1;
@@ -12,7 +12,7 @@ end
 
 mouse_xy=[];cricket_xy=[];EllipseParamsR=[];EllipseParamsL=[]; radR=[]; az=[];
 
-for i=[1:3 6:11]%1:length(Data)
+for i=1:length(Data)
     
     animal(i,:)=Data(i).ani;
     sessionN(i) = Data(i).sessionnum;
@@ -56,8 +56,8 @@ for i=[1:3 6:11]%1:length(Data)
     thMissing(i)= sum(~isnan(Data(i).theta))/(length(Data(i).theta)); %proportion of non-nans
     
     accelData{i,:} = Data(i).accShift;
-    accelCorr(i) =Data(i).accXcorrMax;
-    accelDrift(i) =Data(i).accXcorrLag;
+  %  accelCorr(i) =Data(i).accXcorrMax;
+%     accelDrift(i) =Data(i).accXcorrLag;
     accelDataRaw{i,:}= Data(i).rawAccShift;
     
     EllipseParamsR{i,1,1} = Data(i).EllipseParamsR;
@@ -184,44 +184,44 @@ for vid = 1:length(useFilt)
     dhth=dTheta{useFilt(vid)}; dhth=dhth-nanmean(dhth);
     bad=dhth>20 | dhth<-20;
     dhth(bad)=nan;
-    
-    subplot(4,3,1)
-    plot(rollFilt); hold on; axis square;
-    plot(phi);
-    title('acc 1 - roll, phi')
-    subplot(4,3,2)
-    plot(tiltFilt); hold on; axis square;plot(verg);
-    title('acc 2 - tilt, vg')
-    subplot(4,3,3)
-    plot(yawFilt); hold on; axis square; plot(verg);
-    title('acc 3 - yaw, vg')
-    subplot(4,3,4)
-    plot(gyro1); hold on; axis square; plot(verg);
-    title('gyro 1, vg')
-    subplot(4,3,5)
-    plot(gyro2); hold on; axis square; plot(dphi);
-    title('gyro 2, dPhi')
-    subplot(4,3,6)
-    plot(gyro3); hold on; axis square
-    plot(dhth); title('gyro 3, dHead Th')
-    subplot(4,3,7);
-    plot(-30:30,nanxcorr(rollFilt,phi,30,'coeff'))
-    title('roll, phi diff');ylim([-1 1]);
-    subplot(4,3,8);
-    plot(-30:30,nanxcorr(tiltFilt,verg,30,'coeff'))
-    title('tilt, vergence');ylim([-1 1]);
-    subplot(4,3,9);
-    plot(-30:30,nanxcorr(yawFilt,verg,30,'coeff'))
-    title('yaw, vergence');ylim([-1 1]);
-    subplot(4,3,10)
-    plot(-30:30,nanxcorr(gyro1(1:end-1),dverg,30,'coeff'))
-    title('gyro 1, dVg');ylim([-1 1]);
-    subplot(4,3,11)
-    plot(-30:30,nanxcorr(gyro2(1:end-1),dphi,30,'coeff'))
-    title('gyro 2, dPhi eyes');ylim([-1 1]);
-    subplot(4,3,12)
-    plot(-30:30,nanxcorr(gyro3,dhth,30,'coeff'))
-    title('gyro 3, dHead th');ylim([-1 1]); 
+%     
+%     subplot(4,3,1)
+%     plot(rollFilt); hold on; axis square;
+%     plot(phi);
+%     title('acc 1 - roll, phi')
+%     subplot(4,3,2)
+%     plot(tiltFilt); hold on; axis square;plot(verg);
+%     title('acc 2 - tilt, vg')
+%     subplot(4,3,3)
+%     plot(yawFilt); hold on; axis square; plot(verg);
+%     title('acc 3 - yaw, vg')
+%     subplot(4,3,4)
+%     plot(gyro1); hold on; axis square; plot(verg);
+%     title('gyro 1, vg')
+%     subplot(4,3,5)
+%     plot(gyro2); hold on; axis square; plot(dphi);
+%     title('gyro 2, dPhi')
+%     subplot(4,3,6)
+%     plot(gyro3); hold on; axis square
+%     plot(dhth); title('gyro 3, dHead Th')
+%     subplot(4,3,7);
+%     plot(-30:30,nanxcorr(rollFilt,phi,30,'coeff'))
+%     title('roll, phi diff');ylim([-1 1]);
+%     subplot(4,3,8);
+%     plot(-30:30,nanxcorr(tiltFilt,verg,30,'coeff'))
+%     title('tilt, vergence');ylim([-1 1]);
+%     subplot(4,3,9);
+%     plot(-30:30,nanxcorr(yawFilt,verg,30,'coeff'))
+%     title('yaw, vergence');ylim([-1 1]);
+%     subplot(4,3,10)
+%     plot(-30:30,nanxcorr(gyro1(1:end-1),dverg,30,'coeff'))
+%     title('gyro 1, dVg');ylim([-1 1]);
+%     subplot(4,3,11)
+%     plot(-30:30,nanxcorr(gyro2(1:end-1),dphi,30,'coeff'))
+%     title('gyro 2, dPhi eyes');ylim([-1 1]);
+%     subplot(4,3,12)
+%     plot(-30:30,nanxcorr(gyro3,dhth,30,'coeff'))
+%     title('gyro 3, dHead th');ylim([-1 1]); 
     
     allTilt=[allTilt tiltFilt(1:end-1)'];
     allRoll=[allRoll rollFilt(1:end-1)'];
@@ -1576,7 +1576,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Analyzed_dInter_NN','.pdf')
+    filen=sprintf('%s',ani,'Analyzed_021520_a','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1584,5 +1584,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_Analyzed_dInter_NN','.mat');
+afilename=sprintf('%s',ani,'Analyzed_Analyzed_021520_a','.mat');
 save(fullfile(pSname, afilename))

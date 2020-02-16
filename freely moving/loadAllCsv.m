@@ -343,7 +343,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     if savePDF
         pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
         C={ani, date, sessionnum, clipnum};
-        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'deInterAcc_NN','.pdf')
+        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'.pdf')
         pdfilename=fullfile(pSname,filen)
         dos(['ps2pdf ' psfilename ' ' pdfilename]);
         delete(psfilename);
@@ -355,7 +355,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_021320','.mat')
+afilename=sprintf('%s',ani,'_021420','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))
