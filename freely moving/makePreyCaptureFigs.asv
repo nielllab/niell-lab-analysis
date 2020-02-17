@@ -1251,9 +1251,10 @@ for i = 1:length(appEpoch)
         g3=accelChannels{vid}(:,6); g3=g3-nanmean(g3);
         
         dGaze=diff(gaze);
-%         newData=[dGaze];
+        newData=[dGaze];
         nBins=-20:0.25:20;
-        %newClust=cluster(gm,newData);
+        
+        newClust=cluster(gm,newData);
         dGazeHist=hist(dGaze,nBins);
 
         
