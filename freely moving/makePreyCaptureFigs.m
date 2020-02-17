@@ -1272,7 +1272,7 @@ for i = 1:length(appEpoch)
     p = fit./(dGazeHist+0.0001); p(p>1)=1;  %%% add 0.0001 to prevent 0/0
     prob = interp1(nBins,p,dGaze);
     clust1 = rand(size(prob))<prob;
-    %want ~clust1 to equal idx2
+   
     idx2=~clust1;   
     clust=1;
     
