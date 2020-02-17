@@ -990,6 +990,9 @@ xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
 
 %%% cluster on dHead vs dEye
 
+% 
+dGz= gyro3All(appAll==1) + d_mnEyeAll(appAll==1);
+
 clear mvmts
 mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
 %mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
@@ -998,7 +1001,7 @@ idx = cluster(gm,mvmts');
 
 X=mvmts;
 figure
-gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=1); axis equal
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
 title('cluster on dHead vs dEye 3 clust')
 xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
 clear mvmts
@@ -1018,31 +1021,18 @@ figure
 gscatter(gyro3All(appAll==1),dGz,idx~=1); axis equal
 title('cluster on dHead vs dEye 3 clust')
 xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
-
-
-
-
-
 % 
-dGz= gyro3All(appAll==1) + d_mnEyeAll(appAll==1);
-
-X=mvmts;
-figure
-gscatter(gyro3All(appAll==1),dGz,idx~=1); axis equal
-title('cluster on dHead vs dEye 3 clust')
-xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
-
-%%% cluster on dGz
-clear mvmts
-mvmts = dGz;
-gm = fitgmdist(mvmts',2,'Replicates',10);
-idx = cluster(gm,mvmts');
-X=mvmts;
-figure
-gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
-title('cluster on dGz')
-xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
-%hold on; plot([-25 25], [21 -29],'r'); plot([-25 25], [29 -21],'r')
+% %%% cluster on dGz
+% clear mvmts
+% mvmts = dGz;
+% gm = fitgmdist(mvmts',2,'Replicates',10);
+% idx = cluster(gm,mvmts');
+% X=mvmts;
+% figure
+% gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
+% title('cluster on dGz')
+% xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+% %hold on; plot([-25 25], [21 -29],'r'); plot([-25 25], [29 -21],'r')
 
 
 %%% histogram of gaze
@@ -1063,30 +1053,15 @@ plot(sigmas,err)
 sig = sigmas(min_s)*1.5; fit = A*exp(-(nBins.^2)/(0.5*sig^2));
 figure;
 plot(nBins, dGzHist); hold on; plot(nBins,fit);
-p = fit./(dGzHist+0.0001); p(p>1)=1;  %%% add 0.0001 to prevent 0/0
+pfit = fit./(dGzHist+0.0001); pfit(pfit>1)=1;  %%% add 0.0001 to prevent 0/0
 figure
-plot(nBins,p)
-prob = interp1(nBins,p,dGz);
+plot(nBins,pfit)
+prob = interp1(nBins,pfit,dGz);
 clust1 = rand(size(prob))<prob;
 figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),clust1); axis equal
 title('clutering based on gaussian fit to dGz')
 
-
-
-X=mvmts;
-figure
-gscatter(gyro3All(appAll==1),dGz,clust1); axis equal
-title('cluster on dHead vs dEye 3 clust')
-xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
-
-% X=mvmts;
-figure
-gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
-title('all approach pts only')
-xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25], [25 -25],'r')
-hold on; plot([-25 25], [21 -29],'r')
-plot([-25 25], [29 -21],'r')
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
@@ -1099,9 +1074,9 @@ xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25],[25 -25],'g')
 %% use ~clust1
 % fullData=[gyro3All;d_mnEyeAll]%;mnEyeAll];
 dGzFull= gyro3All + d_mnEyeAll;
-fullData=[dGzFull];
+fullData=[gyro3All; d_mnEyeAll];
 idxAll=cluster(gm, fullData');
-[sacc, clust]= min([sum(idx==1),sum(idx==2), sum(idx==3)])
+[sacc, clust]= max([nanmean(abs(dGzFull(idxAll==1))),nanmean(abs(dGzFull(idxAll==2))), nanmean(abs(dGzFull(idxAll==3)))])
 
 % figure;
 % [corr lags]=nanxcorr(gyro3All(idxAll==clust),d_mnEyeAll(idxAll==clust),30,'coeff')
@@ -1128,7 +1103,7 @@ idxAll=cluster(gm, fullData');
 % plot(find(idx2==1),mnEye(idx2==1),'og')
 
 
-
+%%
 maxlag = 30;
 thbins = -60:5:60;
 skip = 1; %%% only shows figures at this interval
@@ -1171,6 +1146,7 @@ for i = 1:length(appEpoch)
         rphiHist(:,:,i) = NaN;
     end
     
+    % get left eye phi
     lphi = Lphi{vid}-nanmean(Lphi{vid});
     dlphi = dLphi{vid};
     nlp(i) =sum(~isnan(lphi(app))); %%% # good eye approach points
@@ -1188,27 +1164,16 @@ for i = 1:length(appEpoch)
     
     %%% get accelerometers
 
-       %%% get accelerometers
-
     if exist('accelData','var')
         tilt = accelChannels{vid}(:,2);
         roll = accelChannels{vid}(:,1);
         acc_dth = accelChannels{vid}(:,6);
         acc_dth=acc_dth-nanmedian(acc_dth);
+            acc_hth = nancumsum([hth(1) acc_dth(1:end-1)'],[],2);
     else
         display('no acc')
     end
-    
-    %%% get head positions
-     hth = thetaHead{vid}; 
-     %%% alternate: use acc data to calculate cumulative head position
-    %%% may drift, but probably more accurate over short timeframes
-    acc_hth = nancumsum([hth(1) acc_dth(1:end-1)'],[],2);
 
-    dth = d_Theta{vid};
-    azdeg = az{vid}*180/pi;
-    
-    
     %%% azimuth vs eye histograms
     az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
     n= sum(~isnan(azdeg(app)) & ~isnan(lth(app)'));
@@ -1264,10 +1229,10 @@ for i = 1:length(appEpoch)
     gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
     mnEyeApp =  0.5*(rth(appRange) +lth(appRange))';
     
-    dhthnonan = dth;
+    dhthnonan = acc_dth;
     dhthnonan(abs(diff(dth))>90)=NaN;
     
-    dhthApp = dth(appRange)-nanmedian(dth(mainApp));
+    dhthApp = acc_dth(appRange)-nanmedian(acc_dth(mainApp));
     dhthApp = mod(dhthApp + 180,360)-180;
     
     %%% calculate change in position at different lags, as measure of stability
@@ -1277,40 +1242,40 @@ for i = 1:length(appEpoch)
     if round(i/skip)==i/skip
         
 %          figure
-         figure('Renderer', 'painters', 'Position', [10 10 600 960])
+         
 %         subplot(6,1,1);
 % %         plot(hthnonan,'k'); hold on;
 %         plot(rth,'r');hold on; plot(lth,'b'); legend('right th','left th');
 %         plot(find(app),ones(sum(app),1)*90,'g.'); %ylim([-180 180])
         roll = accelChannels{vid}(:,1); roll=roll-nanmean(roll); roll=medfilt1(roll,5);
         tilt=accelChannels{vid}(:,2); tilt=tilt-nanmean(tilt); tilt=medfilt1(tilt,8);
-        g3=accelChannels{vid}(:,6); g3=g3-nanmean(g3);
+        g3=accelChannels{vid}(:,6); g3=g3-nanmedian(g3);
         
-        dGaze=diff(gaze);
-%         newData=[dGaze];
-        nBins=-20:0.25:20;
-        %newClust=cluster(gm,newData);
-        dGazeHist=hist(dGaze,nBins);
-
+        %dGaze=diff(gaze);
+        dGaze = g3(1:end-1) + 0.5*(drth+dlth);
         
-       % newData=[g3(1:end-1) diff(.5*(rth+lth))];% (.5*(rth(1:end-1)+lth(1:end-1)));];
-%         idx2=cluster(gm,newData);
+%         figure
+%         plot(g3(1:end-1), 0.5*(drth+dlth),'.'); axis([-20 20 -20 20])
 
-    sigmas = 0.1:0.1:10; A = max(dGazeHist);
-    for s= 1:length(sigmas);
-        g = A*exp(-(nBins.^2)/(0.5*sigmas(s)^2));
-        err(s) = sum((g-dGazeHist).^2);
-    end
+       % nBins=-20:0.25:20;
+       
+       %%% assign clusters based on previous GMM
+       newData=[g3(1:end-1)' ; 0.5*(drth+dlth)'];
+        idx2=cluster(gm,newData');
 
-    [e min_s] = min(err);
-    sig = sigmas(min_s)*1.5; 
-    fit = A*exp(-(nBins.^2)/(0.5*sig^2));
-    p = fit./(dGazeHist+0.0001); p(p>1)=1;  %%% add 0.0001 to prevent 0/0
-    prob = interp1(nBins,p,dGaze);
-    clust1 = rand(size(prob))<prob;
-   
-    idx2=~clust1;   
-    clust=1;
+
+
+        %%% cluster based on gaussian fit for compensatory points
+        %%% probability distribution from fit is define by pfit (from above)
+        %%% see where new data lands on this (using interp1) then use
+        %%% random probability to assign each one
+           prob = interp1(nBins,pfit,dGaze);
+            clust1 = rand(size(prob))<prob;
+            clust1(isnan(dGaze))=1;
+         idx2=~clust1;
+         clust = 1;
+ 
+    
     
          propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
          propCVid(i,2,2) = length(find(app' & idx2==clust))./(length(newData(app)));
@@ -1324,6 +1289,9 @@ for i = 1:length(appEpoch)
 %         legend('roll','tilt');
 
 %         subplot(6,1,3);
+
+
+figure('Renderer', 'painters', 'Position', [100 -100 600 900])
         subplot(4,1,1)
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on; 
         plot(rth(appRange)','r'); hold on; plot(lth(appRange)','b');
@@ -1391,8 +1359,14 @@ gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
 subplot(4,1,3)
 hold on
 plot(hthApp,'Color',[0 0.75 0],'LineWidth',2);
-plot((hthApp +0.5*( rth(appRange) +lth(appRange))'+30),'k','LineWidth',.75);
-plot(find(idx2(appRange)==clust),hthApp(idx2(appRange)==clust),'bo');
+%plot(find(idx2(appRange)==clust),hthApp(idx2(appRange)==clust),'bo');
+
+plot((gzApp'+30),'k','LineWidth',2);
+sacc = find(idx2(appRange)==clust);
+sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
+for s = 1:length(sacc)
+    plot(sacc(s):sacc(s)+1,gzApp(sacc(s):sacc(s)+1) + 30,'r','LineWidth',2)
+end
 
 if appOffset>0
     plot([appOffset appOffset],[-60 60],'g');end
