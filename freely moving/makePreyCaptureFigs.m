@@ -956,44 +956,81 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %% FIGURE 5: Non-compensatory eye movements
 gyro3All = gyro3All - nanmedian(gyro3All);
 
+
 %%% cluster on dHead vs dEye
 %%%old way
-% % % % clear mvmts
-% % % % mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1); mnEyeAll(appAll==1)];
-% % % % %mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
-% % % % gm = fitgmdist(mvmts',3,'Replicates',10);
-% % % % idx = cluster(gm,mvmts');
-% % % % 
-% % % % X=mvmts;
-% % % % figure
-% % % % gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=2); axis equal
-% % % % title('cluster on dHead vs dEye vs Eye 3 clust')
-% % % % xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+clear mvmts
+mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1); mnEyeAll(appAll==1)];
+%mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=2); axis equal
+title('cluster on dHead vs dEye vs Eye 3 clust')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+
+%%% cluster on dHead vs dEye vs Eye
+clear mvmts
+mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1); mnEyeAll(appAll==1)];
+%mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=2); axis equal
+title('cluster on dHead vs dEye vs Eye 3 clust')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+
 
 
 
 
 %%% cluster on dHead vs dEye
-% % % % clear mvmts
-% % % % mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
-% % % % %mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
-% % % % gm = fitgmdist(mvmts',3,'Replicates',10);
-% % % % idx = cluster(gm,mvmts');
-% % % % 
-% % % % X=mvmts;
-% % % % figure
-% % % % gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=1); axis equal
-% % % % title('cluster on dHead vs dEye 3 clust')
-% % % % xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+
+clear mvmts
+mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
+%mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=1); axis equal
+title('cluster on dHead vs dEye 3 clust')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+clear mvmts
+mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
+%mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
+gm = fitgmdist(mvmts',3,'Replicates',10);
+idx = cluster(gm,mvmts');
+
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=2); axis equal
+title('cluster on dHead vs dEye 3 clust')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),dGz,idx~=1); axis equal
+title('cluster on dHead vs dEye 3 clust')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+
+
+
+
 
 % 
 dGz= gyro3All(appAll==1) + d_mnEyeAll(appAll==1);
 
-% % % % X=mvmts;
-% % % % figure
-% % % % gscatter(gyro3All(appAll==1),dGz,idx~=1); axis equal
-% % % % title('cluster on dHead vs dEye 3 clust')
-% % % % xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+X=mvmts;
+figure
+gscatter(gyro3All(appAll==1),dGz,idx~=1); axis equal
+title('cluster on dHead vs dEye 3 clust')
+xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
 
 %%% cluster on dGz
 clear mvmts
@@ -1055,10 +1092,9 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 
 
 figure
-gscatter(gyro3All(appAll==1)-nanmedian(gyro3All),1.2*d_mnEyeAll(appAll==1),idx); axis equal; hold on
+gscatter(gyro3All(appAll==1)-nanmedian(gyro3All),d_mnEyeAll(appAll==1),idx); axis equal; hold on
 title('all approach pts only')
-xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25], [18 -32],'r')
-plot([-25 25], [32 -18],'r')
+xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25],[25 -25],'g')
 
 %% use ~clust1
 % fullData=[gyro3All;d_mnEyeAll]%;mnEyeAll];
