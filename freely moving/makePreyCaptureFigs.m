@@ -3,7 +3,7 @@ close all; clear all;
 load('ACC_AllAnimals_021520_a.mat')
  %load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
-savePDF=1;
+savePDF=0;
 if savePDF
     psfilename = 'C:\analysisPS_B.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -39,7 +39,7 @@ Cntrl_err= nanstd(Cntrl_speed)/sqrt(length(useData));
 clear mouseSp appEpoch useData appTime thetaHead vid
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 load('ACC_AllAnimals_021520_a.mat')
-savePDF=1;
+savePDF=0;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
     appTime=appEpoch{vid};
@@ -90,7 +90,7 @@ xlim([1 7]); axis square
 legend('cam','cam app','control','control app');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 [h p]= kstest2(Cntrl_speed(:,3),Cntrl_speed(:,4))
-[h , ~]= kstest2(Cam_speed(:,3),Cam_speed(:,4))
+[h p]= kstest2(Cam_speed(:,3),Cam_speed(:,4))
 [h p]= kstest2(Cam_speed(:,3),Cntrl_speed(:,3))
 [h p]= kstest2(Cam_speed(:,4),Cntrl_speed(:,4))
 
@@ -102,7 +102,7 @@ mnC=mean(cntrl); errC=std(cntrl)./(length(sqrt(cntrl)));
 comp=[expM mnC];err=[errExp,errC];
 figure
 barweb(comp,err)
-[sig p]=ttest2(exp',cntrl');
+[sig p]=kstest2(exp',cntrl');
 
 % Figure 1G: gyro & DLC traces
 figure
@@ -318,7 +318,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 clear all
 load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
-savePDF=1;
+savePDF=0;
     psfilename = 'C:\analysisPS_B.ps';
 
 figure
@@ -386,7 +386,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 clear all
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 load('ACC_AllAnimals_021520_a.mat')
-savePDF=1;
+savePDF=0;
     psfilename = 'C:\analysisPS_B.ps';
     
  % Figure 2D: example of convergence during approach
@@ -785,12 +785,13 @@ end
 %% FIGURE 4: Coordination of eyes and head
 
 % Figure 4A: hist of head yaw app and non approach (not different)
+gyroBias=nanmedian(gyro3All);
 figure
 for c=0:1
 clear nBins h use
 use = find(appAll==c);
 nBins=-30:2:30
-h=hist(gyro3All(use),nBins);
+h=hist(gyro3All(use)-gyroBias,nBins);
 plot(nBins, h/length(gyro3All(use))); hold on; title('head yaw from gyro')
 title('Figure 4A: head angle is not diff between non-app and app')
 if c==1
@@ -863,11 +864,11 @@ for c=0:1
     plot(nBins,h/sum(use&still)); hold on; title('mn Eye Yaw'); axis square
     plot([-3,-3],[.6,0],'k--');
     plot([3,3],[.6,0],'k--');
-    prop3(c+1,1) =1- sum(h(nBins<-3 | nBins>3))/sum(h);
+    prop3(c+1,1) =1- sum(h(nBins<-5 | nBins>5))/sum(h);
    hp=hist(mnPhiAll(use& still),nBins);
     subplot(1,2,2)
     plot(nBins, hp/sum(use&still)); axis square; hold on; title('mn Eye Phi')
-    prop3(c+1,2)=1- sum(hp(nBins<-3 | nBins>3))/sum(hp);
+    prop3(c+1,2)=1- sum(hp(nBins<-5 | nBins>5))/sum(hp);
 
     plot([-3,-3],[.6,0],'k--');
     plot([3,3],[.6,0],'k--');
@@ -954,7 +955,6 @@ title('Figure 4E: eye movements are mostly compensatory');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %% FIGURE 5: Non-compensatory eye movements
-gyro3All = gyro3All - nanmedian(gyro3All);
 
 
 %%% cluster on dHead vs dEye
@@ -1067,7 +1067,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 
 
 figure
-gscatter(gyro3All(appAll==1)-nanmedian(gyro3All),d_mnEyeAll(appAll==1),idx); axis equal; hold on
+gscatter(gyro3All(appAll==1)-gyroBias,d_mnEyeAll(appAll==1),idx); axis equal; hold on
 title('all approach pts only')
 xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25],[25 -25],'g')
 
@@ -1075,7 +1075,12 @@ xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25],[25 -25],'g')
 % fullData=[gyro3All;d_mnEyeAll]%;mnEyeAll];
 dGzFull= gyro3All + d_mnEyeAll;
 fullData=[gyro3All; d_mnEyeAll];
+% fullData=[gyro3All; dGzFull];
 idxAll=cluster(gm, fullData');
+% 
+% figure
+% gscatter(gyro3All-nanmedian(gyro3All),dGzFull,idxAll); axis equal; hold on
+
 [sacc, clust]= max([nanmean(abs(dGzFull(idxAll==1))),nanmean(abs(dGzFull(idxAll==2))), nanmean(abs(dGzFull(idxAll==3)))])
 
 % figure;
@@ -1157,10 +1162,7 @@ for i = 1:length(appEpoch)
     end
     
 
-    %%% get head positions
-    hth = thetaHead{vid}; 
-    dth = d_Theta{vid};
-    azdeg = az{vid}*180/pi;
+
     
     %%% get accelerometers
 
@@ -1168,12 +1170,21 @@ for i = 1:length(appEpoch)
         tilt = accelChannels{vid}(:,2);
         roll = accelChannels{vid}(:,1);
         acc_dth = accelChannels{vid}(:,6);
-        acc_dth=acc_dth-nanmedian(acc_dth);
-            acc_hth = nancumsum([hth(1) acc_dth(1:end-1)'],[],2);
+        acc_dth=acc_dth-gyroBias;
+        acc_hth = nancumsum([hth(1) acc_dth(1:end-1)'],[],2);
     else
         display('no acc')
     end
 
+    %%% get head positions
+%     hth = thetaHead{vid}; 
+%     dth = d_Theta{vid};
+%     azdeg = az{vid}*180/pi;
+
+    hth = acc_hth; 
+    dth = acc_dth;
+    azdeg = az{vid}*180/pi;
+    
     %%% azimuth vs eye histograms
     az_hist(:,1,i) = hist(-azdeg(app),thbins)/sum(~isnan(azdeg(app)));
     n= sum(~isnan(azdeg(app)) & ~isnan(lth(app)'));
@@ -1218,14 +1229,14 @@ for i = 1:length(appEpoch)
     
     %%% get rid of large jumps
    % hthnonan = hth;
-    %hthnonan(abs(diff(hth))>90)=NaN;
-    hthnonan = acc_hth;
-    
+   %hthnonan(abs(diff(hth))>90)=NaN;
+   hthnonan = acc_hth;
+   
    % hthApp = hth(appRange)-nanmedian(hth(mainApp));
    hthApp = acc_hth(appRange) - nanmedian(acc_hth(mainApp));
-    hthApp = mod(hthApp + 180,360)-180;
-     
-     
+   hthApp = mod(hthApp + 180,360)-180;
+   
+   
     gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
     mnEyeApp =  0.5*(rth(appRange) +lth(appRange))';
     
@@ -1249,7 +1260,7 @@ for i = 1:length(appEpoch)
 %         plot(find(app),ones(sum(app),1)*90,'g.'); %ylim([-180 180])
         roll = accelChannels{vid}(:,1); roll=roll-nanmean(roll); roll=medfilt1(roll,5);
         tilt=accelChannels{vid}(:,2); tilt=tilt-nanmean(tilt); tilt=medfilt1(tilt,8);
-        g3=accelChannels{vid}(:,6); g3=g3-nanmedian(g3);
+        g3=accelChannels{vid}(:,6); g3=g3-gyroBias;
         
         %dGaze=diff(gaze);
         dGaze = g3(1:end-1) + 0.5*(drth+dlth);
@@ -1261,7 +1272,7 @@ for i = 1:length(appEpoch)
        
        %%% assign clusters based on previous GMM
        newData=[g3(1:end-1)' ; 0.5*(drth+dlth)'];
-        idx2=cluster(gm,newData');
+       idx2=cluster(gm,newData');
 
 
 
@@ -1269,12 +1280,12 @@ for i = 1:length(appEpoch)
         %%% probability distribution from fit is define by pfit (from above)
         %%% see where new data lands on this (using interp1) then use
         %%% random probability to assign each one
-           prob = interp1(nBins,pfit,dGaze);
-            clust1 = rand(size(prob))<prob;
-            clust1(isnan(dGaze))=1;
-         idx2=~clust1;
-         clust = 1;
- 
+        prob = interp1(nBins,pfit,dGaze);
+        clust1 = rand(size(prob))<prob;
+        clust1(isnan(dGaze))=1;
+        idx2=~clust1;
+        clust = 1;
+        
     
     
          propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
@@ -1291,16 +1302,16 @@ for i = 1:length(appEpoch)
 %         subplot(6,1,3);
 
 
-figure('Renderer', 'painters', 'Position', [100 -100 600 900])
+        figure('Renderer', 'painters', 'Position', [100 -100 600 900])
         subplot(4,1,1)
-        plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on; 
+        plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on;
         plot(rth(appRange)','r'); hold on; plot(lth(appRange)','b');
         plot(find(idx2(appRange)==clust),0.5*(rth(appRange(idx2(appRange)==clust)) +lth(appRange(idx2(appRange)==clust)))','og')
         ylim([-30 30]);  xlim([0 max(length(appRange),1)]);
-%         xlim([40 110]);
+        %         xlim([40 110]);
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
-         title(sprintf('vid %d',vid));
+        title(sprintf('vid %d',vid));
 
 
         subplot(4,1,2)
@@ -1455,7 +1466,7 @@ xlabel('frames'); ylabel('deg');
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s','PaperFigs_021620_dGazeFit ','.pdf')
+    filen=sprintf('%s','PaperFigs_021820_dGaze','.pdf')
 %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
