@@ -1116,7 +1116,7 @@ nthresh  = 60;
 headAll=[];
 eyeAll=[];
 % figure
-for i = 1:length(appEpoch)
+for i = 11%1:length(appEpoch)
     vid = useData(i);
     %%% get approaches
     app = appEpoch{i};
