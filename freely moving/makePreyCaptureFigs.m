@@ -1289,7 +1289,8 @@ for i = 1:length(appEpoch)
 
        % nBins=-20:0.25:20;
        
-       %%% assign clusters based on previous GMM
+       %%% assign clusters based on previous GMM; clust for analysis is set
+       %%% above
        newData=[g3(1:end-1)' ; 0.5*(drth+dlth)'];
        idx2=cluster(gm,newData');
 
@@ -1298,11 +1299,11 @@ for i = 1:length(appEpoch)
         %%% see where new data lands on this (using interp1) then use
         %%% random probability to assign each one
 
-        prob = interp1(nBins,pfit,dGaze);
-        clust1 = rand(size(prob))<prob;
-        clust1(isnan(dGaze))=1;
-        idx2=~clust1;
-        clust = 1;
+%         prob = interp1(nBins,pfit,dGaze);
+%         clust1 = rand(size(prob))<prob;
+%         clust1(isnan(dGaze))=1;
+%         idx2=~clust1;
+%         clust = 1;
         
     
     
@@ -1359,73 +1360,6 @@ for i = 1:length(appEpoch)
         end
         
 
-        %
-%                  figure
-%                  plot(-buffer:buffer,saccHead)
-%                  hold on
-%                  plot(-buffer:buffer,nanmean(saccHead,2),'g','LineWidth',2)
-%                   plot(-buffer:buffer,nanmean(saccEye,2),'r','LineWidth',2);
-%         
-        %                   ylabel('head position')
-        %
-        %
-        %                figure
-        %          plot(-buffer:buffer,saccEye(:,useTrace))
-        %          hold on
-        %          plot(-buffer:buffer,nanmean(saccEye,2),'g','LineWidth',2);
-        %          ylabel('mean Eye position'); ylim([-20 20])
-        %
-        %          [pc score latent]= pca([ saccEye]');
-        %          figure
-        %          plot(pc(:,1:5))
-        %
-        %
-        %          figure
-        %          plot(score(:,1),score(:,2),'.')
-        %
-        %           figure
-        %          plot(score(:,2),score(:,3),'.')
-        %
-        %          eyeFig = figure;
-        %          headFig = figure;
-        %          for i = 1:4
-        % %             if i ==1
-        % %                 use = score(:,4)<score(:,3) & score(:,3)>0
-        % %             elseif i==2
-        % %                 use = score(:,4)>score(:,3)& score(:,4)>0
-        % %             else
-        %              use = score(:,i)>5;
-        %          %   end
-        %          figure(eyeFig);
-        %          subplot(2,2,i);
-        %          plot(saccEye(:,use));
-        %          hold on; plot(nanmean(saccEye(:,use),2),'g', 'Linewidth',2);
-        %          ylim([-20 20]); title(sprintf('n = %d',sum(use)))
-        %
-        %          figure(headFig)
-        %
-        %             subplot(2,2,i);
-        %          plot(saccHead(:,use));
-        %          hold on; plot(nanmean(saccHead(:,use),2),'g', 'Linewidth',2);
-        %          %ylim([-20 20]); title(sprintf('n = %d',sum(use)))
-        %
-        %          end
-        %
-        %            figure
-        %          plot(score(:,1),score(:,3),'.')
-        %
-        %
-        %
-        %            figure
-        %          plot(score(:,2),score(:,4),'.')
-        %
-        %
-        %%% plot az and eye az
-        
-%         figure
-%         gscatter(g3(1:end-1), 0.5*(drth+dlth),idx2==clust); axis([-20 20 -20 20])
-%         
-        
         
         propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
         propCVid(i,2,2) = length(find(app' & idx2==clust))./(length(newData(app)));
