@@ -1120,9 +1120,10 @@ skip = 1; %%% only shows figures at this interval
 nthresh  = 60;
 headAll=[];
 eyeAll=[];
-ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; saccAzAll = []; saccThAll = []; saccEyeRawAll=[];
+ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; saccAzAll = []; saccThAll = []; saccEyeRawAll=[]; timetoAppAll =[];
 % figure
 
+allS = 0; clear headStable eyeStable gazeStable %%% store out stable periods
 for i = 1:length(appEpoch)
      vid = useData(i);
 
@@ -1325,7 +1326,7 @@ for i = 1:length(appEpoch)
         sacc = idx2==clust;
         saccStart = [0; diff(sacc)>0];
         saccs = find(saccStart);
-        clear saccHead saccEye saccApp saccVid saccAz saccTh saccEyeRaw
+        clear saccHead saccEye saccApp saccVid saccAz saccTh saccEyeRaw timetoApp
         
         %%% grab traces around saccades;
         buffer = 10;
@@ -1347,6 +1348,9 @@ for i = 1:length(appEpoch)
                 end
                saccApp(ns) = app(saccs(i));
                saccVid(ns) = vid;
+               distToApp = saccs(i)-find(app);              
+               [d nearApp] = min(abs(distToApp));             
+               timetoApp(ns) = distToApp(nearApp);
             end
         end
         if exist('saccEye','var')
@@ -1357,6 +1361,18 @@ for i = 1:length(appEpoch)
         saccAzAll = [saccAzAll saccAz];
         saccThAll = [saccThAll saccTh];
         saccEyeRawAll = [saccEyeRawAll saccEyeRaw];
+        timetoAppAll = [timetoAppAll timetoApp];
+        end
+        
+        %%% calculate stabilization;
+        saccEnds = find(diff(sacc)<0)+1;
+        
+        for s = 1:length(saccs)-1;
+            stable = saccEnds(s):saccs(s+1);
+           allS = allS+1;
+           headStable{allS} = g3(stable);
+            gzStable{allS} = dGaze(stable);
+            eyeStable{allS} = meEyeTh(stable);
         end
         
 
