@@ -21,7 +21,7 @@ if f ~=0
 end
 fprintf('Done Reading in Top Video \n');
 
-vid = input('which trial? ');
+vid = 7%input('which trial? ');
 
 %%% zero-center eye positions
 % Data(vid).Rtheta = Data(vid).Rtheta - nanmedian(Data(vid).Rtheta);
@@ -44,9 +44,7 @@ startLag = 10; %%% offset from beginning (needed for trails behind mouse)
 % if resized to .25, 1 cm = 6.75 px, 5 cm = 33.7500 pixels
 %%
 figure
-vidObj = VideoWriter('testVid_J470c_111519_1_2_b'); 
-open(vidObj);
-for i = (1+startLag):length(Data(vid).Rtheta)-79
+for i = (1+startLag):100%200%length(Data(vid).Rtheta)
     %%% plot left eye position (with circle)
 %     subplot(2,2,3);
 %     plot(Data(vid).Ltheta,Data(vid).Lphi); hold on
@@ -72,7 +70,7 @@ for i = (1+startLag):length(Data(vid).Rtheta)-79
     %     hy = 20*sin(cumsum(accelData{vid}(i,6)));
     hx = 20*cos(Data(vid).theta(:,i));
     hy = 20*sin(Data(vid).theta(:,i));
-    plot((Data(vid).mouse_xyN(1,i)+ [0 hx']),(Data(vid).mouse_xyN(2,i)+ [0 hy']),'w', 'Linewidth',.75); hold on
+    plot((Data(vid).mouse_xyN(1,i)+ [0 hx']) ,(Data(vid).mouse_xyN(2,i)+ [0 hy']),'r', 'Linewidth',.75); hold on
     %%% calculate gaze direction (head + eyes); assume each eye is centered
     %%% at 45deg (pi/4)
 %     rth = cumsum(accelData{vid}(i,6)) + pi/4 + Data(vid).Rtheta(i)*pi/180;
@@ -86,25 +84,20 @@ for i = (1+startLag):length(Data(vid).Rtheta)-79
 
     axis equal; hold off;
 %     imshow(TopVid(:,:,i)); hold off
-   drawnow
+%    drawnow
 %     axis([0 1600 0 1200]);
 %   axis([0 400 0 350]);
     mov(i-startLag) = getframe(gcf);
     if mod(i,100)==0
             fprintf('frame = %d\n',i)
-    end
-          currFrame = getframe(gcf);
-    writeVideo(vidObj,currFrame);
+        end
 end
-close(vidObj);
+
 %%
 %%% save video
-
-
-% 
-% sprintf('TEST subj %s session %s date %s clipnum %s',Data(vid).ani{1},Data(vid).sessionnum{1}, Data(vid).date{1},Data(vid).clipnum{1})
-% [f p] = uiputfile('*.avi','output video file');
-% movObj = VideoWriter(fullfile(p,f));
-% open(movObj);
-% writeVideo(movObj,mov);
-% close(movObj);
+sprintf('TEST subj %s session %s date %s clipnum %s',Data(vid).ani{1},Data(vid).sessionnum{1}, Data(vid).date{1},Data(vid).clipnum{1})
+[f p] = uiputfile('*.avi','output video file');
+movObj = VideoWriter(fullfile(p,f));
+open(movObj);
+writeVideo(movObj,mov);
+close(movObj);
