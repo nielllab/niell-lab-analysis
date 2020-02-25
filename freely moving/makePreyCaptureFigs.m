@@ -1116,7 +1116,7 @@ nthresh  = 60;
 headAll=[];
 eyeAll=[];
 % figure
-for i = 11%1:length(appEpoch)
+for i = 1:length(appEpoch)
     vid = useData(i);
     %%% get approaches
     app = appEpoch{i};
@@ -1307,8 +1307,9 @@ for i = 11%1:length(appEpoch)
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on;
         plot(rth(appRange)','r'); hold on; plot(lth(appRange)','b');
         plot(find(idx2(appRange)==clust),0.5*(rth(appRange(idx2(appRange)==clust)) +lth(appRange(idx2(appRange)==clust)))','og')
-        ylim([-30 30]);  xlim([0 max(length(appRange),1)]);
-        %         xlim([40 110]);
+        ylim([-30 30]); % xlim([0 max(length(appRange),1)]);
+        xlim([0 70]);
+        
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
         title(sprintf('vid %d',vid));
@@ -1318,8 +1319,9 @@ for i = 11%1:length(appEpoch)
         plot(0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',2); hold on; 
         plot(drth(appRange)','r'); hold on; plot(dlth(appRange)','b');
         plot(find(idx2(appRange)==clust),0.5*(drth(appRange(idx2(appRange)==clust)) +dlth(appRange(idx2(appRange)==clust)))','og')
-        ylim([-20 20]);  xlim([0 max(length(appRange),1)]);
-        plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+        ylim([-20 20]); % xlim([0 max(length(appRange),1)]);
+xlim([0 70]);
+plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         title('d eye theta')
 %         subplot(6,1,4)
 %         plot(roll(appRange)); hold on;
@@ -1349,41 +1351,51 @@ for i = 11%1:length(appEpoch)
 %         end
 
 subplot(4,1,4)
-hold on
-plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
-plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
-        plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
-ylim([-50 50])
-title('d head, dgaze')
+gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+
+plot((gzApp'),'k','LineWidth',2); hold on; xlim([0 70]);
+sacc = find(idx2(appRange)==clust);
+sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
+for s = 1:length(sacc)
+    plot(sacc(s):sacc(s)+1,gzApp(sacc(s):sacc(s)+1),'r','LineWidth',2)
+end
+
+
+% hold on
+% plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
+% plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
+%         plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
+% ylim([-50 50])
+% title('d head, dgaze')
 
 if appOffset>0
     plot([appOffset appOffset],[-60 60],'g');end
 plot([endOffset endOffset],[-60 60],'r');
 if ~isempty(min(hthApp))
-    %ylim([min(hthApp)-20 max(hthApp)+20]);
-    ylim([-50 50])
+    ylim([min(gzApp)-5 max(gzApp)+5]);
+%     ylim([-50 50])
 else  ylim([-50 50]);end
         
 
-gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
 % subplot(6,1,6);
 subplot(4,1,3)
 hold on
-plot(hthApp,'Color',[0 0.75 0],'LineWidth',2);
+plot(hthApp,'Color',[0 0.75 0],'LineWidth',2); xlim([0 70]);
 %plot(find(idx2(appRange)==clust),hthApp(idx2(appRange)==clust),'bo');
 
-plot((gzApp'+30),'k','LineWidth',2);
-sacc = find(idx2(appRange)==clust);
-sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
-for s = 1:length(sacc)
-    plot(sacc(s):sacc(s)+1,gzApp(sacc(s):sacc(s)+1) + 30,'r','LineWidth',2)
-end
+% plot((gzApp'+30),'k','LineWidth',2);
+% sacc = find(idx2(appRange)==clust);
+% sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
+% for s = 1:length(sacc)
+%     plot(sacc(s):sacc(s)+1,gzApp(sacc(s):sacc(s)+1) + 30,'r','LineWidth',2)
+% end
 
 if appOffset>0
     plot([appOffset appOffset],[-60 60],'g');end
 plot([endOffset endOffset],[-60 60],'r');
 if ~isempty(min(hthApp)) & sum(~isnan(hthApp))>10
-    ylim([min(hthApp)-20 max(gzApp)+30]);
+        ylim([min(hthApp)-5 max(hthApp)+5]);
+
 else  ylim([-60 60]);end
 % xlim([0 max(length(appRange),1)]);
 xlabel('frames'); ylabel('deg');
