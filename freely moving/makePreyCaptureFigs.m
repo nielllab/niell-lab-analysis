@@ -1646,58 +1646,57 @@ else  ylim([-50 50]);end
         drawnow
 end 
 
+%% analyze eye/head position around saccades
+
+%%% plot all eye traces (select every 100th one)
 figure
-plot(-buffer:buffer,saccEyeAll(:,useTrace))
+plot(-buffer:buffer,saccEyeAll(:,1:100:end))
 hold on
 plot(-buffer:buffer,nanmean(saccEyeAll,2),'g','LineWidth',2);
 ylabel('mean Eye position'); ylim([-20 20])
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-
+%%% can either select all saccs for analysis, or just approaches. 
+%%% right now, all saccs
 useS = saccAppAll>=0;
-
 eyeData = saccEyeAll(:,useS);
 headData = saccHeadAll(:,useS);
-[pc score latent]= pca(eyeData');
-figure
-plot(pc(:,1:5))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
+%%% some stuff with with pca ... not used any more
+% [pc score latent]= pca(eyeData');
+% figure
+% plot(pc(:,1:5))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% 
+% figure
+% plot(score(:,1),score(:,2),'.')
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% plot(score(:,2),score(:,3),'.')
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-figure
-plot(score(:,1),score(:,2),'.')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+ 
+%idx = kmeans(eyeData',3);
 
-figure
-plot(score(:,2),score(:,3),'.')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-eyeFig = figure;
-headFig = figure;  %%% subtract off means
-idx = kmeans(eyeData',3);
-
+%%% do kmeans on mean-subtracted traces
 clear eyeDataCent
 for i = 1:size(eyeData,2);
     eyeDataCent(:,i) = eyeData(:,i)-nanmean(eyeData(:,i),1);
 end
 idx = kmeans(eyeDataCent(5:20,:)',4);
-idx(idx==4)=1;
+idx(idx==4)=1;  %%% group together clust 4 and clust 1, since both are "tracking", large and small
 
+%%% tried used gmm, doesn't work well
 % gm = fitgmdist(eyeDataCent(5:end,:)',4,'Replicates',10);
 % idx = cluster(gm,eyeDataCent(5:end,:)');
 
-%idx = kmeans(score(:,2:5),4);
+%%% plot clusters
 eyeFig = figure;
 headFig = figure;  
 for i = 1:4
-    %             if i ==1
-    %                 use = score(:,4)<score(:,3) & score(:,3)>0
-    %             elseif i==2
-    %                 use = score(:,4)>score(:,3)& score(:,4)>0
-    %             else
-    use = score(:,i+1)>5;
-    
-    %   end
+
     figure(eyeFig);
     use = (idx==i);
     subplot(2,2,i);
@@ -1724,82 +1723,13 @@ for i = 1:4
 end
 
 
-
+%%% find frequencies of each saccade type during app, non-app
 for i = 1:4
     sfreq(i,1) = sum(idx==i & saccAppAll'==0);
     sfreq(i,2) = sum(idx==i & saccAppAll'==1);
 end
 
-apps = find(saccAppAll==1);
-
-figure
-plot(saccAzAll(:,apps))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
- figure
-plot(abs(saccAzAll(:,apps)));
-hold on
-plot(nanmean(abs(saccAzAll(:,apps)),2),'g','Linewidth',2)
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(abs(saccAzAll(:,apps) + saccEyeRawAll(:,apps)));
-hold on
-plot(nanmean(abs(saccAzAll(:,apps) +saccEyeRawAll(:,apps)),2),'g','Linewidth',2)
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(nanmean(abs(saccAzAll(:,apps)),2),'g','Linewidth',2)
-hold on
-plot(nanmean(abs(saccAzAll(:,apps) +saccEyeRawAll(:,apps)),2),'g','Linewidth',2)
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-%%% there is ~6deg asymmetry in head position relative to cricket. this is
-%%% probably based on the definition of theta from "model" head points. 
-s = saccAzAll(:,apps);
-azOffset=nanmedian(s(:))
-%azOffset=0
-
-eyeAz = saccAzAll + saccEyeRawAll-azOffset;
-
-bins = -60:10:60;
-figure
-clear eyeAzHist
-eyeAzHist(:,1) = hist(eyeAz(11,apps),bins);
-eyeAzHist(:,2) = hist(eyeAz(12,apps),bins);
-plot(bins,eyeAzHist/size(eyeAz,2))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-
-AzHist(:,1) = hist(saccAzAll(11,apps)-azOffset,bins);
-AzHist(:,2) = hist(saccAzAll(12,apps)-azOffset,bins);
-plot(bins,AzHist/size(eyeAz,2))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-eyeOffset(1) = nanmedian(abs(eyeAz(11,apps)))
-eyeOffset(2) = nanmedian(abs(eyeAz(13,apps)))
-
-headOffset(1) = nanmedian(abs(saccAzAll(11,apps)-azOffset))
-headOffset(2) = nanmedian(abs(saccAzAll(13,apps)-azOffset))
-
-figure
-plot(bins,eyeAzHist(:,1))
-hold on
-plot(bins,AzHist(:,1))
-xlabel('azimuth'); legend('eyes','head')
-title('pre saccade')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(bins,eyeAzHist(:,2))
-hold on
-plot(bins,AzHist(:,2))
-xlabel('azimuth'); legend('eyes','head')
-title('post saccade')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-
+    
 %%% plotting 4 clusters
 
 %%% plot with medians
@@ -1860,64 +1790,124 @@ end
 
 
 
+%% analyze eye and head relative to cricket for saccades during approaches
+apps = find(saccAppAll==1);
 
-keyboard
+%%% plot azimuth for all approaches
+ figure
+plot(abs(saccAzAll(:,apps)));
+hold on
+plot(nanmean(abs(saccAzAll(:,apps)),2),'g','Linewidth',2); title('head azimuth for all approaches')
+    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
+figure
+plot(abs(saccAzAll(:,apps) + saccEyeRawAll(:,apps)));
+hold on
+plot(nanmean(abs(saccAzAll(:,apps) +saccEyeRawAll(:,apps)),2),'g','Linewidth',2)
+title('gaze azimuth for all approaches')
+    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+    
+figure
+plot(nanmean(abs(saccAzAll(:,apps)),2),'g','Linewidth',2)
+hold on
+plot(nanmean(abs(saccAzAll(:,apps) +saccEyeRawAll(:,apps)),2),'g','Linewidth',2)
+legend('head azimuth','gaze azimuth')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+%%% there is ~6deg asymmetry in head position relative to cricket. this is
+%%% probably based on the definition of theta from "model" head points. 
+s = saccAzAll(:,apps);
+azOffset=nanmedian(s(:))
+
+eyeAz = saccAzAll + saccEyeRawAll-azOffset;
+
+preSaccT = 11; postSaccT=12;  %%% timepoints to compare pre/post saccade
+
+bins = -60:10:60;
+
+%%% get histograms of eye&head for pre/post saccade
+clear eyeAzHist
+eyeAzHist(:,1) = hist(eyeAz(preSaccT,apps),bins);
+eyeAzHist(:,2) = hist(eyeAz(postSaccT,apps),bins);
+
+AzHist(:,1) = hist(saccAzAll(preSaccT,apps)-azOffset,bins);
+AzHist(:,2) = hist(saccAzAll(postSaccT,apps)-azOffset,bins);
+
+%%% plot pre
+figure
+plot(bins,eyeAzHist(:,1))
+hold on
+plot(bins,AzHist(:,1))
+xlabel('azimuth'); legend('gaze','head')
+title('pre saccade')
+    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+    %%% plot post
+figure
+plot(bins,eyeAzHist(:,2))
+hold on
+plot(bins,AzHist(:,2))
+xlabel('azimuth'); legend('gaze','head')
+title('post saccade')
+    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
+%%% get median offset of eye&head for pre/post saccade
+eyeOffset(1) = nanmedian(abs(eyeAz(preSaccT,apps)));
+eyeOffset(2) = nanmedian(abs(eyeAz(postSaccT,apps)))
+eyeOffsetErr(1) = nanstd(abs(eyeAz(preSaccT,apps)))/sqrt(sum(~isnan(eyeAz(preSaccT,apps))));
+eyeOffsetErr(2) = nanstd(abs(eyeAz(postSaccT,apps)))/sqrt(sum(~isnan(eyeAz(postSaccT,apps))))
+
+headOffset(1) = nanmedian(abs(saccAzAll(preSaccT,apps)-azOffset));
+headOffset(2) = nanmedian(abs(saccAzAll(postSaccT,apps)-azOffset))
+headOffsetErr(1) = nanstd(abs(saccAzAll(preSaccT,apps)-azOffset))/sqrt(sum(~isnan(saccAzAll(preSaccT,apps))));
+headOffsetErr(2) = nanstd(abs(saccAzAll(postSaccT,apps)-azOffset))/sqrt(sum(~isnan(saccAzAll(postSaccT,apps))))
+
+%%% plot errorbar
+    figure
+    barweb([eyeOffset; headOffset]',[eyeOffsetErr; headOffsetErr]')
+    ylabel('azimuth to cricket (deg)');
+   set(gca,'Xticklabel',{'pre saccade','post saccade'})
+   legend('gaze','head')
+    
+%% calculate stability and frequency of fixations
+
+%%% remove stabilizations with NaNs (since these may cause to miss a saccade)
 for i = 1:length(eyeStable)
     nanCount(i) = sum(isnan(eyeStable{i})) + sum(isnan(dheadStable{i}));
 end
-
-
 sum(nanCount==0)/sum(nanCount>=0)
-
 good = find(nanCount==0);
-
 for i = 1:length(good)
     dheadStableGood{i} = dheadStable{good(i)};
     eyeStableGood{i} = eyeStable{good(i)};
     dgzStableGood{i} = dgzStable{good(i)};
 end
 
-
-
-
+%%% calculate stats for each fixation (duration and stdev of positions)
 clear stabDur headStd gazeStd eyeStd
 for i = 1:length(dheadStableGood);
     stabDur(i) = length(dheadStableGood{i});
-    if length(dheadStableGood{i})>1
+    if length(dheadStableGood{i})>1   %%% can't do stats on one point
         headStd(i) = std(cumsum(dheadStableGood{i}));
         gazeStd(i) = std(cumsum(dgzStableGood{i}));
         eyeStd(i) = std(eyeStableGood{i});
     else
         headStd(i) = NaN;
         gazeStd(i) = NaN;
-        eyeStd(i) = NaN;
-        
+        eyeStd(i) = NaN;   
     end
 end
 
-
+%%% plot histogram of durations
 hbins = 1:2:150;
 figure
 h =hist(stabDurGood,hbins);
 plot(hbins/30,h/sum(h)); xlabel('secs'); ylabel('fraction');
 title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDurGood)/30,(1/30)*std(stabDurGood)/sqrt(length(stabDurGood)))); xlim([0 2]);
 
-stability(1) = nanmedian(headStd);
-stability(2) = nanmedian(gazeStd);
-stabErr(1) = nanstd(headStd)/sqrt(sum(~isnan(headStd)));
-stabErr(2) = nanstd(gazeStd)/sqrt(sum(~isnan(gazeStd)));
-
-figure
-bar(1:2, stability);
-hold on
-errorbar(1:2,stability, stabErr,'.');
-set(gca,'Xtick',1:2); set(gca,'XtickLabel',{'head','gaze'}); ylabel('RMS stability (deg)'); title('stability during fixations')
-
-nanmedian(headStd)
-nanmedian(gazeStd)
-nanmedian(eyeStd)
-
+%%% histogram of stability for head and gaze
 figure
 hbins = 0.25:0.5:20;
 hold on
@@ -1929,6 +1919,20 @@ legend('head','gaze');
 xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
 
 
+%%% calculate average stability of head and gaze
+stability(1) = nanmedian(headStd);
+stability(2) = nanmedian(gazeStd);
+stabErr(1) = nanstd(headStd)/sqrt(sum(~isnan(headStd)));
+stabErr(2) = nanstd(gazeStd)/sqrt(sum(~isnan(gazeStd)));
+figure
+bar(1:2, stability);
+hold on
+errorbar(1:2,stability, stabErr,'.');
+set(gca,'Xtick',1:2); set(gca,'XtickLabel',{'head','gaze'}); ylabel('RMS stability (deg)'); title('stability during fixations')
+
+
+%%% look at the longest stabilization (out of interest only, maybe demo
+%%% that no saccades during head stability
 [m longStable] = max(stabDurGood);
 
 for longStable = 1:100:length(stabDur)
@@ -1941,77 +1945,76 @@ title(sprintf('head %0.1f  gaze %0.1f',headStd(longStable),gazeStd(longStable)))
 end
 
 
-%%%%
+%%%% old ways of trying to cluster sacades
 
-hold on
-plot(diff(mean(saccHeadAll,2)))
-plot(mean(saccEyeAll,2))
-plot(diff(mean(saccEyeAll,2)))
-vhead = diff(saccHeadAll,1);
-
-maxpre = max(vhead(1:9,:),[],1);
-meanpre = mean(vhead(1:9,:),1);
-meanpost = mean(saccHeadAll(15:20,:),1);
-
-    stationary_sm = abs(meanpre)<2 &  abs(maxpre)<2  &meanpost< 20;
-    stationary_lg = abs(meanpre)<2 &  abs(maxpre)<2 & meanpost>20;
-
-    stationary = abs(meanpre)<1 &  abs(maxpre)<2;
-    moving = meanpre>1 & abs(maxpre)>5 ;
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(nanmean(saccEyeAll(:,stationary_sm),2));
-hold on
-plot(nanmean(saccEyeAll(:,stationary_lg),2));
-plot(nanmean(saccEyeAll(:,moving),2));
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(nanmean(saccHeadAll(:,stationary_sm),2))
-hold on
-plot(nanmean(saccHeadAll(:,stationary_lg),2))
-plot(nanmean(saccHeadAll(:,moving),2))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-
-figure
-plot(saccEyeAll(:,stationary_sm))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(saccEyeAll(:,stationary_lg))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(saccEyeAll(:,moving))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-figure
-plot(nanmean(saccHeadAll(:,stationary),2))
-hold on
-plot(nanmean(saccHeadAll(:,moving),2))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-
-v = unique(saccVidAll)
-%for i = 1:length(v)
-    for i = 1:10
-    
-    stationary = abs(meanpre)<2 &  abs(maxpre)<2 & saccVidAll==v(i);
-moving = meanpre>1 & abs(maxpre)>5 & saccVidAll==v(i);
-
-figure
-plot(saccEyeAll(:,stationary));
-hold on
-plot(saccEyeAll(:,moving));
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-end
-
-figure
-plot(nanmean(saccEyeAll,2))
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% plot(diff(mean(saccHeadAll,2)))
+% plot(mean(saccEyeAll,2))
+% plot(diff(mean(saccEyeAll,2)))
+% vhead = diff(saccHeadAll,1);
+% 
+% maxpre = max(vhead(1:9,:),[],1);
+% meanpre = mean(vhead(1:9,:),1);
+% meanpost = mean(saccHeadAll(15:20,:),1);
+% 
+%     stationary_sm = abs(meanpre)<2 &  abs(maxpre)<2  &meanpost< 20;
+%     stationary_lg = abs(meanpre)<2 &  abs(maxpre)<2 & meanpost>20;
+% 
+%     stationary = abs(meanpre)<1 &  abs(maxpre)<2;
+%     moving = meanpre>1 & abs(maxpre)>5 ;
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% plot(nanmean(saccEyeAll(:,stationary_sm),2));
+% hold on
+% plot(nanmean(saccEyeAll(:,stationary_lg),2));
+% plot(nanmean(saccEyeAll(:,moving),2));
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% plot(nanmean(saccHeadAll(:,stationary_sm),2))
+% hold on
+% plot(nanmean(saccHeadAll(:,stationary_lg),2))
+% plot(nanmean(saccHeadAll(:,moving),2))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% 
+% figure
+% plot(saccEyeAll(:,stationary_sm))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% plot(saccEyeAll(:,stationary_lg))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% plot(saccEyeAll(:,moving))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% figure
+% plot(nanmean(saccHeadAll(:,stationary),2))
+% hold on
+% plot(nanmean(saccHeadAll(:,moving),2))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% 
+% v = unique(saccVidAll)
+% %for i = 1:length(v)
+%     for i = 1:10
+%     
+%     stationary = abs(meanpre)<2 &  abs(maxpre)<2 & saccVidAll==v(i);
+% moving = meanpre>1 & abs(maxpre)>5 & saccVidAll==v(i);
+% 
+% figure
+% plot(saccEyeAll(:,stationary));
+% hold on
+% plot(saccEyeAll(:,moving));
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% 
+% end
+% 
+% figure
+% plot(nanmean(saccEyeAll,2))
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 
