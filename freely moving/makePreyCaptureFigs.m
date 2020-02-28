@@ -1076,7 +1076,7 @@ gscatter(gyro3All(appAll==1)-gyroBias,d_mnEyeAll(appAll==1),idx); axis equal; ho
 title('all approach pts only')
 xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25],[25 -25],'g')
 
-%% use ~clust1
+% use ~clust1
 % fullData=[gyro3All;d_mnEyeAll]%;mnEyeAll];
 dGzFull= gyro3All + d_mnEyeAll;
 fullData=[gyro3All; d_mnEyeAll];
@@ -1125,7 +1125,7 @@ ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; sacc
 % figure
 
 
-allS = 0; clear headStable eyeStable gazeStable %%% store out stable periods
+allS = 0; clear dheadStable eyeStable dgzStable %%% store out stable periods
 for i = 1:length(appEpoch)
     vid = useData(i);
     %%% get approaches
@@ -1180,9 +1180,9 @@ for i = 1:length(appEpoch)
 
     %%% get accelerometers
     
-    figure
-    hist(azdeg(app==1))
-  if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+%     figure
+%     hist(azdeg(app==1))
+%   if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
     if exist('accelData','var')
         tilt = accelChannels{vid}(:,2);
@@ -1351,8 +1351,12 @@ for i = 1:length(appEpoch)
                saccApp(ns) = app(saccs(i));
                saccVid(ns) = vid;
                distToApp = saccs(i)-find(app);              
-               [d nearApp] = min(abs(distToApp));             
+               [d nearApp] = min(abs(distToApp)); 
+               if isempty(nearApp)
+                   timetoApp(ns)=NaN;
+               else
                timetoApp(ns) = distToApp(nearApp);
+               end
             end
         end
         if exist('saccEye','var')
@@ -1370,11 +1374,11 @@ for i = 1:length(appEpoch)
         saccEnds = find(diff(sacc)<0)+1;
         
         for s = 1:length(saccs)-1;
-            stable = saccEnds(s):saccs(s+1);
+            stable = saccEnds(s):saccs(s+1)-1;
            allS = allS+1;
-           headStable{allS} = g3(stable);
-            gzStable{allS} = dGaze(stable);
-            eyeStable{allS} = meEyeTh(stable);
+           dheadStable{allS} = g3(stable);
+            dgzStable{allS} = dGaze(stable);
+            eyeStable{allS} = mnEyeTh(stable);
         end
         
 
@@ -1563,6 +1567,7 @@ else  ylim([-50 50]);end
     %         plot(head,eyeTrace(useT),'bo'); hold on;
     drawnow
     
+    
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
     
     %           clear corr lags
@@ -1580,14 +1585,14 @@ else  ylim([-50 50]);end
 % saccAppAll = saccAppAll(notnan);
 % saccVidAll = saccVidAll(notnan);
 
-useTrace = ceil(rand(200,1)*size(saccHeadAll,2));
-figure
-plot(-buffer:buffer,saccHeadAll(:,useTrace))
-hold on
-plot(-buffer:buffer,nanmean(saccHeadAll,2),'g','LineWidth',2)
-plot(-buffer:buffer,nanmean(saccEyeAll,2),'r','LineWidth',2);
-ylabel('head position')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% useTrace = ceil(rand(200,1)*size(saccHeadAll,2));
+% figure
+% plot(-buffer:buffer,saccHeadAll(:,useTrace))
+% hold on
+% plot(-buffer:buffer,nanmean(saccHeadAll,2),'g','LineWidth',2)
+% plot(-buffer:buffer,nanmean(saccEyeAll,2),'r','LineWidth',2);
+% ylabel('head position')
+%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
         
@@ -1740,7 +1745,6 @@ plot(bins,eyeAzHist/size(eyeAz,2))
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 figure
-clear eyeAzHist
 AzHist(:,1) = hist(saccAzAll(11,apps)-azOffset,bins);
 AzHist(:,2) = hist(saccAzAll(12,apps)-azOffset,bins);
 plot(bins,AzHist/size(eyeAz,2))
@@ -1769,6 +1773,7 @@ title('post saccade')
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
+%%% plotting 4 clusters
 
 %%% plot with medians
 figure
@@ -1812,6 +1817,7 @@ ylim([0 30])
 
 end
 
+%%% plot all of them
 figure
 for i =1:4
  subplot(2,2,i)
@@ -1825,8 +1831,89 @@ ylim([-60 60])
 end
 
 
+
+keyboard
+
+for i = 1:length(eyeStable)
+    nanCount(i) = sum(isnan(eyeStable{i})) + sum(isnan(dheadStable{i}));
+end
+
+
+sum(nanCount==0)/sum(nanCount>=0)
+
+good = find(nanCount==0);
+
+for i = 1:length(good)
+    dheadStableGood{i} = dheadStable{good(i)};
+    eyeStableGood{i} = eyeStable{good(i)};
+    dgzStableGood{i} = dgzStable{good(i)};
+end
+
+
+
+
+clear stabDur headStd gazeStd eyeStd
+for i = 1:length(dheadStableGood);
+    stabDur(i) = length(dheadStableGood{i});
+    if length(dheadStableGood{i})>1
+        headStd(i) = std(cumsum(dheadStableGood{i}));
+        gazeStd(i) = std(cumsum(dgzStableGood{i}));
+        eyeStd(i) = std(eyeStableGood{i});
+    else
+        headStd(i) = NaN;
+        gazeStd(i) = NaN;
+        eyeStd(i) = NaN;
+        
+    end
+end
+
+
+hbins = 1:2:150;
 figure
-plot(mean(saccHeadAll,2));
+h =hist(stabDurGood,hbins);
+plot(hbins/30,h/sum(h)); xlabel('secs'); ylabel('fraction');
+title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDurGood)/30,(1/30)*std(stabDurGood)/sqrt(length(stabDurGood)))); xlim([0 2]);
+
+stability(1) = nanmedian(headStd);
+stability(2) = nanmedian(gazeStd);
+stabErr(1) = nanstd(headStd)/sqrt(sum(~isnan(headStd)));
+stabErr(2) = nanstd(gazeStd)/sqrt(sum(~isnan(gazeStd)));
+
+figure
+bar(1:2, stability);
+hold on
+errorbar(1:2,stability, stabErr,'.');
+set(gca,'Xtick',1:2); set(gca,'XtickLabel',{'head','gaze'}); ylabel('RMS stability (deg)'); title('stability during fixations')
+
+nanmedian(headStd)
+nanmedian(gazeStd)
+nanmedian(eyeStd)
+
+figure
+hbins = 0.25:0.5:20;
+hold on
+h = hist(headStd,hbins);
+plot(hbins,h/sum(h));
+h = hist(gazeStd,hbins);
+plot(hbins,h/sum(h));
+legend('head','gaze');
+xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
+
+
+[m longStable] = max(stabDurGood);
+
+for longStable = 1:100:length(stabDur)
+figure
+plot(cumsum(dheadStableGood{longStable}));
+hold on
+%plot(eyeStableGood{longStable})
+plot(cumsum(dgzStableGood{longStable}))
+title(sprintf('head %0.1f  gaze %0.1f',headStd(longStable),gazeStd(longStable)));
+end
+
+
+%%%%
+
 hold on
 plot(diff(mean(saccHeadAll,2)))
 plot(mean(saccEyeAll,2))
