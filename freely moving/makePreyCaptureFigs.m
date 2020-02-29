@@ -3,7 +3,7 @@ close all; clear all;
 load('ACC_AllAnimals_021520_a.mat')
 %load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS_B.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -39,7 +39,7 @@ Cntrl_err= nanstd(Cntrl_speed)/sqrt(length(useData));
 clear mouseSp appEpoch useData appTime thetaHead vid
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 load('ACC_AllAnimals_021520_a.mat')
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
     appTime=appEpoch{vid};
@@ -329,7 +329,7 @@ clear all
 load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
 
 
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 
@@ -399,7 +399,7 @@ clear all
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 load('ACC_AllAnimals_021520_a.mat')
 
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 % Figure 2D: example of convergence during approach
