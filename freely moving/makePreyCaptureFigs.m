@@ -194,9 +194,9 @@ for vid=1:length(useData)
     tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
     clear use
     useN = appEpoch{vid}==0; use = appEpoch{vid}==1;
-    ptsUsed(vid,1,1)=length(1:60:length(useN)); 
+    ptsUsed(vid,1,1)=length(1:60:length(useN));
     ptsUsed(vid,1,2)=length(1:60:length(use));
-    ptsUsed(vid,2,1)=length(useN); 
+    ptsUsed(vid,2,1)=length(useN);
     ptsUsed(vid,2,2)=length(use);
     subplot(1,2,1)
     plot(tR(useN(1:60:length(useN))),pR(useN(1:60:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
@@ -803,16 +803,16 @@ end
 gyroBias=nanmedian(gyro3All);
 figure
 for c=0:1
-clear nBins h use
-use = find(appAll==c);
-nBins=-30:2:30
-h=hist(gyro3All(use)-gyroBias,nBins);
-headHist(:,c+1)=h;
-plot(nBins, h/length(gyro3All(use))); hold on; title('head yaw from gyro')
-title('Figure 4A: head angle is not diff between non-app and app')
-if c==1
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-end
+    clear nBins h use
+    use = find(appAll==c);
+    nBins=-30:2:30
+    h=hist(gyro3All(use)-gyroBias,nBins);
+    headHist(:,c+1)=h;
+    plot(nBins, h/length(gyro3All(use))); hold on; title('head yaw from gyro')
+    title('Figure 4A: head angle is not diff between non-app and app')
+    if c==1
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    end
 end
 
 [h p]= ttest2(headHist(:,1),headHist(:,2))
@@ -884,13 +884,13 @@ for c=0:1
     plot(nBins,h/sum(use&still)); hold on; title('mn Eye Yaw'); axis square
     plot([-3,-3],[.6,0],'k--');
     plot([3,3],[.6,0],'k--');
-
+    
     prop3(c+1,1) =1- sum(h(nBins<-5 | nBins>5))/sum(h);
     hp=hist(mnPhiAll(use& still),nBins);
     subplot(1,2,2)
     plot(nBins, hp/sum(use&still)); axis square; hold on; title('mn Eye Phi')
     prop3(c+1,2)=1- sum(hp(nBins<-5 | nBins>5))/sum(hp);
-
+    
     plot([-3,-3],[.6,0],'k--');
     plot([3,3],[.6,0],'k--');
     if c==1
@@ -1100,7 +1100,7 @@ dGzFull= gyro3All + d_mnEyeAll;
 fullData=[gyro3All; d_mnEyeAll];
 % fullData=[gyro3All; dGzFull];
 idxAll=cluster(gm, fullData');
-% 
+%
 % figure
 % gscatter(gyro3All-nanmedian(gyro3All),dGzFull,idxAll); axis equal; hold on
 
@@ -1190,19 +1190,19 @@ for i = 1:length(appEpoch)
         lphiHist(:,:,i) = NaN;
     end
     
- 
+    
     %%% get head positions
     hth = thetaHead{vid};
     dth = d_Theta{vid};
     azdeg = az{vid}*180/pi;
     crickD = dist{vid};
-
+    
     %%% get accelerometers
     
-%     figure
-%     hist(azdeg(app==1))
-%   if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
+    %     figure
+    %     hist(azdeg(app==1))
+    %   if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    
     if exist('accelData','var')
         tilt = accelChannels{vid}(:,2);
         roll = accelChannels{vid}(:,1);
@@ -1212,14 +1212,14 @@ for i = 1:length(appEpoch)
     else
         display('no acc')
     end
-
-
+    
+    
     %%% get head positions
-%     hth = thetaHead{vid}; 
-%     dth = d_Theta{vid};
-%     azdeg = az{vid}*180/pi;
-
-    hth = acc_hth; 
+    %     hth = thetaHead{vid};
+    %     dth = d_Theta{vid};
+    %     azdeg = az{vid}*180/pi;
+    
+    hth = acc_hth;
     dth = acc_dth;
     azdeg = az{vid}*180/pi;
     
@@ -1266,7 +1266,7 @@ for i = 1:length(appEpoch)
     
     
     %%% get rid of large jumps
-
+    
     % hthnonan = hth;
     %hthnonan(abs(diff(hth))>90)=NaN;
     hthnonan = acc_hth;
@@ -1276,7 +1276,7 @@ for i = 1:length(appEpoch)
     hthApp = hthApp - nanmedian(acc_hth(mainApp));
     %hthApp = mod(hthApp + 180,360)-180;
     
-
+    
     gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
     mnEyeApp =  0.5*(rth(appRange) +lth(appRange))';
     
@@ -1305,102 +1305,29 @@ for i = 1:length(appEpoch)
         %dGaze=diff(gaze);
         dGaze = g3(1:end-1) + 0.5*(drth+dlth);
         
-
-%         figure
-%         plot(g3(1:end-1), 0.5*(drth+dlth),'.'); axis([-20 20 -20 20])
-
-       % nBins=-20:0.25:20;
-       
-       %%% assign clusters based on previous GMM; clust for analysis is set
-       %%% above
-       newData=[g3(1:end-1)' ; 0.5*(drth+dlth)'];
-       idx2=cluster(gm,newData');
-
+        
+        %         figure
+        %         plot(g3(1:end-1), 0.5*(drth+dlth),'.'); axis([-20 20 -20 20])
+        
+        % nBins=-20:0.25:20;
+        
+        %%% assign clusters based on previous GMM; clust for analysis is set
+        %%% above
+        newData=[g3(1:end-1)' ; 0.5*(drth+dlth)'];
+        idx2=cluster(gm,newData');
+        
         %%% cluster based on gaussian fit for compensatory points
         %%% probability distribution from fit is define by pfit (from above)
         %%% see where new data lands on this (using interp1) then use
         %%% random probability to assign each one
-
-%         prob = interp1(nBins,pfit,dGaze);
-%         clust1 = rand(size(prob))<prob;
-%         clust1(isnan(dGaze))=1;
-%         idx2=~clust1;
-%         clust = 1;
         
-    
-    
-         propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
-         propCVid(i,2,2) = length(find(app' & idx2==clust))./(length(newData(app)));
-         propCVid(i,1,1)=  length(find(~app' & idx2~=clust))./(length(newData(~app))); %compensatory, non-approach
-         propCVid(i,1,2)= length(find(app' & idx2~=clust))./(length(newData(app))); %compensatory, approach
-         
-%         subplot(6,1,2)
-%         plot(roll); hold on;
-%         plot(tilt);
-%         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
-%         legend('roll','tilt');
-
-%         subplot(6,1,3);
-
-
-        %%% get saccade starts
-        sacc = idx2==clust;
-        saccStart = [0; diff(sacc)>0];
-        saccs = find(saccStart);
-        clear saccHead saccEye saccApp saccVid saccAz saccTh saccEyeRaw timetoApp
+        %         prob = interp1(nBins,pfit,dGaze);
+        %         clust1 = rand(size(prob))<prob;
+        %         clust1(isnan(dGaze))=1;
+        %         idx2=~clust1;
+        %         clust = 1;
         
-        %%% grab traces around saccades;
-        buffer = 10;
-       ns =0;
-
-  
-       for i = 1:length(saccs);
-  
-            if saccs(i)>buffer & saccs(i)<length(drth)-buffer
-                ns = ns+1;
-                saccHead(:,ns) = cumsum(g3(saccs(i) + (-buffer:buffer)));
-                saccEye(:,ns) = mnEyeTh(saccs(i) + (-buffer:buffer));
-                saccAz(:,ns) = azdeg(saccs(i) + (-buffer:buffer));
-                saccTh(:,ns) = hth(saccs(i) + (-buffer:buffer));
-                saccEyeRaw(:,ns) = saccEye(:,ns); %%% copy that is not inverted
-                if dGaze(saccs(i))<0
-                    saccHead(:,ns) = - saccHead(:,ns);
-                    saccEye(:,ns) = - saccEye(:,ns);
-                end
-               saccApp(ns) = app(saccs(i));
-               saccVid(ns) = vid;
-               distToApp = saccs(i)-find(app);              
-               [d nearApp] = min(abs(distToApp)); 
-               if isempty(nearApp)
-                   timetoApp(ns)=NaN;
-               else
-               timetoApp(ns) = distToApp(nearApp);
-               end
-            end
-        end
-        if exist('saccEye','var')
-            saccEyeAll = [saccEyeAll saccEye];
-        saccHeadAll = [saccHeadAll saccHead];
-        saccAppAll = [saccAppAll saccApp];
-        saccVidAll = [saccVidAll saccVid];
-        saccAzAll = [saccAzAll saccAz];
-        saccThAll = [saccThAll saccTh];
-        saccEyeRawAll = [saccEyeRawAll saccEyeRaw];
-        timetoAppAll = [timetoAppAll timetoApp];
-        end
         
-        %%% calculate stabilization;
-        saccEnds = find(diff(sacc)<0)+1;
-        
-        for s = 1:length(saccs)-1;
-            stable = saccEnds(s):saccs(s+1)-1;
-           allS = allS+1;
-           dheadStable{allS} = g3(stable);
-            dgzStable{allS} = dGaze(stable);
-            eyeStable{allS} = mnEyeTh(stable);
-        end
-        
-
         
         propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
         propCVid(i,2,2) = length(find(app' & idx2==clust))./(length(newData(app)));
@@ -1415,30 +1342,103 @@ for i = 1:length(appEpoch)
         
         %         subplot(6,1,3);
         
-
+        
+        %%% get saccade starts
+        sacc = idx2==clust;
+        saccStart = [0; diff(sacc)>0];
+        saccs = find(saccStart);
+        clear saccHead saccEye saccApp saccVid saccAz saccTh saccEyeRaw timetoApp
+        
+        %%% grab traces around saccades;
+        buffer = 10;
+        ns =0;
+        
+        
+        for i = 1:length(saccs);
+            
+            if saccs(i)>buffer & saccs(i)<length(drth)-buffer
+                ns = ns+1;
+                saccHead(:,ns) = cumsum(g3(saccs(i) + (-buffer:buffer)));
+                saccEye(:,ns) = mnEyeTh(saccs(i) + (-buffer:buffer));
+                saccAz(:,ns) = azdeg(saccs(i) + (-buffer:buffer));
+                saccTh(:,ns) = hth(saccs(i) + (-buffer:buffer));
+                saccEyeRaw(:,ns) = saccEye(:,ns); %%% copy that is not inverted
+                if dGaze(saccs(i))<0
+                    saccHead(:,ns) = - saccHead(:,ns);
+                    saccEye(:,ns) = - saccEye(:,ns);
+                end
+                saccApp(ns) = app(saccs(i));
+                saccVid(ns) = vid;
+                distToApp = saccs(i)-find(app);
+                [d nearApp] = min(abs(distToApp));
+                if isempty(nearApp)
+                    timetoApp(ns)=NaN;
+                else
+                    timetoApp(ns) = distToApp(nearApp);
+                end
+            end
+        end
+        if exist('saccEye','var')
+            saccEyeAll = [saccEyeAll saccEye];
+            saccHeadAll = [saccHeadAll saccHead];
+            saccAppAll = [saccAppAll saccApp];
+            saccVidAll = [saccVidAll saccVid];
+            saccAzAll = [saccAzAll saccAz];
+            saccThAll = [saccThAll saccTh];
+            saccEyeRawAll = [saccEyeRawAll saccEyeRaw];
+            timetoAppAll = [timetoAppAll timetoApp];
+        end
+        
+        %%% calculate stabilization;
+        saccEnds = find(diff(sacc)<0)+1;
+        
+        for s = 1:length(saccs)-1;
+            stable = saccEnds(s):saccs(s+1)-1;
+            allS = allS+1;
+            dheadStable{allS} = g3(stable);
+            dgzStable{allS} = dGaze(stable);
+            eyeStable{allS} = mnEyeTh(stable);
+        end
+        
+        
+        
+        propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
+        propCVid(i,2,2) = length(find(app' & idx2==clust))./(length(newData(app)));
+        propCVid(i,1,1)=  length(find(~app' & idx2~=clust))./(length(newData(~app))); %compensatory, non-approach
+        propCVid(i,1,2)= length(find(app' & idx2~=clust))./(length(newData(app))); %compensatory, approach
+        
+        %         subplot(6,1,2)
+        %         plot(roll); hold on;
+        %         plot(tilt);
+        %         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+        %         legend('roll','tilt');
+        
+        %         subplot(6,1,3);
+        
+        
         figure('Renderer', 'painters', 'Position', [100 -100 600 900])
         subplot(4,1,1)
         plot(0.5*( rth(appRange) +lth(appRange))','k','LineWidth',2); hold on;
         plot(rth(appRange)','r'); hold on; plot(lth(appRange)','b');
         plot(find(idx2(appRange)==clust),0.5*(rth(appRange(idx2(appRange)==clust)) +lth(appRange(idx2(appRange)==clust)))','og')
         ylim([-30 30]); % xlim([0 max(length(appRange),1)]);
-       
+        
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         legend('mean','right','left');
         title(sprintf('vid %d',vid));
-
+        
         subplot(4,1,2)
         
         plot(azdeg(appRange)); hold on
-%         plot(0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',2); hold on;
-%         plot(drth(appRange)','r'); hold on; plot(dlth(appRange)','b');
-%         plot(find(idx2(appRange)==clust),0.5*(drth(appRange(idx2(appRange)==clust)) +dlth(appRange(idx2(appRange)==clust)))','og')
-%         ylim([-20 20]); % xlim([0 max(length(appRange),1)]);
+        %         plot(0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',2); hold on;
+        %         plot(drth(appRange)','r'); hold on; plot(dlth(appRange)','b');
+        %         plot(find(idx2(appRange)==clust),0.5*(drth(appRange(idx2(appRange)==clust)) +dlth(appRange(idx2(appRange)==clust)))','og')
+        %         ylim([-20 20]); % xlim([0 max(length(appRange),1)]);
         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
         title('az to cricket')
         xlim([0 max(length(appRange),1)]);
         
-         gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+        gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
         % subplot(6,1,6);
         subplot(4,1,3)
         hold on
@@ -1462,58 +1462,6 @@ for i = 1:length(appEpoch)
         xlabel('frames'); ylabel('deg');
         % legend('gaze','head')
         
-%         subplot(6,1,4)
-%         plot(roll(appRange)); hold on;
-%         plot(tilt(appRange));
-%         plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'og')
-%         plot(find(idx2(appRange)==clust),tilt(appRange(idx2(appRange)==clust)),'og')
-%         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
-%         plot([1  max(length(appRange),1)],[0 0],'--')
-%         xlim([0 max(length(appRange),1)]);
-%         if ~isempty(appRange)
-%         ylim([((min(min(roll(appRange),tilt(appRange))))-5) ((max(max(roll(appRange),tilt(appRange))))+5)]);
-%         end
-%         legend('roll','tilt');
-%         
-%         subplot(6,1,5)
-%         vgPhi=rphi(appRange)-lphi(appRange);
-%         plot(vgPhi); hold on
-%         plot(roll(appRange),'k'); hold on
-%         plot(find(idx2(appRange)==clust),vgPhi((idx2(appRange)==clust)),'go')
-%         plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'go')
-% 
-%         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
-%         xlim([0 max(length(appRange),1)]);
-%         legend('R phi- L phi','acc roll')
-%             if ~isempty(appRange)
-%         ylim([((min(min(roll(appRange),vgPhi)))-5) ((max(max(roll(appRange),vgPhi)))+5)]);
-%         end
-
-    subplot(4,1,4)
-    gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
-    plot((gzApp'),'k','LineWidth',2); hold on; 
-    sacc = find(idx2(appRange)==clust);
-    sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
-    for s = 1:length(sacc)
-        plot(sacc(s):sacc(s)+1,gzApp(sacc(s):sacc(s)+1),'r','LineWidth',2)
-    end
-
-
-% hold on
-% plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
-% plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
-%         plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
-% ylim([-50 50])
-% title('d head, dgaze')
-
-if appOffset>0
-    plot([appOffset appOffset],[-60 60],'g');end
-plot([endOffset endOffset],[-60 60],'r');
-if ~isempty(min(hthApp))
-    ylim([min(gzApp)-5 max(gzApp)+5]);
-%     ylim([-50 50])
-else  ylim([-50 50]);end
-
         %         subplot(6,1,4)
         %         plot(roll(appRange)); hold on;
         %         plot(tilt(appRange));
@@ -1541,23 +1489,75 @@ else  ylim([-50 50]);end
         %         ylim([((min(min(roll(appRange),vgPhi)))-5) ((max(max(roll(appRange),vgPhi)))+5)]);
         %         end
         
-%         subplot(4,1,4)
-%         hold on
-%         plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
-%         plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
-%         plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
-%         ylim([-50 50])
-%         title('d head, dgaze')
-%         
-%         if appOffset>0
-%             plot([appOffset appOffset],[-60 60],'g');end
-%         plot([endOffset endOffset],[-60 60],'r');
-%         if ~isempty(min(hthApp))
-%             %ylim([min(hthApp)-20 max(hthApp)+20]);
-%             ylim([-50 50])
-%         else  ylim([-50 50]);end
-
-              
+        subplot(4,1,4)
+        gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+        plot((gzApp'),'k','LineWidth',2); hold on;
+        sacc = find(idx2(appRange)==clust);
+        sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
+        for s = 1:length(sacc)
+            plot(sacc(s):sacc(s)+1,gzApp(sacc(s):sacc(s)+1),'r','LineWidth',2)
+        end
+        
+        
+        % hold on
+        % plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
+        % plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
+        %         plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
+        % ylim([-50 50])
+        % title('d head, dgaze')
+        
+        if appOffset>0
+            plot([appOffset appOffset],[-60 60],'g');end
+        plot([endOffset endOffset],[-60 60],'r');
+        if ~isempty(min(hthApp))
+            ylim([min(gzApp)-5 max(gzApp)+5]);
+            %     ylim([-50 50])
+        else  ylim([-50 50]);end
+        
+        %         subplot(6,1,4)
+        %         plot(roll(appRange)); hold on;
+        %         plot(tilt(appRange));
+        %         plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'og')
+        %         plot(find(idx2(appRange)==clust),tilt(appRange(idx2(appRange)==clust)),'og')
+        %         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+        %         plot([1  max(length(appRange),1)],[0 0],'--')
+        %         xlim([0 max(length(appRange),1)]);
+        %         if ~isempty(appRange)
+        %         ylim([((min(min(roll(appRange),tilt(appRange))))-5) ((max(max(roll(appRange),tilt(appRange))))+5)]);
+        %         end
+        %         legend('roll','tilt');
+        %
+        %         subplot(6,1,5)
+        %         vgPhi=rphi(appRange)-lphi(appRange);
+        %         plot(vgPhi); hold on
+        %         plot(roll(appRange),'k'); hold on
+        %         plot(find(idx2(appRange)==clust),vgPhi((idx2(appRange)==clust)),'go')
+        %         plot(find(idx2(appRange)==clust),roll(appRange(idx2(appRange)==clust)),'go')
+        %
+        %         plot([appOffset appOffset],[-60 60],'g'); plot([endOffset endOffset],[-60 60],'r');
+        %         xlim([0 max(length(appRange),1)]);
+        %         legend('R phi- L phi','acc roll')
+        %             if ~isempty(appRange)
+        %         ylim([((min(min(roll(appRange),vgPhi)))-5) ((max(max(roll(appRange),vgPhi)))+5)]);
+        %         end
+        
+        %         subplot(4,1,4)
+        %         hold on
+        %         plot(dhthApp','Color',[0 0.75 0],'LineWidth',2); hold on
+        %         plot(dhthApp' +0.5*( drth(appRange) +dlth(appRange))','k','LineWidth',.75);
+        %         plot(find(idx2(appRange)==clust),dhthApp(idx2(appRange)==clust),'bo')
+        %         ylim([-50 50])
+        %         title('d head, dgaze')
+        %
+        %         if appOffset>0
+        %             plot([appOffset appOffset],[-60 60],'g');end
+        %         plot([endOffset endOffset],[-60 60],'r');
+        %         if ~isempty(min(hthApp))
+        %             %ylim([min(hthApp)-20 max(hthApp)+20]);
+        %             ylim([-50 50])
+        %         else  ylim([-50 50]);end
+        
+        
         %        if exist('gm','var')
         %            X = [dth(appRange)'; [diff(mnEyeApp) 0]; mnEyeApp]';
         %         idx = cluster(gm,X);
@@ -1597,54 +1597,54 @@ else  ylim([-50 50]);end
     % %           end
     %     headAll=[headAll head'];
     %     eyeAll=[eyeAll eyeTrace(useT)'];
-
-
-% notnan = ~isnan(sum(saccEyeAll,1)) & ~isnan(sum(saccHeadAll,1));
-% saccHeadAll = saccHeadAll(:,notnan);
-% saccEyeAll = saccEyeAll(:,notnan);
-% saccAppAll = saccAppAll(notnan);
-% saccVidAll = saccVidAll(notnan);
-
-% useTrace = ceil(rand(200,1)*size(saccHeadAll,2));
-% figure
-% plot(-buffer:buffer,saccHeadAll(:,useTrace))
-% hold on
-% plot(-buffer:buffer,nanmean(saccHeadAll,2),'g','LineWidth',2)
-% plot(-buffer:buffer,nanmean(saccEyeAll,2),'r','LineWidth',2);
-% ylabel('head position')
-%     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-
-        
-%        if exist('gm','var')
-%            X = [dth(appRange)'; [diff(mnEyeApp) 0]; mnEyeApp]';
-%         idx = cluster(gm,X);
-%         sacc = find(idx==3);
-%         for i = 1:length(sacc)-1;
-%             plot(sacc(i):sacc(i)+1,gzApp(sacc(i):sacc(i)+1),'r')
-%         end
-       
-       
-        
-        %         appGaze =(hthApp +0.5*( rth(appRange) +lth(appRange))')
-        %         hold on;plot(find(resetPt(appRange)),appGaze(resetPt(appRange)),'ob');
-        %         plot(find(stablePt(appRange)),appGaze(stablePt(appRange)),'og')
-        %         plot(find(headTurnPt(appRange)),appGaze(headTurnPt(appRange)),'or')
-        %
-%         clear head eyeTrace useT
-%         useTAll=(find(idx2(appRange)==clust)); 
-%         useT=useTAll-1; 
-%         %head=g3(find(idx2(appRange)==clust));
-%         head =(.5*(rth+lth));head = head(find(idx2(appRange)==clust));
-%         eyeTrace=(.5*(drth+dlth)); 
-%      
-%         if ~isempty(useT) && useT(1)==0|useT(1)<0
-%         useT=useT(2:end);
-%         head=head(2:end);
-%         end
-%         plot(head,eyeTrace(useT),'bo'); hold on;
-        drawnow
-end 
+    
+    
+    % notnan = ~isnan(sum(saccEyeAll,1)) & ~isnan(sum(saccHeadAll,1));
+    % saccHeadAll = saccHeadAll(:,notnan);
+    % saccEyeAll = saccEyeAll(:,notnan);
+    % saccAppAll = saccAppAll(notnan);
+    % saccVidAll = saccVidAll(notnan);
+    
+    % useTrace = ceil(rand(200,1)*size(saccHeadAll,2));
+    % figure
+    % plot(-buffer:buffer,saccHeadAll(:,useTrace))
+    % hold on
+    % plot(-buffer:buffer,nanmean(saccHeadAll,2),'g','LineWidth',2)
+    % plot(-buffer:buffer,nanmean(saccEyeAll,2),'r','LineWidth',2);
+    % ylabel('head position')
+    %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+    
+    
+    
+    %        if exist('gm','var')
+    %            X = [dth(appRange)'; [diff(mnEyeApp) 0]; mnEyeApp]';
+    %         idx = cluster(gm,X);
+    %         sacc = find(idx==3);
+    %         for i = 1:length(sacc)-1;
+    %             plot(sacc(i):sacc(i)+1,gzApp(sacc(i):sacc(i)+1),'r')
+    %         end
+    
+    
+    
+    %         appGaze =(hthApp +0.5*( rth(appRange) +lth(appRange))')
+    %         hold on;plot(find(resetPt(appRange)),appGaze(resetPt(appRange)),'ob');
+    %         plot(find(stablePt(appRange)),appGaze(stablePt(appRange)),'og')
+    %         plot(find(headTurnPt(appRange)),appGaze(headTurnPt(appRange)),'or')
+    %
+    %         clear head eyeTrace useT
+    %         useTAll=(find(idx2(appRange)==clust));
+    %         useT=useTAll-1;
+    %         %head=g3(find(idx2(appRange)==clust));
+    %         head =(.5*(rth+lth));head = head(find(idx2(appRange)==clust));
+    %         eyeTrace=(.5*(drth+dlth));
+    %
+    %         if ~isempty(useT) && useT(1)==0|useT(1)<0
+    %         useT=useT(2:end);
+    %         head=head(2:end);
+    %         end
+    %         plot(head,eyeTrace(useT),'bo'); hold on;
+    drawnow
+end
 
 %% analyze eye/head position around saccades
 %%% defining 3 clusters
@@ -1655,9 +1655,9 @@ plot(-buffer:buffer,saccEyeAll(:,1:100:end))
 hold on
 plot(-buffer:buffer,nanmean(saccEyeAll,2),'g','LineWidth',2);
 ylabel('mean Eye position'); ylim([-20 20])
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-%%% can either select all saccs for analysis, or just approaches. 
+%%% can either select all saccs for analysis, or just approaches.
 %%% right now, all saccs
 useS = saccAppAll>=0;
 eyeData = saccEyeAll(:,useS);
@@ -1676,16 +1676,16 @@ idx = kmeans(eyeDataCent(5:20,:)',4);
 % gm = fitgmdist(eyeDataCent(5:end,:)',4,'Replicates',10);
 % idx = cluster(gm,eyeDataCent(5:end,:)');
 
-    
+
 %%% plotting 4 clusters
 eyeFig = figure;
-headFig = figure;  
+headFig = figure;
 for i = 1:4
-
+    
     figure(eyeFig);
     use = (idx==i);
     subplot(2,2,i);
-   % plot(saccEyeAll(:,use));
+    % plot(saccEyeAll(:,use));
     hold on; plot(nanmean(eyeData(:,use),2),'g', 'Linewidth',2);
     ylim([-10 10]); xlim([5 20]);title(sprintf('n = %d',sum(use)))
     ylabel('eye theta')
@@ -1697,13 +1697,13 @@ for i = 1:4
     figure(headFig)
     
     subplot(2,2,i);
-   % plot(saccHeadAll(:,use));
+    % plot(saccHeadAll(:,use));
     hold on; plot(nanmean(headData(:,use),2)-nanmean(headData(5,use),2) ,'g', 'Linewidth',2);
     ylim([0 40]);xlim([5 20])%ylim([-20 20]); title(sprintf('n = %d',sum(use)))
     ylabel('head theta')
-
+    
     if i ==4
-       if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+        if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
     end
 end
 
@@ -1739,7 +1739,7 @@ for i = 1:length(dheadStableGood);
     else
         headStd(i) = NaN;
         gazeStd(i) = NaN;
-        eyeStd(i) = NaN;   
+        eyeStd(i) = NaN;
     end
 end
 
@@ -1750,16 +1750,36 @@ h =hist(stabDurGood,hbins);  %%% add error bars here!
 plot(hbins/30,h/sum(h)); xlabel('secs'); ylabel('fraction');
 title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDurGood)/30,(1/30)*std(stabDurGood)/sqrt(length(stabDurGood)))); xlim([0 2]);
 
+%%% plot histogram of durations (with error bars)
+hbins = 1:2:150;
+figure
+errorbar(hbins/30,h/sum(h),sqrt(h)/sum(h)); xlabel('secs'); ylabel('fraction');
+title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDurGood)/30,(1/30)*std(stabDurGood)/sqrt(length(stabDurGood)))); xlim([0 2]);
+
+
+
 %%% histogram of stability for head and gaze
 figure
 hbins = 0.25:0.5:20;
 hold on
-h = hist(headStd,hbins);  %%% add error bars here!
+h = hist(headStd,hbins);  
 plot(hbins,h/sum(h));
 h = hist(gazeStd,hbins);
 plot(hbins,h/sum(h));
 legend('head','gaze');
 xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
+
+%%% histogram of stability for head and gaze (with error bars)
+figure
+hbins = 0.25:0.5:20;
+hold on
+h = hist(headStd,hbins);  %%% add error bars here!
+errorbar(hbins,h/sum(h),sqrt(h)/sum(h));
+h = hist(gazeStd,hbins);
+errorbar(hbins,h/sum(h),sqrt(h)/sum(h));
+legend('head','gaze');
+xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
+
 
 
 %%% calculate average stability of head and gaze
@@ -1801,7 +1821,7 @@ legend('head','eyes','gaze')
 apps = find(saccAppAll==1);
 
 %%% there is ~6deg asymmetry in head position relative to cricket. this is
-%%% probably based on the definition of theta from "model" head points. 
+%%% probably based on the definition of theta from "model" head points.
 s = saccAzAll(:,apps);
 azOffset=nanmedian(s(:))
 saccAzAllRaw = saccAzAll; %%% save raw value
@@ -1811,19 +1831,19 @@ saccAzAll = saccAzAll - azOffset;
 eyeAz = saccAzAll + saccEyeRawAll;
 
 %%% plot azimuth for all approaches
- figure
+figure
 plot(abs(saccAzAll(:,apps)));
 hold on
 plot(nanmean(abs(saccAzAll(:,apps)),2),'g','Linewidth',2); title('head azimuth for all approaches')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 figure
 plot(abs(eyeAz(:,apps)));
 hold on
 plot(nanmean(abs(eyeAz(:,apps)),2),'g','Linewidth',2)
 title('gaze azimuth for all approaches')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
- 
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 figure
 plot(nanmedian(abs(saccAzAll(:,apps)),2),'b','Linewidth',2)
 hold on
@@ -1839,43 +1859,36 @@ hold on
 data = nanmedian(abs(eyeAz(:,apps)),2);
 err = nanstd(abs(eyeAz(:,apps)),[],2) ./ sqrt(sum(~isnan(eyeAz(:,apps)),2))
 data = data(trange); err = err(trange);
-t = (0:length(data)-1)/30; 
+t = (0:length(data)-1)/30;
 errorbar(t,data,err,'k')
-
 data = nanmedian(abs(saccAzAll(:,apps)),2);
 err = nanstd(abs(saccAzAll(:,apps)),[],2) ./ sqrt(sum(~isnan(saccAzAll(:,apps)),2))
 data = data(trange); err = err(trange);
-t = (0:length(data)-1)/30; 
+t = (0:length(data)-1)/30;
 errorbar(t,data,err,'b')
-
 legend('head azimuth','gaze azimuth');
 ylim([7.5 27.5]); xlim([t(1)-1/60 t(end)+1/60]);axis square
 xlabel('secs'); ylabel('azimuth to cricket (deg)')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
-
 %%% plot for all 4 clusters
 figure
 for i =1:4
- subplot(2,2,i)
- use = saccAppAll'==1 & idx ==i;
-plot(nanmedian(abs(saccAzAll(:,use)),2),'r','Linewidth',2)
-hold on
-plot(nanmedian(abs(eyeAz(:,use)),2),'g','Linewidth',2)
-ylim([0 40])
-title(sprintf('clust %d',i))
-legend('head','eye');
-ylabel('azimuth')
-%%% add mean of all clusters
+    subplot(2,2,i)
+    use = saccAppAll'==1 & idx ==i;
+    plot(nanmedian(abs(saccAzAll(:,use)),2),'r','Linewidth',2)
+    hold on
+    plot(nanmedian(abs(eyeAz(:,use)),2),'g','Linewidth',2)
+    ylim([0 40])
+    title(sprintf('clust %d',i))
+    legend('head','eye');
+    ylabel('azimuth')
+    %%% add mean of all clusters
 end
 
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-    
-    
-    
 %%% where does eye end up after saccade?
 preSaccT = 11; postSaccT=12;  %%% timepoints to compare pre/post saccade
 bins = -60:10:60;
@@ -1895,16 +1908,36 @@ hold on
 plot(bins,AzHist(:,1))
 xlabel('azimuth'); legend('gaze','head')
 title('pre saccade')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-    %%% plot post
+%%% plot post
 figure
 plot(bins,eyeAzHist(:,2))
 hold on
 plot(bins,AzHist(:,2))
 xlabel('azimuth'); legend('gaze','head')
 title('post saccade')
-    if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+%%% plot pre (with error bars)
+figure
+errorbar(bins,eyeAzHist(:,1)/sum(eyeAzHist(:,1)), sqrt(eyeAzHist(:,1))/sum(eyeAzHist(:,1)))
+hold on
+errorbar(bins,AzHist(:,1)/sum(AzHist(:,1)), sqrt(AzHist(:,1))/sum(AzHist(:,1)))
+xlabel('azimuth (deg)'); legend('gaze','head')
+title('pre saccade')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+%%% plot post (with error bars)
+figure
+errorbar(bins,eyeAzHist(:,2)/sum(eyeAzHist(:,2)), sqrt(eyeAzHist(:,2))/sum(eyeAzHist(:,2)))
+hold on
+errorbar(bins,AzHist(:,2)/sum(AzHist(:,2)), sqrt(AzHist(:,2))/sum(AzHist(:,2)))
+xlabel('azimuth (deg)'); legend('gaze','head')
+title('post saccade')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
 
 
 %%% get median offset of eye&head for pre/post saccade
@@ -1919,12 +1952,12 @@ headOffsetErr(1) = nanstd(abs(saccAzAll(preSaccT,apps)))/sqrt(sum(~isnan(saccAzA
 headOffsetErr(2) = nanstd(abs(saccAzAll(postSaccT,apps)))/sqrt(sum(~isnan(saccAzAll(postSaccT,apps))))
 
 %%% plot errorbar
-    figure
-    barweb([eyeOffset; headOffset]',[eyeOffsetErr; headOffsetErr]')
-    ylabel('azimuth to cricket (deg)');
-   set(gca,'Xticklabel',{'pre saccade','post saccade'})
-   legend('gaze','head')
-    
+figure
+barweb([eyeOffset; headOffset]',[eyeOffsetErr; headOffsetErr]')
+ylabel('azimuth to cricket (deg)');
+set(gca,'Xticklabel',{'pre saccade','post saccade'})
+legend('gaze','head')
+
 
 
 %% old ways of trying to cluster sacades
@@ -1933,67 +1966,67 @@ headOffsetErr(2) = nanstd(abs(saccAzAll(postSaccT,apps)))/sqrt(sum(~isnan(saccAz
 % plot(mean(saccEyeAll,2))
 % plot(diff(mean(saccEyeAll,2)))
 % vhead = diff(saccHeadAll,1);
-% 
+%
 % maxpre = max(vhead(1:9,:),[],1);
 % meanpre = mean(vhead(1:9,:),1);
 % meanpost = mean(saccHeadAll(15:20,:),1);
-% 
+%
 %     stationary_sm = abs(meanpre)<2 &  abs(maxpre)<2  &meanpost< 20;
 %     stationary_lg = abs(meanpre)<2 &  abs(maxpre)<2 & meanpost>20;
-% 
+%
 %     stationary = abs(meanpre)<1 &  abs(maxpre)<2;
 %     moving = meanpre>1 & abs(maxpre)>5 ;
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
+%
 % figure
 % plot(nanmean(saccEyeAll(:,stationary_sm),2));
 % hold on
 % plot(nanmean(saccEyeAll(:,stationary_lg),2));
 % plot(nanmean(saccEyeAll(:,moving),2));
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
+%
 % figure
 % plot(nanmean(saccHeadAll(:,stationary_sm),2))
 % hold on
 % plot(nanmean(saccHeadAll(:,stationary_lg),2))
 % plot(nanmean(saccHeadAll(:,moving),2))
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
-% 
+%
+%
 % figure
 % plot(saccEyeAll(:,stationary_sm))
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
+%
 % figure
 % plot(saccEyeAll(:,stationary_lg))
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
+%
 % figure
 % plot(saccEyeAll(:,moving))
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
+%
 % figure
 % plot(nanmean(saccHeadAll(:,stationary),2))
 % hold on
 % plot(nanmean(saccHeadAll(:,moving),2))
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
-% 
+%
+%
 % v = unique(saccVidAll)
 % %for i = 1:length(v)
 %     for i = 1:10
-%     
+%
 %     stationary = abs(meanpre)<2 &  abs(maxpre)<2 & saccVidAll==v(i);
 % moving = meanpre>1 & abs(maxpre)>5 & saccVidAll==v(i);
-% 
+%
 % figure
 % plot(saccEyeAll(:,stationary));
 % hold on
 % plot(saccEyeAll(:,moving));
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% 
+%
 % end
-% 
+%
 % figure
 % plot(nanmean(saccEyeAll,2))
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -2036,10 +2069,10 @@ headOffsetErr(2) = nanstd(abs(saccAzAll(postSaccT,apps)))/sqrt(sum(~isnan(saccAz
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-
+    
     filen=sprintf('%s','PaperFigs_022520_dheaddEye_azTraces_a','.pdf')
-%     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
-
+    %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
+    
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
