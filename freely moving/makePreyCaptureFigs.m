@@ -854,13 +854,11 @@ for c=0:1
     plot([-20,-20],[.15,0],'k--');
     plot([20,20],[.15,0],'k--');
     
-    clear nBins
     nBins=-30:2:30
     hp=hist(d_mnEyeAll(use),nBins);
     subplot(1,2,2)
     plot(nBins, hp/length(d_mnEyeAll(use))); axis square; hold on; title('mn d Eye Theta')
     deltaBinoc(:,c+1)=hp;
-    xlim([-60 60]);
     if c==1
         suptitle('Figure 4B: mn Eye yaw falls within binocular zone');
         if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -886,7 +884,6 @@ for c=0:1
     plot(nBins,h/sum(use&still)); hold on; title('mn Eye Yaw'); axis square
     plot([-3,-3],[.6,0],'k--');
     plot([3,3],[.6,0],'k--');
-    xlim([-60 60])
 
     prop3(c+1,1) =1- sum(h(nBins<-5 | nBins>5))/sum(h);
     hp=hist(mnPhiAll(use& still),nBins);
