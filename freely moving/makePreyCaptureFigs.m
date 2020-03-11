@@ -16,16 +16,20 @@ load('T:\PreyCaptureAnalysis\Data\ControlAnalysis\compileAllAnimals_CONTROL_0902
 for vid=1:length(thetaHead)
     prop(vid)=sum(~isnan(thetaHead{vid}))./length(thetaHead{vid})
 end
-useData=find(prop>.85); % 90% of points needs to be present for exp to be used
+useData=find(prop>.85); % 85% of points needs to be present for exp to be used
 
 for vid=1:length(useData)
     appTime=appEpoch{useData(vid)};
-    Cntrl_speed(vid,1) =sum(mouseSp{useData(vid)}(:,appTime==0)>5)./(length(mouseSp{useData(vid)}(:,appTime==0)));
-    Cntrl_speed(vid,3) =nanmean(mouseSp{useData(vid)}(:,appTime==0));
+     w=gausswin(15);
+%     runningSmooth=filter(w,1,mouseSp{useData(vid)});
+    runningSmooth =medfilt1(mouseSp{useData(vid)},15);
+    Cntrl_speed(vid,1) =sum(runningSmooth(:,appTime==0)>5)./length(runningSmooth(:,appTime==0));
+   
+    Cntrl_speed(vid,3) =nanmean(runningSmooth(:,appTime==0));
     
     if sum(appTime==1)>30
-        Cntrl_speed(vid,2) =sum(mouseSp{useData(vid)}(:,appTime==1)>5)./(length(mouseSp{useData(vid)}(:,appTime==1)));
-        Cntrl_speed(vid,4) =nanmean(mouseSp{useData(vid)}(:,appTime==1));
+        Cntrl_speed(vid,2) =sum(runningSmooth(:,appTime==1)>5)./length(runningSmooth(:,appTime==1));
+        Cntrl_speed(vid,4) =nanmean(runningSmooth(:,appTime==1));
         
     else
         Cntrl_speed(vid,2)=nan;
@@ -33,37 +37,45 @@ for vid=1:length(useData)
         
     end
 end
-Cntrl_speed(Cntrl_speed(:,4)>60,4)=NaN; % noisy control data, speeds at a few timepoints go above 150 cm/sec
-Cntrl_err= nanstd(Cntrl_speed)/sqrt(length(useData));
 
-clear mouseSp appEpoch useData appTime thetaHead vid
+
+clear mouseSp appEpoch useData appTime thetaHead vid runningSmooth
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 load('ACC_AllAnimals_021520_a.mat')
 savePDF=0;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
     appTime=appEpoch{vid};
-    Cam_speed(vid,1) = sum(mouseSp{useData(vid)}(:,appTime==0)>5)./(length(mouseSp{useData(vid)}(:,appTime==0)));
-    Cam_speed(vid,3) = nanmean(mouseSp{useData(vid)}(:,appTime==0));
+     w=gausswin(15);
+%     runningSmooth=filter(w,1,mouseSp{useData(vid)});
+        runningSmooth =medfilt1(mouseSp{useData(vid)},15);
+
+    Cam_speed(vid,1) = sum(runningSmooth(:,appTime==0)>5)./(length(runningSmooth(:,appTime==0)));
+    
+    
+    Cam_speed(vid,3) = nanmean(runningSmooth(:,appTime==0));
     if sum(appTime==1)>30
-        Cam_speed(vid,2) =sum(mouseSp{useData(vid)}(:,appTime==1)>5)./(length(mouseSp{useData(vid)}(:,appTime==1)));
-        Cam_speed(vid,4) = nanmean(mouseSp{useData(vid)}(:,appTime==1));
+        Cam_speed(vid,2) =sum(runningSmooth(:,appTime==1)>5)./(length(runningSmooth(:,appTime==1)));
+        Cam_speed(vid,4) = nanmean(runningSmooth(:,appTime==1));
     else
         Cam_speed(vid,2)=nan;
         Cam_speed(vid,4)=nan;
     end
 end
+
+Cntrl_speed(Cntrl_speed(:,4)>60,4)=NaN; % noisy control data, speeds at a few timepoints go above 150 cm/sec - bad DLC tracking
+Cntrl_err= nanstd(Cntrl_speed)/sqrt(length(useData));
 Cam_err= nanstd(Cam_speed)/sqrt(length(useData));
 % figure; barweb([nanmean(Cam_speed(:,1)) nanmean(Cam_speed(:,2)) nanmean(Cntrl_speed(:,1)) nanmean(Cntrl_speed(:,2))],...
 %     [nanmean(Cam_err(:,1)) nanmean(Cam_err(:,2)) nanmean(Cntrl_err(:,1)) nanmean(Cntrl_err(:,2))]);
 % title('proportion of time moving')
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-[h p]= kstest2(Cntrl_speed(:,1),Cntrl_speed(:,2))
-[h p]= kstest2(Cam_speed(:,1),Cam_speed(:,2))
-[h p]= kstest2(Cntrl_speed(:,1),Cam_speed(:,1))
-[h p]= kstest2(Cntrl_speed(:,2),Cam_speed(:,2))
+
+[h p]= ttest2(Cntrl_speed(:,3),Cam_speed(:,3))
+[h p]= ttest2(Cntrl_speed(:,4),Cam_speed(:,4))
 %
+% [h,p,ci,stats] = ttest2(Cntrl_speed(:,3),Cam_speed(:,3), 'both','Alpha',.05)
 % figure; barweb([nanmean(Cam_speed(:,3)) nanmean(Cam_speed(:,4)) nanmean(Cntrl_speed(:,3)) nanmean(Cntrl_speed(:,4))],...
 %     [nanmean(Cam_err(:,3)) nanmean(Cam_err(:,4)) nanmean(Cntrl_err(:,3)) nanmean(Cntrl_err(:,4))]);
 % title('mean speed')
@@ -91,95 +103,87 @@ legend('cam','cam app','control','control app');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 [h p]= kstest2(Cntrl_speed(:,3),Cntrl_speed(:,4))
 [h p]= kstest2(Cam_speed(:,3),Cam_speed(:,4))
-[h p]= kstest2(Cam_speed(:,3),Cntrl_speed(:,3))
-[h p]= kstest2(Cam_speed(:,4),Cntrl_speed(:,4))
+[h p]= ttest2(Cam_speed(:,3),Cntrl_speed(:,3))
+[h p]= ttest2(Cam_speed(:,4),Cntrl_speed(:,4))
 
-%%%average number of captures per session
-exp=[4.6	6.2	5.2	4.333333333	3.166666667	4.166666667	5.2	6.6	3.5	4.166666667]; %avg numbers of crickets for each animal, across sessions, from experiment spreadsheet
+%%%average number of captures per session %avg numbers of crickets for each animal, across sessions, from experiment spreadsheet
+exp=[4.6	6.2	5.2	4.333333333	3.166666667	4.166666667	5.2	6.6	3.5	4.166666667]; 
 cntrl=[4.933333333	6.366666667	5.366666667	5.666666667	5.833333333	4.5	5	6.6	5.166666667	5.333333333];
 expM=mean(exp); errExp=std(exp)./(length(sqrt(exp)));
 mnC=mean(cntrl); errC=std(cntrl)./(length(sqrt(cntrl)));
 comp=[expM mnC];err=[errExp,errC];
 figure
 barweb(comp,err)
-[sig p]=kstest2(exp',cntrl');
+[sig p]=ttest2(exp',cntrl');
 
 % Figure 1G: gyro & DLC traces
-figure
-range=350:830;
-for vid=10%1:10%length(useData)
-    %     subplot(2,5,vid);
-    plot(d_Theta{useData(vid)}(range,:));
-    hold on;
-    plot(accelChannels{useData(vid)}(range,6));
+% range=1:100;
+for vid=105% 56 105]%91:105%length(useData)
+%     range=1:812
+    range=1148:1655
+    %1:length((Rtheta{useData(vid)}))
+    use=appEpoch{vid};
+    
+    tR=Rtheta{useData(vid)}(range,:)-nanmedian(Rtheta{useData(vid)}(range,:));
+    tL=Ltheta{useData(vid)}(range,:)-nanmedian(Ltheta{useData(vid)}(range,:))
+    mnEye=.5*(tR+tL);
+    headTh=thetaHead{useData(vid)}(:,range)-nanmedian(thetaHead{useData(vid)}(:,range));
+    figure
+    subplot(6,1,1)
+    plot(tR); hold on
+    plot(tL);
+    plot(mnEye-nanmedian(mnEye));xlim([1 length(range)])
+    ylim([-32 32]);
+    subplot(6,1,2)
+    plot(dist{useData(vid)}(:,range));xlim([1 length(range)]); hold on
+    plot([296 296],[-60 60],'g')
+    subplot(6,1,3)
+    plot(rad2deg(az{useData(vid)}(:,range)));xlim([1 length(range)])
+    subplot(6,1,4);
+    plot(mouseSp{useData(vid)}(:,range))%-nanmedian(mouseSp{useData(vid)}(:,range)));
+    xlim([1 length(range)])
+    subplot(6,1,5)
+    plot(headTh);
+   % plot(cumsum(accelChannels{useData(vid)}(range,6))-nanmedian(cumsum(accelChannels{useData(vid)}(range,6))));
+    xlim([1 length(range)])
+    subplot(6,1,6)
+    plot(accelChannels{useData(vid)}(range,2)-nanmedian(accelChannels{useData(vid)}(range,2)));
+    xlim([1 length(range)])
 end
-legend('DLC head theta','gyroscope')
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
+
+
+% figure
+% range=350:830;
+% for vid=10%1:10%length(useData)
+%     %     subplot(2,5,vid);
+%     plot(d_Theta{useData(vid)}(range,:));
+%     hold on;
+%     plot(accelChannels{useData(vid)}(range,6));
+% end
+% legend('DLC head theta','gyroscope')
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 % Figure 1H: measure of similarity of gyro & DLC (scatter or hist of
 % difference)
+gyroBias=nanmedian(gyro3All);
 
-figure
-clear h
-subplot(1,2,1)
-plot(gyro3All(1:100:end),dlcDhth(1:100:end),'.'); xlabel('gyro yaw'); ylabel('DLC yaw')
-axis equal; xlim([-20 20]); ylim([-20 20]);
-bins=-20:2:20
-h=hist(gyro3All-dlcDhth,bins)
-subplot(1,2,2)
-plot(bins,h/length(gyro3All)); hold on
-xlabel('gyro - DLC (degrees');
-suptitle('Figure 1H: DLC is good measure of head angle')
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% figure
+% clear h
+% subplot(1,2,1)
+% plot(gyro3All(1:100:end),dlcDhth(1:100:end),'.'); xlabel('gyro yaw'); ylabel('DLC yaw')
+% axis equal; xlim([-20 20]); ylim([-20 20]);
+% bins=-20:2:20
+% h=hist(gyro3All-dlcDhth,bins)
+% subplot(1,2,2)
+% plot(bins,h/length(gyro3All)); hold on
+% xlabel('gyro - DLC (degrees');
+% suptitle('Figure 1H: DLC is good measure of head angle')
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 % Figure 1I (where is the right place to put this?): head angle is directed
 % towards cricket - corr of az and change in head yaw
 
-clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
-for vid=1:length(useData)
-    clear hT azC use useN corrR corrRA corrL corrLA
-    nframe = min(length(az{useData(vid)}),length(d_Theta{useData(vid)}));
-    
-    nframe = min(nframe,length(appEpoch{vid}));
-    useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
-    
-    azC=-(az{useData(vid)}); hT=d_Theta{useData(vid)}; hT=hT-nanmedian(hT);
-    
-    if sum(useN)>3 & sum(~isnan(hT(useN)))>20 & sum(~isnan(azC(useN)))>20
-        [corrR lagsR]= nanxcorr(azC(useN),hT(useN),30,'coeff');
-        hold on;
-    else
-        corrR=NaN;
-    end
-    
-    %     subplot(4,5,vid)
-    %     plot(rad2deg(azC(use))); hold on; plot(hT(use));
-    if sum(use)>4 & sum(~isnan(hT(use)))>20
-        [corrRA lagsRA]= nanxcorr(azC(use),hT(use),30,'coeff');
-    else
-        corrRA=NaN;
-    end
-    corrRAll(vid,:)=corrR;
-    corrRAAll(vid,:)=corrRA;
-end
-
-figure%('units','normalized','outerposition',[0 0 1 1])
-errR= nanstd(corrRAll)/(sqrt(length(corrRAll)));
-errRA= nanstd(corrRAAll)/(sqrt(length(corrRAAll)));
-
-shadedErrorBar(1:size(corrRAll,2),nanmean(corrRAll,1),errR,'-b',1); hold on
-shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
-plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); xlim([1 61]); axis square; ylim([-.2 .5]);
-
-clear L
-L(1) = plot(nan, nan, 'b-');
-L(2) = plot(nan, nan, 'g-');
-legend(L,{'az to cricket','dtheta head'});
-
-title('Figure 1I: Corr of az and dHead Theta, head is directed to cricket')
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-
-clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
 
 %% FIGURE 2: Coordination of eyes during free movement
 
@@ -193,19 +197,19 @@ for vid=1:length(useData)
     tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
     tR=nanmean(tR)-tR; tL=nanmean(tL)-tL;
     clear use
-    useN = appEpoch{vid}==0; use = appEpoch{vid}==1;
-    ptsUsed(vid,1,1)=length(1:60:length(useN));
-    ptsUsed(vid,1,2)=length(1:60:length(use));
+    useN = find(appEpoch{vid}==0); use = find(appEpoch{vid}==1);
+    ptsUsed(vid,1,1)=length(1:240:length(useN));
+    ptsUsed(vid,1,2)=length(1:240:length(use));
     ptsUsed(vid,2,1)=length(useN);
     ptsUsed(vid,2,2)=length(use);
     subplot(1,2,1)
-    plot(tR(useN(1:60:length(useN))),pR(useN(1:60:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
-    plot(tR(use(1:60:length(use))),pR(use(1:60:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+    plot(tR(useN(1:240:length(useN))),pR(useN(1:240:length(useN))),'.b'); hold on; xlim([-50 50]);ylim([-50 50]); axis square
+    plot(tR(use(1:240:length(use))),pR(use(1:240:length(use))),'.g'); hold on; xlim([-50 50]);ylim([-50 50]); axis square
     title('R eye')
     xlabel('yaw (deg)'); ylabel('pitch(deg)');
     subplot(1,2,2)
-    plot(tL(useN(1:60:length(useN))),pL(useN(1:60:length(useN))),'.b'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
-    plot(tL(use(1:60:length(use))),pL(use(1:60:length(use))),'.g'); hold on; xlim([-60 60]);ylim([-60 60]); axis square
+    plot(tL(useN(1:240:length(useN))),pL(useN(1:240:length(useN))),'.b'); hold on; xlim([-50 50]);ylim([-50 50]); axis square
+    plot(tL(use(1:240:length(use))),pL(use(1:240:length(use))),'.g'); hold on; xlim([-50 50]);ylim([-50 50]); axis square
     xlabel('yaw (deg)'); ylabel('pitch(deg)');
     title('L eye')
 end
@@ -294,12 +298,16 @@ allThN(:,2)=nansum(tNcounts(:,:,2),1)./(length(useData))
 allThA(:,1)=nansum(tAcounts(:,:,1),1)./(length(useData))
 allThA(:,2)=nansum(tAcounts(:,:,2),1)./(length(useData))
 
-[h p]=ttest2(allThN(:,2),allThA(:,2))
+mns=squeeze(nanmean(tNcounts,2));
+mnsA=squeeze(nanmean(tAcounts,2));
+
+[h p]=ttest2(mns(:,1),mnsA(:,1))%R eye
+[h p]=ttest2(mns(:,2),mnsA(:,2))%L eye
 
 figure;subplot(1,2,1); plot(nBins,allThN(:,1),'b'); hold on; plot(nBins,allThA(:,1),'g'); title('Right Eye Theta'); axis square
-ylim([0 .25]); xlabel('theta (degrees)'); ylabel('proportion of time');
+ylim([0 .27]);xlim([-50 50]); xlabel('theta (degrees)'); ylabel('proportion of time');
 subplot(1,2,2);plot(nBins,allThN(:,2),'b'); hold on; plot(nBins,allThA(:,2),'g');title('Left Eye Theta');axis square
-ylim([0 .25]); xlabel('theta (degrees)'); ylabel('proportion of time');
+ylim([0 .27]);xlim([-50 50]); xlabel('theta (degrees)'); ylabel('proportion of time');
 legend('non approach','approach')
 suptitle('Figure 2B: eyes are more centered in yaw during app')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -311,7 +319,12 @@ allThNP(:,2)=nansum(tNcountsP(:,:,2),1)./(length(useData))
 allThAP(:,1)=nansum(tAcountsP(:,:,1),1)./(length(useData))
 allThAP(:,2)=nansum(tAcountsP(:,:,2),1)./(length(useData))
 
-[h p]=ttest2(allThNP(:,1),allThAP(:,1))
+mnsPhi=squeeze(nanmean(tNcountsP,2));
+mnsAPhi=squeeze(nanmean(tAcountsP,2));
+
+[h p]=ttest2(mnsPhi(:,1),mnsAPhi(:,1))%R eye
+[h p]=ttest2(mnsPhi(:,2),mnsAPhi(:,2))%L eye
+
 
 figure;subplot(1,2,1); plot(nBinsP,allThNP(:,1),'b'); hold on; plot(nBinsP,allThAP(:,1),'g'); title('Right Eye Phi'); axis square
 ylim([0 .35]);
@@ -351,34 +364,51 @@ legend('r theta','l theta');
 % plot(Rtheta{useData(40)}(range,:)-Ltheta{useData(40)}(range,:))
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-range=3500:4400
+range=3600:4400
 figure
 plot(Rtheta{useData(40)}(range,:)); hold on; % 30 second segment
 plot(Ltheta{useData(40)}(range,:)); hold on;
 legend('r theta','l theta');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %
+figure
+w = gausswin(10);
+y = filter(w,1,mouseSp{useData(40)}(:,range))
+plot(y); hold on; % 30 second segment
+
+
 % close all
 % range=4000:4600
 % for vid = 40%(useData)
-%
+% 
 %    if length(Rtheta{useData(vid)})>=100
-% tr=medfilt1(Rtheta{useData(vid)}(range,:),8);
-% pr=medfilt1(Rphi{useData(vid)}(range,:),8);
-%
-% tl=medfilt1(Ltheta{useData(vid)}(range,:),8);
-% pl=medfilt1(Lphi{useData(vid)}(range,:),8);
-%
-%
+% % tr=medfilt1(Rtheta{useData(vid)}(range,:),10);
+% % pr=medfilt1(Rphi{useData(vid)}(range,:),10);
+% % 
+% % tl=medfilt1(Ltheta{useData(vid)}(range,:),10);
+% % pl=medfilt1(Lphi{useData(vid)}(range,:),10);
+% 
+% tr=Rtheta{useData(vid)}(range,:); tr=tr-nanmean(tr);
+% pr=Rphi{useData(vid)}(range,:); pr=pr-nanmean(pr);
+% 
+% tl=(Ltheta{useData(vid)}(range,:));tl=tl-nanmean(tl);
+% pl=(Lphi{useData(vid)}(range,:)); pl=pl-nanmean(pl);
+% 
+% filtwin=gausswin(10);
+% tr=filter(filtwin,5,tr);
+% pr=filter(filtwin,5,pr);
+% tl=filter(filtwin,5,tl);
+% pl=filter(filtwin,5,pl);
+% 
 % figure(1)
 % % subplot(1,2,1)
 % plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-% title('right eye'); xlim([-30 30]); ylim([-30 30]); colormap jet; colorbar
+% title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
 % figure(2)
 % % subplot(1,2,2)
 % plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-% title('left eye'); xlim([-30 30]); ylim([-30 30]); colorbar
-%
+% title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
+% 
 % for i =1:length(tl)
 %     figure(1)
 % % subplot(1,2,1)
@@ -386,11 +416,11 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 % % subplot(1,2,2)
 % figure(2)
 %  plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-%
+% 
 %  end
-%
-% % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% %
+% 
+% % % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% % %
 %     end
 % end
 %%
@@ -596,18 +626,18 @@ for c=0:1
 end
 
 vergCounts(:,1)=nansum(vgDiff(:,:,1),1)./(length(useData))
-vergCounts(:,2)=nansum(vgDiff(:,:,2),1)./(length(useData))
+vergCounts(:,2)=nansum(vgDiff(:,:,2),1)./(sum(~isnan(useData))-sum(isnan(vgDiff(:,1,2))))
 vergErr=nanstd(vgDiff)./(sqrt(length(vgDiff))); vergErr=squeeze(vergErr);
 
 figure; shadedErrorBar(nBins,vergCounts(:,1),vergErr(:,1),'b',1); hold on
 shadedErrorBar(nBins,vergCounts(:,2),vergErr(:,2),'g',1); hold on
 
-
 title('Figure 2F: vergence (R - L eye)'); axis square
 xlabel('vergence (deg)'); ylabel('proportion of time');
-ylim([0 .22])
+ylim([0 .27])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-[h p]=kstest2(vergCounts(:,1),vergCounts(:,2))
+trMn=squeeze(nanmean(vgDiff,2))
+[h, p]=ttest2(trMn(:,1),trMn(:,2))
 
 % Figure 2G: correlation of eye thetas & eye phis
 clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
@@ -674,13 +704,47 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 
 % Figure 3B: scatter & corr of pitch (tilt) and vergence
 close all
+figure; clear pts
+for vid=1:length(useData)
+    clear tiltVid
+ nframe = min(length(Rtheta{useData(vid)}),length(Ltheta{useData(vid)}));
+    tR=Rtheta{useData(vid)}(1:nframe); tL=Ltheta{useData(vid)}(1:nframe);
+    tR=nanmedian(tR)-tR; tL=nanmedian(tL)-tL;
+    
+    tiltVid=accelChannels{useData(vid)}(:,2);
+    tiltVid = medfilt1(tiltVid,8);
+    
+    tiltVid=tiltVid-nanmedian(tiltVid);
+    vg=tR-tL;
+    clear use
+    for c=0:1
+        use = find(appEpoch{vid}==c);
+        if c==0
+            plot(tiltVid(use(1:150:length(use))),vg(use(1:150:length(use))),'b.'); hold on;
+            xlim([-60 60]);ylim([-60 60]);
+            pts(vid,1,1)=length(use(1:150:end))
+            
+            axis square
+        else
+            plot(tiltVid(use(1:150:length(use))),vg(use(1:150:length(use))),'g.');
+            pts(vid,2,1)=length(use(1:150:end))
+            
+        end
+        %     pts(vid,1,1)=length(use(1:70:end))
+        %     pts(vid,2,1)=length(use(1:50:end))
+        pts(vid,c+1,2)=length(tiltVid(use));
+    end
+end
+v=squeeze(nansum(pts,1))
 
+close all
 for c=0:1
     clear use
     use = find(appAll==c);
-    
     figure(1)
-    plot(tiltAll(use(1:20:end)),vergDlc(use(1:20:end)),'.'); axis equal; hold on; lsline
+    plot(tiltAll(use(1:60:end)),vergDlc(use(1:60:end)),'.'); axis equal; hold on;
+    pts(c+1,1)=length(use(1:60:end))
+    pts(c+1,2)=length(use(1:60:end))/length(tiltAll);
     xlabel('acc tilt'); ylabel('eye vergence');
     ylim([-90 90]); xlim([-90 90]);
     R=corrcoef(tiltAll(use), vergDlc(use),'Rows','pairwise')
@@ -689,8 +753,6 @@ for c=0:1
     if c==1
         if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
     end
-    
-    
     figure(2)
     [corr lags]=(nanxcorr(tiltAll(use),vergDlc(use),30,'coeff'));
     plot(lags,corr); hold on; ylabel('correlation coeff');
@@ -717,7 +779,7 @@ clear tiltHist
 for c=0:1
     for vid=1:length(useData)
         clear useN tilt tiltHist
-        tilt=accelChannels{useData(vid)}(:,2);
+        tilt=accelChannels{useData(vid)}(:,1);
         useN= appEpoch{vid}==c;
         nframe=min(length(tilt), length(useN));
         useN=useN(1:nframe);tilt=tilt(1:nframe);
@@ -744,7 +806,8 @@ title('Figure 3B: pitch'); axis square
 xlabel('pitch (deg)'); ylabel('proportion of time');
 ylim([0 .2])
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-[h p]=kstest2(tiltCounts(:,1),tiltCounts(:,2))
+tiltMns=squeeze(nanmean(tiltFull,2));
+[h p]=ttest2(tiltMns(:,1),tiltMns(:,2))
 
 
 % Figure 3C: example trace, less change in pitch during approach
@@ -800,7 +863,7 @@ end
 %% FIGURE 4: Coordination of eyes and head
 
 % Figure 4A: hist of head yaw app and non approach (not different)
-gyroBias=nanmedian(gyro3All);
+ gyroBias=nanmedian(gyro3All);
 figure
 for c=0:1
     clear nBins h use
@@ -815,7 +878,15 @@ for c=0:1
     end
 end
 
-[h p]= ttest2(headHist(:,1),headHist(:,2))
+for c=0:1
+    for vid=1:length(useData)
+        use=appEpoch{vid}==c;
+        headMn(vid,c+1)=nanmean(accelChannels{useData(vid)}(use,6));
+    end
+end
+
+[h p]= ttest2(headMn(:,1),headMn(:,2))
+
 % Figure 4B: hist of mean eye yaw, app and non-app
 d_mnEyeAll=[];mnPhiAll=[];allDLChead=[];mnEyeAll=[]; mouseSpAll=[];
 for vid=1:length(useData)
@@ -849,6 +920,8 @@ for c=0:1
     nBins= -60:2:60
     h=hist(mnEyeAll(use),nBins);
     binoc(:,c+1)=h;
+    
+
     subplot(1,2,1)
     plot(nBins,h/length(mnEyeAll(use))); hold on; title('mn Eye Yaw'); axis square
     plot([-20,-20],[.15,0],'k--');
@@ -865,9 +938,24 @@ for c=0:1
     end
 end
 
-[h pB]=kstest2(binoc(:,1),binoc(:,2))
+
+
+% [h pB]=kstest2(binoc(:,1),binoc(:,2))
 [h pdB]=ttest2(deltaBinoc(:,1),deltaBinoc(:,2))
 
+for vid=1:length(useData)
+   tR=Rtheta{useData(vid)}; tL=Ltheta{useData(vid)};
+    nframe = min(length(tR), length(appEpoch{vid}))
+ for c=0:1
+     use=appEpoch{vid}(1:nframe)==c;
+    tR=Rtheta{useData(vid)}; tL=Ltheta{useData(vid)};
+    eyePos=.5*(tR+tL); eyePos=eyePos-nanmedian(eyePos);
+    use=appEpoch{vid}==c;
+    expMn(vid,c+1)=nanmean(eyePos(use));
+ end
+end
+
+[h p]=ttest2(expMn(:,1),expMn(:,2))
 % Figure 4C: ex trace when dTh is 0, eyes are also 0, then hist
 
 figure
@@ -903,7 +991,10 @@ end
 %
 figure
 clear nBins h use hp
-stationary = mouseSpAll<5;
+allRunFilt=medfilt1(mouseSpAll,15);
+stationary = allRunFilt<1;
+% stationary = mouseSpAll<1;
+
 nBins= -40:1:40;
 hs=hist(d_mnEyeAll(stationary),nBins);
 plot(nBins,hs/sum(stationary)); hold on; title('mn Eye Yaw, stationary'); axis square
@@ -913,13 +1004,22 @@ plot(nBins,hmv/sum(stationary==0)); hold on; title('mn Eye Yaw, moving'); axis s
 % h=hist(d_mnEyeAll(appAll==1),nBins);
 % plot(nBins,h/sum(appAll==1)); hold on; title('mn Eye Yaw, approach'); axis square
 legend('stationary','moving');
-plot([-3,-3],[.3,0],'k--');
-plot([3,3],[.3,0],'k--');
-ylim([0 .32]); xlim([-22 22]);
+ylim([0 .35]); xlim([-22 22]);
 title('Figure 4C: when mouse is stationary, so are eyes');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-[h stat]=ttest2(hs,hmv)
 
+
+    for vid=1:length(useData)
+        speed=mouseSp{useData(vid)}(:,1:end-1);
+        runFilt = medfilt1(speed,15);
+        
+        running =runFilt>=1;
+        mnEyes(vid,1) = nanmedian((.5*(dRtheta{useData(vid)}(running==0,:)+ dLtheta{useData(vid)}(running==0,:))));
+        mnEyes(vid,2) = nanmedian((.5*(dRtheta{useData(vid)}(running==1,:)+ dLtheta{useData(vid)}(running==1,:))));
+
+    end
+    
+[h stat]=kstest2(mnEyes(:,1),mnEyes(:,2))
 
 % Figure 4D: scatter of change in head yaw and change in eye yaw, shows
 % mostly congruent but not all
@@ -937,10 +1037,28 @@ xlabel('gyro yaw'); ylabel('d eye yaw');
 title('Figure 4D: head & eye thetas, not all compensatory')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
+%%
+clear ptsUsed
+figure
+for c=0:1
+    clear use
+    use = find(appAll==c);
+    ptsUsed(c+1,1)=length(use(1:200:end));
+    ptsUsed(c+1,2)=length(use(1:200:end))/length(gyro3All(use));
+%     samp(c,:)=randsample(use,7375);
+%     plot(gyro3All(samp(c,:)), d_mnEyeAll(samp(c,:)),'.')
+    plot(gyro3All(use(1:200:end)), d_mnEyeAll(use(1:200:end)),'.'); hold on
+%     axis([-35 35 -35 35]); 
+    axis([-20 20 -20 20]); 
+
+    axis square
+    hold on
+end
+xlabel('gyro yaw'); ylabel('d eye yaw');
 % Figure 4E: corr of change in head and eye yaw, congruence
 % (non-compensation) at short time scales
 
-
+%%
 clear corrYaw corrAllYaw err errA lagsYaw
 for c=0:1
     for vid=1:length(useData)
@@ -988,7 +1106,6 @@ mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1); mnEyeAll(appAll==1)];
 gm = fitgmdist(mvmts',3,'Replicates',10);
 idx = cluster(gm,mvmts');
 
-X=mvmts;
 figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=2); axis equal
 title('cluster on dHead vs dEye vs Eye 3 clust')
@@ -1024,9 +1141,14 @@ idx = cluster(gm,mvmts');
 
 X=mvmts;
 figure
-gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx); axis equal
+use=find(appAll==1)
+gscatter(gyro3All(use(1:5:end)),d_mnEyeAll(use(1:5:end)),idx(1:5:end)); axis equal
 title('cluster on dHead vs dEye 3 clust')
 xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
+
+
+
+
 clear mvmts
 mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
 %mvmts = [gyro3All(appAll==1) + d_mnEyeAll(appAll==1)];
@@ -1729,17 +1851,21 @@ for i = 1:length(good)
 end
 
 %%% calculate stats for each fixation (duration and stdev of positions)
-clear stabDur headStd gazeStd eyeStd
+clear stabDur headStd gazeStd eyeStd headMn gazeMn
 for i = 1:length(dheadStableGood);
     stabDurGood(i) = length(dheadStableGood{i});
     if length(dheadStableGood{i})>1   %%% can't do stats on one point
         headStd(i) = std(cumsum(dheadStableGood{i}));
         gazeStd(i) = std(cumsum(dgzStableGood{i}));
         eyeStd(i) = std(eyeStableGood{i});
+        headMn(i)= nanmean((dheadStableGood{i}));
+        gazeMn(i) = nanmean((dgzStableGood{i}));
     else
         headStd(i) = NaN;
         gazeStd(i) = NaN;
         eyeStd(i) = NaN;
+        headMn(i)= NaN;
+        gazeMn(i)= NaN;
     end
 end
 
@@ -1753,7 +1879,7 @@ title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDur
 %%% plot histogram of durations (with error bars)
 hbins = 1:2:150;
 figure
-errorbar(hbins/30,h/sum(h),sqrt(h)/sum(h)); xlabel('secs'); ylabel('fraction');
+shadedErrorBar(hbins/30,h/sum(h),sqrt(h)/sum(h)); xlabel('secs'); ylabel('fraction');
 title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDurGood)/30,(1/30)*std(stabDurGood)/sqrt(length(stabDurGood)))); xlim([0 2]);
 
 
@@ -1774,13 +1900,14 @@ figure
 hbins = 0.25:0.5:20;
 hold on
 h = hist(headStd,hbins);  %%% add error bars here!
-errorbar(hbins,h/sum(h),sqrt(h)/sum(h));
+shadedErrorBar(hbins,h/sum(h),sqrt(h)/sum(h),'b');
 h = hist(gazeStd,hbins);
-errorbar(hbins,h/sum(h),sqrt(h)/sum(h));
+shadedErrorBar(hbins,h/sum(h),sqrt(h)/sum(h),'k');
 legend('head','gaze');
 xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
 
 
+[h p]=kstest2(headStd,gazeStd)
 
 %%% calculate average stability of head and gaze
 stability(1) = nanmedian(headStd);
@@ -1921,18 +2048,18 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 
 %%% plot pre (with error bars)
 figure
-errorbar(bins,eyeAzHist(:,1)/sum(eyeAzHist(:,1)), sqrt(eyeAzHist(:,1))/sum(eyeAzHist(:,1)))
+shadedErrorBar(bins,eyeAzHist(:,1)/sum(eyeAzHist(:,1)), sqrt(eyeAzHist(:,1))/sum(eyeAzHist(:,1)),'b')
 hold on
-errorbar(bins,AzHist(:,1)/sum(AzHist(:,1)), sqrt(AzHist(:,1))/sum(AzHist(:,1)))
+shadedErrorBar(bins,AzHist(:,1)/sum(AzHist(:,1)), sqrt(AzHist(:,1))/sum(AzHist(:,1)),'r')
 xlabel('azimuth (deg)'); legend('gaze','head')
 title('pre saccade')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%% plot post (with error bars)
 figure
-errorbar(bins,eyeAzHist(:,2)/sum(eyeAzHist(:,2)), sqrt(eyeAzHist(:,2))/sum(eyeAzHist(:,2)))
+shadedErrorBar(bins,eyeAzHist(:,2)/sum(eyeAzHist(:,2)), sqrt(eyeAzHist(:,2))/sum(eyeAzHist(:,2)),'b')
 hold on
-errorbar(bins,AzHist(:,2)/sum(AzHist(:,2)), sqrt(AzHist(:,2))/sum(AzHist(:,2)))
+shadedErrorBar(bins,AzHist(:,2)/sum(AzHist(:,2)), sqrt(AzHist(:,2))/sum(AzHist(:,2)),'r')
 xlabel('azimuth (deg)'); legend('gaze','head')
 title('post saccade')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -1951,6 +2078,14 @@ headOffset(2) = nanmedian(abs(saccAzAll(postSaccT,apps)))
 headOffsetErr(1) = nanstd(abs(saccAzAll(preSaccT,apps)))/sqrt(sum(~isnan(saccAzAll(preSaccT,apps))));
 headOffsetErr(2) = nanstd(abs(saccAzAll(postSaccT,apps)))/sqrt(sum(~isnan(saccAzAll(postSaccT,apps))))
 
+eyez=nanmedian(abs(eyeAz(preSaccT,apps)),1);
+headz=nanmedian(abs(saccAzAll(preSaccT,apps)),1);
+[h p]=ttest2(eyez,headz)
+
+eyez=nanmedian(abs(eyeAz(postSaccT,apps)),1);
+headz=nanmedian(abs(saccAzAll(postSaccT,apps)),1);
+[h p]=ttest2(eyez,headz)
+
 %%% plot errorbar
 figure
 barweb([eyeOffset; headOffset]',[eyeOffsetErr; headOffsetErr]')
@@ -1958,6 +2093,103 @@ ylabel('azimuth to cricket (deg)');
 set(gca,'Xticklabel',{'pre saccade','post saccade'})
 legend('gaze','head')
 
+%%
+clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll
+for vid=1:length(useData)
+    clear hT azC use useN corrR corrRA corrL corrLA
+    nframe = min(length(az{useData(vid)}),length(accelChannels{useData(vid)}(:,6)));
+    
+    nframe = min(nframe,length(appEpoch{vid}));
+    useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
+    
+    azC=-(az{useData(vid)}); 
+% hT=d_Theta{useData(vid)}; hT=hT-nanmedian(hT);
+    
+    hT=(accelChannels{useData(vid)}(:,6))-gyroBias;
+    if sum(useN)>3 & sum(~isnan(hT(useN)))>20 & sum(~isnan(azC(useN)))>20
+        [corrR lagsR]= nanxcorr(azC(useN),hT(useN),30,'coeff');
+        hold on;
+    else
+        corrR=NaN;
+    end
+    
+    %     subplot(4,5,vid)
+    %     plot(rad2deg(azC(use))); hold on; plot(hT(use));
+    if sum(use)>4 & sum(~isnan(hT(use)))>20
+        [corrRA lagsRA]= nanxcorr(azC(use),hT(use),30,'coeff');
+    else
+        corrRA=NaN;
+    end
+    corrRAll(vid,:)=corrR;
+    corrRAAll(vid,:)=corrRA;
+end
+
+figure%('units','normalized','outerposition',[0 0 1 1])
+errR= nanstd(corrRAll)/(sqrt(length(corrRAll)));
+errRA= nanstd(corrRAAll)/(sqrt(length(corrRAAll)));
+
+shadedErrorBar(1:size(corrRAll,2),nanmean(corrRAll,1),errR,'-b',1); hold on
+shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); xlim([1 61]); axis square; ylim([-.2 .5]);
+
+clear L
+L(1) = plot(nan, nan, 'b-');
+L(2) = plot(nan, nan, 'g-');
+legend(L,{'az to cricket','dtheta head'});
+
+title('Figure 4H: Corr of az and dHead Theta, head is directed to cricket')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+%%
+
+
+clear corrR lagsR corrRAll corrLAll uselagsL uselagsR corrL lagsL corrRAAll corrLAAll mnEye
+for vid=1:length(useData)
+    clear hT azC use useN corrR corrRA corrL corrLA
+    nframe = min(length(az{useData(vid)}),length(accelChannels{useData(vid)}(:,6)));
+   
+    nframe = min(nframe,length(appEpoch{vid}));
+    useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
+    
+    azC=(az{useData(vid)}); 
+    hT=(accelChannels{useData(vid)}(:,6))-gyroBias;
+
+    mnEye=.5*(Rtheta{useData(vid)}+Ltheta{useData(vid)}); mnEye=mnEye-nanmedian(mnEye);
+    hT=(accelChannels{useData(vid)}(:,6))-gyroBias;
+    dGazeVid= diff(hT+mnEye);    
+    
+    if sum(useN)>3 & sum(~isnan(dGazeVid(useN)))>20 & sum(~isnan(azC(useN)))>20
+        [corrR lagsR]= nanxcorr(azC(useN),dGazeVid(useN),30,'coeff');
+        hold on;
+    else
+        corrR=NaN;
+    end
+    
+    %     subplot(4,5,vid)
+    %     plot(rad2deg(azC(use))); hold on; plot(hT(use));
+    if sum(use)>4 & sum(~isnan(dGazeVid(use)))>20
+        [corrRA lagsRA]= nanxcorr(azC(use),dGazeVid(use),30,'coeff');
+    else
+        corrRA=NaN;
+    end
+    corrRAll(vid,:)=corrR;
+    corrRAAll(vid,:)=corrRA;
+end
+
+figure%('units','normalized','outerposition',[0 0 1 1])
+errR= nanstd(corrRAll)/(sqrt(length(corrRAll)));
+errRA= nanstd(corrRAAll)/(sqrt(length(corrRAAll)));
+
+shadedErrorBar(1:size(corrRAll,2),nanmean(corrRAll,1),errR,'-b',1); hold on
+shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
+plot([31,31],[1,-1],'--','Color', [.5 .5 .5]); xlim([1 61]); axis square; ylim([-.2 .5]);
+
+clear L
+L(1) = plot(nan, nan, 'b-');
+L(2) = plot(nan, nan, 'g-');
+legend(L,{'az to cricket','dtheta head'});
+
+title('Figure 4I: Corr of az and dGaze, gaze is less directed to cricket')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 %% old ways of trying to cluster sacades
