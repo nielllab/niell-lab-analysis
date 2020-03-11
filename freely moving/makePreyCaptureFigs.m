@@ -1137,7 +1137,7 @@ thbins = -60:5:60;
 skip = 1; %%% only shows figures at this interval
 nthresh  = 60;
 headAll=[];
-eyeAll=[];
+eyeAll=[]; g3All= []; azAll = [];
 
 
 ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; saccAzAll = []; saccThAll = []; saccEyeRawAll=[]; timetoAppAll =[];
@@ -1354,6 +1354,10 @@ for i = 1:length(appEpoch)
         ns =0;
         
         
+        azAll = [azAll; azdeg'];
+        eyeAll = [eyeAll; mnEyeTh];
+        g3All = [g3All; g3];
+        
         for i = 1:length(saccs);
             
             if saccs(i)>buffer & saccs(i)<length(drth)-buffer
@@ -1391,6 +1395,9 @@ for i = 1:length(appEpoch)
         
         %%% calculate stabilization;
         saccEnds = find(diff(sacc)<0)+1;
+        if length(saccEnds)>0 & length(saccs>0) &  (saccEnds(1) < saccs(1)) %%% sometimes trace starts with a saccade end, messes things up
+            saccEnds = saccEnds(2:end);
+        end
         
         for s = 1:length(saccs)-1;
             stable = saccEnds(s):saccs(s+1)-1;
@@ -1398,6 +1405,9 @@ for i = 1:length(appEpoch)
             dheadStable{allS} = g3(stable);
             dgzStable{allS} = dGaze(stable);
             eyeStable{allS} = mnEyeTh(stable);
+%             if ~isnan(sum(dgzStable{allS})) & std(cumsum(dgzStable{allS}))>25
+%                 keyboard
+%             end
         end
         
         
@@ -1814,6 +1824,26 @@ legend('head','eyes','gaze')
 % plot(cumsum(dgzStableGood{stable}))
 % title(sprintf('head %0.1f  gaze %0.1f',headStd(stable),gazeStd(stable)));
 % end
+
+if nanmean(azAll)<=0
+azAll = azAll-azOffset;  %%% don't do it twice
+end
+eyeAzAll = azAll+eyeAll;
+
+hbins = -180:10:180;
+figure
+h = hist(azAll,hbins)
+plot(hbins,h/sum(h));
+h = hist(eyeAzAll,hbins);
+plot(hbins,h/sum(h));
+
+use = abs(azAll)<90 & abs(g3All)<1;
+nanmean(abs(azAll(use)))
+nanmean(abs(eyeAzAll(use)))
+
+figure
+plot(azAll(1:10:end),eyeAll(1:10:end),'.')
+
 
 
 
