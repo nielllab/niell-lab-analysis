@@ -836,7 +836,7 @@ for vid=1:length(useData)
     allDLChead = [allDLChead dHead'];
     
     speed =mouseSp{useData(vid)}(1:nframe);
-    speed =speed-nanmean(speed);
+    %speed =speed-nanmean(speed);  commented out 3/11 since this makes speeds inaccurate
     mouseSpAll=[mouseSpAll speed];
     
 end
@@ -1137,7 +1137,7 @@ thbins = -60:5:60;
 skip = 1; %%% only shows figures at this interval
 nthresh  = 60;
 headAll=[];
-eyeAll=[]; g3All= []; azAll = [];
+eyeAll=[]; g3All= []; azAll = []; spAll  = []; appAll = [];
 
 
 ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; saccAzAll = []; saccThAll = []; saccEyeRawAll=[]; timetoAppAll =[];
@@ -1825,15 +1825,21 @@ legend('head','eyes','gaze')
 % title(sprintf('head %0.1f  gaze %0.1f',headStd(stable),gazeStd(stable)));
 % end
 
+apps = find(saccAppAll==1);
+
+s = saccAzAll(:,apps);
+azOffset=nanmedian(s(:))
+
 if nanmean(azAll)<=0
 azAll = azAll-azOffset;  %%% don't do it twice
 end
 eyeAzAll = azAll+eyeAll;
 
-hbins = -180:10:180;
+hbins = -170:2:170;
 figure
 h = hist(azAll,hbins)
 plot(hbins,h/sum(h));
+hold on
 h = hist(eyeAzAll,hbins);
 plot(hbins,h/sum(h));
 
