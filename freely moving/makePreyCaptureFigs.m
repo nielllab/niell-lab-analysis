@@ -1970,7 +1970,7 @@ azAll = azAll-azOffset;  %%% don't do it twice
 end
 eyeAzAll = azAll+eyeAll;
 
-hbins = -170:2:170;
+hbins = -190:2:190;
 figure
 h = hist(azAll,hbins)
 plot(hbins,h/sum(h));
@@ -1993,7 +1993,7 @@ hist(spAll,1:500);
 xlim([0 50])
  spAll(spAll>50)= NaN;
  
- range = 1:1:length(azAll);
+ range = 1:10:length(azAll);
  spSmooth = medfilt1(spAll,5);
  azSmooth = medfilt1(azAll,5);
  azData = azSmooth(range); spData = spSmooth(range); appData = appAll(range);
