@@ -20,7 +20,7 @@ useData=find(prop>.85); % 85% of points needs to be present for exp to be used
 
 for vid=1:length(useData)
     appTime=appEpoch{useData(vid)};
-     w=gausswin(15);
+%      w=gausswin(15);
 %     runningSmooth=filter(w,1,mouseSp{useData(vid)});
     runningSmooth =medfilt1(mouseSp{useData(vid)},15);
     Cntrl_speed(vid,1) =sum(runningSmooth(:,appTime==0)>5)./length(runningSmooth(:,appTime==0));
@@ -907,7 +907,6 @@ for vid=1:length(useData)
     allDLChead = [allDLChead dHead'];
     
     speed =mouseSp{useData(vid)}(1:nframe);
-    speed =speed-nanmean(speed);
     mouseSpAll=[mouseSpAll speed];
     
 end
@@ -972,8 +971,9 @@ for c=0:1
     plot(nBins,h/sum(use&still)); hold on; title('mn Eye Yaw'); axis square
     plot([-3,-3],[.6,0],'k--');
     plot([3,3],[.6,0],'k--');
+    xlim([-10 10]);
     
-    prop3(c+1,1) =1- sum(h(nBins<-5 | nBins>5))/sum(h);
+    prop3(c+1,1) =1- sum(h(nBins<-1 | nBins>1))/sum(h);
     hp=hist(mnPhiAll(use& still),nBins);
     subplot(1,2,2)
     plot(nBins, hp/sum(use&still)); axis square; hold on; title('mn Eye Phi')
@@ -1021,13 +1021,14 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
     
 [h stat]=kstest2(mnEyes(:,1),mnEyes(:,2))
 
+
 % Figure 4D: scatter of change in head yaw and change in eye yaw, shows
 % mostly congruent but not all
-figure
+figure; clear samp
 for c=1:2
     clear use
     use = find(appAll==c-1);
-    samp(c,:)=randsample(use,7375);
+    samp(c,:)=randsample(use,200);
     plot(gyro3All(samp(c,:)), d_mnEyeAll(samp(c,:)),'.')
     axis([-35 35 -35 35]); axis square
     hold on
@@ -1043,14 +1044,13 @@ figure
 for c=0:1
     clear use
     use = find(appAll==c);
-    ptsUsed(c+1,1)=length(use(1:200:end));
-    ptsUsed(c+1,2)=length(use(1:200:end))/length(gyro3All(use));
+    ptsUsed(c+1,1)=length(use(1:50:end));
+    ptsUsed(c+1,2)=length(use(1:50:end))/length(gyro3All(use));
 %     samp(c,:)=randsample(use,7375);
 %     plot(gyro3All(samp(c,:)), d_mnEyeAll(samp(c,:)),'.')
-    plot(gyro3All(use(1:200:end)), d_mnEyeAll(use(1:200:end)),'.'); hold on
+    plot(gyro3All(use(1:50:end)), d_mnEyeAll(use(1:50:end)),'.'); hold on
 %     axis([-35 35 -35 35]); 
     axis([-20 20 -20 20]); 
-
     axis square
     hold on
 end
@@ -1141,7 +1141,7 @@ idx = cluster(gm,mvmts');
 
 X=mvmts;
 figure
-use=find(appAll==1)
+use=find(appAll==1) % subset op pts - used in paper
 gscatter(gyro3All(use(1:5:end)),d_mnEyeAll(use(1:5:end)),idx(1:5:end)); axis equal
 title('cluster on dHead vs dEye 3 clust')
 xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
@@ -1916,8 +1916,9 @@ shadedErrorBar(hbins,h/sum(h),sqrt(h)/sum(h),'k');
 legend('head','gaze');
 xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
 
-
-[h p]=kstest2(headStd,gazeStd)
+ [p,h,stats]=ranksum(headStd(~isnan(headStd)),gazeStd(~isnan(gazeStd)),'method','approximate')
+ 
+[h p]=ttest2(headStd(~isnan(headStd)),gazeStd(~isnan(gazeStd)))
 
 %%% calculate average stability of head and gaze
 stability(1) = nanmedian(headStd);
@@ -2017,12 +2018,12 @@ data = nanmedian(abs(eyeAz(:,apps)),2);
 err = nanstd(abs(eyeAz(:,apps)),[],2) ./ sqrt(sum(~isnan(eyeAz(:,apps)),2))
 data = data(trange); err = err(trange);
 t = (0:length(data)-1)/30;
-errorbar(t,data,err,'k')
+shadedErrorBar(t,data,err,'k')
 data = nanmedian(abs(saccAzAll(:,apps)),2);
 err = nanstd(abs(saccAzAll(:,apps)),[],2) ./ sqrt(sum(~isnan(saccAzAll(:,apps)),2))
 data = data(trange); err = err(trange);
 t = (0:length(data)-1)/30;
-errorbar(t,data,err,'b')
+shadedErrorBar(t,data,err,'b')
 legend('head azimuth','gaze azimuth');
 ylim([7.5 27.5]); xlim([t(1)-1/60 t(end)+1/60]);axis square
 xlabel('secs'); ylabel('azimuth to cricket (deg)')
