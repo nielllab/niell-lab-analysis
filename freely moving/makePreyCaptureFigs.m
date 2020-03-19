@@ -377,52 +377,52 @@ y = filter(w,1,mouseSp{useData(40)}(:,range))
 plot(y); hold on; % 30 second segment
 
 
-% close all
-% range=4000:4600
-% for vid = 40%(useData)
+close all
+range=4000:4600
+for vid = 40%(useData)
+
+   if length(Rtheta{useData(vid)})>=100
+% tr=medfilt1(Rtheta{useData(vid)}(range,:),10);
+% pr=medfilt1(Rphi{useData(vid)}(range,:),10);
 % 
-%    if length(Rtheta{useData(vid)})>=100
-% % tr=medfilt1(Rtheta{useData(vid)}(range,:),10);
-% % pr=medfilt1(Rphi{useData(vid)}(range,:),10);
-% % 
-% % tl=medfilt1(Ltheta{useData(vid)}(range,:),10);
-% % pl=medfilt1(Lphi{useData(vid)}(range,:),10);
-% 
-% tr=Rtheta{useData(vid)}(range,:); tr=tr-nanmean(tr);
-% pr=Rphi{useData(vid)}(range,:); pr=pr-nanmean(pr);
-% 
-% tl=(Ltheta{useData(vid)}(range,:));tl=tl-nanmean(tl);
-% pl=(Lphi{useData(vid)}(range,:)); pl=pl-nanmean(pl);
-% 
-% filtwin=gausswin(10);
-% tr=filter(filtwin,5,tr);
-% pr=filter(filtwin,5,pr);
-% tl=filter(filtwin,5,tl);
-% pl=filter(filtwin,5,pl);
-% 
-% figure(1)
-% % subplot(1,2,1)
-% plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-% title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
-% figure(2)
-% % subplot(1,2,2)
-% plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-% title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
-% 
-% for i =1:length(tl)
-%     figure(1)
-% % subplot(1,2,1)
-% plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-% % subplot(1,2,2)
-% figure(2)
-%  plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-% 
-%  end
-% 
+% tl=medfilt1(Ltheta{useData(vid)}(range,:),10);
+% pl=medfilt1(Lphi{useData(vid)}(range,:),10);
+
+tr=Rtheta{useData(vid)}(range,:); tr=tr-nanmean(tr);
+pr=Rphi{useData(vid)}(range,:); pr=pr-nanmean(pr);
+
+tl=(Ltheta{useData(vid)}(range,:));tl=tl-nanmean(tl);
+pl=(Lphi{useData(vid)}(range,:)); pl=pl-nanmean(pl);
+
+filtwin=gausswin(10);
+tr=filter(filtwin,5,tr);
+pr=filter(filtwin,5,pr);
+tl=filter(filtwin,5,tl);
+pl=filter(filtwin,5,pl);
+
+figure(1)
+% subplot(1,2,1)
+plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
+figure(2)
+% subplot(1,2,2)
+plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
+
+for i =1:length(tl)
+    figure(1)
+% subplot(1,2,1)
+plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% subplot(1,2,2)
+figure(2)
+ plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+
+ end
+
 % % % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 % % %
-%     end
-% end
+    end
+end
 %%
 
 clear all
@@ -2017,16 +2017,19 @@ hold on
 data = nanmedian(abs(eyeAz(:,apps)),2);
 err = nanstd(abs(eyeAz(:,apps)),[],2) ./ sqrt(sum(~isnan(eyeAz(:,apps)),2))
 data = data(trange); err = err(trange);
-t = (0:length(data)-1)/30;
+t = (0:length(data)-1)%/30;
 shadedErrorBar(t,data,err,'k')
 data = nanmedian(abs(saccAzAll(:,apps)),2);
 err = nanstd(abs(saccAzAll(:,apps)),[],2) ./ sqrt(sum(~isnan(saccAzAll(:,apps)),2))
 data = data(trange); err = err(trange);
-t = (0:length(data)-1)/30;
+t = (0:length(data)-1)%/30;
 shadedErrorBar(t,data,err,'b')
 legend('head azimuth','gaze azimuth');
-ylim([7.5 27.5]); xlim([t(1)-1/60 t(end)+1/60]);axis square
-xlabel('secs'); ylabel('azimuth to cricket (deg)')
+ylim([7.5 27.5]); 
+% xlim([t(1)-1/60 t(end)+1/60]);
+axis square
+% xlabel('secs');
+ylabel('azimuth to cricket (deg)')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
@@ -2133,7 +2136,7 @@ for vid=1:length(useData)
     nframe = min(nframe,length(appEpoch{vid}));
     useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
     
-    azC=-(az{useData(vid)}); 
+    azC=(az{useData(vid)}); 
 % hT=d_Theta{useData(vid)}; hT=hT-nanmedian(hT);
     
     hT=(accelChannels{useData(vid)}(:,6))-gyroBias;
