@@ -2017,18 +2017,18 @@ hold on
 data = nanmedian(abs(eyeAz(:,apps)),2);
 err = nanstd(abs(eyeAz(:,apps)),[],2) ./ sqrt(sum(~isnan(eyeAz(:,apps)),2))
 data = data(trange); err = err(trange);
-t = (0:length(data)-1)%/30;
+t = (0:length(data)-1)/30;
 shadedErrorBar(t,data,err,'k')
 data = nanmedian(abs(saccAzAll(:,apps)),2);
 err = nanstd(abs(saccAzAll(:,apps)),[],2) ./ sqrt(sum(~isnan(saccAzAll(:,apps)),2))
 data = data(trange); err = err(trange);
-t = (0:length(data)-1)%/30;
+t = (0:length(data)-1)/30;
 shadedErrorBar(t,data,err,'b')
 legend('head azimuth','gaze azimuth');
 ylim([7.5 27.5]); 
-% xlim([t(1)-1/60 t(end)+1/60]);
+xlim([t(1)-1/60 t(end)+1/60]);
 axis square
-% xlabel('secs');
+xlabel('secs');
 ylabel('azimuth to cricket (deg)')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
