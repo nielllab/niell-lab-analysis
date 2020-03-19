@@ -20,7 +20,11 @@ useData=find(prop>.85); % 85% of points needs to be present for exp to be used
 
 for vid=1:length(useData)
     appTime=appEpoch{useData(vid)};
+<<<<<<< HEAD
 %      w=gausswin(15);
+=======
+     w=gausswin(15);
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 %     runningSmooth=filter(w,1,mouseSp{useData(vid)});
     runningSmooth =medfilt1(mouseSp{useData(vid)},15);
     Cntrl_speed(vid,1) =sum(runningSmooth(:,appTime==0)>5)./length(runningSmooth(:,appTime==0));
@@ -377,6 +381,7 @@ y = filter(w,1,mouseSp{useData(40)}(:,range))
 plot(y); hold on; % 30 second segment
 
 
+<<<<<<< HEAD
 close all
 range=4000:4600
 for vid = 40%(useData)
@@ -423,6 +428,54 @@ figure(2)
 % % %
     end
 end
+=======
+% close all
+% range=4000:4600
+% for vid = 40%(useData)
+% 
+%    if length(Rtheta{useData(vid)})>=100
+% % tr=medfilt1(Rtheta{useData(vid)}(range,:),10);
+% % pr=medfilt1(Rphi{useData(vid)}(range,:),10);
+% % 
+% % tl=medfilt1(Ltheta{useData(vid)}(range,:),10);
+% % pl=medfilt1(Lphi{useData(vid)}(range,:),10);
+% 
+% tr=Rtheta{useData(vid)}(range,:); tr=tr-nanmean(tr);
+% pr=Rphi{useData(vid)}(range,:); pr=pr-nanmean(pr);
+% 
+% tl=(Ltheta{useData(vid)}(range,:));tl=tl-nanmean(tl);
+% pl=(Lphi{useData(vid)}(range,:)); pl=pl-nanmean(pl);
+% 
+% filtwin=gausswin(10);
+% tr=filter(filtwin,5,tr);
+% pr=filter(filtwin,5,pr);
+% tl=filter(filtwin,5,tl);
+% pl=filter(filtwin,5,pl);
+% 
+% figure(1)
+% % subplot(1,2,1)
+% plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+% title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
+% figure(2)
+% % subplot(1,2,2)
+% plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+% title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
+% 
+% for i =1:length(tl)
+%     figure(1)
+% % subplot(1,2,1)
+% plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% % subplot(1,2,2)
+% figure(2)
+%  plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% 
+%  end
+% 
+% % % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% % %
+%     end
+% end
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 %%
 
 clear all
@@ -907,6 +960,10 @@ for vid=1:length(useData)
     allDLChead = [allDLChead dHead'];
     
     speed =mouseSp{useData(vid)}(1:nframe);
+<<<<<<< HEAD
+=======
+    %speed =speed-nanmean(speed);  commented out 3/11 since this makes speeds inaccurate
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
     mouseSpAll=[mouseSpAll speed];
     
 end
@@ -1007,6 +1064,7 @@ legend('stationary','moving');
 ylim([0 .35]); xlim([-22 22]);
 title('Figure 4C: when mouse is stationary, so are eyes');
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+<<<<<<< HEAD
 
 
     for vid=1:length(useData)
@@ -1020,7 +1078,21 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
     end
     
 [h stat]=kstest2(mnEyes(:,1),mnEyes(:,2))
+=======
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 
+
+    for vid=1:length(useData)
+        speed=mouseSp{useData(vid)}(:,1:end-1);
+        runFilt = medfilt1(speed,15);
+        
+        running =runFilt>=1;
+        mnEyes(vid,1) = nanmedian((.5*(dRtheta{useData(vid)}(running==0,:)+ dLtheta{useData(vid)}(running==0,:))));
+        mnEyes(vid,2) = nanmedian((.5*(dRtheta{useData(vid)}(running==1,:)+ dLtheta{useData(vid)}(running==1,:))));
+
+    end
+    
+[h stat]=kstest2(mnEyes(:,1),mnEyes(:,2))
 
 % Figure 4D: scatter of change in head yaw and change in eye yaw, shows
 % mostly congruent but not all
@@ -1044,6 +1116,7 @@ figure
 for c=0:1
     clear use
     use = find(appAll==c);
+<<<<<<< HEAD
     ptsUsed(c+1,1)=length(use(1:50:end));
     ptsUsed(c+1,2)=length(use(1:50:end))/length(gyro3All(use));
 %     samp(c,:)=randsample(use,7375);
@@ -1051,6 +1124,16 @@ for c=0:1
     plot(gyro3All(use(1:50:end)), d_mnEyeAll(use(1:50:end)),'.'); hold on
 %     axis([-35 35 -35 35]); 
     axis([-20 20 -20 20]); 
+=======
+    ptsUsed(c+1,1)=length(use(1:200:end));
+    ptsUsed(c+1,2)=length(use(1:200:end))/length(gyro3All(use));
+%     samp(c,:)=randsample(use,7375);
+%     plot(gyro3All(samp(c,:)), d_mnEyeAll(samp(c,:)),'.')
+    plot(gyro3All(use(1:200:end)), d_mnEyeAll(use(1:200:end)),'.'); hold on
+%     axis([-35 35 -35 35]); 
+    axis([-20 20 -20 20]); 
+
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
     axis square
     hold on
 end
@@ -1141,7 +1224,11 @@ idx = cluster(gm,mvmts');
 
 X=mvmts;
 figure
+<<<<<<< HEAD
 use=find(appAll==1) % subset op pts - used in paper
+=======
+use=find(appAll==1)
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 gscatter(gyro3All(use(1:5:end)),d_mnEyeAll(use(1:5:end)),idx(1:5:end)); axis equal
 title('cluster on dHead vs dEye 3 clust')
 xlim([-25 25]); ylim([-25 25]); %hold on; plot([-25 25], [25 -25],'r')
@@ -1259,7 +1346,7 @@ thbins = -60:5:60;
 skip = 1; %%% only shows figures at this interval
 nthresh  = 60;
 headAll=[];
-eyeAll=[]; g3All= []; azAll = [];
+eyeAll=[]; g3All= []; azAll = []; spAll  = []; appAll = []; distAll = [];
 
 
 ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; saccAzAll = []; saccThAll = []; saccEyeRawAll=[]; timetoAppAll =[];
@@ -1479,6 +1566,14 @@ for i = 1:length(appEpoch)
         azAll = [azAll; azdeg'];
         eyeAll = [eyeAll; mnEyeTh];
         g3All = [g3All; g3];
+        appAll = [appAll; [app 0]' ];
+        spAll = [spAll; mouseSp{vid}'];
+        distAll = [distAll; dist{vid}'];
+        
+        if length(mouseSp{vid}) ~= length(g3)
+            keyboard
+        end
+        
         
         for i = 1:length(saccs);
             
@@ -1916,9 +2011,14 @@ shadedErrorBar(hbins,h/sum(h),sqrt(h)/sum(h),'k');
 legend('head','gaze');
 xlabel('RMS stabilization (deg)'); ylabel('fraction'); xlim([0 15])
 
+<<<<<<< HEAD
  [p,h,stats]=ranksum(headStd(~isnan(headStd)),gazeStd(~isnan(gazeStd)),'method','approximate')
  
 [h p]=ttest2(headStd(~isnan(headStd)),gazeStd(~isnan(gazeStd)))
+=======
+
+[h p]=kstest2(headStd,gazeStd)
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 
 %%% calculate average stability of head and gaze
 stability(1) = nanmedian(headStd);
@@ -1953,27 +2053,81 @@ legend('head','eyes','gaze')
 % title(sprintf('head %0.1f  gaze %0.1f',headStd(stable),gazeStd(stable)));
 % end
 
+<<<<<<< HEAD
+=======
+apps = find(saccAppAll==1);
+
+s = saccAzAll(:,apps);
+azOffset=nanmedian(s(:))
+
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 if nanmean(azAll)<=0
 azAll = azAll-azOffset;  %%% don't do it twice
 end
 eyeAzAll = azAll+eyeAll;
 
+<<<<<<< HEAD
 hbins = -180:10:180;
+=======
+hbins = -170:2:170;
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 figure
 h = hist(azAll,hbins)
 plot(hbins,h/sum(h));
+hold on
 h = hist(eyeAzAll,hbins);
 plot(hbins,h/sum(h));
 
 use = abs(azAll)<90 & abs(g3All)<1;
 nanmean(abs(azAll(use)))
 nanmean(abs(eyeAzAll(use)))
+<<<<<<< HEAD
+
+figure
+plot(azAll(1:10:end),eyeAll(1:10:end),'.')
+=======
 
 figure
 plot(azAll(1:10:end),eyeAll(1:10:end),'.')
 
+figure
+plot(azAll,spAll,'.')
+
+figure
+hist(spAll,1:500);
+xlim([0 50])
+ spAll(spAll>50)= NaN;
+ 
+ range = 1:10:length(azAll);
+ spSmooth = medfilt1(spAll,5);
+ azSmooth = medfilt1(azAll,5);
+ azData = azSmooth(range); spData = spSmooth(range); appData = appAll(range);
+ distData = distAll(range);
+ 
+
+   figure
+ subplot(plot(azData(spData<10),distData(spData<10),'k.')
+ hold on
+ plot(azData(spData>10),distData(spData>10),'g.')
+ 
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
+
+hold on
+ plot(azData(spData<10 & appData ==1),distData(spData<10 & appData ==1),'g.')
+ 
+ 
+ figure
+ plot(distData,spData,'.')
+ 
+ figure
+plot(azData,spData,'.')
+axis([-150 150 0 40])
+hold on
+plot(azData(appData==1),spData(appData==1),'g.')
 
 
+ 
+ 
 
 %% analyze eye and head relative to cricket for saccades during approaches
 apps = find(saccAppAll==1);
@@ -2136,7 +2290,11 @@ for vid=1:length(useData)
     nframe = min(nframe,length(appEpoch{vid}));
     useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
     
+<<<<<<< HEAD
     azC=(az{useData(vid)}); 
+=======
+    azC=-(az{useData(vid)}); 
+>>>>>>> e4411ca8c59d49840e292da503e28c80f8fb46e2
 % hT=d_Theta{useData(vid)}; hT=hT-nanmedian(hT);
     
     hT=(accelChannels{useData(vid)}(:,6))-gyroBias;

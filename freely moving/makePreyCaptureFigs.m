@@ -905,8 +905,8 @@ for vid=1:length(useData)
     mnPhiAll=[mnPhiAll mnPhi'];
     dHead=d_Theta{useData(vid)}(1:nframe); dHead=dHead-nanmean(dHead);
     allDLChead = [allDLChead dHead'];
-    
     speed =mouseSp{useData(vid)}(1:nframe);
+    %speed =speed-nanmean(speed);  commented out 3/11 since this makes speeds inaccurate
     mouseSpAll=[mouseSpAll speed];
     
 end
@@ -1259,7 +1259,7 @@ thbins = -60:5:60;
 skip = 1; %%% only shows figures at this interval
 nthresh  = 60;
 headAll=[];
-eyeAll=[]; g3All= []; azAll = [];
+eyeAll=[]; g3All= []; azAll = []; spAll  = []; appAll = []; distAll = [];
 
 
 ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; saccAzAll = []; saccThAll = []; saccEyeRawAll=[]; timetoAppAll =[];
@@ -1479,6 +1479,14 @@ for i = 1:length(appEpoch)
         azAll = [azAll; azdeg'];
         eyeAll = [eyeAll; mnEyeTh];
         g3All = [g3All; g3];
+        appAll = [appAll; [app 0]' ];
+        spAll = [spAll; mouseSp{vid}'];
+        distAll = [distAll; dist{vid}'];
+        
+        if length(mouseSp{vid}) ~= length(g3)
+            keyboard
+        end
+        
         
         for i = 1:length(saccs);
             
@@ -1953,15 +1961,21 @@ legend('head','eyes','gaze')
 % title(sprintf('head %0.1f  gaze %0.1f',headStd(stable),gazeStd(stable)));
 % end
 
+apps = find(saccAppAll==1);
+
+s = saccAzAll(:,apps);
+azOffset=nanmedian(s(:))
+
 if nanmean(azAll)<=0
 azAll = azAll-azOffset;  %%% don't do it twice
 end
 eyeAzAll = azAll+eyeAll;
 
-hbins = -180:10:180;
+hbins = -190:2:190;
 figure
 h = hist(azAll,hbins)
 plot(hbins,h/sum(h));
+hold on
 h = hist(eyeAzAll,hbins);
 plot(hbins,h/sum(h));
 
@@ -1972,6 +1986,72 @@ nanmean(abs(eyeAzAll(use)))
 figure
 plot(azAll(1:10:end),eyeAll(1:10:end),'.')
 
+figure
+plot(azAll,spAll,'.')
+
+figure
+hist(spAll,1:500);
+xlim([0 50])
+ spAll(spAll>50)= NaN;
+ 
+ range = 1:10:length(azAll);
+ spSmooth = medfilt1(spAll,5);
+ azSmooth = medfilt1(azAll,5);
+ azData = azSmooth(range); spData = spSmooth(range); appData = appAll(range);
+ distData = distAll(range);
+ 
+
+   figure
+ subplot(2,2,1)
+ plot(azData(spData<10),distData(spData<10),'k.'); xlabel('azimuth'); ylabel('distance'); title('stationary')
+  hold on
+ % plot(azData(spData<10 & appData ==1),distData(spData<10 & appData ==1),'g.'); xlabel('azimuth'); ylabel('distance'); 
+
+  subplot(2,2,2)
+ plot(azData(spData>10),distData(spData>10),'k.'); xlabel('azimuth'); ylabel('distance'); title('moving')
+ hold on
+  %plot(azData(spData>10 & appData ==1),distData(spData>10 & appData ==1),'g.'); xlabel('azimuth'); ylabel('distance'); 
+
+
+ subplot(2,2,3)
+ plot(azData(spData<10),distData(spData<10),'b.'); xlabel('azimuth'); ylabel('distance'); title('stationary')
+  hold on
+  plot(azData(spData<10 & appData ==1),distData(spData<10 & appData ==1),'g.'); xlabel('azimuth'); ylabel('distance'); 
+
+  subplot(2,2,4)
+ plot(azData(spData>10),distData(spData>10),'b.'); xlabel('azimuth'); ylabel('distance'); title('moving')
+ hold on
+  plot(azData(spData>10 & appData ==1),distData(spData>10 & appData ==1),'g.'); xlabel('azimuth'); ylabel('distance'); 
+
+  
+  
+ 
+figure
+subplot(1,2,1)
+plot(azData,spData,'.')
+axis([-150 150 0 40])
+subplot(1,2,2)
+plot(azData,spData,'.')
+axis([-150 150 0 40])
+hold on
+plot(azData(appData==1),spData(appData==1),'g.')
+
+newApp = abs(azData)<30 & spData>10;
+newApp = medfilt1(double(newApp),5); 
+
+figure
+ subplot(2,1,1)
+ plot(azData(spData<10),distData(spData<10),'b.'); xlabel('azimuth'); ylabel('distance'); title('stationary')
+  hold on
+  plot(azData(spData<10 & newApp ==1),distData(spData<10 & newApp ==1),'g.'); xlabel('azimuth'); ylabel('distance'); 
+
+  subplot(2,1,2)
+ plot(azData(spData>10),distData(spData>10),'b.'); xlabel('azimuth'); ylabel('distance'); title('moving')
+ hold on
+  plot(azData(spData>10 & newApp ==1),distData(spData>10 & newApp ==1),'g.'); xlabel('azimuth'); ylabel('distance'); 
+ 
+figure
+plot(newApp(1:1000))
 
 
 
