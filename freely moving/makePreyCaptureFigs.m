@@ -400,24 +400,26 @@ pr=filter(filtwin,5,pr);
 tl=filter(filtwin,5,tl);
 pl=filter(filtwin,5,pl);
 
-figure(1)
-% subplot(1,2,1)
-plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
-figure(2)
-% subplot(1,2,2)
-plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
+% figure(1)
+% % subplot(1,2,1)
+% plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+% title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
+% figure(2)
+% % subplot(1,2,2)
+% plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+% title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
 
-for i =1:length(tl)
-    figure(1)
-% subplot(1,2,1)
-plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-% subplot(1,2,2)
-figure(2)
- plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% for i =1:length(tl)
+%     figure(1)
+% % subplot(1,2,1)
+% plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% % subplot(1,2,2)
+% figure(2)
+%  plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% 
+% end
+ 
 
- end
 
 % % % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 % % %
