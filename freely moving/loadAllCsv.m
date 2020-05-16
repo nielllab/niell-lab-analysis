@@ -6,7 +6,7 @@ savePDF=1; dbstop if error
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
-deInter = 0;
+deInter = 1;
 doAcc = 1;
 
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
@@ -355,7 +355,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_021420','.mat')
+afilename=sprintf('%s',ani,'_DEINTERLACED_051520','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))

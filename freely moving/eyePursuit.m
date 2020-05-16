@@ -119,7 +119,6 @@ rightVidShift = shiftdim(RVid,2); %%% moves 2 dimensions to left
 rightVidShiftInterp= interp1(RTime,rightVidShift,TopTime,'linear');
 RVidInterp = shiftdim(rightVidShiftInterp,1); %%% move it one more to the left to get back in place.
 
-
 figure
 subplot(3,1,1); plot(headTh); title('head th')
 subplot(3,1,2); plot(Rth); title('rth');
@@ -135,30 +134,25 @@ startLag = 10; %%% offset from beginning (needed for trails behind mouse)
 
 %%
 figure
-vidObj = VideoWriter('J462a_111119_1_4_eyes_head_fullsize_withEyes_HQ2.avi','Uncompressed AVI');
+vidObj = VideoWriter('J462a_111119_1_4_Supp2_033120.avi');
 VidObj.Quality = 100;
 vidObj.FrameRate = 30;
 open(vidObj);
-eyeSz = 110;
-headSz = 80;
-gazeSz = 0;
+eyeSz = 0;
+headSz = 165;
+gazeSz = 165;
 showCricket = 0;
-lineW = 1.5;
-%for i = (1+startLag)+3150:3550%length(headTh)
-for i= (1+startLag):length(headTh)
+lineW = 2;
+%for i = (1+startLag)+3150:3550%length(headTh) 
+%for i= (300+startLag):length(headTh) %for supplemental movie 1, clip at 10
+%seconds
+for i=(90+startLag):240 %for supplemental movie 2, use 3-8 seconds
     %%% plot cricket and mouse tracks
-    subplot(3,2,[1:4]);
     imshow(videoGain*flipud((TopVid(:,:,i)))); hold on;
-    %       imshow(flipud(TopVid(:,:,i))); hold on;
-    % subplot(2,2,[1:2]);
-    %        plot(Data(vid).cricketxy(1,i),Data(vid).cricketxy(2,i),'g*');
-    %     plot(Data(vid).cricketxy(1,i)-20,Data(vid).cricketxy(2,i)-135,'g*');
-    %      plot(Data(vid).mouse_xy(1,i + (-startLag:0)), Data(vid).mouse_xy(2,i + (-10:0)),'b', 'Linewidth',2)
-    
     %%% calculate head vector
     hx = headSz*cos(headTh(:,i));
     hy = headSz*sin(headTh(:,i));
-    plot((mousexy(1,i)+ [0 hx']),(mousexy(2,i)+ [0 hy'])-120,'w', 'Linewidth',lineW); hold on
+    plot((mousexy(1,i)+ [0 hx']),(mousexy(2,i)+ [0 hy'])-120,'Color', [.07 .226 .59], 'Linewidth',lineW+.3); hold on
 
     %%% calculate gaze direction (head + eyes); assume each eye is centered
     %%% at 45deg (pi/4)
@@ -171,13 +165,13 @@ for i= (1+startLag):length(headTh)
     gaze = headTh(i) + 0.5*(Rth(i) + Lth(i));
 
     %%% plotleft and right eyes
-    plot(((mousexy(1,i))) + [0 eyeSz*cos(lth)' ],((mousexy(2,i))) + [0 eyeSz*sin(lth)']-120,'Color', [.363 .586 .808], 'Linewidth',lineW+.5)
-    plot(((mousexy(1,i))) + [0 eyeSz*cos(rth)' ],((mousexy(2,i))) + [0 eyeSz*sin(rth)']-120,'Color',[.339 .238 .4336], 'Linewidth',lineW+.5)
+    plot(((mousexy(1,i))) + [0 eyeSz*cos(lth)' ],((mousexy(2,i))) + [0 eyeSz*sin(lth)']-120,'Color', [.43 .62 .9], 'Linewidth',lineW+.3)%.363 .586 .808
+    plot(((mousexy(1,i))) + [0 eyeSz*cos(rth)' ],((mousexy(2,i))) + [0 eyeSz*sin(rth)']-120,'Color',[.5 .238 .52], 'Linewidth',lineW+.3)% .339 .238 .4336
 
     %%% plot gaze
     hxg = gazeSz*cos(gaze);
     hyg = gazeSz*sin(gaze);
-    plot((mousexy(1,i)+ [0 hxg]),(mousexy(2,i)+ [0 hyg])-120,'c', 'Linewidth',lineW); hold on
+    plot((mousexy(1,i)+ [0 hxg]),(mousexy(2,i)+ [0 hyg])-120,'c', 'Linewidth',lineW+.3); hold on
     %%% plot cricket
    if showCricket
        plot(cricketxy(1,i),cricketxy(2,i)-120,'b.');
@@ -188,11 +182,11 @@ for i= (1+startLag):length(headTh)
     drawnow
     %     axis([0 1600 0 1200]);
     %   axis([0 400 0 350]);
-    subplot(3,2,5);
-    imshow(RVidInterp(:,:,i));hold off; drawnow
-   subplot(3,2,6);
-    imshow(fliplr(LVidInterp(:,:,i))); hold off; drawnow
-    
+%     subplot(3,2,5);
+%     imshow(LVidInt(:,:,i));hold off; drawnow
+%     subplot(3,2,6);
+%     imshow(RVidInt(:,:,i)); hold off; drawnow
+%     
     mov(i-startLag) = getframe(gcf);
     if mod(i,100)==0
         fprintf('frame = %d\n',i)
@@ -201,6 +195,48 @@ for i= (1+startLag):length(headTh)
    writeVideo(vidObj,currFrame);
 end
 close(vidObj);
+
+%%
+
+figure
+vidObj = VideoWriter('J462c_111119_2_6_Supp1_noHead_LEye.avi');
+VidObj.Quality = 100;
+vidObj.FrameRate = 10;
+open(vidObj);
+eyeSz = 0;
+lineW = 1.75;
+for i= (90+startLag):240%length(headTh)
+    imshow(LVidInterp(:,:,i));hold off; drawnow
+    mov(i-startLag) = getframe(gcf);
+    if mod(i,100)==0
+        fprintf('frame = %d\n',i)
+    end
+    currFrame = getframe(gcf);
+   writeVideo(vidObj,currFrame);
+end
+close(vidObj)
+
+
+figure
+vidObj = VideoWriter('J462c_111119_2_6_Supp1_noHead_REye.avi');
+VidObj.Quality = 100;
+vidObj.FrameRate = 30;
+open(vidObj);
+eyeSz = 10;
+lineW = 1.75;
+for i= (90+startLag):240%length(headTh)
+    imshow(RVidInterp(:,:,i));hold off; drawnow
+    mov(i-startLag) = getframe(gcf);
+    if mod(i,100)==0
+        fprintf('frame = %d\n',i)
+    end
+    currFrame = getframe(gcf);
+   writeVideo(vidObj,currFrame);
+end
+close(vidObj)
+
+
+
 %%
 %%% save video
 
