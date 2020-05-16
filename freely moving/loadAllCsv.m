@@ -190,7 +190,12 @@ for j=1:length(fileList) %%% loop over all top camera files
             start=max([startT,startR,startL]);
             endT = min([TopTs(end-1),RTS(end),LTS(end)])  %%% TopTs goes to end-1 since dTheta only goes to end-1
         end
-        xq=(start:1/30:endT)';  %%% 30Hz resample
+       if ~deInter
+           xq=(start:1/30:endT)';  %%% 30Hz resample
+       elseif deInter
+           xq=(start:1/60:endT)';  %%% 60Hz resample
+       end
+       
         Data(j).usedTS=xq;
         
         %%% resample top cam values
@@ -294,6 +299,11 @@ for j=1:length(fileList) %%% loop over all top camera files
             eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
             plot(Data(j).accShift(1:end-1,6),eyes,'.');
             axis equal; axis([-20 20 -20 20]); xlabel('gyro 3 interp'); ylabel('mean eye dtheta');
+            
+            figure
+            plot(-30:30,nanxcorr(Data(j).accShift(1:end-1,6),eyes,30,'coeff'));
+            axis([-30 30 -1 1]); hold on; plot([0 0],[-1 1],'r');
+            title('acc3 vs mean dEye xcorr');
             
         end
         
