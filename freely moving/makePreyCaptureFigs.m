@@ -1157,6 +1157,41 @@ mvmts=[gyro3All(appAll==1); d_mnEyeAll(appAll==1)] %; mnEyeAll(appAll==1)];
 gm = fitgmdist(mvmts',3,'Replicates',10);
 idx = cluster(gm,mvmts');
 
+bins = -16:0.5:16;
+clustGz = gyro3All(appAll==1)+ d_mnEyeAll(appAll==1);
+clustGz = clustGz-nanmedian(clustGz);
+nclustPts = sum(~isnan(clustGz));
+
+bins = -16:1:16;
+clear gazeHist
+gazeHist = hist(clustGz,bins)/nclustPts;
+figure
+plot(30*bins,gazeHist,'b');
+xlim([-15 15]*30)
+xlabel('gaze velocity deg/sec')
+
+
+clear gazeHist
+gazeHist(:,1) = hist(clustGz(idx~=2),bins)/nclustPts;
+gazeHist(:,2) = hist(clustGz(idx==2),bins)/nclustPts;
+%gazeHist(gazeHist==0) = NaN;
+gazeHist(abs(bins)>9) = NaN;
+gazeHist(abs(bins)<3,2)=NaN;
+%gazeHist = log10(gazeHist); gazeHist(gazeHist<-3)=-3;
+figure
+plot(30*bins,gazeHist(:,1),'k');
+hold on
+plot(30*bins,gazeHist(:,2),'r','LineWidth',2);
+xlim([-16 16]*30); %ylim([0 0.1])
+xlabel('gaze velocity deg/sec')
+
+bins = 0.25:0.5:15;
+gazeHist = hist(abs(clustGz),bins)/nclustPts;
+figure
+plot(bins,gazeHist)
+
+
+
 X=mvmts;
 figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),idx~=2); axis equal
@@ -2190,7 +2225,7 @@ eyeOffsetErr(1) = nanstd(abs(eyeAz(preSaccT,apps)))/sqrt(sum(~isnan(eyeAz(preSac
 eyeOffsetErr(2) = nanstd(abs(eyeAz(postSaccT,apps)))/sqrt(sum(~isnan(eyeAz(postSaccT,apps))))
 
 headOffset(1) = nanmedian(abs(saccAzAll(preSaccT,apps)));
-headOffset(2) = nanmedian(abs(saccAzAll(postSaccT,apps)))
+headOffset(2) = nanmedian(abs(saccAzAll(postSaccT,apps)));
 headOffsetErr(1) = nanstd(abs(saccAzAll(preSaccT,apps)))/sqrt(sum(~isnan(saccAzAll(preSaccT,apps))));
 headOffsetErr(2) = nanstd(abs(saccAzAll(postSaccT,apps)))/sqrt(sum(~isnan(saccAzAll(postSaccT,apps))))
 
