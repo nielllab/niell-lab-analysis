@@ -6,9 +6,14 @@ savePDF=1; dbstop if error
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
 
-deInter = 1;
+deInter = 0;
 doAcc = 1;
 
+if deInter
+    frRate=60;
+else
+    frRate=30;
+end
 fileList=[] ;fileListR=[] ;fileListL=[] ; TSfileList=[];
 %finds all files w/top.csv in the name, used for all camera files
 %finds all files with acc.csv in the name for the accelerometers
@@ -311,8 +316,8 @@ for j=1:length(fileList) %%% loop over all top camera files
             axis equal; axis([-20 20 -20 20]); xlabel('gyro 3 interp'); ylabel('mean eye dtheta');
             
             figure
-            plot(-30:30,nanxcorr(Data(j).accShift(1:end-1,6),eyes,30,'coeff'));
-            axis([-30 30 -1 1]); hold on; plot([0 0],[-1 1],'r');
+            plot(-frRate:frRate,nanxcorr(Data(j).accShift(1:end-1,6),eyes,frRate,'coeff'));
+            axis([-frRate frRate -1 1]); hold on; plot([0 0],[-1 1],'r');
             title('acc3 vs mean dEye xcorr');
             
         end
@@ -332,10 +337,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         %%% a few figures ...
         
         figure
-        plot(xcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),30,'coeff'))
+        plot(xcorr(Data(j).dxRTheta,Data(j).dth(1:end-1),frRate,'coeff'))
         hold on
-        plot(xcorr(Data(j).dxLTheta,Data(j).dth(1:end-1),30,'coeff'))
-        plot(xcorr(Data(j).dxRTheta,-Data(j).dxLTheta,30,'coeff'))
+        plot(xcorr(Data(j).dxLTheta,Data(j).dth(1:end-1),frRate,'coeff'))
+        plot(xcorr(Data(j).dxRTheta,-Data(j).dxLTheta,frRate,'coeff'))
         legend('R','L','R-L')
         title('eye theta & head theta');
         %         if savePDF
@@ -345,10 +350,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         %         close(gcf)
         
         figure
-        plot(xcorr(Data(j).dxRPhi,Data(j).dth(1:end-1),30,'coeff'))
+        plot(xcorr(Data(j).dxRPhi,Data(j).dth(1:end-1),frRate,'coeff'))
         hold on
-        plot(xcorr(Data(j).dxLPhi,Data(j).dth(1:end-1),30,'coeff'))
-        plot(xcorr(Data(j).dxRPhi,Data(j).dxLPhi,30,'coeff'))
+        plot(xcorr(Data(j).dxLPhi,Data(j).dth(1:end-1),frRate,'coeff'))
+        plot(xcorr(Data(j).dxRPhi,Data(j).dxLPhi,frRate,'coeff'))
         legend('R','L','R-L')
         title('eye phi & head theta');
         %         if savePDF
@@ -375,7 +380,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_DEINTERLACED_051620_interpNan','.mat')
+afilename=sprintf('%s',ani,'_ORIGINAL_051920','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))

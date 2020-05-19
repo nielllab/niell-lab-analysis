@@ -6,9 +6,9 @@ set(groot,'defaultFigureVisible','on') %disable figure plotting
 deInter=1;
 
 if deInter
-frRate=60; window=2;
+frRate=60;
 else
-frRate=30; window=1;
+frRate=30; 
 end
 
 savePDF=1;
@@ -533,7 +533,7 @@ end
 % %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+% %     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -595,7 +595,7 @@ end
 % %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+% %     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -658,7 +658,7 @@ end
 % %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+% %     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -731,7 +731,7 @@ end
 % %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+% %     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -793,7 +793,7 @@ end
 % %     else
 % %         corrRA=NaN; uselagsRA=NaN;
 % %     end
-% %     if sum(uselagsR)==2*(frRate)+window) & sum(uselagsL)==2*(frRate)+window) &sum(uselagsRA)==2*(frRate)+window) & sum(uselagsLA)==2*(frRate)+window)
+% %     if sum(uselagsR)==2*(frRate)+1) & sum(uselagsL)==2*(frRate)+1) &sum(uselagsRA)==2*(frRate)+1) & sum(uselagsLA)==2*(frRate)+1)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -863,7 +863,7 @@ end
 %        uselagsRA=NaN;
 %      end
 %
-%     if sum(uselagsR)==2*(frRate)+window) & sum(uselagsL)==2*(frRate)+window) &sum(uselagsRA)==2*(frRate)+window) & sum(uselagsLA)==2*(frRate)+window)
+%     if sum(uselagsR)==2*(frRate)+1) & sum(uselagsL)==2*(frRate)+1) &sum(uselagsRA)==2*(frRate)+1) & sum(uselagsLA)==2*(frRate)+1)
 %        corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -935,7 +935,7 @@ end
 %          corrRA =NaN; uselagsRA=NaN;
 %      end
 %
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1002,7 +1002,7 @@ end
 %     else
 %     end
 %
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1068,7 +1068,7 @@ end
 %     else
 %     end
 %
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1136,7 +1136,7 @@ end
 %
 %      else
 %      end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1208,7 +1208,7 @@ end
 %          else
 %          end
 %
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %

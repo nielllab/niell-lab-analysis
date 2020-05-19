@@ -2,8 +2,8 @@ clear all; close all;
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 deInter=1;
 if deInter
-    frRate=60; window=1;
-else frRate=30; window=1;
+    frRate=60;
+else frRate=30; 
 end
 
 savePDF=0;
@@ -23,11 +23,11 @@ if analyzeAcc==1
     files={'J462aDeinterlaced_051820_analyzed_c.mat','J462bDeinterlaced_051820_analyzed_c.mat','J462cDeinterlaced_051820_analyzed_c.mat',...
         'J463bDeinterlaced_051820_analyzed_c.mat','J463cDeinterlaced_051820_analyzed_c.mat','J470cDeinterlaced_051820_analyzed_c.mat',...
         'J475cDeinterlaced_051820_analyzed_c.mat'};
-% 
+
 %         files={'J462aAnalyzed_010819_ACCSessions_a','J462bAnalyzed_010819_ACCSessions_a.mat','J462cAnalyzed_010819_ACCSessions_a',...
 %         'J463bAnalyzed_010819_ACCSessions_a','J463cAnalyzed_010819_ACCSessions_a','J470cAnalyzed_010819_ACCSessions_a',...
 %         'J475cAnalyzed_010819_ACCSessions_a'}; %analysis redone with daylight savings data on 010819
-    
+%     
 else
     files={'J462aAnalyzed_120219_allSessions.mat','J462bAnalyzed_120219_allSessions.mat','J462cAnalyzed_120219_allSessions.mat',...
         'J463bAnalyzed_120219_allSessions.mat','J463cAnalyzed_120219_allSessions.mat','J465dAnalyzed_120219_allSessions.mat'...
@@ -260,11 +260,19 @@ for i = 1:length(useData)
     tiltAll=[tiltAll tiltFilt(1:end-1)'];
     rollAll=[rollAll rollFilt(1:end-1)'];
     yawAll=[yawAll yawFilt(1:end-1)'];
-    vergDlc=[vergDlc verg(1:end-1)];
-    dvergDlc=[dvergDlc dverg];
+    if deInter
+        vergDlc=[vergDlc verg(1:end-1)];
+        dvergDlc=[dvergDlc dverg];
+        dlcPhi=[dlcPhi phi(1:end-1)];
+        dlcDphi=[dlcDphi dphi];
+    else
+        vergDlc=[vergDlc verg(1:end-1)'];
+        dvergDlc=[dvergDlc dverg'];
+        dlcPhi=[dlcPhi phi(1:end-1)'];
+        dlcDphi=[dlcDphi dphi'];
+    end
     gyro3All=[gyro3All gyro3(1:end-1)'];
-    dlcPhi=[dlcPhi phi(1:end-1)];
-    dlcDphi=[dlcDphi dphi];
+
     dlcHth=[dlcHth hth(1:end-1)];
     dlcDhth=[dlcDhth dhth(1:end-1)'];
 %     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -429,7 +437,7 @@ for vid=1:length(useData)
         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
     else
     end
-    if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+    if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 
@@ -482,7 +490,7 @@ legend(L,{'dtheta R non-app','dtheta L non-app','dtheta R Approach','dtheta L Ap
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -539,7 +547,7 @@ for vid=1:length(useData)
     else
     end
 
-    if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+    if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 
@@ -599,7 +607,7 @@ for vid=1:length(useData)
         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
     else
     end
-    if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+    if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 
@@ -617,7 +625,7 @@ shadedErrorBar(1:size(corrLAll,2),nanmean(corrLAll,1),errL,'-r',1);
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
 shadedErrorBar(1:size(corrLAAll,2),nanmean(corrLAAll,1),errLA,'-c',1);
 
-plot([frRate+1,frRate+1],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.25 .2]); xlim([1 (2*(frRate)+window)]); axis square
+plot([frRate+1,frRate+1],[1,-1],'--','Color', [.5 .5 .5]); ylim([-.25 .2]); xlim([1 (2*(frRate)+1)]); axis square
 L(1) = plot(nan, nan, 'b-');
 L(2) = plot(nan, nan, 'r-');
 L(3) = plot(nan, nan, 'g-');
@@ -659,7 +667,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -716,7 +724,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -774,7 +782,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) && sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) && sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -878,7 +886,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -935,7 +943,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -992,7 +1000,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1049,7 +1057,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1106,7 +1114,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1163,7 +1171,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1220,7 +1228,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1277,7 +1285,7 @@ title('az and dEye Theta')
 %         uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %     else
 %     end
-%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
+%     if sum(uselagsR)==(2*(frRate)+1) & sum(uselagsL)==(2*(frRate)+1) &sum(uselagsRA)==(2*(frRate)+1) & sum(uselagsLA)==(2*(frRate)+1)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1748,7 +1756,7 @@ clear dTAll dTRALL dTLAll dPRAll dPLAll
 % % [corrR lagsR]=nanxcorr(gaze(useN),cT(useN),frRate,'coeff');
 % % % [corrL lagsL]=nanxcorr(cT(useN),HGazeL(useN),frRate,'coeff');
 % % else
-% %       lag=1:(2*(frRate)+window)
+% %       lag=1:(2*(frRate)+1)
 % %       corrR=NaN(size([lag],1),'like',lag);
 % %     %  corrL=NaN(size([lag],1),'like',lag);
 % %       %dbstop
@@ -1758,7 +1766,7 @@ clear dTAll dTRALL dTLAll dPRAll dPLAll
 % % [corrRA lagsRA]=nanxcorr(gaze(use),cT(use),frRate,'coeff');
 % % %[corrLA lagsLA]=nanxcorr(HGazeL(use),cT(use),frRate,'coeff');
 % % else
-% %   lag=1:(2*(frRate)+window)
+% %   lag=1:(2*(frRate)+1)
 % %       corrRA=NaN(size([lag],1),'like',lag);
 % %  %     corrLA=NaN(size([lag],1),'like',lag);
 % %     end
@@ -1915,7 +1923,7 @@ legend('non approach','approach')
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s','DEINTER_Analyzed_AllAnimals_051820','.pdf')
+    filen=sprintf('%s','ORIGINAL_Analyzed_AllAnimals_051920_TEST','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1924,6 +1932,6 @@ else
 end
 
 
-afilename=sprintf('%s','DEINTER_Analyzed_AllAnimals_051820','.mat')
+afilename=sprintf('%s','ORIGINAL_Analyzed_AllAnimals_051920_TEST','.mat')
 save(fullfile(pSname, afilename))
 

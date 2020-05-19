@@ -684,7 +684,11 @@ for c=0:1
         useN= appEpoch{vid}(1:nframe)==c;
         nBins=-90:5:90
         if sum(useN)>4
-            vgHist = (hist(vg(useN),nBins))/sum(useN&~isnan(vg));
+            if deInter
+                vgHist = (hist(vg(useN),nBins))/sum(useN&~isnan(vg));
+            else
+            vgHist = (hist(vg(useN),nBins))/sum(useN&~isnan(vg)');
+            end
         else
             vgHist=NaN;
         end
@@ -961,20 +965,28 @@ for vid=1:length(useData)
     nframe=min(nframe, length(d_Theta{useData(vid)}));
     mnEye =.5*(Rtheta{useData(vid)}(1:nframe)+Ltheta{useData(vid)}(1:nframe));
     mnEye=mnEye-nanmean(mnEye);
-    mnEyeAll=[mnEyeAll mnEye];
     
     mnEyeD =.5*(dRtheta{useData(vid)}(1:nframe)+dLtheta{useData(vid)}(1:nframe));
     mnEyeD=mnEyeD-nanmean(mnEyeD);
-    d_mnEyeAll=[d_mnEyeAll mnEyeD];
-    
     mnPhi =.5*(dRphi{useData(vid)}(1:nframe)+dLphi{useData(vid)}(1:nframe));
     mnPhi=mnPhi-nanmean(mnPhi);
-    mnPhiAll=[mnPhiAll mnPhi];
+    
     dHead=d_Theta{useData(vid)}(1:nframe); dHead=dHead-nanmean(dHead);
     allDLChead = [allDLChead dHead'];
+    
     speed =mouseSp{useData(vid)}(1:nframe);
     %speed =speed-nanmean(speed);  commented out 3/11 since this makes speeds inaccurate
     mouseSpAll=[mouseSpAll speed];
+    
+    if deInter
+        mnEyeAll=[mnEyeAll mnEye];
+        d_mnEyeAll=[d_mnEyeAll mnEyeD];
+        mnPhiAll=[mnPhiAll mnPhi];
+    else
+        mnEyeAll=[mnEyeAll mnEye'];
+        d_mnEyeAll=[d_mnEyeAll mnEyeD'];
+        mnPhiAll=[mnPhiAll mnPhi'];
+    end
     
 end
 
@@ -1081,9 +1093,14 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
         runFilt = medfilt1(speed,(frRate/2));
         
         running =runFilt>=1;
+        if deInter
         mnEyes(vid,1) = nanmedian((.5*(dRtheta{useData(vid)}(:,running==0)+ dLtheta{useData(vid)}(:,running==0))));
         mnEyes(vid,2) = nanmedian((.5*(dRtheta{useData(vid)}(:,running==1)+ dLtheta{useData(vid)}(:,running==1))));
+        else
+         mnEyes(vid,1) = nanmedian((.5*(dRtheta{useData(vid)}(running==0,:)+ dLtheta{useData(vid)}(running==0,:))));
+            mnEyes(vid,2) = nanmedian((.5*(dRtheta{useData(vid)}(running==1,:)+ dLtheta{useData(vid)}(running==1,:))));
 
+        end
     end
     
 [h stat]=kstest2(mnEyes(:,1),mnEyes(:,2))
@@ -1097,7 +1114,8 @@ for c=1:2
     use = find(appAll==c-1);
     samp(c,:)=randsample(use,200);
     plot(gyro3All(samp(c,:)), d_mnEyeAll(samp(c,:)),'.')
-    axis([-35 35 -35 35]); axis square
+    axis([-35 35 -35 35]);
+    axis square
     hold on
 end
 xlabel('gyro yaw'); ylabel('d eye yaw');
@@ -1472,7 +1490,11 @@ for i = 1:length(appEpoch)
     
     %%% gaze is the sum of head position + mean eye position
     %%% key variable!!!
-    gaze = hth + mnEyeTh';
+    if deInter
+    gaze = hth + mnEyeTh;
+    else
+      gaze = hth + mnEyeTh';
+    end
     
     %%% find the longest approach, to use as example image
     appPts = find(app);
