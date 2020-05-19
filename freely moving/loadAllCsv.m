@@ -151,10 +151,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3);
         if deInter
             RTSnew = zeros(size(RTS,1)*2,1);
-            %             RTSnew(2:2:end) = RTS;
-            %             RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
-            RTSnew(2:2:end) = RTS  +0.5*median(diff(RTS)) ;
-            RTSnew(1:2:end) = RTS ;
+                        RTSnew(2:2:end) = RTS;
+                        RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
+%             RTSnew(2:2:end) = RTS  +0.5*median(diff(RTS)) ;
+%             RTSnew(1:2:end) = RTS ;
             RTS = RTSnew;
         end
         
@@ -167,10 +167,10 @@ for j=1:length(fileList) %%% loop over all top camera files
         LTS= LTS(:,1)*60*60 + LTS(:,2)*60 + LTS(:,3);
         if deInter
             LTSnew = zeros(size(LTS,1)*2,1);
-            % LTSnew(2:2:end) = LTS;
-            % LTSnew(1:2:end) = LTS- 0.5*median(diff(LTS));
-            LTSnew(2:2:end) = LTS  +0.5*median(diff(LTS)) ;
-            LTSnew(1:2:end) = LTS ;
+            LTSnew(2:2:end) = LTS;
+            LTSnew(1:2:end) = LTS- 0.5*median(diff(LTS));
+%             LTSnew(2:2:end) = LTS  +0.5*median(diff(LTS)) ;
+%             LTSnew(1:2:end) = LTS ;
             LTS = LTSnew;
         end
         startL = LTS(1);
@@ -218,15 +218,19 @@ for j=1:length(fileList) %%% loop over all top camera files
         %%% interpolate right eye points
         Data(j).XRcent =interp1(RTS,Data(j).XRcentraw,xq);
         Data(j).YRcent =interp1(RTS,Data(j).YRcentraw,xq);
-        Data(j).Rtheta =interp1(RTS,Data(j).Rthetaraw,xq);
+        Data(j).Rtheta = interp1(RTS,Data(j).Rthetaraw,xq);
+        Data(j).Rtheta =interpNan(Data(j).Rtheta,1,'linear')
         Data(j).Rphi = interp1(RTS,Data(j).Rphiraw,xq);
+        Data(j).Rphi =interpNan(Data(j).Rphi,1,'linear')
         Data(j).RRad = interp1(RTS,Data(j).RRadRaw,xq);
         
         %%% interpolate left eye points
         Data(j).XLcent =interp1(LTS,Data(j).XLcentraw,xq);
         Data(j).YLcent =interp1(LTS,Data(j).YLcentraw,xq);
         Data(j).Ltheta =interp1(LTS,Data(j).Lthetaraw,xq);
+        Data(j).Ltheta =interpNan(Data(j).Ltheta,1,'linear')
         Data(j).Lphi =interp1(LTS,Data(j).Lphiraw,xq);
+        Data(j).Lphi =interpNan(Data(j).Lphi,1,'linear')
         Data(j).LRad = interp1(LTS,Data(j).LRadRaw,xq);
         
         figure;subplot(1,2,1)
@@ -353,7 +357,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     if savePDF
         pSname='T:\PreyCaptureAnalysis\Data\singleVid_pdfs\';
         C={ani, date, sessionnum, clipnum};
-        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'.pdf')
+        filen=sprintf('%s%s%s%s',ani,date,sessionnum,clipnum,'interpNan','.pdf')
         pdfilename=fullfile(pSname,filen)
         dos(['ps2pdf ' psfilename ' ' pdfilename]);
         delete(psfilename);
@@ -365,7 +369,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_DEINTERLACED_051520','.mat')
+afilename=sprintf('%s',ani,'_DEINTERLACED_051620_interpNan','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))

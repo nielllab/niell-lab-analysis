@@ -1,8 +1,15 @@
 clear all; close all;
 dbstop if error
-% load('J462a_AllACCSessions_120619_a.mat');
-load('J475c_021420.mat');
+% load('J462a_AlACCSessions_120619_a.mat');
+load('J475c_DEINTERLACED_051620_interpNan.mat');
 set(groot,'defaultFigureVisible','on') %disable figure plotting
+deInter=1;
+
+if deInter
+frRate=60; window=2;
+else
+frRate=30; window=1;
+end
 
 savePDF=1;
 if savePDF
@@ -21,10 +28,10 @@ for i=1:length(Data)
     
     mouse_xyRaw{i,1,1}=Data(i).mouse_xyRaw;
     mouseVRaw{i,:}= Data(i).mouseVRaw; %in pix/frame
-    mouseVRaw{i,:}=((Data(i).mouseVRaw)/27)*30; %cm/sec
+    mouseVRaw{i,:}=((Data(i).mouseVRaw)/27)*frRate; %cm/sec
     cricket_xyRaw{i,1}=Data(i).cricketxyRaw;
     cricketVRaw{i,:}= Data(i).cricketVRaw % pix/frame
-    cricketVRaw{i,:} = ((Data(i).cricketVRaw)/27)*30; %now cm/sec
+    cricketVRaw{i,:} = ((Data(i).cricketVRaw)/27)*frRate; %now cm/sec
     thetaRaw{i,:}= Data(i).thetaRaw;
     dThetaRaw{i,:}= diff(Data(i).thetaRaw);
     rangeRaw{i,:}= (Data(i).rangeRaw)/27; %convert pixels to cm
@@ -36,11 +43,11 @@ for i=1:length(Data)
     
     mouse_xy{i,1,1}=Data(i).mouse_xy;
     % mouseV{i,:}= Data(i).mouseV; %in pix/frame
-    mouseV{i,:}=((Data(i).mouseV)/27)*30; %cm/sec
+    mouseV{i,:}=((Data(i).mouseV)/27)*frRate; %cm/sec
     cricket_xy{i,1}=Data(i).cricketxy;
     cricketAz{i,:}=Data(i).cricketTheta;
     %    cricketV{i,:}= Data(i).cricketV % pix/frame
-    cricketV{i,:} = ((Data(i).cricketV)/27)*30; %now cm/sec
+    cricketV{i,:} = ((Data(i).cricketV)/27)*frRate; %now cm/sec
     theta{i,:}= rad2deg(Data(i).theta);
     dTheta{i,:}=rad2deg(Data(i).dth);
 %     dThetaFilt{i,:}=medfilt1(dTheta{i,:},3);
@@ -126,17 +133,17 @@ rownum=10 ; colnum=8;
 %%
 % figure
 % subplot(3,2,1)
-% hist(Rcc); title('R corrcoef'); ylim([0 30]); xlim([0 1]);
+% hist(Rcc); title('R corrcoef'); ylim([0 frRate]); xlim([0 1]);
 % subplot(3,2,3)
-% hist(Rslope);title(' R Cal slope');ylim([0 30]); xlim([0 1]);
+% hist(Rslope);title(' R Cal slope');ylim([0 frRate]); xlim([0 1]);
 % subplot(3,2,2)
-% hist(Lcc); title('L corrcoef');ylim([0 30]); xlim([0 1]);
+% hist(Lcc); title('L corrcoef');ylim([0 frRate]); xlim([0 1]);
 % subplot(3,2,4)
-% hist(Lslope);title('L Cal slope');ylim([0 30]); xlim([0 1]);
+% hist(Lslope);title('L Cal slope');ylim([0 frRate]); xlim([0 1]);
 % subplot(3,2,5)
-% hist(Rscale);title('R Cal scale');ylim([0 30]); xlim([20 80]);
+% hist(Rscale);title('R Cal scale');ylim([0 frRate]); xlim([20 80]);
 % subplot(3,2,6)
-% hist(Lscale);title('L Cal scale');ylim([0 30]); xlim([20 80]);
+% hist(Lscale);title('L Cal scale');ylim([0 frRate]); xlim([20 80]);
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%
@@ -205,34 +212,34 @@ for vid = 1:length(useFilt)
 %     plot(gyro3); hold on; axis square
 %     plot(dhth); title('gyro 3, dHead Th')
 %     subplot(4,3,7);
-%     plot(-30:30,nanxcorr(rollFilt,phi,30,'coeff'))
+%     plot(-frRate:frRate,nanxcorr(rollFilt,phi,frRate,'coeff'))
 %     title('roll, phi diff');ylim([-1 1]);
 %     subplot(4,3,8);
-%     plot(-30:30,nanxcorr(tiltFilt,verg,30,'coeff'))
+%     plot(-frRate:frRate,nanxcorr(tiltFilt,verg,frRate,'coeff'))
 %     title('tilt, vergence');ylim([-1 1]);
 %     subplot(4,3,9);
-%     plot(-30:30,nanxcorr(yawFilt,verg,30,'coeff'))
+%     plot(-frRate:frRate,nanxcorr(yawFilt,verg,frRate,'coeff'))
 %     title('yaw, vergence');ylim([-1 1]);
 %     subplot(4,3,10)
-%     plot(-30:30,nanxcorr(gyro1(1:end-1),dverg,30,'coeff'))
+%     plot(-frRate:frRate,nanxcorr(gyro1(1:end-1),dverg,frRate,'coeff'))
 %     title('gyro 1, dVg');ylim([-1 1]);
 %     subplot(4,3,11)
-%     plot(-30:30,nanxcorr(gyro2(1:end-1),dphi,30,'coeff'))
+%     plot(-frRate:frRate,nanxcorr(gyro2(1:end-1),dphi,frRate,'coeff'))
 %     title('gyro 2, dPhi eyes');ylim([-1 1]);
 %     subplot(4,3,12)
-%     plot(-30:30,nanxcorr(gyro3,dhth,30,'coeff'))
+%     plot(-frRate:frRate,nanxcorr(gyro3,dhth,frRate,'coeff'))
 %     title('gyro 3, dHead th');ylim([-1 1]); 
     
     allTilt=[allTilt tiltFilt(1:end-1)'];
     allRoll=[allRoll rollFilt(1:end-1)'];
     allYaw=[allYaw yawFilt(1:end-1)'];
-    dlcVerg=[dlcVerg verg(1:end-1)'];
-    dlcDverg=[dlcDverg dverg'];
+    dlcVerg=[dlcVerg verg(1:end-1)];
+    dlcDverg=[dlcDverg dverg];
     allGyro1=[allGyro1 gyro1(1:end-1)'];
     allGyro2=[allGyro2 gyro2(1:end-1)'];
     allGyro3=[allGyro3 gyro3(1:end-1)'];
-    dlcPhi=[dlcPhi phi(1:end-1)'];
-    dlcDphi=[dlcDphi dphi'];
+    dlcPhi=[dlcPhi phi(1:end-1)];
+    dlcDphi=[dlcDphi dphi];
     dlcHth=[dlcHth hth(1:end-1)];
     dlcDhth=[dlcDhth dhth(1:end-1)'];
     if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -280,7 +287,7 @@ title('acc ch 3');
 subplot(2,3,4)
 plot(allGyro1,dlcDverg,'.');axis equal; hold on; lsline %dlcVerg
 xlabel('gyro 1'); ylabel('eye verg');
-ylim([-30 30]); xlim([-30 30]);
+ylim([-frRate frRate]); xlim([-frRate frRate]);
 R=corrcoef(allGyro1, dlcDverg,'Rows','pairwise')
 text(-25,25, ['corrcoef = ' num2str(R(1,2),'%.2f')],'FontSize',10)
 title('gyro ch 1')
@@ -334,39 +341,39 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 %%
 figure
 subplot(2,3,1)
-[corr lags]=(nanxcorr(allRoll,dlcPhi,30,'coeff'));
+[corr lags]=(nanxcorr(allRoll,dlcPhi,frRate,'coeff'));
 plot(lags,corr);axis square
 title('acc roll, phi');
 ylim([-1 1]);
 
 subplot(2,3,2)
-[corr lags]=(nanxcorr(allTilt,dlcVerg,30,'coeff'));
+[corr lags]=(nanxcorr(allTilt,dlcVerg,frRate,'coeff'));
 plot(lags,corr)
 axis square;ylim([-1 1]);
 title('acc tilt, vergence');
 
 subplot(2,3,3)
-[corr lags]=(nanxcorr(allYaw,dlcVerg,30,'coeff'));
+[corr lags]=(nanxcorr(allYaw,dlcVerg,frRate,'coeff'));
 plot(lags, corr)
 axis square;ylim([-1 1]);
 title('acc yaw, vergence');
 
 subplot(2,3,4)
-[corr lags]=(nanxcorr(allGyro1,dlcDverg,30,'coeff'));
+[corr lags]=(nanxcorr(allGyro1,dlcDverg,frRate,'coeff'));
 plot(lags, corr)
 axis square;ylim([-1 1]);
 title('gyro1, d vergence');
 
 subplot(2,3,5)
-[corr lags]=(nanxcorr(allGyro2,dlcDphi,30,'coeff'));
+[corr lags]=(nanxcorr(allGyro2,dlcDphi,frRate,'coeff'));
 plot(lags, corr)
 axis square;ylim([-1 1]);
 title('gyro2, d phi');
 
 subplot(2,3,6)
-[corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),30,'coeff'));
+[corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),frRate,'coeff'));
 plot(lags, corr); hold on;
-% [corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),30,'coeff'));
+% [corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),frRate,'coeff'));
 % plot(lags, corr,'r')
 axis square;ylim([-1 1]);
 title('gyro ch 3,d head')
@@ -378,12 +385,11 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 for vid =1:length(useFilt)
     
    if length(thetaR{useFilt(vid)})>=100
-tr=medfilt1(thetaR{useFilt(vid)}(1:100),8);
-pr=medfilt1(phiR{useFilt(vid)}(1:100),8);
+tr=medfilt1(thetaR{useFilt(vid)}(1:(2*frRate)),8);
+pr=medfilt1(phiR{useFilt(vid)}(1:(2*frRate)),8);
 
-tl=medfilt1(thetaL{useFilt(vid)}(1:100),8);
-pl=medfilt1(phiL{useFilt(vid)}(1:100),8);
-
+tl=medfilt1(thetaL{useFilt(vid)}(1:(2*frRate)),8);
+pl=medfilt1(phiL{useFilt(vid)}(1:(2*frRate)),8);
 
 figure
 subplot(1,2,1)
@@ -449,7 +455,7 @@ end
 %% identify approach!!!
 
 for vid=1:length(useFilt)
-    deltaR = diff(range{useFilt(vid)})*30;
+    deltaR = diff(range{useFilt(vid)})*frRate;
     vsmooth = conv(mouseV{useFilt(vid)},ones(5,1)/5,'same');
     dRThresh=-10; %%%cm/sec
     vThresh=10;
@@ -483,7 +489,7 @@ end
 %     subplot(rownum,colnum,vid)
 %     plot(mouse_xy{useFilt(vid),1}(1,:),mouse_xy{useFilt(vid),1}(2,:)); hold on;
 %     plot(cricket_xy{useFilt(vid),1}(1,:),cricket_xy{useFilt(vid),1}(2,:))
-%     dur=num2str(length(mouse_xy{useFilt(vid),1}(1,:))/30,'%.2f');
+%     dur=num2str(length(mouse_xy{useFilt(vid),1}(1,:))/frRate,'%.2f');
 %     title([dur,'sec']);
 %     xlim([300 1600]);
 %     use=appEpoch{vid}==1
@@ -505,29 +511,29 @@ end
 % %     clear use
 % %     use =(nonapp==1)% & ~isnan(dT(1:nframe))
 % %     if sum(use)>3 & (sum(~isnan(dT(use)))>20)
-% %     [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'zero');
-% %     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
+% %     [corrR lagsR]= nanxcorr(dT(use),rR(use),frRate,'zero');
+% %     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3])
 % %     hold on;
-% %     uselagsR=(lagsR>=-30& lagsR<=30);
+% %     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 % %
-% %     [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'zero');
-% %     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-% %     uselagsL=(lagsL>=-30 & lagsL<=30);
+% %     [corrL lagsL]= nanxcorr(dT(use),rL(use),frRate,'zero');
+% %     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+% %     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 % %     else
 % %     end
 % %     clear use;
 % %     use=appEpoch{vid}==1% & ~isnan(dT(1:nframe))
 % %     if sum(use)>4% & (sum(isnan(rR(use)))>20)
-% %     [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'zero');
-% %     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
-% %     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+% %     [corrRA lagsRA]= nanxcorr(dT(use),rR(use),frRate,'zero');
+% %     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);
+% %     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 % %
-% %     [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'zero');
-% %     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-% %     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+% %     [corrLA lagsLA]= nanxcorr(dT(use),rL(use),frRate,'zero');
+% %     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+% %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -568,28 +574,28 @@ end
 % %     clear use
 % %     use =(nonapp==1)%&~isnan(dT(1:nframe));
 % %    if sum(use)>3 & sum(~isnan(dT(use)))>20
-% %     [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'zero');
-% %     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
+% %     [corrR lagsR]= nanxcorr(dT(use),rR(use),frRate,'zero');
+% %     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3])
 % %     hold on;
-% %     uselagsR=(lagsR>=-30& lagsR<=30);
+% %     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 % %
-% %     [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'zero');
-% %     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-% %     uselagsL=(lagsL>=-30 & lagsL<=30);
+% %     [corrL lagsL]= nanxcorr(dT(use),rL(use),frRate,'zero');
+% %     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+% %     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 % %     else
 % %     end
 % %     clear use;
 % %     use=appEpoch{vid}==1% & ~isnan(dT(1:nframe))
 % %     if sum(use)>4 & sum(isnan(rR(use))>20);
-% %     [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'zero');
-% %     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
-% %     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-% %     [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'zero');
-% %     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-% %     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+% %     [corrRA lagsRA]= nanxcorr(dT(use),rR(use),frRate,'zero');
+% %     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);
+% %     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
+% %     [corrLA lagsLA]= nanxcorr(dT(use),rL(use),frRate,'zero');
+% %     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+% %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -631,28 +637,28 @@ end
 % %     clear use
 % %     use =  (nonapp==1) %& ~isnan(dT(1:nframe));
 % %   %  if sum(use)>3
-% %     [corrR lagsR]= nanxcorr(dT(use),rR(use),30,'zero');
-% %     plot(lagsR/30,corrR,'b');xlim([-.3 .3])
+% %     [corrR lagsR]= nanxcorr(dT(use),rR(use),frRate,'zero');
+% %     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3])
 % %     hold on;
-% %     uselagsR=(lagsR>=-30& lagsR<=30);
+% %     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 % %
-% %     [corrL lagsL]= nanxcorr(dT(use),rL(use),30,'zero');
-% %     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-% %     uselagsL=(lagsL>=-30 & lagsL<=30);
+% %     [corrL lagsL]= nanxcorr(dT(use),rL(use),frRate,'zero');
+% %     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+% %     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 % % %     else
 % % %     end
 % %     clear use;
 % %     use=appEpoch{vid}==1 %& ~isnan(dT(1:nframe))
 % %     if sum(use)>4
-% %     [corrRA lagsRA]= nanxcorr(dT(use),rR(use),30,'zero');
-% %     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
-% %     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-% %     [corrLA lagsLA]= nanxcorr(dT(use),rL(use),30,'zero');
-% %     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-% %     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+% %     [corrRA lagsRA]= nanxcorr(dT(use),rR(use),frRate,'zero');
+% %     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);
+% %     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
+% %     [corrLA lagsLA]= nanxcorr(dT(use),rL(use),frRate,'zero');
+% %     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+% %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -697,22 +703,22 @@ end
 % %     clear use
 % %     use = (nonapp==1)'; %~isnan(dT(1:nframe)) &
 % %   %  if sum(use)>3
-% %     [corrR lagsR]= nanxcorr(dT(use),dtR(use),30,'coeff');
-% %     plot(lagsR/30,corrR,'b');%xlim([-.3 .3])
+% %     [corrR lagsR]= nanxcorr(dT(use),dtR(use),frRate,'coeff');
+% %     plot(lagsR/frRate,corrR,'b');%xlim([-.3 .3])
 % %     hold on;
-% %     uselagsR=(lagsR>=-30& lagsR<=30);
+% %     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 % %
-% %     [corrL lagsL]= nanxcorr(dT(use),dtL(use),30,'coeff');
-% %     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-% %     uselagsL=(lagsL>=-30 & lagsL<=30);
+% %     [corrL lagsL]= nanxcorr(dT(use),dtL(use),frRate,'coeff');
+% %     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+% %     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 % % %     else
 % % %     end
 % %     clear use;
 % %     use=appEpoch{vid}==1
 % %     if sum(use)>4 & sum(~isnan(dtR(use)))>20
-% %     [corrRA lagsRA]= nanxcorr(dT(use),dtR(use),30,'coeff');
-% %     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);
-% %     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+% %     [corrRA lagsRA]= nanxcorr(dT(use),dtR(use),frRate,'coeff');
+% %     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);
+% %     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 % %
 % %     else
 % %         corrRA=NaN;uselagsRA=NaN;
@@ -720,12 +726,12 @@ end
 % %
 % %     end
 % %      if sum(use)>4 & sum(~isnan(dtL(use)))>20
-% %     [corrLA lagsLA]= nanxcorr(dT(use),dtL(use),30,'coeff');
-% %     plot(lagsLA/30,corrLA,'c');%xlim([-.3 .3]);
-% %     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+% %     [corrLA lagsLA]= nanxcorr(dT(use),dtL(use),frRate,'coeff');
+% %     plot(lagsLA/frRate,corrLA,'c');%xlim([-.3 .3]);
+% %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %     end
-% %     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+% %     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -766,28 +772,28 @@ end
 % %     clear use
 % %     use = (nonapp==1)'% & ~isnan(dT(1:length(dpR)));
 % %     if sum(use)>3 &sum(~isnan(dpR(use)))>20
-% %     [corrR lagsR]= nanxcorr(dT(use),dpR(use),30,'coeff');
-% %     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-% %     uselagsR=(lagsR>=-30& lagsR<=30);
+% %     [corrR lagsR]= nanxcorr(dT(use),dpR(use),frRate,'coeff');
+% %     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+% %     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 % %
-% %     [corrL lagsL]= nanxcorr(dT(use),dpL(use),30,'coeff');
-% %     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-% %     uselagsL=(lagsL>=-30 & lagsL<=30);
+% %     [corrL lagsL]= nanxcorr(dT(use),dpL(use),frRate,'coeff');
+% %     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+% %     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 % %     else
 % %     end
 % %     clear use;
 % %     use=appEpoch{vid}==1
 % %     if sum(use)>3 & sum(~isnan(dpR(use)))>20
-% %     [corrRA lagsRA]= nanxcorr(dT(use),dpR(use),30,'coeff');
-% %     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-% %     uselagsRA=(lagsRA>=-30& lagsRA<=30);
-% %     [corrLA lagsLA]= nanxcorr(dT(use),dpL(use),30,'coeff');
-% %     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-% %     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+% %     [corrRA lagsRA]= nanxcorr(dT(use),dpR(use),frRate,'coeff');
+% %     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+% %     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
+% %     [corrLA lagsLA]= nanxcorr(dT(use),dpL(use),frRate,'coeff');
+% %     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+% %     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 % %     else
 % %         corrRA=NaN; uselagsRA=NaN;
 % %     end
-% %     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+% %     if sum(uselagsR)==2*(frRate)+window) & sum(uselagsL)==2*(frRate)+window) &sum(uselagsRA)==2*(frRate)+window) & sum(uselagsLA)==2*(frRate)+window)
 % %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 % %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 % %
@@ -827,37 +833,37 @@ end
 %     nonapp=appEpoch{vid}==0;
 %     use = (nonapp==1)'%& ~isnan(dtR(1:nframe));
 %     if sum(use)>3
-%     [corrR lagsR]= nanxcorr(dtR(use),dtL(use),30,'coeff');
-%     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-%     uselagsR=(lagsR>=-30& lagsR<=30);
+%     [corrR lagsR]= nanxcorr(dtR(use),dtL(use),frRate,'coeff');
+%     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+%     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 %
 %     clear nframe
 %     nframe = min(length(dphiR{useFilt(vid)}),length(dphiL{useFilt(vid)}));
 %     dpR=dphiR{useFilt(vid)}(1:nframe); dpL=dphiL{useFilt(vid)}(1:nframe);
-%     [corrL lagsL]= nanxcorr(dpR(use),dpL(use),30,'coeff');
-%     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-%     uselagsL=(lagsL>=-30 & lagsL<=30);
+%     [corrL lagsL]= nanxcorr(dpR(use),dpL(use),frRate,'coeff');
+%     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+%     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 %     else
 %     end
 %       % use = ~isnan(dT(1:nframe));
 %        use=appEpoch{vid}==1;
 %      if sum(use)>3 & sum(~isnan(dtR(use)))>20
-%     [corrRA lagsRA]= nanxcorr(dtR(use),dtL(use),30,'coeff');
-%     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-%     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+%     [corrRA lagsRA]= nanxcorr(dtR(use),dtL(use),frRate,'coeff');
+%     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+%     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 %
 % %     clear nframe
 %     nframe = min(length(dphiR{useFilt(vid)}),length(dphiL{useFilt(vid)}));
 %     dpR=dphiR{useFilt(vid)}(1:nframe); dpL=dphiL{useFilt(vid)}(1:nframe);
-%     [corrLA lagsLA]= nanxcorr(dpR(use),dpL(use),30,'coeff');
-%     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-%     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+%     [corrLA lagsLA]= nanxcorr(dpR(use),dpL(use),frRate,'coeff');
+%     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+%     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %      else
 %        %  corrRA=NaN;
 %        uselagsRA=NaN;
 %      end
 %
-%     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+%     if sum(uselagsR)==2*(frRate)+window) & sum(uselagsL)==2*(frRate)+window) &sum(uselagsRA)==2*(frRate)+window) & sum(uselagsLA)==2*(frRate)+window)
 %        corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -899,37 +905,37 @@ end
 %     nonapp=appEpoch{vid}==0;
 %     use = (nonapp==1)'%& ~isnan(dtR(1:nframe));
 %     if sum(use)>3 &sum(~isnan(dpR(use)))>20
-%     [corrR lagsR]= nanxcorr(dtR(use),dpR(use),30,'coeff');
-%     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-%     uselagsR=(lagsR>=-30& lagsR<=30);
+%     [corrR lagsR]= nanxcorr(dtR(use),dpR(use),frRate,'coeff');
+%     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+%     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 %
 %     clear nframe
 %     nframe = min(length(dthetaL{useFilt(vid)}),length(dphiL{useFilt(vid)}));
 %     dtL=dthetaL{useFilt(vid)}(1:nframe); dpL=dphiL{useFilt(vid)}(1:nframe);
-%     [corrL lagsL]= nanxcorr(dtL(use),dpL(use),30,'coeff');
-%     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-%     uselagsL=(lagsL>=-30 & lagsL<=30);
+%     [corrL lagsL]= nanxcorr(dtL(use),dpL(use),frRate,'coeff');
+%     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+%     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 %     else
 %     end
 %       % use = ~isnan(dT(1:nframe));
 %       clear use
 %       use=appEpoch{vid}==1;
 %      if sum(use)>3 & sum(~isnan(dtR(use)))>20 & sum(~isnan(dpR(use)))>20
-%     [corrRA lagsRA]= nanxcorr(dtR(use),dpR(use),30,'coeff');
-%     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-%     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+%     [corrRA lagsRA]= nanxcorr(dtR(use),dpR(use),frRate,'coeff');
+%     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+%     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 %
 % %     clear nframe
 %     nframe = min(length(dphiR{useFilt(vid)}),length(dphiL{useFilt(vid)}));
 %     dtL=dthetaL{useFilt(vid)}(1:nframe); dpL=dphiL{useFilt(vid)}(1:nframe);
-%     [corrLA lagsLA]= nanxcorr(dtL(use),dpL(use),30,'coeff');
-%     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-%     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+%     [corrLA lagsLA]= nanxcorr(dtL(use),dpL(use),frRate,'coeff');
+%     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+%     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %      else
 %          corrRA =NaN; uselagsRA=NaN;
 %      end
 %
-%     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -973,30 +979,30 @@ end
 %     clear use
 %     use = ~isnan(dT(1:nframe))& (nonapp==1)';
 %     if sum(use)>3
-%     [corrR lagsR]= nanxcorr(dT(use),tR(use),30,'coeff');
-%     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-%     uselagsR=(lagsR>=-30& lagsR<=30);
+%     [corrR lagsR]= nanxcorr(dT(use),tR(use),frRate,'coeff');
+%     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+%     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 %
-%     [corrL lagsL]= nanxcorr(dT(use),tL(use),30,'coeff');
-%     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-%     uselagsL=(lagsL>=-30 & lagsL<=30);
+%     [corrL lagsL]= nanxcorr(dT(use),tL(use),frRate,'coeff');
+%     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+%     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 %     else
 %     end
 %     clear use;
 %     use=(appEpoch{vid}==1)' %& ~isnan(dT(1:nframe));
 %     if sum(use)>3 & sum(~isnan(dT(use)))>20
-%       [corrRA lagsRA]= nanxcorr(dT(use),tR(use),30,'coeff');
-%     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-%     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+%       [corrRA lagsRA]= nanxcorr(dT(use),tR(use),frRate,'coeff');
+%     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+%     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 %
-%     [corrLA lagsLA]= nanxcorr(dT(use),tL(use),30,'coeff');
-%     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-%     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+%     [corrLA lagsLA]= nanxcorr(dT(use),tL(use),frRate,'coeff');
+%     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+%     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %
 %     else
 %     end
 %
-%     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1039,30 +1045,30 @@ end
 %     clear use
 %     use = (nonapp==1)';%~isnan(dT(1:nframe))& (nonapp==1)';
 %     if sum(use)>3
-%     [corrR lagsR]= nanxcorr(dT(use),pR(use),30,'coeff');
-%     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-%     uselagsR=(lagsR>=-30& lagsR<=30);
+%     [corrR lagsR]= nanxcorr(dT(use),pR(use),frRate,'coeff');
+%     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+%     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 %
-%     [corrL lagsL]= nanxcorr(dT(use),pL(use),30,'coeff');
-%     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-%     uselagsL=(lagsL>=-30 & lagsL<=30);
+%     [corrL lagsL]= nanxcorr(dT(use),pL(use),frRate,'coeff');
+%     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+%     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 %     else
 %     end
 %     clear use;
 %     use=(appEpoch{vid}==1)' %& ~isnan(dT(1:nframe));
 %     if sum(use)>3 & sum(~isnan(dT(use)))>20
-%       [corrRA lagsRA]= nanxcorr(dT(use),pR(use),30,'coeff');
-%     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-%     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+%       [corrRA lagsRA]= nanxcorr(dT(use),pR(use),frRate,'coeff');
+%     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+%     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 %
-%     [corrLA lagsLA]= nanxcorr(dT(use),pL(use),30,'coeff');
-%     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-%     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+%     [corrLA lagsLA]= nanxcorr(dT(use),pL(use),frRate,'coeff');
+%     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+%     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %
 %     else
 %     end
 %
-%     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %         corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1102,35 +1108,35 @@ end
 %
 %     use = (nonapp==1)' %& ~isnan(tR(1:length(nonapp)));
 %     if sum(use)>3
-%     [corrR lagsR]= nanxcorr(tR(use),tL(use),30,'zero');
-%     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-%     uselagsR=(lagsR>=-30& lagsR<=30);
+%     [corrR lagsR]= nanxcorr(tR(use),tL(use),frRate,'zero');
+%     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+%     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 %
 %     clear nframe
 %     nframe = min(length(phiR{useFilt(vid)}),length(phiL{useFilt(vid)}));
 %     pR=phiR{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-%     [corrL lagsL]= nanxcorr(pR(use),pL(use),30,'zero');
-%     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-%     uselagsL=(lagsL>=-30 & lagsL<=30);
+%     [corrL lagsL]= nanxcorr(pR(use),pL(use),frRate,'zero');
+%     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+%     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 %     else
 %     end
 %       % use = ~isnan(dT(1:nframe));
 %        use=appEpoch{vid}==1;
 %      if sum(use)>3 & sum(~isnan(tR(use)))>20
-%     [corrRA lagsRA]= nanxcorr(tR(use),tL(use),30,'zero');
-%     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-%     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+%     [corrRA lagsRA]= nanxcorr(tR(use),tL(use),frRate,'zero');
+%     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+%     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 %
 % %     clear nframe
 %     nframe = min(length(phiR{useFilt(vid)}),length(phiL{useFilt(vid)}));
 %     pR=phiR{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-%     [corrLA lagsLA]= nanxcorr(pR(use),pL(use),30,'zero');
-%     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-%     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+%     [corrLA lagsLA]= nanxcorr(pR(use),pL(use),frRate,'zero');
+%     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+%     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %
 %      else
 %      end
-%     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1173,36 +1179,36 @@ end
 %
 %     use = (nonapp==1)' %& ~isnan(tR(1:length(nonapp)));
 %     if sum(use)>3
-%     [corrR lagsR]= nanxcorr(tR(use),pR(use),30,'zero');
-%     plot(lagsR/30,corrR,'b');xlim([-.3 .3]);hold on;
-%     uselagsR=(lagsR>=-30& lagsR<=30);
+%     [corrR lagsR]= nanxcorr(tR(use),pR(use),frRate,'zero');
+%     plot(lagsR/frRate,corrR,'b');xlim([-.3 .3]);hold on;
+%     uselagsR=(lagsR>=-frRate& lagsR<=frRate);
 %
 %     clear nframe
 %     nframe = min(length(thetaL{useFilt(vid)}),length(phiL{useFilt(vid)}));
 %     tL=thetaL{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-%     [corrL lagsL]= nanxcorr(tL(use),pL(use),30,'zero');
-%     plot(lagsL/30,corrL,'r');xlim([-.3 .3]);
-%     uselagsL=(lagsL>=-30 & lagsL<=30);
+%     [corrL lagsL]= nanxcorr(tL(use),pL(use),frRate,'zero');
+%     plot(lagsL/frRate,corrL,'r');xlim([-.3 .3]);
+%     uselagsL=(lagsL>=-frRate & lagsL<=frRate);
 %     else
 %     end
 %     % use = ~isnan(dT(1:nframe));
 %     clear use
 %     use=appEpoch{vid}==1;
 %          if sum(use)>3 &sum(~isnan(tR(use)))>20
-%     [corrRA lagsRA]= nanxcorr(tR(use),pR(use),30,'zero');
-%     plot(lagsRA/30,corrRA,'g');xlim([-.3 .3]);hold on;
-%     uselagsRA=(lagsRA>=-30& lagsRA<=30);
+%     [corrRA lagsRA]= nanxcorr(tR(use),pR(use),frRate,'zero');
+%     plot(lagsRA/frRate,corrRA,'g');xlim([-.3 .3]);hold on;
+%     uselagsRA=(lagsRA>=-frRate& lagsRA<=frRate);
 %
 % %     clear nframe
 %     nframe = min(length(thetaL{useFilt(vid)}),length(phiL{useFilt(vid)}));
 %     tL=thetaL{useFilt(vid)}(1:nframe); pL=phiL{useFilt(vid)}(1:nframe);
-%     [corrLA lagsLA]= nanxcorr(tL(use),pL(use),30,'zero');
-%     plot(lagsLA/30,corrLA,'c');xlim([-.3 .3]);
-%     uselagsLA=(lagsLA>=-30 & lagsLA<=30);
+%     [corrLA lagsLA]= nanxcorr(tL(use),pL(use),frRate,'zero');
+%     plot(lagsLA/frRate,corrLA,'c');xlim([-.3 .3]);
+%     uselagsLA=(lagsLA>=-frRate & lagsLA<=frRate);
 %          else
 %          end
 %
-%     if sum(uselagsR)==61 & sum(uselagsL)==61 &sum(uselagsRA)==61 & sum(uselagsLA)==61
+%     if sum(uselagsR)==(2*(frRate)+window) & sum(uselagsL)==(2*(frRate)+window) &sum(uselagsRA)==(2*(frRate)+window) & sum(uselagsLA)==(2*(frRate)+window)
 %         corrRAll(vid,:)=corrR(uselagsR); corrLAll(vid,:)=corrL(uselagsL);
 %        corrRAAll(vid,:)=corrRA(uselagsRA); corrLAAll(vid,:)=corrLA(uselagsLA);
 %
@@ -1576,7 +1582,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Analyzed_021520_a','.pdf')
+    filen=sprintf('%s',ani,'Deinterlaced_051820_analyzed_c','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1584,5 +1590,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Analyzed_Analyzed_021520_a','.mat');
+afilename=sprintf('%s',ani,'Deinterlaced_051820_analyzed_c','.mat');
 save(fullfile(pSname, afilename))
