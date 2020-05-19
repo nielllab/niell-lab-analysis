@@ -1,13 +1,20 @@
 close all; clear all;
 %    load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 % load('ACC_AllAnimals_021520_a.mat')
-load('DEINTER_Analyzed_AllAnimals_051820.mat');
+% load('DEINTER_Analyzed_AllAnimals_051820.mat');
 %load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat')
+
+%%% NOTE: find and replace entire script deInter==0 for original dataset or ==1 for
+%%% deinterlaced - it will load the appropriate dataset and will adjust framerate
+
 deInter=1;
 if deInter
-    frRate=60;   
+    frRate=60; 
+    load('DEINTER_Analyzed_AllAnimals_051820.mat');
+
 else
     frRate=30;
+    load('ACC_AllAnimals_021520_a.mat')
 end
 
 savePDF=1;
@@ -57,12 +64,15 @@ end
 clear mouseSp appEpoch useData appTime thetaHead vid runningSmooth
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 % load('ACC_AllAnimals_021520_a.mat')
-load('DEINTER_Analyzed_AllAnimals_051820.mat');
+% load('DEINTER_Analyzed_AllAnimals_051820.mat');
 deInter=1;
 if deInter
-    frRate=60;   
+    frRate=60; 
+    load('DEINTER_Analyzed_AllAnimals_051820.mat');
+
 else
     frRate=30;
+    load('ACC_AllAnimals_021520_a.mat')
 end
 
 savePDF=1;
@@ -566,6 +576,25 @@ gaze=(.5*(tR+tL))+hT'; %gaze=gaze-nanmean(gaze);
 % ylim([-60 60]); title('acc tilt');
 % legend('roll','tilt');
 % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+%%
+
+clear all
+
+% %  load('ACC_AllAnimals_021520_a.mat')
+% load('DEINTER_Analyzed_AllAnimals_051820.mat');
+
+deInter=1;
+if deInter
+    frRate=60; 
+    load('DEINTER_Analyzed_AllAnimals_051820.mat');
+
+else
+    frRate=30;
+    load('ACC_AllAnimals_021520_a.mat')
+end
+savePDF=1;
+psfilename = 'C:\analysisPS_B.ps';
+
 
 % Figure 2D: scatter plot of R vs L eye yaw to show conv/divergence
 clear numPts congMv convMv divMv Rmv Lmv
@@ -655,7 +684,7 @@ for c=0:1
         useN= appEpoch{vid}(1:nframe)==c;
         nBins=-90:5:90
         if sum(useN)>4
-            vgHist = (hist(vg(useN),nBins))/sum(useN&~isnan(vg)');
+            vgHist = (hist(vg(useN),nBins))/sum(useN&~isnan(vg));
         else
             vgHist=NaN;
         end
@@ -932,15 +961,15 @@ for vid=1:length(useData)
     nframe=min(nframe, length(d_Theta{useData(vid)}));
     mnEye =.5*(Rtheta{useData(vid)}(1:nframe)+Ltheta{useData(vid)}(1:nframe));
     mnEye=mnEye-nanmean(mnEye);
-    mnEyeAll=[mnEyeAll mnEye'];
+    mnEyeAll=[mnEyeAll mnEye];
     
     mnEyeD =.5*(dRtheta{useData(vid)}(1:nframe)+dLtheta{useData(vid)}(1:nframe));
     mnEyeD=mnEyeD-nanmean(mnEyeD);
-    d_mnEyeAll=[d_mnEyeAll mnEyeD'];
+    d_mnEyeAll=[d_mnEyeAll mnEyeD];
     
     mnPhi =.5*(dRphi{useData(vid)}(1:nframe)+dLphi{useData(vid)}(1:nframe));
     mnPhi=mnPhi-nanmean(mnPhi);
-    mnPhiAll=[mnPhiAll mnPhi'];
+    mnPhiAll=[mnPhiAll mnPhi];
     dHead=d_Theta{useData(vid)}(1:nframe); dHead=dHead-nanmean(dHead);
     allDLChead = [allDLChead dHead'];
     speed =mouseSp{useData(vid)}(1:nframe);
@@ -1052,8 +1081,8 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
         runFilt = medfilt1(speed,(frRate/2));
         
         running =runFilt>=1;
-        mnEyes(vid,1) = nanmedian((.5*(dRtheta{useData(vid)}(running==0,:)+ dLtheta{useData(vid)}(running==0,:))));
-        mnEyes(vid,2) = nanmedian((.5*(dRtheta{useData(vid)}(running==1,:)+ dLtheta{useData(vid)}(running==1,:))));
+        mnEyes(vid,1) = nanmedian((.5*(dRtheta{useData(vid)}(:,running==0)+ dLtheta{useData(vid)}(:,running==0))));
+        mnEyes(vid,2) = nanmedian((.5*(dRtheta{useData(vid)}(:,running==1)+ dLtheta{useData(vid)}(:,running==1))));
 
     end
     
@@ -1455,8 +1484,8 @@ for i = 1:length(appEpoch)
     mainApp = appPts(newApp(longest)  : endApp(longest)); %%% approach time only
     %%% add 2 secs on either side
     try
-        appStart = max(appPts(newApp(longest))-60,1); appOffset = appPts(newApp(longest))-appStart;
-        appEnd = min(appPts(endApp(longest))+60,length(app)); endOffset = appPts(endApp(longest))-appStart;
+        appStart = max(appPts(newApp(longest))-(2*frRate),1); appOffset = appPts(newApp(longest))-appStart;
+        appEnd = min(appPts(endApp(longest))+(2*frRate),length(app)); endOffset = appPts(endApp(longest))-appStart;
         appRange = appStart  : appEnd;
     catch
         appRange = appPts(newApp(longest)  : endApp(longest));
@@ -1476,7 +1505,7 @@ for i = 1:length(appEpoch)
     %hthApp = mod(hthApp + 180,360)-180;
     
     
-    gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+    gzApp = hthApp' +0.5*( rth(appRange) +lth(appRange))';
     mnEyeApp =  0.5*(rth(appRange) +lth(appRange))';
     
     dhthnonan = acc_dth;
@@ -1512,7 +1541,7 @@ for i = 1:length(appEpoch)
         
         %%% assign clusters based on previous GMM; clust for analysis is set
         %%% above
-        newData=[g3(1:end-1)' ; 0.5*(drth+dlth)'];
+        newData=[g3(1:end-1)' ; 0.5*(drth+dlth)];
         idx2=cluster(gm,newData');
         
         %%% cluster based on gaussian fit for compensatory points
@@ -1549,12 +1578,16 @@ for i = 1:length(appEpoch)
         clear saccHead saccEye saccApp saccVid saccAz saccTh saccEyeRaw timetoApp
         
         %%% grab traces around saccades;
+        if deInter
+        buffer = 20;
+        else
         buffer = 10;
+        end
         ns =0;
         
         
         azAll = [azAll; azdeg'];
-        eyeAll = [eyeAll; mnEyeTh];
+        eyeAll = [eyeAll; mnEyeTh'];
         g3All = [g3All; g3];
         appAll = [appAll; [app 0]' ];
         spAll = [spAll; mouseSp{vid}'];
@@ -1655,7 +1688,7 @@ for i = 1:length(appEpoch)
         title('az to cricket')
         xlim([0 max(length(appRange),1)]);
         
-        gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+        gzApp = hthApp' +0.5*( rth(appRange) +lth(appRange))';
         % subplot(6,1,6);
         subplot(4,1,3)
         hold on
@@ -1707,7 +1740,7 @@ for i = 1:length(appEpoch)
         %         end
         
         subplot(4,1,4)
-        gzApp = hthApp +0.5*( rth(appRange) +lth(appRange))';
+        gzApp = hthApp' +0.5*( rth(appRange) +lth(appRange))';
         plot((gzApp'),'k','LineWidth',2); hold on;
         sacc = find(idx2(appRange)==clust);
         sacc = sacc(sacc<length(gzApp)-1); %%% make sure we don't run off the end of the data
@@ -2177,12 +2210,16 @@ plot(nanmedian(abs(saccAzAll(:,apps)),2),'b','Linewidth',2)
 hold on
 plot(nanmedian(abs(eyeAz(:,apps)),2),'g','Linewidth',2)
 legend('head azimuth','gaze azimuth')
+if deInter
+    xlim([15 30]);
+end
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 
 %%% head and eye relative to cricket (azimuth) on all saccades
 figure
-trange = 3:17
+ trange = 3:17
+%  trange=3:32
 hold on
 data = nanmedian(abs(eyeAz(:,apps)),2);
 err = nanstd(abs(eyeAz(:,apps)),[],2) ./ sqrt(sum(~isnan(eyeAz(:,apps)),2))
@@ -2511,7 +2548,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
     
-    filen=sprintf('%s','PaperFigs_deinter_051820_d','.pdf')
+    filen=sprintf('%s','PaperFigs_deinter_051820_TEST_d','.pdf')
     %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     
     pdfilename=fullfile(pSname,filen);
