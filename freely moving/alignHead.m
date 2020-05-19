@@ -56,11 +56,11 @@ nframes = 50
 clear p pts
 figure
 for i = 1:nPts
-    p(i,:) = data(:,i*3+1);
-    pts(i,:,:) = data(:,(i-1)*3 + (2:3))';
+    p(i,:) = data(:,i*3+1);  %%% likelihood
+    pts(i,:,:) = data(:,(i-1)*3 + (2:3))';  %%% x/y
     pts(i,2,:) = 1200 - pts(i,2,:); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
     ptsRaw(i,:,:) = pts(i,:,:); %%% keep a clean version before inserting NaNs
-    pts(i,:,p(i,:)<p_thresh)=NaN;
+    pts(i,:,p(i,:)<p_thresh)=NaN;   % set low likelihood to NaN
     subplot(2,4,i)
     plot(squeeze(pts(i,1,:)),squeeze(pts(i,2,:)),'*b'); hold on; axis square
     try
@@ -158,7 +158,7 @@ for t = 1:size(centroid,2)
         theta = linspace(0,2*pi,101); theta = theta(1:end-1);
         for i = 1:length(theta)
             c_rot = c*rotmat(theta(i))';  %%% rotation
-            d(i) = sum((ref(:) -c_rot(:)).^2);  %%% rms error
+            d(i) = sum((ref(:) -c_rot(:)).^2);  %%% rms error (root mean square)
         end
         
         %%% find smallest error, and rotate by this amount
@@ -470,6 +470,7 @@ subplot(2,3,4)
 plot(dTheta)
 title('head angular velocity'); ylabel('rad/frame'); xlabel('frame')
 
+%%% head velocity
 vx = diff(cent(1,:)); vy = diff(cent(2,:));
 filt = ones(3,1); filt =filt/sum(filt);
 vx = conv(vx,filt,'same'); vy = conv(vy,filt,'same');
