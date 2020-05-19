@@ -1,4 +1,4 @@
-function data = getAcc(accname,psfilename)
+function data = getAcc(accname,framerate,psfilename)
 filterWin = 5; %%% timepoints to median filter over for acceleration
 
 data=dlmread(accname)
@@ -31,8 +31,10 @@ acc = asind(filtAcc);
 % acc(~good) = NaN;
 acc(:,2)=-acc(:,2); %flip sign of channel 2 & 3
 acc(:,3)=-acc(:,3); %flip sign of channel 2 & 3
-% gyro = ((data(:,5:7))-2.5)*400*(pi/180); % convert voltage from gyro channels to degrees
-gyro = (data(:,5:7)-2.5)*12.5; %convert voltage from gyro channels to degrees
+gyro = (data(:,5:7)-2.5)*(400/framerate); 
+%convert voltage from gyro channels to degrees: Full range (5V) is set to  +/- 1000deg/sec. So ...
+%5V = 2000deg/sec, 1V = 400deg/sec, so 1V = (400/framerate) deg/frame.
+%So multiply gyro data by 400/framerate
 
 %%% get data (columns 2-7)
 

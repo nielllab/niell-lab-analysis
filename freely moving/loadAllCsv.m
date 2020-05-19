@@ -102,7 +102,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     %%% read in accelerometer data
     if doAcc
         accname = strcat(sname{1},'_','acc','_',sname{3},'_',date,'_',clipnum,'.dat')
-        accData = getAcc(accname,psfilename);
+        accData = getAcc(accname,frRate,psfilename);
         Data(j).accTS=accData.accTs;  %%% timestamps
         Data(j).rawAcc=accData.rawAcc;   %%% raw voltages
         Data(j).accTrace =accData.accTrace;  %%% voltages converted to m/sec2 and rad/sec
