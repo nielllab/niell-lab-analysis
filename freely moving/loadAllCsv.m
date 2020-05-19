@@ -112,6 +112,10 @@ for j=1:length(fileList) %%% loop over all top camera files
     Data(j).xR=640 - Data(j).DataR(:,2:3:end); %%% flip right eye since this camera is reversed in bonsai
     Data(j).yR=480 - Data(j).DataR(:,3:3:end); %%% put into cartesian coords (origin lower left), instead of image coords (origin in upper left corner)
     Data(j).RLikelihood=Data(j).DataR(:,4:3:end);
+    if deInter     %%% one pixel shift with deinterlacing
+        Data(j).yR(2:2:end) = Data(j).yR(2:2:end) -1;
+    end
+    
     [Data(j).Rthetaraw,Data(j).Rphiraw,Data(j).EllipseParamsR,Data(j).ExtraParamsR,Data(j).goodReye, Data(j).ngoodR, Data(j).RcalR,Data(j).RcalM, Data(j).scaleR] = EyeCameraCalc1(length(Data(j).xR(:,1)), Data(j).xR,Data(j).yR, Data(j).RLikelihood,psfilename)
     Data(j).XRcentraw=Data(j).EllipseParamsR(:,1);  Data(j).YRcentraw=Data(j).EllipseParamsR(:,2);
     
@@ -123,6 +127,10 @@ for j=1:length(fileList) %%% loop over all top camera files
     Data(j).xL= Data(j).DataL(:,2:3:end);
     Data(j).yL=480 - Data(j).DataL(:,3:3:end);    %%% put into cartesian coordinates, instead of image (origin in upper left corner)
     Data(j).LLikelihood=Data(j).DataL(:,4:3:end);
+       if deInter     %%% one pixel shift with deinterlacing
+        Data(j).yL(2:2:end) = Data(j).yL(2:2:end) -1;
+    end
+      
     [Data(j).Lthetaraw,Data(j).Lphiraw,Data(j).EllipseParamsL,Data(j).ExtraParamsL,Data(j).goodLeye,Data(j).ngoodL,Data(j).LcalR,Data(j).LcalM, Data(j).scaleL] = EyeCameraCalc1(length(Data(j).xL(:,1)),Data(j).xL,Data(j).yL, Data(j).LLikelihood,psfilename)
     Data(j).XLcentraw=Data(j).EllipseParamsL(:,1);  Data(j).YLcentraw=Data(j).EllipseParamsL(:,2);
     
@@ -314,6 +322,8 @@ for j=1:length(fileList) %%% loop over all top camera files
             eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
             plot(Data(j).accShift(1:end-1,6),eyes,'.');
             axis equal; axis([-20 20 -20 20]); xlabel('gyro 3 interp'); ylabel('mean eye dtheta');
+            hold on
+            plot([-20 20],[20 -20])
             
             figure
             plot(-frRate:frRate,nanxcorr(Data(j).accShift(1:end-1,6),eyes,frRate,'coeff'));
