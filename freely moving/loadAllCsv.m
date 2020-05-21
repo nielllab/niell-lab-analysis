@@ -167,10 +167,10 @@ for j=1:length(fileList) %%% loop over all top camera files
             RTSnew(1:2:end) = RTS;  %%% switch order of deinterlaced frames
             RTSnew(2:2:end) = RTS- 0.5*median(diff(RTS));
             
-            %             RTSnew(2:2:end) = RTS;
-            %             RTSnew(1:2:end) = RTS- 0.5*median(diff(RTS));
-            %             RTSnew(2:2:end) = RTS  +0.5*median(diff(RTS)) ;
-            %             RTSnew(1:2:end) = RTS ;
+            %%% alternate shift for deinterlaced frame
+%             RTSnew(1:2:end) = RTS + 0.5*median(diff(RTS));  %%% switch order of deinterlaced frames
+%             RTSnew(2:2:end) = RTS;
+           
             RTS = RTSnew;
         end
         
@@ -186,10 +186,10 @@ for j=1:length(fileList) %%% loop over all top camera files
             LTSnew(1:2:end) = LTS;  % switch order of deinterlaced frames
             LTSnew(2:2:end) = LTS- 0.5*median(diff(LTS));
             
-            %             LTSnew(2:2:end) = LTS;
-            %             LTSnew(1:2:end) = LTS- 0.5*median(diff(LTS));
-            %             LTSnew(2:2:end) = LTS  +0.5*median(diff(LTS)) ;
-            %             LTSnew(1:2:end) = LTS ;
+            %%% alternate shift for deinterlaced frame
+%             LTSnew(1:2:end) = LTS + 0.5*median(diff(LTS));  %%% switch order of deinterlaced frames
+%             LTSnew(2:2:end) = LTS;
+
             LTS = LTSnew;
         end
         startL = LTS(1);
