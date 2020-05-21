@@ -1,7 +1,7 @@
 clear all; close all;
 dbstop if error
 % load('J462a_AlACCSessions_120619_a.mat');
-load('J475c_DEINTERLACED_051620_interpNan.mat');
+load('J475c_DEINTERLACED_051920_a.mat');
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 deInter=1;
 
@@ -91,14 +91,18 @@ for i=1:length(Data)
     YLcent{i,:} =Data(i).YLcent;
     RRad{i,:}=Data(i).RRad;
     LRad{i,:}=Data(i).LRad;
-    
-    goodR{i,:}=Data(i).goodReye; %1=all 8pts above likelihood .95
+%     
+%     if deInter
+%     goodR{:,i}=Data(i).goodReye;
+%     else
+%     goodR{i,:}=Data(i).goodReye; %1=all 8pts above likelihood .95
+%     end
     Rngood{i,:}=Data(i).ngoodR; % num good DLC pts
     Rcc(i)=Data(i).RcalR;
     Rslope(i)=Data(i).RcalM;
     Rscale(i)=Data(i).scaleR;
     
-    goodL{i,:}=Data(i).goodLeye;
+%     goodL{i,:}=Data(i).goodLeye;
     Lngood{i,:}=Data(i).ngoodL;
     Lcc(i)=Data(i).LcalR;
     Lslope(i)=Data(i).LcalM;
@@ -339,46 +343,46 @@ end
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
-figure
-subplot(2,3,1)
-[corr lags]=(nanxcorr(allRoll,dlcPhi,frRate,'coeff'));
-plot(lags,corr);axis square
-title('acc roll, phi');
-ylim([-1 1]);
+% figure
+% subplot(2,3,1)
+% [corr lags]=(nanxcorr(allRoll,dlcPhi,frRate,'coeff'));
+% plot(lags,corr);axis square
+% title('acc roll, phi');
+% ylim([-1 1]);
 
-subplot(2,3,2)
-[corr lags]=(nanxcorr(allTilt,dlcVerg,frRate,'coeff'));
-plot(lags,corr)
-axis square;ylim([-1 1]);
-title('acc tilt, vergence');
-
-subplot(2,3,3)
-[corr lags]=(nanxcorr(allYaw,dlcVerg,frRate,'coeff'));
-plot(lags, corr)
-axis square;ylim([-1 1]);
-title('acc yaw, vergence');
-
-subplot(2,3,4)
-[corr lags]=(nanxcorr(allGyro1,dlcDverg,frRate,'coeff'));
-plot(lags, corr)
-axis square;ylim([-1 1]);
-title('gyro1, d vergence');
-
-subplot(2,3,5)
-[corr lags]=(nanxcorr(allGyro2,dlcDphi,frRate,'coeff'));
-plot(lags, corr)
-axis square;ylim([-1 1]);
-title('gyro2, d phi');
-
-subplot(2,3,6)
-[corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),frRate,'coeff'));
-plot(lags, corr); hold on;
+% subplot(2,3,2)
+% [corr lags]=(nanxcorr(allTilt,dlcVerg,frRate,'coeff'));
+% plot(lags,corr)
+% axis square;ylim([-1 1]);
+% title('acc tilt, vergence');
+% 
+% subplot(2,3,3)
+% [corr lags]=(nanxcorr(allYaw,dlcVerg,frRate,'coeff'));
+% plot(lags, corr)
+% axis square;ylim([-1 1]);
+% title('acc yaw, vergence');
+% 
+% subplot(2,3,4)
+% [corr lags]=(nanxcorr(allGyro1,dlcDverg,frRate,'coeff'));
+% plot(lags, corr)
+% axis square;ylim([-1 1]);
+% title('gyro1, d vergence');
+% 
+% subplot(2,3,5)
+% [corr lags]=(nanxcorr(allGyro2,dlcDphi,frRate,'coeff'));
+% plot(lags, corr)
+% axis square;ylim([-1 1]);
+% title('gyro2, d phi');
+% 
+% subplot(2,3,6)
 % [corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),frRate,'coeff'));
-% plot(lags, corr,'r')
-axis square;ylim([-1 1]);
-title('gyro ch 3,d head')
-
-if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% plot(lags, corr); hold on;
+% % [corr lags]=(nanxcorr(allGyro3(test==0),dlcDhth(test==0),frRate,'coeff'));
+% % plot(lags, corr,'r')
+% axis square;ylim([-1 1]);
+% title('gyro ch 3,d head')
+% 
+% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 %%
 
 
@@ -1582,7 +1586,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Deinterlaced_051820_analyzed_c','.pdf')
+    filen=sprintf('%s',ani,'Deinterlaced_052020_analyzed','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1590,5 +1594,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Deinterlaced_051820_analyzed_c','.mat');
+afilename=sprintf('%s',ani,'Deinterlaced_052020_analyzed','.mat');
 save(fullfile(pSname, afilename))

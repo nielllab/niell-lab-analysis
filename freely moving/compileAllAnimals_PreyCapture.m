@@ -6,7 +6,7 @@ if deInter
 else frRate=30; 
 end
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS_all.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -20,9 +20,9 @@ analyzeAcc = input('use acc data? (1==yes) ');
 
 % for acc sessions
 if analyzeAcc==1
-    files={'J462aDeinterlaced_051820_analyzed_c.mat','J462bDeinterlaced_051820_analyzed_c.mat','J462cDeinterlaced_051820_analyzed_c.mat',...
-        'J463bDeinterlaced_051820_analyzed_c.mat','J463cDeinterlaced_051820_analyzed_c.mat','J470cDeinterlaced_051820_analyzed_c.mat',...
-        'J475cDeinterlaced_051820_analyzed_c.mat'};
+    files={'J462aDeinterlaced_052020_analyzed.mat','J462bDeinterlaced_052020_analyzed.mat','J462cDeinterlaced_052020_analyzed.mat',...
+        'J463bDeinterlaced_052020_analyzed.mat','J463cDeinterlaced_052020_analyzed.mat','J470cDeinterlaced_052020_analyzed.mat',...
+        'J475cDeinterlaced_052020_analyzed.mat'};
 
 %         files={'J462aAnalyzed_010819_ACCSessions_a','J462bAnalyzed_010819_ACCSessions_a.mat','J462cAnalyzed_010819_ACCSessions_a',...
 %         'J463bAnalyzed_010819_ACCSessions_a','J463cAnalyzed_010819_ACCSessions_a','J470cAnalyzed_010819_ACCSessions_a',...
@@ -1923,7 +1923,7 @@ legend('non approach','approach')
 
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
-    filen=sprintf('%s','ORIGINAL_Analyzed_AllAnimals_051920_TEST','.pdf')
+    filen=sprintf('%s','DEINTERLACED_Analyzed_AllAnimals_052020','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1932,6 +1932,6 @@ else
 end
 
 
-afilename=sprintf('%s','ORIGINAL_Analyzed_AllAnimals_051920_TEST','.mat')
+afilename=sprintf('%s','DEINTERLACED_Analyzed_AllAnimals_052020','.mat')
 save(fullfile(pSname, afilename))
 

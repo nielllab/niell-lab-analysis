@@ -10,8 +10,8 @@ close all; clear all;
 deInter=1;
 if deInter
     frRate=60; 
-    load('DEINTER_Analyzed_AllAnimals_051820.mat');
-
+%     load('DEINTER_Analyzed_AllAnimals_051820.mat');
+load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
 else
     frRate=30;
     load('ACC_AllAnimals_021520_a.mat')
@@ -68,7 +68,9 @@ clear mouseSp appEpoch useData appTime thetaHead vid runningSmooth
 deInter=1;
 if deInter
     frRate=60; 
-    load('DEINTER_Analyzed_AllAnimals_051820.mat');
+%     load('DEINTER_Analyzed_AllAnimals_051820.mat');
+load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+
 
 else
     frRate=30;
@@ -586,7 +588,9 @@ clear all
 deInter=1;
 if deInter
     frRate=60; 
-    load('DEINTER_Analyzed_AllAnimals_051820.mat');
+%     load('DEINTER_Analyzed_AllAnimals_051820.mat');
+load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+
 
 else
     frRate=30;
@@ -2240,8 +2244,8 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 
 %%% head and eye relative to cricket (azimuth) on all saccades
 figure
- trange = 3:17
-%  trange=3:32
+%  trange = 3:17
+ trange=3:32
 hold on
 data = nanmedian(abs(eyeAz(:,apps)),2);
 err = nanstd(abs(eyeAz(:,apps)),[],2) ./ sqrt(sum(~isnan(eyeAz(:,apps)),2))
@@ -2570,7 +2574,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
     
-    filen=sprintf('%s','PaperFigs_deinter_051820_TEST_d','.pdf')
+    filen=sprintf('%s','PaperFigs_deinter_052020','.pdf')
     %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     
     pdfilename=fullfile(pSname,filen);
