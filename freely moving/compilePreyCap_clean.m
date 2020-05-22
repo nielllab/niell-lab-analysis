@@ -1,7 +1,9 @@
 clear all; close all;
 dbstop if error
 % load('J462a_AlACCSessions_120619_a.mat');
-load('J475c_DEINTERLACED_051920_a.mat');
+% load('J475c_DEINTERLACED_051920_a.mat');
+% load('J475c_DEINTERLACED_052120_shiftTest.mat')
+load('J475c_DEINTERLACED_052120_alternate_shiftTest.mat')
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 deInter=1;
 
@@ -11,7 +13,7 @@ else
 frRate=30; 
 end
 
-savePDF=1;
+savePDF=0;
 if savePDF
     psfilename = 'C:\analysisPS3.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end

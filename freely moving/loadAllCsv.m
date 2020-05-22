@@ -1,7 +1,7 @@
 %do for each animal, all sessions? or all animals together?
 %clear all; close all
 set(groot,'defaultFigureVisible','on') %disable figure plotting
-savePDF=1; dbstop if error
+savePDF=0; dbstop if error
 % pname={'T:\PreyCaptureNew\Cohort3\deInterlaceTest\'};
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110119\Approach\';
 % pname={'T:\PreyCaptureNew\Cohort3\J463b(white)\110719\Approach\'};
@@ -165,11 +165,11 @@ for j=1:length(fileList) %%% loop over all top camera files
         if deInter
             RTSnew = zeros(size(RTS,1)*2,1);
             RTSnew(1:2:end) = RTS;  %%% switch order of deinterlaced frames
-            RTSnew(2:2:end) = RTS- 0.5*median(diff(RTS));
+            RTSnew(2:2:end) = RTS - 0.5*median(diff(RTS));
             
             %%% alternate shift for deinterlaced frame
-%             RTSnew(1:2:end) = RTS + 0.5*median(diff(RTS));  %%% switch order of deinterlaced frames
-%             RTSnew(2:2:end) = RTS;
+            RTSnew(1:2:end) = RTS + 0.5*median(diff(RTS));  %%% switch order of deinterlaced frames
+            RTSnew(2:2:end) = RTS;
            
             RTS = RTSnew;
         end
@@ -187,8 +187,8 @@ for j=1:length(fileList) %%% loop over all top camera files
             LTSnew(2:2:end) = LTS- 0.5*median(diff(LTS));
             
             %%% alternate shift for deinterlaced frame
-%             LTSnew(1:2:end) = LTS + 0.5*median(diff(LTS));  %%% switch order of deinterlaced frames
-%             LTSnew(2:2:end) = LTS;
+            LTSnew(1:2:end) = LTS + 0.5*median(diff(LTS));  %%% switch order of deinterlaced frames
+            LTSnew(2:2:end) = LTS;
 
             LTS = LTSnew;
         end
@@ -390,7 +390,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_DEINTERLACED_051920_a','.mat')
+afilename=sprintf('%s',ani,'_DEINTERLACED_052120_alternate_shiftTest','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))
