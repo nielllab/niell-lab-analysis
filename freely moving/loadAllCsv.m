@@ -164,12 +164,16 @@ for j=1:length(fileList) %%% loop over all top camera files
         RTS= RTS(:,1)*60*60 + RTS(:,2)*60 + RTS(:,3);
         if deInter
             RTSnew = zeros(size(RTS,1)*2,1);
-            RTSnew(1:2:end) = RTS;  %%% switch order of deinterlaced frames
-            RTSnew(2:2:end) = RTS - 0.5*median(diff(RTS));
+%             RTSnew(1:2:end) = RTS;  %%% switch order of deinterlaced frames
+%             RTSnew(2:2:end) = RTS - 0.5*median(diff(RTS));
             
-            %%% alternate shift for deinterlaced frame
-            RTSnew(1:2:end) = RTS + 0.5*median(diff(RTS));  %%% switch order of deinterlaced frames
-            RTSnew(2:2:end) = RTS;
+            RTSnew(1:2:end) = RTS  + 0.25*median(diff(RTS));  %%% switch order of deinterlaced frames
+            RTSnew(2:2:end) = RTS - 0.25*median(diff(RTS));
+ 
+            
+%             %%% alternate shift for deinterlaced frame
+%             RTSnew(1:2:end) = RTS + 0.5*median(diff(RTS));  %%% switch order of deinterlaced frames
+%             RTSnew(2:2:end) = RTS;
            
             RTS = RTSnew;
         end
@@ -183,12 +187,15 @@ for j=1:length(fileList) %%% loop over all top camera files
         LTS= LTS(:,1)*60*60 + LTS(:,2)*60 + LTS(:,3);
         if deInter
             LTSnew = zeros(size(LTS,1)*2,1);
-            LTSnew(1:2:end) = LTS;  % switch order of deinterlaced frames
-            LTSnew(2:2:end) = LTS- 0.5*median(diff(LTS));
+%             LTSnew(1:2:end) = LTS;  % switch order of deinterlaced frames
+%             LTSnew(2:2:end) = LTS- 0.5*median(diff(LTS));
+%             
+             LTSnew(1:2:end) = LTS + 0.25*median(diff(LTS));;  % switch order of deinterlaced frames
+            LTSnew(2:2:end) = LTS- 0.25*median(diff(LTS));
             
-            %%% alternate shift for deinterlaced frame
-            LTSnew(1:2:end) = LTS + 0.5*median(diff(LTS));  %%% switch order of deinterlaced frames
-            LTSnew(2:2:end) = LTS;
+%             %%% alternate shift for deinterlaced frame
+%             LTSnew(1:2:end) = LTS + 0.5*median(diff(LTS));  %%% switch order of deinterlaced frames
+%             LTSnew(2:2:end) = LTS;
 
             LTS = LTSnew;
         end
@@ -320,10 +327,25 @@ for j=1:length(fileList) %%% loop over all top camera files
             
             figure
             eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
-            plot(Data(j).accShift(1:end-1,6),eyes,'.');
+            plot(Data(j).accShift(2:end,6),eyes,'.');
             axis equal; axis([-20 20 -20 20]); xlabel('gyro 3 interp'); ylabel('mean eye dtheta');
             hold on
             plot([-20 20],[20 -20])
+            title(sprintf('trial %d',j));
+            
+            if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
+        close(gcf)
+            
+            figure
+            eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
+            hold on; plot(-Data(j).accShift(1:end-1,6)); plot(eyes);
+            legend('neg gyro3 interp','diff mnEye')
+            xlim([0 180]);   title(sprintf('trial %d',j));
+
+            
+            if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
+        close(gcf)
+     
             
             figure
             plot(-frRate:frRate,nanxcorr(Data(j).accShift(1:end-1,6),eyes,frRate,'coeff'));
