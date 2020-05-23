@@ -167,6 +167,8 @@ for j=1:length(fileList) %%% loop over all top camera files
 %             RTSnew(1:2:end) = RTS;  %%% switch order of deinterlaced frames
 %             RTSnew(2:2:end) = RTS - 0.5*median(diff(RTS));
             
+            %%% shift each deinterlacted frame by 0.5 frame period
+            %%% forward/back relative to timestamp
             RTSnew(1:2:end) = RTS  + 0.25*median(diff(RTS));  %%% switch order of deinterlaced frames
             RTSnew(2:2:end) = RTS - 0.25*median(diff(RTS));
  
@@ -190,6 +192,9 @@ for j=1:length(fileList) %%% loop over all top camera files
 %             LTSnew(1:2:end) = LTS;  % switch order of deinterlaced frames
 %             LTSnew(2:2:end) = LTS- 0.5*median(diff(LTS));
 %             
+
+ %%% shift each deinterlacted frame by 0.5 frame period
+            %%% forward/back relative to timestamp
              LTSnew(1:2:end) = LTS + 0.25*median(diff(LTS));;  % switch order of deinterlaced frames
             LTSnew(2:2:end) = LTS- 0.25*median(diff(LTS));
             
@@ -333,14 +338,14 @@ for j=1:length(fileList) %%% loop over all top camera files
             plot([-20 20],[20 -20])
             title(sprintf('trial %d',j));
             
-            if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
-        close(gcf)
+           % if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
+        
             
             figure
             eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
             hold on; plot(-Data(j).accShift(1:end-1,6)); plot(eyes);
             legend('neg gyro3 interp','diff mnEye')
-            xlim([0 180]);   title(sprintf('trial %d',j));
+            %xlim([0 180]);   title(sprintf('trial %d',j));
 
             
             if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
