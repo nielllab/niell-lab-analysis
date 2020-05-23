@@ -338,8 +338,8 @@ for j=1:length(fileList) %%% loop over all top camera files
             plot([-20 20],[20 -20])
             title(sprintf('trial %d',j));
             
-           % if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
-        
+            if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
+        close(gcf)
             
             figure
             eyes = 0.5*(diff(Data(j).Rtheta)  + diff(Data(j).Ltheta));
@@ -356,6 +356,8 @@ for j=1:length(fileList) %%% loop over all top camera files
             plot(-frRate:frRate,nanxcorr(Data(j).accShift(1:end-1,6),eyes,frRate,'coeff'));
             axis([-frRate frRate -1 1]); hold on; plot([0 0],[-1 1],'r');
             title('acc3 vs mean dEye xcorr');
+                   if savePDF,set(gcf, 'PaperPositionMode', 'auto');print('-dpsc',psfilename,'-append');   end
+        close(gcf)
             
         end
         
