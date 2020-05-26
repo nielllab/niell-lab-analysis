@@ -79,6 +79,7 @@ else
     load('ACC_AllAnimals_021520_a.mat')
 end
 
+
 savePDF=0;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
@@ -1427,9 +1428,28 @@ figure
 plot(nBins,pfit)
 prob = interp1(nBins,pfit,dGz);
 clust1 = rand(size(prob))<prob;
+
+%%% super simple! threshold on gaze velocity
+dGzV = dGz*frRate;
+gzThresh = 180;  %% was 180
+clust1 = abs(dGzV)>gzThresh;
 figure
 gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),clust1); axis equal
 title('clutering based on gaussian fit to dGz')
+
+
+gzVall = (gyro3All + d_mnEyeAll)*frRate;
+figure
+[gzHist bins] = hist(gzVall,-600:5:600);
+semilogy(bins,gzHist/nansum(gzHist));
+xlabel('gaze velocity deg/sec'); hold on
+sPts = bins>=gzThresh;
+semilogy(bins(sPts),gzHist(sPts)/nansum(gzHist),'r');
+sPts = bins<=-gzThresh;
+semilogy(bins(sPts),gzHist(sPts)/nansum(gzHist),'r');
+plot([gzThresh gzThresh],[0.0001 0.1],'r:')
+plot(-[gzThresh gzThresh],[0.0001 0.1],'r:')
+
 
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -1684,6 +1704,10 @@ for i = 1:length(appEpoch)
 %         idx2=~clust1;
 %         clust = 1;
         
+    %%% threshold on gaze velocity
+    dGazeV = dGaze*frRate;
+        idx2 = abs(dGazeV)>=gzThresh;
+        clust = 1;
         
         
         propCVid(i,2,1) = length(find(~app' & idx2==clust))./(length(newData(~app))); %non-comp.
