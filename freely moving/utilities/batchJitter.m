@@ -25,3 +25,5 @@ end
 sprintf('x jitter = %0.2f +/- %0.2f pix',nanmean(jitter(:,1)), nanstd(jitter(:,1)))
 sprintf('y jitter = %0.2f +/- %0.2f pix',nanmean(jitter(:,2)), nanstd(jitter(:,2)))
 
+[f p] = uiputfile('*.mat','save results');
+save(fullfile(p,f),'jitter','trace')
