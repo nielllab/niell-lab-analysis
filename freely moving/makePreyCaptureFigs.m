@@ -1,4 +1,4 @@
-% close all;
+close all;
 clear all;
 %    load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 % load('ACC_AllAnimals_021520_a.mat')
@@ -12,13 +12,14 @@ deInter=1;
 if deInter
     frRate=60;
     %     load('DEINTER_Analyzed_AllAnimals_051820.mat');
-    load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+%     load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+   load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
 else
     frRate=30;
     load('ACC_AllAnimals_021520_a.mat')
 end
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS_B.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -70,15 +71,15 @@ deInter=1;
 if deInter
     frRate=60;
     %     load('DEINTER_Analyzed_AllAnimals_051820.mat');
-    load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
-    
+%     load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+  load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
     
 else
     frRate=30;
     load('ACC_AllAnimals_021520_a.mat')
 end
 
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
     appTime=appEpoch{vid};
@@ -154,19 +155,16 @@ barweb(comp,err)
 
 %%% old ex trace
 % Figure 1G: gyro & DLC traces
-% range=1:100;
-if deInter
-    useVid=105;
-else useVid=105;
-end
-for vid=useVid
+
+for vid=105
     
     use=appEpoch{vid};
     if deInter
         range=2*1148:2*1655
         tR=Rtheta{useData(vid)}(:,range)-nanmedian(Rtheta{useData(vid)}(:,range));
-        tL=Ltheta{useData(vid)}(:,range)-nanmedian(Ltheta{useData(vid)}(:,range))
-        mnEye=.5*(tR+tL);
+        tL=Ltheta{useData(vid)}(:,range)-nanmedian(Ltheta{useData(vid)}(:,range));
+        tR=interpNan(tR,10,'linear'); tL=interpNan(tL,10,'linear');
+        mnEye=.5*(tR+tL); mnEye=interpNan(mnEye,10,'linear');
         headTh=thetaHead{useData(vid)}(:,range)-nanmedian(thetaHead{useData(vid)}(:,range));
     else
         range =1148:1655
@@ -176,7 +174,7 @@ for vid=useVid
         
     end
     headTh=thetaHead{useData(vid)}(:,range)-nanmedian(thetaHead{useData(vid)}(:,range));
-    eyeVelocity=diff(mnEye)/frRate;
+    eyeVelocity=interpNan(diff(mnEye), 10,'linear');
     
     figure
     subplot(7,1,1)
@@ -399,7 +397,9 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 clear all
 % load('ACC_deInter_Analyzed_AllAnimals_011520_a.mat') %original preprint
 % used first deinterlaced dataset for example - video 40
-load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+% load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+
 
 deInter=1;
 if deInter
@@ -407,7 +407,7 @@ if deInter
 else
     frRate=30;
 end
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 
@@ -520,7 +520,7 @@ if deInter
 else
     frRate=30;
 end
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 % Figure 2D: example of convergence during approach
@@ -630,9 +630,9 @@ deInter=1;
 if deInter
     frRate=60;
     %     load('DEINTER_Analyzed_AllAnimals_051820.mat');
-    load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
-    
-    
+%load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
+   load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+  
 else
     frRate=30;
     load('ACC_AllAnimals_021520_a.mat')
@@ -643,7 +643,7 @@ gyroBias=nanmedian(gyro3All)
 gyro3All = gyro3All-gyroBias;
 
 
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 
@@ -1432,6 +1432,8 @@ figure
 gscatter(gyro3All(appAll==1)-gyroBias,d_mnEyeAll(appAll==1),idx); axis equal; hold on
 title('all approach pts only')
 xlim([-25 25]); ylim([-25 25]); hold on; plot([-25 25],[25 -25],'g')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 
 % use ~clust1
 % fullData=[gyro3All;d_mnEyeAll]%;mnEyeAll];
@@ -1485,7 +1487,7 @@ ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; sacc
 %%% non-app example is vid 114, approach example is vid 48
 allS = 0; clear dheadStable eyeStable dgzStable %%% store out stable periods
 %for i = 87%1:length(appEpoch)
-for i = 6
+for i = 1:length(appEpoch)
     vid = useData(i);
     %%% get approaches
     app = appEpoch{i};
@@ -1657,7 +1659,11 @@ for i = 6
         
         %%% assign clusters based on previous GMM; clust for analysis is set
         %%% above
+        if deInter
         newData=[g3(1:end-1)' ; 0.5*(drth+dlth)];
+        else
+          newData=[g3(1:end-1) ; 0.5*(drth+dlth)];
+        end
         idx2=cluster(gm,newData');
         
         %%% cluster based on gaussian fit for compensatory points
@@ -1665,11 +1671,11 @@ for i = 6
         %%% see where new data lands on this (using interp1) then use
         %%% random probability to assign each one
         
-        prob = interp1(nBins,pfit,dGaze);
-        clust1 = rand(size(prob))<prob;
-        clust1(isnan(dGaze))=1;
-        idx2=~clust1;
-        clust = 1;
+%         prob = interp1(nBins,pfit,dGaze);
+%         clust1 = rand(size(prob))<prob;
+%         clust1(isnan(dGaze))=1;
+%         idx2=~clust1;
+%         clust = 1;
         
         
         
@@ -2707,7 +2713,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
     
-    filen=sprintf('%s','PaperFigs_deinter_052120','.pdf')
+    filen=sprintf('%s','PaperFigs_deinter_052320_halfShift_a_GaussFit','.pdf')
     %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     
     pdfilename=fullfile(pSname,filen);

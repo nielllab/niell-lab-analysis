@@ -3,7 +3,7 @@ dbstop if error
 % load('J462a_AlACCSessions_120619_a.mat');
 % load('J475c_DEINTERLACED_051920_a.mat');
 % load('J475c_DEINTERLACED_052120_shiftTest.mat')
-load('J475c_DEINTERLACED_052120_alternate_shiftTest.mat')
+load('J475c_DEINTERLACED_052320_halfShift.mat')
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 deInter=1;
 
@@ -13,7 +13,7 @@ else
 frRate=30; 
 end
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS3.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -1588,7 +1588,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Deinterlaced_052020_analyzed','.pdf')
+    filen=sprintf('%s',ani,'Deinterlaced_052320_analyzed_halfShift','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1596,5 +1596,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Deinterlaced_052020_analyzed','.mat');
+afilename=sprintf('%s',ani,'Deinterlaced_052320_analyzed_halfShift','.mat');
 save(fullfile(pSname, afilename))
