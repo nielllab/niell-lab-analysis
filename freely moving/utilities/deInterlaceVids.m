@@ -11,7 +11,7 @@ function fnew = deInterlaceVids(movieFilename);
 %%%
 %%% cmn 2019
 
-doubleSize=1;
+doubleSize=0;
 
 %%% read in original movie file if not passed as argument
 if ~exist('movieFilename','var');
