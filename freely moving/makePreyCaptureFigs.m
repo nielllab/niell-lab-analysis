@@ -463,55 +463,55 @@ psfilename = 'C:\analysisPS_B.ps';
 % plot(y); hold on; % 30 second segment
 %
 %
-close all
-range=4000:4600
-% range=2000:2300
-for vid = 40%(useData)
-
-   if length(Rtheta{useData(vid)})>=100
-% tr=medfilt1(Rtheta{useData(vid)}(range,:),10);
-% pr=medfilt1(Rphi{useData(vid)}(range,:),10);
-%
-% tl=medfilt1(Ltheta{useData(vid)}(range,:),10);
-% pl=medfilt1(Lphi{useData(vid)}(range,:),10);
-
-tr=Rtheta{useData(vid)}(range,:); tr=tr-nanmean(tr);
-pr=Rphi{useData(vid)}(range,:); pr=pr-nanmean(pr);
-
-tl=(Ltheta{useData(vid)}(range,:));tl=tl-nanmean(tl);
-pl=(Lphi{useData(vid)}(range,:)); pl=pl-nanmean(pl);
-
-filtwin=gausswin(10);
-tr=filter(filtwin,5,tr);
-pr=filter(filtwin,5,pr);
-tl=filter(filtwin,5,tl);
-pl=filter(filtwin,5,pl);
-
-figure(1)
-subplot(1,2,1)
-plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
-figure(2)
-subplot(1,2,2)
-plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
-title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
-
-for i =1:length(tl)
-    figure(1)
-subplot(1,2,1)
-plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-subplot(1,2,2)
-figure(2)
- plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
-
-end
-%
-%
-%
-% % % % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
-% % % %
-    end
-end
+% close all
+% range=4000:4600
+% % range=2000:2300
+% for vid = 40%(useData)
+% 
+%    if length(Rtheta{useData(vid)})>=100
+% % tr=medfilt1(Rtheta{useData(vid)}(range,:),10);
+% % pr=medfilt1(Rphi{useData(vid)}(range,:),10);
+% %
+% % tl=medfilt1(Ltheta{useData(vid)}(range,:),10);
+% % pl=medfilt1(Lphi{useData(vid)}(range,:),10);
+% 
+% tr=Rtheta{useData(vid)}(range,:); tr=tr-nanmean(tr);
+% pr=Rphi{useData(vid)}(range,:); pr=pr-nanmean(pr);
+% 
+% tl=(Ltheta{useData(vid)}(range,:));tl=tl-nanmean(tl);
+% pl=(Lphi{useData(vid)}(range,:)); pl=pl-nanmean(pl);
+% 
+% filtwin=gausswin(10);
+% tr=filter(filtwin,5,tr);
+% pr=filter(filtwin,5,pr);
+% tl=filter(filtwin,5,tl);
+% pl=filter(filtwin,5,pl);
+% 
+% figure(1)
+% subplot(1,2,1)
+% plot(tr-nanmean(tr),pr-nanmean(pr),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+% title('right eye'); xlim([-23 23]); ylim([-23 23]); colormap jet; colorbar
+% figure(2)
+% subplot(1,2,2)
+% plot(tl-nanmean(tl),pl-nanmean(pl),'k'); axis square; hold on; xlabel('eye theta'); ylabel('eye phi'); axis equal
+% title('left eye'); xlim([-23 23]); ylim([-23 23]); colorbar
+% 
+% for i =1:length(tl)
+%     figure(1)
+% subplot(1,2,1)
+% plot(tr(i)-nanmean(tr),pr(i)-nanmean(pr),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% subplot(1,2,2)
+% figure(2)
+%  plot(tl(i)-nanmean(tl),pl(i)-nanmean(pl),'.','Markersize',15,'Color', cmapVar(i,1,length(tl),jet)); axis square; hold on
+% 
+% end
+% %
+% %
+% %
+% % % % % if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+% % % % %
+%     end
+% end
 %%
 
 clear all
@@ -873,7 +873,7 @@ for c=0:1
     use = find(appAll==c);
     figure(1)
     plot(tiltAll(use(1:60:end)),vergDlc(use(1:60:end)),'.'); axis equal; hold on;
-    pts(c+1,1)=length(use(1:60:end))
+    pts(c+1,1)=length(use(1:60:end));
     pts(c+1,2)=length(use(1:60:end))/length(tiltAll);
     xlabel('acc tilt'); ylabel('eye vergence');
     ylim([-90 90]); xlim([-90 90]);
@@ -1078,8 +1078,7 @@ for c=0:1
 end
 
 
-
-% [h pB]=kstest2(binoc(:,1),binoc(:,2))
+%  [h pB]=kstest2(binoc(:,1),binoc(:,2))
 [h pdB]=ttest2(deltaBinoc(:,1),deltaBinoc(:,2))
 
 for vid=1:length(useData)
@@ -1434,8 +1433,13 @@ dGzV = dGz*frRate;
 gzThresh = 180;  %% was 180
 clust1 = abs(dGzV)>gzThresh;
 figure
-gscatter(gyro3All(appAll==1),d_mnEyeAll(appAll==1),clust1); axis equal
+useTime=find(appAll==1) % subset op pts - used in paper
+gscatter(gyro3All(useTime(1:10:end)),d_mnEyeAll(useTime(1:10:end)),clust1(1:10:end)); axis equal
+% useGyro=gyro3All(appAll==1); useEyes=d_mnEyeAll(appAll==1);
 title('clutering based on gaussian fit to dGz')
+xlim([-15 15]); ylim([-15 15]);
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+
 
 
 gzVall = (gyro3All + d_mnEyeAll)*frRate;
@@ -1449,7 +1453,6 @@ sPts = bins<=-gzThresh;
 semilogy(bins(sPts),gzHist(sPts)/nansum(gzHist),'r');
 plot([gzThresh gzThresh],[0.0001 0.1],'r:')
 plot(-[gzThresh gzThresh],[0.0001 0.1],'r:')
-
 
 
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
@@ -1513,7 +1516,6 @@ ns = 0; saccHeadAll = []; saccEyeAll = []; saccAppAll = []; saccVidAll= []; sacc
 
 %%% non-app example is vid 114, approach example is vid 48
 allS = 0; clear dheadStable eyeStable dgzStable %%% store out stable periods
-%for i = 87%1:length(appEpoch)
 for i = 1:length(appEpoch)
     vid = useData(i);
     %%% get approaches
@@ -1691,7 +1693,7 @@ for i = 1:length(appEpoch)
         else
           newData=[g3(1:end-1) ; 0.5*(drth+dlth)];
         end
-        idx2=cluster(gm,newData');
+    %    idx2=cluster(gm,newData');
         
         %%% cluster based on gaussian fit for compensatory points
         %%% probability distribution from fit is define by pfit (from above)
@@ -1705,7 +1707,7 @@ for i = 1:length(appEpoch)
 %         clust = 1;
         
     %%% threshold on gaze velocity
-    dGazeV = dGaze*frRate;
+     dGazeV = dGaze*frRate;
         idx2 = abs(dGazeV)>=gzThresh;
         clust = 1;
         
@@ -2197,6 +2199,7 @@ title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDur
 hbins = 1:2:150;
 figure
 shadedErrorBar(hbins/30,h/sum(h),sqrt(h)/sum(h)); xlabel('secs'); ylabel('fraction');
+hold on; plot([nanmedian(stabDurGood)/frRate nanmedian(stabDurGood)/frRate], [0 .14])
 title(sprintf('fixation duration median = %0.2f +/- %0.2f sec',nanmedian(stabDurGood)/frRate,(1/frRate)*std(stabDurGood)/sqrt(length(stabDurGood)))); xlim([0 2]);
 
 
@@ -2404,11 +2407,11 @@ if deInter
 end
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-
+%%
 %%% head and eye relative to cricket (azimuth) on all saccades
 figure
 if deInter
-    trange=3:32
+    trange=3:34
 else
     trange=3:17;
 end
@@ -2426,12 +2429,13 @@ shadedErrorBar(t,data,err,'b')
 legend('head azimuth','gaze azimuth');
 ylim([7.5 27.5]);
 xlim([t(1)-1/(2*frRate) t(end)+1/(2*frRate)]);
+plot([t(19) t(19)],[7 28])
 axis square
 xlabel('secs');
 ylabel('azimuth to cricket (deg)')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
-
+%%
 %%% plot for all 4 clusters
 figure
 for i =1:4
@@ -2529,10 +2533,10 @@ headz=nanmedian(abs(saccAzAll(postSaccT,apps)),1);
 
 %%% plot errorbar
 figure
-barweb([eyeOffset; headOffset]',[eyeOffsetErr; headOffsetErr]')
+barweb([headOffset; eyeOffset]',[headOffsetErr; eyeOffsetErr]')
 ylabel('azimuth to cricket (deg)');
 set(gca,'Xticklabel',{'pre saccade','post saccade'})
-legend('gaze','head')
+legend('head','gaze')
 if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 %%
@@ -2544,7 +2548,7 @@ for vid=1:length(useData)
     nframe = min(nframe,length(appEpoch{vid}));
     useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
     
-    azC=(az{useData(vid)});
+    azC=-(az{useData(vid)});
     % hT=d_Theta{useData(vid)}; hT=hT-nanmedian(hT);
     
     hT=(accelChannels{useData(vid)}(:,6))-gyroBias;
@@ -2572,7 +2576,7 @@ errRA= nanstd(corrRAAll)/(sqrt(length(corrRAAll)));
 
 shadedErrorBar(1:size(corrRAll,2),nanmean(corrRAll,1),errR,'-b',1); hold on
 shadedErrorBar(1:size(corrRAAll,2),nanmean(corrRAAll,1),errRA,'-g',1); hold on
-plot([frRate+1,frRate+1],[1,-1],'--','Color', [.5 .5 .5]); xlim([1 2*frRate+1]); axis square; ylim([-.5 .2]);
+plot([frRate+1,frRate+1],[1,-1],'--','Color', [.5 .5 .5]); xlim([1 2*frRate+1]); axis square; ylim([-.2 .5]);
 
 clear L
 L(1) = plot(nan, nan, 'b-');
@@ -2592,7 +2596,7 @@ for vid=1:length(useData)
     nframe = min(nframe,length(appEpoch{vid}));
     useN=appEpoch{vid}(1:nframe)==0; use=appEpoch{vid}(1:nframe)==1;
     
-    azC=(az{useData(vid)});
+    azC=-(az{useData(vid)});
     hT=(accelChannels{useData(vid)}(:,6))-gyroBias;
     
     mnEye=.5*(Rtheta{useData(vid)}+Ltheta{useData(vid)}); mnEye=mnEye-nanmedian(mnEye);
@@ -2744,7 +2748,7 @@ if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfil
 if savePDF
     pSname='T:\PreyCaptureAnalysis\Data\';
     
-    filen=sprintf('%s','PaperFigs_deinter_052320_halfShift_a_GaussFit','.pdf')
+    filen=sprintf('%s','PaperFigs_deinter_052620_halfShift_a_gazeVelocity','.pdf')
     %     filen=sprintf('%s','PaperFigs_011519_c','.pdf')
     
     pdfilename=fullfile(pSname,filen);
