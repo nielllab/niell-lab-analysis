@@ -3,7 +3,7 @@ dbstop if error
 % load('J462a_AlACCSessions_120619_a.mat');
 % load('J475c_DEINTERLACED_051920_a.mat');
 % load('J475c_DEINTERLACED_052120_shiftTest.mat')
-load('J475c_DEINTERLACED_052320_halfShift.mat')
+load('J470c_DEINTERLACED_061120_halfShift_a.mat')
 set(groot,'defaultFigureVisible','on') %disable figure plotting
 deInter=1;
 
@@ -1588,7 +1588,7 @@ end
 %%
 pSname='T:\PreyCaptureAnalysis\Data\';
 if savePDF
-    filen=sprintf('%s',ani,'Deinterlaced_052320_analyzed_halfShift','.pdf')
+    filen=sprintf('%s',ani,'Deinterlaced_061120_analyzed_halfShift_a','.pdf')
     pdfilename=fullfile(pSname,filen);
     dos(['ps2pdf ' psfilename ' ' pdfilename]);
     delete(psfilename);
@@ -1596,5 +1596,5 @@ if savePDF
 end
 
 
-afilename=sprintf('%s',ani,'Deinterlaced_052320_analyzed_halfShift','.mat');
+afilename=sprintf('%s',ani,'Deinterlaced_061120_analyzed_halfShift_a','.mat');
 save(fullfile(pSname, afilename))

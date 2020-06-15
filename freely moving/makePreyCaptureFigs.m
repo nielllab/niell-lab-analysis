@@ -13,13 +13,14 @@ if deInter
     frRate=60;
     %     load('DEINTER_Analyzed_AllAnimals_051820.mat');
 %     load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
-   load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+%    load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+   load('DEINTERLACED_Analyzed_AllAnimals_060220_halfShift.mat')
 else
     frRate=30;
     load('ACC_AllAnimals_021520_a.mat')
 end
 
-savePDF=0;
+savePDF=1;
 if savePDF
     psfilename = 'C:\analysisPS_B.ps';
     if exist(psfilename,'file')==2;delete(psfilename);end
@@ -72,15 +73,16 @@ if deInter
     frRate=60;
     %     load('DEINTER_Analyzed_AllAnimals_051820.mat');
 %     load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
-  load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
-    
+%   load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+       load('DEINTERLACED_Analyzed_AllAnimals_060220_halfShift.mat')
+
 else
     frRate=30;
     load('ACC_AllAnimals_021520_a.mat')
 end
 
 
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 for vid=1:length(useData)
     appTime=appEpoch{vid};
@@ -408,7 +410,7 @@ if deInter
 else
     frRate=30;
 end
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 % 
 % 
@@ -517,7 +519,9 @@ psfilename = 'C:\analysisPS_B.ps';
 clear all
 % load('ACCAnalyzed_AllAnimals_010820_noDLS.mat')
 % %  load('ACC_AllAnimals_021520_a.mat')
-load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+% load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+   load('DEINTERLACED_Analyzed_AllAnimals_060220_halfShift.mat')
+
 
 deInter=1;
 if deInter
@@ -525,7 +529,7 @@ if deInter
 else
     frRate=30;
 end
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 % Figure 2D: example of convergence during approach
@@ -637,7 +641,9 @@ if deInter
     frRate=60;
     %     load('DEINTER_Analyzed_AllAnimals_051820.mat');
 %load('DEINTERLACED_Analyzed_AllAnimals_052020.mat')
-   load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+%    load('DEINTERLACED_Analyzed_AllAnimals_052320_halfShift.mat')
+      load('DEINTERLACED_Analyzed_AllAnimals_060220_halfShift.mat')
+
   
 else
     frRate=30;
@@ -649,7 +655,7 @@ gyroBias=nanmedian(gyro3All)
 gyro3All = gyro3All-gyroBias;
 
 
-savePDF=0;
+savePDF=1;
 psfilename = 'C:\analysisPS_B.ps';
 
 

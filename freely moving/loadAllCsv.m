@@ -81,7 +81,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
     
     %%% extract headpoints and cricket points from top camera
-    aligned = alignHead(fname,8,0,psfilename,.90, .95)
+    aligned = alignHead(fname,8,0,psfilename,.995, .95)
     Data(j).mouse_xyRaw=aligned.mouse_xy;
     Data(j).mouseVRaw=aligned.mouseSp;
     Data(j).thetaRaw=aligned.theta;
@@ -419,7 +419,7 @@ for j=1:length(fileList) %%% loop over all top camera files
     
 end
 pFile='T:\PreyCaptureAnalysis\Data\';
-afilename=sprintf('%s',ani,'_DEINTERLACED_052320_halfShift','.mat')
+afilename=sprintf('%s',ani,'_DEINTERLACED_061120_halfShift_a','.mat')
 %afilename=sprintf('%s',ani,'_121019','.mat')
 
 save(fullfile(pFile, afilename))
