@@ -5,7 +5,7 @@ dHead_thresh = 1;  %%% rotation threshold, deg/frame
 
 close all
 clear n
-for i = length(appEpoch) %[1:82 84:length(appEpoch)]
+for i =1: length(appEpoch) %[1:82 84:length(appEpoch)]
     vid = useData(i);
     
     %%% get head rotaiton and speed
@@ -30,12 +30,18 @@ for i = length(appEpoch) %[1:82 84:length(appEpoch)]
    phiStability(i,2)=nanstd(dRphi{vid}(stationary));
 end
 
+fullStability=[stability(:,1);stability(:,2)];
 %%% how many stationary timepoints needed to include video in average?
 nthresh = 30;
 
 sprintf('data from %d videos with >%d frames',sum(n>nthresh),nthresh)
 sprintf('left theta = %0.2f +/- %0.2f',mean(stability(n>nthresh,1),1),std(stability(n>nthresh,1),[],1))
 sprintf('right theta = %0.2f +/- %0.2f',mean(stability(n>nthresh,2),1),std(stability(n>nthresh,2),[],1))
+
+sprintf('mean theta = %0.2f +/- %0.2f',nanmean(fullStability(n>nthresh,:)),std(fullStability(n>nthresh,1),[],1))
+
+
+
 
 sprintf('data from %d videos with >%d frames',sum(n>nthresh),nthresh)
 sprintf('left phi = %0.2f +/- %0.2f',mean(phiStability(n>nthresh,1),1),std(phiStability(n>nthresh,1),[],1))

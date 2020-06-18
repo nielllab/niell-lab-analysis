@@ -209,8 +209,12 @@ for vid=105
     plot(accelChannels{useData(vid)}(range,2)-nanmedian(accelChannels{useData(vid)}(range,2)));
     xlim([1 length(range)])
 end
-
-
+% %%%RMS err for dTheta measures
+% for vid=1:length(useData)
+% 
+% comp(vid,:)=nanmean(d_Theta{useData(vid)}-accelChannels{useData(vid)}(:,6));
+% end
+% nanstd(comp)
 
 % figure
 % range=350:830;
@@ -227,18 +231,18 @@ end
 % difference)
 
 
-% figure
-% clear h
-% subplot(1,2,1)
-% plot(gyro3All(1:100:end),dlcDhth(1:100:end),'.'); xlabel('gyro yaw'); ylabel('DLC yaw')
-% axis equal; xlim([-20 20]); ylim([-20 20]);
-% bins=-20:2:20
-% h=hist(gyro3All-dlcDhth,bins)
-% subplot(1,2,2)
-% plot(bins,h/length(gyro3All)); hold on
-% xlabel('gyro - DLC (degrees');
-% suptitle('Figure 1H: DLC is good measure of head angle')
-% if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
+figure
+clear h
+subplot(1,2,1)
+plot(gyro3All(1:100:end),dlcDhth(1:100:end),'.'); xlabel('gyro yaw'); ylabel('DLC yaw')
+axis equal; xlim([-20 20]); ylim([-20 20]);
+bins=-20:2:20
+h=hist(gyro3All-dlcDhth,bins)
+subplot(1,2,2)
+plot(bins,h/length(gyro3All)); hold on
+xlabel('gyro - DLC (degrees');
+suptitle('Figure 1H: DLC is good measure of head angle')
+if savePDF, set(gcf, 'PaperPositionMode', 'auto');print('-bestfit','-dpsc',psfilename,'-append'); close(gcf); end
 
 % Figure 1I (where is the right place to put this?): head angle is directed
 % towards cricket - corr of az and change in head yaw
@@ -1198,7 +1202,7 @@ for vid=1:length(useData)
 end
 
 %%% distance to cricket histograms
-clear crickHist crickCounts crickErr crickMns crickFull
+clear crickHist crickCounts crickErr crickMns crickFull 
 for c=0:1  %%% approach vs non-approach
     for vid=1:length(useData)
         clear useN crick crickHist
