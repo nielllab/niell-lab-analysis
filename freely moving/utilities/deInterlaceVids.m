@@ -1,4 +1,4 @@
-function fnew = deInterlaceVids(movieFilename);
+function fnew = deInterlaceVids(movieFilename,doubleSize,grayscale);
 %%% De-interlace video to double framerate and remove interlacing artifact
 %%% Separates out every other line and places them into separate frames
 %%% Down-size along the other axis, to keep pixels square
@@ -11,7 +11,15 @@ function fnew = deInterlaceVids(movieFilename);
 %%%
 %%% cmn 2019
 
-doubleSize=0;
+if ~exist('doubleSize','var')
+    doubleSize = input('restore video size by interp? 0/1 :');
+end
+if ~exist('grayscale','var')
+    grayscale = input('convert to grayscale? 0/1 :');
+end
+
+% doubleSize=0;
+% grayscale = 1;
 
 %%% read in original movie file if not passed as argument
 if ~exist('movieFilename','var');
@@ -49,6 +57,17 @@ sz = [size(world,1) size(world,2)];
 world(:,:,:,1:2:end) = imresize(worldLaced(1:2:end,:,:,:),sz);
 world(:,:,:,2:2:end) = imresize(worldLaced(2:2:end,:,:,:),sz);
 
+%% make movie grayscale 
+graymov = uint8(squeeze(mean(world,3)));
+if grayscale
+    for i = 1:3
+        world(:,:,i,:) = graymov;
+    end
+end
+
+% if grayscale
+%     world = uint8(squeeze(mean(world,3)));
+% end
 
 %%% plot as troubleshooting
 % figure

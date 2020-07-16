@@ -142,7 +142,6 @@ thetad = asind((EllipseParams(:,1)-CamCent(1))*1/scale); %in deg
 phi = asind((EllipseParams(:,2)-CamCent(2))./cos(theta)*1/scale); %in deg
 
 
-
 %% calculate one example image
 i=50;
 w = EllipseParams(i,5); L=EllipseParams(i,3); l=EllipseParams(i,4); x_C=EllipseParams(i,1); y_C=EllipseParams(i,2);
