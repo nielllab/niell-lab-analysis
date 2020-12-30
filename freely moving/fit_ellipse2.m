@@ -2,6 +2,11 @@ function ellipse_t = fit_ellipse2( x,y,axis_handle )
 %
 % fit_ellipse - finds the best fit to an ellipse for the given set of points.
 %
+
+% based on  fit_ellipse by Ohad Gal (https://www.mathworks.com/matlabcentral/fileexchange/3215-fit_ellipse), MATLAB Central File Exchange.
+% modified by E. Abe (Niell lab) 2018
+
+%
 % Format:   ellipse_t = fit_ellipse( x,y,axis_handle )
 %
 % Input:    x,y         - a set of points in 2 column vectors. AT LEAST 5 points are needed !

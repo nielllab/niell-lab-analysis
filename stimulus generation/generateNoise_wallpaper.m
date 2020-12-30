@@ -3,6 +3,7 @@ function moviedata=generateNoise_xyt(maxSpatFreq,maxTempFreq,contrastSigma,durat
 %%% frequency, via inverse fourier transform
 %%% this version is specifically to make large images to use as wallpaper
 %%% in freely moving expts
+%%% e.g. generateNoise_wallpaper(0.32,10,0.5,0.25,0,0,512,6,4);
 
 %%% now with more options ...
 %%% binarize (0/1) = convert grayscale to binary, for higher contrast
