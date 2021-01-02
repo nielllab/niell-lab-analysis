@@ -77,7 +77,7 @@ end
 
 
 %%% plot number of good points
-figure
+figure  %%% add this figure to python pipeline
 subplot(2,2,3)
 plot(ngood); ylim([0 9]);
 ylabel('# good eyepoints'); title(sprintf('%0.3f good thresh %0.2f',mean(usegood),eyethresh))
@@ -124,7 +124,7 @@ CamCent=(A'*A)\(A'*b)   %%% camcent*A = EllipseParams(list,1:2)*A
 
 w= EllipseParams(:,5);
 
-figure
+figure  %%% add this figure to python pipeline
 subplot(2,2,1)
 hold on
 for i = 1:length(list);
