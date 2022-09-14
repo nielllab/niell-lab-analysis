@@ -8,5 +8,5 @@ if v<0
 elseif v>1
     v=1;
 end
-v = ceil(v*63+1);
+v = ceil(v*(size(cmap,1)-1)+1);
 cm = cmap(v,:);
